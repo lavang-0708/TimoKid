@@ -21,7 +21,7 @@ TimoKid là app Android giúp bé lớp 2 ôn thi Olympic Toán TIMO bằng các
 
 ## Năm định hướng
 
-1. **Câu hỏi là khuôn sinh câu, không phải danh sách cố định.** Với 25 câu mỗi ngày, một bộ 267 câu sẽ hết sau khoảng 11 ngày. App sinh câu mới từ khoảng 90 dạng bài có tham số và theo dõi bé theo dạng bài.
+1. **Câu hỏi là khuôn sinh câu, không phải danh sách cố định.** Với 25 câu mỗi ngày, một bộ 267 câu sẽ hết sau khoảng 11 ngày. App sinh câu mới từ 48 dạng bài có tham số và theo dõi bé theo dạng bài.
 2. **Đề 25 câu chia 5 chặng.** Mỗi chặng 5 câu ở một khu của thị trấn, xong chặng có thưởng nhỏ, bé nghỉ giữa chừng rồi làm tiếp được.
 3. **Thưởng cho nỗ lực và tiến bộ.** Không có hộp quà may rủi, không quảng cáo. Pet không ốm hay buồn khi bé nghỉ. Sai không bị trừ xu hay mất đồ.
 4. **Nội dung thêm được mà không cần cài lại app.** Đồ mới, pet mới và câu hỏi mới là các gói nội dung đẩy lên từ web admin.
@@ -52,7 +52,7 @@ App theo dõi bé theo dạng bài, ví dụ "bài cái cân" hay "đếm hình 
 ### Ngân hàng câu hỏi
 
 - 5 mảng: Tư duy lôgic, Số học / Đại số, Lý thuyết số, Hình học, Tổ hợp.
-- Khoảng 90 dạng bài, mỗi dạng có 3 mức: Dễ, Vừa, Khó. Bộ 267 câu đã soạn (`tools/question_bank/questions.json`) là mẫu của các dạng này.
+- 48 dạng bài (mỗi `form` trong `gen.py` là một dạng). Mỗi dạng hỗ trợ từ 1 đến 3 mức trong Dễ, Vừa, Khó; 17 dạng đủ cả 3 mức. Bộ 267 câu đã soạn (`tools/question_bank/questions.json`) là mẫu của các dạng này.
 - Mỗi dạng là một khuôn: đề tiếng Việt, đề tiếng Anh, từ khóa song ngữ, gợi ý, lời giải từng bước, và công thức tính đáp án. App thay số, tên và hình để ra câu mới. Đáp án luôn do code tính.
 - Câu phụ huynh nạp từ web admin là câu cố định, được gắn mảng và mức để trộn vào đề.
 
@@ -67,7 +67,7 @@ App theo dõi bé theo dạng bài, ví dụ "bài cái cân" hay "đếm hình 
 
 - Mỗi mảng có một thang ải 6 bậc, ghép mức nội dung với kiểu trả lời: bậc 1 Dễ trắc nghiệm, bậc 2 Dễ điền số, bậc 3 Vừa trắc nghiệm, bậc 4 Vừa điền số, bậc 5 Khó trắc nghiệm, bậc 6 Khó điền số. Bé lên một bậc khi đúng từ 8 trên 10 câu gần nhất, xuống một bậc khi đúng dưới 5 trên 10. Đáp án nhiễu của câu trắc nghiệm là các lỗi sai hay gặp. Bố khóa được kiểu trả lời cho từng bé trên web admin.
 - Bậc 6 là trần của lớp bé đang học, app không đẩy sang đề lớp trên.
-- Một dạng bài được tính là thành thạo khi bé đúng ngay lần đầu 4 trong 5 câu gần nhất ở mức Vừa trở lên (bậc 3 trở lên). Thành thạo là thước đo để pet lớn, mở tòa nhà và nhận sticker.
+- Một dạng bài được tính là thành thạo khi bé đúng ngay lần đầu 4 trong 5 câu gần nhất ở mức cao nhất mà dạng đó hỗ trợ, và không thấp hơn mức Vừa nếu dạng có mức Vừa. Thành thạo là thước đo để pet lớn, mở tòa nhà và nhận sticker.
 
 ### Khi bé trả lời sai
 

@@ -6,7 +6,7 @@ Muse viết code, Claude ra yêu cầu và review thay anh Điệp, anh Điệp 
 
 ## Vai trò và quy trình
 
-Mỗi nhiệm vụ trong kế hoạch có một mã (ví dụ `T1-05`) và đi qua đúng một pull request. Không ai đẩy thẳng lên nhánh `main` (ngoại lệ duy nhất: commit khởi tạo tài liệu và tài sản do Claude đẩy ngày 17/11).
+Mỗi nhiệm vụ trong kế hoạch có một mã (ví dụ `T1-05`) và đi qua đúng một pull request. Không ai đẩy thẳng code lên nhánh `main`. Ngoại lệ: Claude được đẩy thẳng thay đổi của `docs/DESIGN.md` và `docs/PLAN.md`.
 
 | Ai | Làm gì |
 | --- | --- |
@@ -37,6 +37,23 @@ Mọi báo cáo dùng đúng năm trạng thái: **Chưa bắt đầu**, **Đang
 - Không đưa bí mật (mật khẩu, khóa, chuỗi kết nối) vào code hay pull request.
 - Không thêm thư viện, dịch vụ trả phí hay quảng cáo, theo dõi người dùng.
 - Cuối mỗi pull request cập nhật `docs/HANDOVER.md`.
+
+## Làm rõ ngày 17/11 (trả lời câu hỏi của Muse)
+
+Các điểm dưới đây ghi đè mọi chỗ nói khác trong kế hoạch.
+
+| Mã | Câu hỏi | Chốt |
+| --- | --- | --- |
+| a | "Dạng bài" là gì | Dạng bài = một `form` trong `gen.py`: 48 generator. Mỗi generator khai báo các mức nó hỗ trợ và chỉ sinh câu ở các mức đó. Không tự soạn thêm mức mới trong T1-05; việc bổ sung mức là nhiệm vụ nội dung riêng của Claude. |
+| b | Dạng không có mức Khó thì thành thạo thế nào | Thành thạo = đúng ngay lần đầu 4 trong 5 câu gần nhất ở mức cao nhất mà dạng hỗ trợ, và không thấp hơn mức Vừa nếu dạng có mức Vừa. Như vậy cả 48 dạng đều thành thạo được. |
+| c | Khoảng xu và thứ tự nhân thưởng | Thứ tự: xu gốc theo bậc, rồi chia đôi làm tròn lên nếu đúng sau gợi ý, rồi nhân đôi nếu là câu ôn tập. Test nghiệm thu T1-11: bé ở bậc 3-4, sổ ôn tập trống, đúng ngay hết 25 câu, tổng phải là 120 xu. Giữ khoảng 100-130 là mục tiêu thiết kế, không phải tiêu chí test cho mọi trường hợp. |
+| d | Nghiệm thu T1-05 cho câu trắc nghiệm chọn | Với dạng `choiceOnly` (compare, weekday, parityrule): chỉ số đáp án hợp lệ, 4 lựa chọn khác nhau (hoặc đủ số lựa chọn của dạng), lựa chọn đúng khớp với hàm giải độc lập, cả VI và EN. Các kiểm tra "số dương" và "3 đáp án nhiễu" chỉ áp dụng cho câu điền số. |
+| e | Bảng dữ liệu | T1-04 tạo 7 bảng như ghi. `inventory` tạo ở T2-05, `pets` ở T2-07 (bằng migration). `families`, `messages`, `custom_questions`, `content_packs` thuộc bản 0.3 và 0.5. Ngoại lệ cột: `children` không có `child_id` (có `family_id` để trống tới bản 0.3); `settings` có `child_id` để trống cho cài đặt chung. |
+| f | Định nghĩa "đúng" và cửa sổ 10 câu | "Đúng" cho lên bậc, xuống bậc và thành thạo luôn là đúng ngay lần đầu. Xuống bậc khi số câu đúng ngay lần đầu dưới 5 trong 10. Giữ quy tắc tính lại từ 10 câu mới sau mỗi lần đổi bậc. |
+| g | Đề ngày: thiếu dạng và câu ôn tập | Thiếu dạng thì được lặp, ưu tiên lặp dạng ít gặp nhất trong 7 ngày gần đây. Câu 4 (ôn tập) dùng bậc đã lưu trong `review_queue`. Nếu dạng ôn tập trùng dạng đã có trong chặng thì giữ câu ôn tập, đổi dạng của câu kia. |
+| h | CI và phát hành | Integration test trên máy ảo tách ra workflow riêng, chạy cho pull request có thay đổi trong `app/lib/**` phần giao diện hoặc khi gắn nhãn `ui`, ngân sách 25 phút. Workflow chính (analyze, test, build APK debug) giữ dưới 15 phút. Tag phát hành do Muse tạo sau khi Claude kết luận Đạt cho nhiệm vụ nghiệm thu. Phần ký APK của T1-03 chờ anh Điệp nạp keystore; các phần khác của T1-03 làm trước. |
+| i | Điểm nhỏ | Nghiệm thu T1-01 là log chạy tay `check.py`. Menu QA mở bằng nhấn giữ 5 giây ở góc trên bên trái. `Clock` trả ngày theo múi giờ Asia/Ho_Chi_Minh. Bản 0.1 mở app vào thẳng màn Thị trấn tạm với bé mặc định. |
+| j | Môi trường build | Muse được cài Flutter SDK trong workspace của mình để chạy `flutter create`, `analyze`, unit test và widget test. Build APK và test máy ảo chạy trên GitHub Actions. |
 
 ## Quy ước kỹ thuật
 
