@@ -28,6 +28,29 @@ Muse đẩy file lên GitHub qua MCP chỉ được file text UTF-8; thử đẩ
 - Chưa có icon launcher riêng: bỏ `android:icon` khỏi `AndroidManifest.xml`, app dùng icon mặc định của hệ thống; icon thật làm ở T1-12 cùng art Thị trấn.
 - Thiếu `app/android/gradle/wrapper/gradle-wrapper.jar` (file nhị phân): `flutter build apk` chưa chạy được; T1-03 bổ sung trong CI (tải jar chuẩn Gradle 9.5.0 trong workflow rồi commit bằng git của Actions, hoặc cài Gradle hệ thống). `flutter analyze` và `flutter test` không cần jar này.
 
+## 17/11/2026 — T1-04: schema 7 bảng và cách chặn sửa/xóa lịch sử (Muse thiết kế, chờ Claude duyệt trong PR #4)
+
+DESIGN.md chỉ mô tả mỗi bảng bằng một dòng nên Muse tự thiết kế cột cụ thể, căn theo nhu cầu của T1-07 (thang ải), T1-08 (đề ngày), T1-09 (màn làm toán), T1-10 (sổ ôn tập), T1-11 (ví xu):
+
+- `children`: `id` UUID, `name`, `grade` (mặc định 2), `family_id` nullable. Không có cột `child_id` (mục (e)).
+- `attempts`: `child_id`, `form_id`, `strand`, `level` (1–3), `rung` (1–6), `answer_type` (`choice`/`number`), `correct_first_try`, `attempts_count`, `duration_ms`, `is_review`, `daily_set_id` nullable, `stage` nullable, `question_seed` nullable. `strand` lưu riêng (dù suy được từ tiền tố `form_id`) để T1-07 truy vấn theo mảng không phải tách chuỗi.
+- `skill_progress`: một bảng, hai loại dòng theo `scope`: `strand` (`key` = mã mảng, `rung` bậc 1–6, `window_started_at` mốc bắt đầu cửa sổ 10 câu sau lần đổi bậc) và `form` (`key` = `form_id`, `mastered`, `mastered_at`). Unique (`child_id`, `scope`, `key`).
+- `review_queue`: `child_id`, `form_id`, `rung` (bậc đã lưu, câu ôn tập dùng bậc này — mục (g)), `due_date`, `correct_streak` (0–3). Unique (`child_id`, `form_id`) — một dạng chỉ có một mục trong sổ.
+- `daily_sets`: `child_id`, `date` (`YYYY-MM-DD` giờ Việt Nam, dạng text), `questions` (JSON 25 câu: `formId`, `strand`, `level`, `rung`, `answerType`, `isReview`, `seed`), `stage_status` (JSON 5 trạng thái chặng), `completed`, `completed_at`. Unique (`child_id`, `date`). Không tách bảng con vì PLAN chốt đúng 7 bảng.
+- `wallet_ledger`: `child_id`, `currency` (`xu`/`gem`), `amount` có dấu (âm = trừ), `reason`, `ref_id` nullable. Số dư = `SUM(amount)` theo từng loại tiền.
+- `settings`: `child_id` nullable (null = cài đặt chung), `key`, `value` (JSON để lưu mọi kiểu). Cài đặt riêng bé được ưu tiên hơn cài đặt chung (`getEffectiveValue`).
+
+Các quyết định kèm theo:
+
+- **Chặn sửa/xóa hai bảng append-only bằng trigger SQLite** (`attempts_no_update/delete`, `wallet_ledger_no_update/delete`, `RAISE(ABORT, ...)`), tạo trong `onCreate` cùng file DB nên còn hiệu lực sau khi tắt/mở app. DAO của hai bảng này cũng không có hàm sửa/xóa — hai lớp chặn độc lập, test kiểm tra cả hai (SQL thô bị chặn, dòng còn nguyên).
+- **Commit cả file `.g.dart` sinh bởi build_runner** (`app_database.g.dart`, `daos.g.dart`): CI chưa có bước build_runner (PR #3 chưa merge) nên nếu không commit thì code trên CI không biên dịch được. Khi CI có bước build_runner thì xem lại.
+- **`Clock` không dùng gói `timezone`**: giờ Việt Nam là UTC+7 cố định, không có giờ mùa hè, nên `SystemClock` = giờ UTC + 7 giờ. Test dùng `FakeClock` (đặt/giờ trôi tay).
+- **Hồ sơ bé mặc định tên "Bé", lớp 2**: DESIGN chốt "bé tự đặt tên, app không có tên đặt sẵn" cho luồng tạo nhân vật (T2-03); tên "Bé" ở đây chỉ là chỗ giữ tạm cho bản 0.1 để màn Thị trấn và đề ngày có hồ sơ mà chạy, sẽ đổi khi có màn tạo nhân vật.
+- **Hạt giống mặc định**: bậc 1 cho cả 5 mảng; cài đặt chung `rewards` theo bảng thưởng T1-11 (`easy:2, medium:3, hard:5, stage_complete:5, daily_complete_xu:20, daily_complete_gem:1, mastery_gem:2`), `sound_enabled`/`music_enabled` = true. `ensureSeeded()` gọi lại nhiều lần an toàn.
+- **`insertOnConflictUpdate` của Drift chỉ nhắm vào khóa chính**: upsert theo unique (`child_id`, `scope`, `key`) bị lỗi `UNIQUE constraint failed` vì `id` UUID mới mỗi lần gọi; vì vậy `SkillProgressDao` tự kiểm tra rồi cập nhật (cùng cách đã dùng cho `ReviewQueue` và `Settings`). Phát hiện nhờ test rớt, đã sửa và test lại xanh.
+- **Unique trên `child_id` nullable không bắt được trùng khóa chung** (SQLite coi NULL là khác nhau): `SettingsDao.setValue` tự kiểm tra rồi cập nhật thay vì dựa vào `ON CONFLICT`.
+- **Thêm gói `uuid` (4.6.0)**: sinh id UUID v4 cho mọi dòng, gói Dart thuần, không có dịch vụ ngoài.
+
 ## 17/11/2026 — Vị trí Flutter SDK của Muse
 
 Flutter SDK stable đặt tại `~/workspace/flutter-sdk/flutter` (nằm trong workspace nên tồn tại qua các lần thay máy ảo). Dùng cho `flutter create`, `analyze`, unit test và widget test. Không dùng để build APK hay chạy máy ảo — hai việc đó qua GitHub Actions. Người quyết: Claude (mục (j) ở trên).

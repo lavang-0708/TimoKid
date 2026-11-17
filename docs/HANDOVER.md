@@ -1,17 +1,22 @@
 # HANDOVER — TimoKid
 
-Cập nhật cuối: 17/11/2026 (nhiệm vụ T1-02, nhánh `task/T1-02-khung-app`).
+Cập nhật cuối: 17/11/2026 (nhiệm vụ T1-04, nhánh `task/T1-04-db`).
 
 ## Trạng thái hiện tại
 
-- `main` đang ở commit `c0eca20` — PLAN.md đã có mục "Làm rõ ngày 17/11" (a–j), ghi đè mọi chỗ khác trong kế hoạch.
-- T1-01 **Chờ merge**: PR #1 (https://github.com/lavang-0708/TimoKid/pull/1) đã được Claude review Đạt. Nhánh T1-02 này tách từ `main` trước khi PR #1 merge nên mang theo lại các file của T1-01; rebase sau khi PR #1 merge.
-- T1-02 **Đang làm**: khung app Flutter (package `vn.timokid.app`, 3 màn trống, mở đầu vào Thị trấn). PR: #2 (https://github.com/lavang-0708/TimoKid/pull/2).
-- Các nhiệm vụ còn lại của bản 0.1 (T1-03 đến T1-14): **Chưa bắt đầu**.
+- `main` đang ở commit `04dfe35` — PR #1 (T1-01) và PR #2 (T1-02) đã merge.
+- T1-01 **Xong**, T1-02 **Xong** (khung app Flutter, package `vn.timokid.app`, 3 màn trống, mở đầu vào Thị trấn).
+- T1-03 **Chờ xác nhận**: PR #3 (https://github.com/lavang-0708/TimoKid/pull/3) — CI và phát hành APK. CI chính đã xanh, APK debug đúng `vn.timokid.app`; integration test máy ảo đang chạy lại sau khi Claude sửa (build APK trước, cache AVD, API 30, `--use-application-binary`). Nhánh T1-04 này tách từ `main` trước khi PR #3 merge nên chưa có CI; rebase sau khi PR #3 vào `main`.
+- T1-04 **Đang làm**: Drift với 7 bảng, hồ sơ bé mặc định lớp 2, test trên DB trong bộ nhớ + test tắt/mở lại app. PR: (điền số PR sau khi mở).
+- Các nhiệm vụ còn lại của bản 0.1 (T1-05 đến T1-14): **Chưa bắt đầu**. T1-05 làm song song với T1-04 trên nhánh riêng.
 
 ## Điểm cần biết khi tiếp tục
 
-- **Muse không đẩy được file nhị phân lên GitHub qua MCP** (kênh push-files chỉ nhận file text UTF-8; thử đẩy base64 qua `push_files` thì file lên sai dạng text). Vì vậy T1-02 có 3 chỗ làm khác thường, ghi trong `docs/DECISIONS.md`: (1) ảnh golden nhúng base64 trong `app/test/goldens/golden_data.dart`, test tự giải mã ra PNG trước khi so sánh; (2) chưa có icon launcher riêng — `AndroidManifest.xml` bỏ `android:icon`, app dùng icon mặc định của hệ thống, icon thật làm ở T1-12; (3) thiếu `app/android/gradle/wrapper/gradle-wrapper.jar` nên `flutter build apk` chưa chạy được — T1-03 bổ sung trong CI (tải jar chuẩn của Gradle 9.5.0 trong workflow rồi commit bằng git của Actions, hoặc cài Gradle hệ thống). `flutter analyze` và `flutter test` vẫn chạy đủ trên máy Muse.
+- **Muse không đẩy được file nhị phân lên GitHub qua MCP** (kênh push-files chỉ nhận file text UTF-8; thử đẩy base64 qua `push_files` thì file lên sai dạng text). Vì vậy T1-02 có 2 chỗ làm khác thường, ghi trong `docs/DECISIONS.md`: (1) ảnh golden nhúng base64 trong `app/test/goldens/golden_data.dart`, test tự giải mã ra PNG trước khi so sánh; (2) chưa có icon launcher riêng — `AndroidManifest.xml` bỏ `android:icon`, app dùng icon mặc định của hệ thống, icon thật làm ở T1-12.
+- **Gradle wrapper tự sinh, không cần commit jar**: `flutter build apk` tự copy `gradle-wrapper.jar` từ cache SDK khi thiếu (đã xác minh trong mã flutter_tools ở T1-03). T1-03 không tải hay commit jar.
+- **Muse không đẩy được file trong `.github/workflows/`** (GitHub App không có quyền `workflows`, lỗi 403). 3 file workflow của T1-03 do Claude commit giúp bằng git. T1-04 không có file workflow.
+- **Database T1-04**: Drift 2.35.4 + drift_flutter 0.3.1, schema v1, 7 bảng (`children`, `attempts`, `skill_progress`, `review_queue`, `daily_sets`, `wallet_ledger`, `settings`). File sinh bởi build_runner (`app_database.g.dart`, `daos.g.dart`) được commit cùng code vì CI chưa có bước build_runner. Chi tiết schema và các quyết định xem `docs/DECISIONS.md` (mục 17/11/2026 — T1-04).
+- **Clock**: mọi code lấy thời gian qua lớp `Clock` (`lib/core/time/clock.dart`); giờ Việt Nam = UTC+7 cố định, không cần gói `timezone`. Test dùng `FakeClock`.
 - Flutter SDK của Muse: `~/workspace/flutter-sdk/flutter`, bản 3.50.0 stable, Dart 3.14.0. Build APK và máy ảo chỉ qua GitHub Actions (T1-03).
 
 ## Cách build và chạy test
@@ -24,7 +29,8 @@ Cập nhật cuối: 17/11/2026 (nhiệm vụ T1-02, nhánh `task/T1-02-khung-ap
   ```
 
 - Flutter SDK của Muse nằm ở `~/workspace/flutter-sdk/flutter` (bản stable, cài theo mục (j) trong PLAN). Chạy `flutter analyze`, unit test và widget test local; build APK và test máy ảo chạy trên GitHub Actions.
-- Bản 0.1 chưa có code app; `app/` mới là thư mục rỗng (giữ bằng `.gitkeep`, T1-02 sẽ xóa khi chạy `flutter create`).
+- Test database (`app/test/database_test.dart`) chạy bằng `flutter test` trên máy Muse, không cần Android SDK: dùng `NativeDatabase.memory()` và DB file tạm, nhờ máy có sẵn `libsqlite3.so.0`.
+- Sau khi sửa bảng Drift phải chạy lại `dart run build_runner build` để sinh lại file `.g.dart`, rồi commit cả file sinh.
 
 ## Điểm cần biết khi tiếp tục
 
