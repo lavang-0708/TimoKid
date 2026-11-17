@@ -33,7 +33,7 @@ jobs:
               - 'app/integration_test/**'
 
   emulator:
-    name: Integration test trên Android API 34
+    name: Integration test trên Android API 30
     needs: filter
     if: needs.filter.outputs.ui == 'true' || contains(github.event.pull_request.labels.*.name, 'ui')
     runs-on: ubuntu-latest
@@ -63,17 +63,43 @@ jobs:
         working-directory: app
         run: flutter pub get
 
+      # Build APK test trước khi bật máy ảo, để Gradle không chạy trong lúc máy ảo chờ.
+      - name: Build APK cho integration test
+        working-directory: app
+        run: flutter build apk --debug --target integration_test/app_test.dart
+
+      - name: Cache máy ảo (AVD)
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-api30-x86_64-v1
+
+      - name: Tạo AVD và snapshot để cache
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: default
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Đã tạo snapshot AVD."
+
       - name: Chạy integration test
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
+          api-level: 30
           arch: x86_64
-          target: google_apis
-          profile: pixel_6
+          target: default
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           working-directory: app
-          script: flutter drive --driver test_driver/integration_test.dart --target integration_test/app_test.dart
+          script: flutter drive --driver test_driver/integration_test.dart --target integration_test/app_test.dart --use-application-binary build/app/outputs/flutter-apk/app-debug.apk
 
       - uses: actions/upload-artifact@v4
         if: always()
