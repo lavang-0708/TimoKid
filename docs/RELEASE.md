@@ -47,7 +47,7 @@ keystore này nữa.** Không commit file keystore hay `key.properties` lên rep
    git push origin v0.1.0
    ```
 3. Chờ workflow `Release` chạy xong (tab **Actions** của repo), rồi vào
-   **Releases** tải file `app-release.apk` về cài lên máy.
+   **Releases** tải file `TimoKid-vX.Y.Z.apk` về cài lên máy.
 
 Bản thử đầu tiên sau khi nạp secrets sẽ dùng tag `v0.0.1`.
 

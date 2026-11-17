@@ -1,0 +1,80 @@
+# Integration test trên máy ảo Android, tách riêng khỏi CI chính.
+# Chạy khi PR đổi app/lib/** hoặc app/integration_test/**, hoặc khi PR có nhãn "ui".
+# Ngân sách: 25 phút.
+name: Integration test (máy ảo)
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, labeled]
+
+concurrency:
+  group: integration-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  filter:
+    name: Có cần chạy không
+    runs-on: ubuntu-latest
+    outputs:
+      ui: ${{ steps.changes.outputs.ui }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            ui:
+              - 'app/lib/**'
+              - 'app/integration_test/**'
+
+  emulator:
+    name: Integration test trên Android API 34
+    needs: filter
+    if: needs.filter.outputs.ui == 'true' || contains(github.event.pull_request.labels.*.name, 'ui')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bật KVM cho máy ảo
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.50.0
+          channel: stable
+          cache: true
+
+      - name: flutter pub get
+        working-directory: app
+        run: flutter pub get
+
+      - name: Chạy integration test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          working-directory: app
+          script: flutter drive --driver test_driver/integration_test.dart --target integration_test/app_test.dart
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-screenshots
+          path: app/integration_test/screenshots/
+          if-no-files-found: warn
+          retention-days: 14
