@@ -5,7 +5,7 @@ Cập nhật cuối: 17/11/2026 (nhiệm vụ T1-01, nhánh `task/T1-01-khoi-tao
 ## Trạng thái hiện tại
 
 - `main` đang ở commit `c0eca20` — PLAN.md đã có mục "Làm rõ ngày 17/11" (a–j), ghi đè mọi chỗ khác trong kế hoạch.
-- T1-01 **Đang làm**: thêm README, .gitignore, HANDOVER, DECISIONS và các thư mục còn lại. PR: (điền số PR sau khi mở).
+- T1-01 **Đang làm**: thêm README, .gitignore, HANDOVER, DECISIONS và các thư mục còn lại. PR: #1 (https://github.com/lavang-0708/TimoKid/pull/1).
 - Các nhiệm vụ còn lại của bản 0.1 (T1-02 đến T1-14): **Chưa bắt đầu**.
 
 ## Cách build và chạy test
