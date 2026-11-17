@@ -7,7 +7,7 @@ Cập nhật cuối: 17/11/2026 (nhiệm vụ T1-03, nhánh `task/T1-03-ci`).
 - `main` đang ở commit `04dfe35` (đã merge PR #1 và PR #2) — PLAN.md đã có mục "Làm rõ ngày 17/11" (a–j), ghi đè mọi chỗ khác trong kế hoạch.
 - T1-01 **Xong**: PR #1 đã merge.
 - T1-02 **Xong**: PR #2 đã merge (`04dfe35`). Claude đã rebase nhánh lên main và chạy lại trên máy mình: analyze sạch, 5/5 test pass.
-- T1-03 **Đang làm**: CI và phát hành APK (3 workflow, integration test máy ảo, script keystore, docs phát hành). PR: (điền số PR sau khi mở).
+- T1-03 **Đang làm**: CI và phát hành APK (3 workflow, integration test máy ảo, script keystore, docs phát hành). PR: #3 (https://github.com/lavang-0708/TimoKid/pull/3).
 - Các nhiệm vụ còn lại của bản 0.1 (T1-04 đến T1-14): **Chưa bắt đầu**.
 - **Từ nay Claude merge PR** (anh Điệp giao). Anh Điệp chỉ cần nạp 4 secrets ký APK theo `docs/RELEASE.md`, rồi tag thử `v0.0.1` làm sau.
 
