@@ -17,6 +17,17 @@ Mỗi quyết định: ngày, nội dung, lý do, ai quyết. Chi tiết đầy 
 
 Người quyết: Claude (review và chốt thay anh Điệp), sau câu hỏi review của Muse ngày 17/11/2026. Commit ghi nhận: `c0eca20`.
 
+## 17/11/2026 — Sửa `.gitignore` cho keystore (góp ý review PR #1, Claude chốt)
+
+Đổi `app/key.properties` thành `**/key.properties`, vì Flutter đặt file này ở `app/android/key.properties`, không phải `app/key.properties`. Sửa trong PR T1-02. Người quyết: Claude.
+
+## 17/11/2026 — Cách xử lý file nhị phân vì MCP chỉ đẩy được file text (Muse quyết, ghi để Claude/anh Điệp biết)
+
+Muse đẩy file lên GitHub qua MCP chỉ được file text UTF-8; thử đẩy PNG dạng base64 qua `push_files` thì file lên sai dạng text (đã thử và đã xóa). Vì vậy:
+- Ảnh golden nhúng base64 trong `app/test/goldens/golden_data.dart`; `golden_test.dart` giải mã ra PNG trước khi so sánh. Ảnh nhúng là ảnh kỳ vọng thật nên phép so sánh vẫn có giá trị.
+- Chưa có icon launcher riêng: bỏ `android:icon` khỏi `AndroidManifest.xml`, app dùng icon mặc định của hệ thống; icon thật làm ở T1-12 cùng art Thị trấn.
+- Thiếu `app/android/gradle/wrapper/gradle-wrapper.jar` (file nhị phân): `flutter build apk` chưa chạy được; T1-03 bổ sung trong CI (tải jar chuẩn Gradle 9.5.0 trong workflow rồi commit bằng git của Actions, hoặc cài Gradle hệ thống). `flutter analyze` và `flutter test` không cần jar này.
+
 ## 17/11/2026 — Vị trí Flutter SDK của Muse
 
 Flutter SDK stable đặt tại `~/workspace/flutter-sdk/flutter` (nằm trong workspace nên tồn tại qua các lần thay máy ảo). Dùng cho `flutter create`, `analyze`, unit test và widget test. Không dùng để build APK hay chạy máy ảo — hai việc đó qua GitHub Actions. Người quyết: Claude (mục (j) ở trên).

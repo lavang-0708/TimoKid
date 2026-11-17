@@ -1,12 +1,18 @@
 # HANDOVER — TimoKid
 
-Cập nhật cuối: 17/11/2026 (nhiệm vụ T1-01, nhánh `task/T1-01-khoi-tao-repo`).
+Cập nhật cuối: 17/11/2026 (nhiệm vụ T1-02, nhánh `task/T1-02-khung-app`).
 
 ## Trạng thái hiện tại
 
 - `main` đang ở commit `c0eca20` — PLAN.md đã có mục "Làm rõ ngày 17/11" (a–j), ghi đè mọi chỗ khác trong kế hoạch.
-- T1-01 **Đang làm**: thêm README, .gitignore, HANDOVER, DECISIONS và các thư mục còn lại. PR: #1 (https://github.com/lavang-0708/TimoKid/pull/1).
-- Các nhiệm vụ còn lại của bản 0.1 (T1-02 đến T1-14): **Chưa bắt đầu**.
+- T1-01 **Chờ merge**: PR #1 (https://github.com/lavang-0708/TimoKid/pull/1) đã được Claude review Đạt. Nhánh T1-02 này tách từ `main` trước khi PR #1 merge nên mang theo lại các file của T1-01; rebase sau khi PR #1 merge.
+- T1-02 **Đang làm**: khung app Flutter (package `vn.timokid.app`, 3 màn trống, mở đầu vào Thị trấn). PR: #2 (https://github.com/lavang-0708/TimoKid/pull/2).
+- Các nhiệm vụ còn lại của bản 0.1 (T1-03 đến T1-14): **Chưa bắt đầu**.
+
+## Điểm cần biết khi tiếp tục
+
+- **Muse không đẩy được file nhị phân lên GitHub qua MCP** (kênh push-files chỉ nhận file text UTF-8; thử đẩy base64 qua `push_files` thì file lên sai dạng text). Vì vậy T1-02 có 3 chỗ làm khác thường, ghi trong `docs/DECISIONS.md`: (1) ảnh golden nhúng base64 trong `app/test/goldens/golden_data.dart`, test tự giải mã ra PNG trước khi so sánh; (2) chưa có icon launcher riêng — `AndroidManifest.xml` bỏ `android:icon`, app dùng icon mặc định của hệ thống, icon thật làm ở T1-12; (3) thiếu `app/android/gradle/wrapper/gradle-wrapper.jar` nên `flutter build apk` chưa chạy được — T1-03 bổ sung trong CI (tải jar chuẩn của Gradle 9.5.0 trong workflow rồi commit bằng git của Actions, hoặc cài Gradle hệ thống). `flutter analyze` và `flutter test` vẫn chạy đủ trên máy Muse.
+- Flutter SDK của Muse: `~/workspace/flutter-sdk/flutter`, bản 3.50.0 stable, Dart 3.14.0. Build APK và máy ảo chỉ qua GitHub Actions (T1-03).
 
 ## Cách build và chạy test
 
