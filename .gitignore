@@ -14,7 +14,7 @@ build/
 local.properties
 *.keystore
 *.jks
-app/key.properties
+**/key.properties
 
 # Python
 __pycache__/
