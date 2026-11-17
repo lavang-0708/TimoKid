@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" width="512" height="512" viewBox="0 0 512 512" font-family="sans-serif">
+<g id="01_color" inkscape:groupmode="layer" inkscape:label="01 Màu (xám nếu cần đổi màu)"></g>
+<g id="02_line" inkscape:groupmode="layer" inkscape:label="02 Nét viền và chi tiết"></g>
+<g id="00_guide" inkscape:groupmode="layer" inkscape:label="00 Khung phác (ẩn khi xuất)" sodipodi:insensitive="true"><rect x="32" y="32" width="448" height="448" fill="none" stroke="#2f7fd6" stroke-width="2" stroke-dasharray="4 8"/><line x1="256" y1="32" x2="256" y2="480" stroke="#2f7fd6" stroke-width="1.5" stroke-dasharray="8 6"/><line x1="32" y1="440" x2="480" y2="440" stroke="#2f7fd6" stroke-width="1.5" stroke-dasharray="8 6"/><text x="40" y="60" font-size="16" font-weight="bold" fill="#2f7fd6">KHUNG PET / ĐỒ VẬT · 512 x 512 px</text><text x="40" y="432" font-size="13" fill="#2f7fd6">Mặt đất (y = 440): chân pet, đáy đồ vật chạm đường này</text><text x="40" y="472" font-size="13" fill="#2f7fd6">Viền đứt nét là mép an toàn. Ẩn lớp này khi xuất file.</text></g>
+</svg>
