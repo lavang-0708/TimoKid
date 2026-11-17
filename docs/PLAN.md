@@ -10,8 +10,8 @@ Mỗi nhiệm vụ trong kế hoạch có một mã (ví dụ `T1-05`) và đi q
 
 | Ai | Làm gì |
 | --- | --- |
-| Anh Điệp | Duyệt quyết định sản phẩm, cài APK lên máy thật cho bé chơi thử, cấp tài khoản và bí mật (keystore, Neon, Cloudflare), bấm merge cuối cùng |
-| Claude | Viết yêu cầu cho từng nhiệm vụ, review pull request theo tiêu chí nghiệm thu, kiểm tra bằng chứng chạy thật, báo anh Điệp kết luận |
+| Anh Điệp | Duyệt quyết định sản phẩm, cài APK lên máy thật cho bé chơi thử, cấp tài khoản và bí mật (keystore, Neon, Cloudflare) |
+| Claude | Viết yêu cầu cho từng nhiệm vụ, review pull request theo tiêu chí nghiệm thu, kiểm tra bằng chứng chạy thật, merge pull request đạt (anh Điệp giao từ 17/11), báo anh Điệp tiến độ |
 | Muse | Viết code, test và tài liệu theo yêu cầu, mở pull request, sửa theo review |
 
 ### Vòng làm một nhiệm vụ
@@ -19,7 +19,7 @@ Mỗi nhiệm vụ trong kế hoạch có một mã (ví dụ `T1-05`) và đi q
 1. Claude gửi Muse yêu cầu: mã nhiệm vụ, phạm vi, tiêu chí nghiệm thu, những gì không được làm.
 2. Muse tạo nhánh `task/T1-05-ten-ngan`, làm việc, mở pull request theo mẫu bên dưới.
 3. Claude review: đọc code, đối chiếu tiêu chí, xem log CI và ảnh chụp màn hình. Kết luận một trong ba: Đạt, Cần sửa (kèm danh sách cụ thể), hoặc Cần anh Điệp quyết.
-4. Khi Đạt, anh Điệp merge. Mỗi bản 0.x xong thì gắn tag, CI phát hành APK.
+4. Khi Đạt, Claude merge (squash). Mỗi bản 0.x xong thì gắn tag, CI phát hành APK.
 
 ### Mẫu mô tả pull request
 
