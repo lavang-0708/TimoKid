@@ -80,7 +80,8 @@ jobs:
 
       - name: Xóa keystore khỏi máy chạy
         if: always()
-        run: rm -f android/app/upload.keystore android/key.properties
+        working-directory: .
+        run: rm -f app/android/app/upload.keystore app/android/key.properties
 
       - uses: softprops/action-gh-release@v2
         with:

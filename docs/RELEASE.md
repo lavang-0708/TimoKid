@@ -7,28 +7,39 @@ tự build APK release đã ký bằng keystore riêng và tạo GitHub Release 
 
 ### 1. Tạo keystore (máy Windows)
 
-Mở PowerShell, chạy từ thư mục gốc của repo:
+Cần Java. Nếu chưa có thì cài bằng PowerShell: `winget install Microsoft.OpenJDK.17`.
+
+Mở thư mục sẽ chứa keystore (để **ngoài** repo, ví dụ `D:\Work\TimoKid\keystore`),
+chuột phải chọn **Open in Terminal**, rồi chạy (một dòng, Enter xong mới nhập mật khẩu):
 
 ```powershell
-.\tools\android\create_keystore.ps1
+& "C:\Program Files\Microsoft\jdk-17.0.21.102-hotspot\bin\keytool.exe" -genkeypair -v -keystore timokid-release.keystore -alias timokid -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=TimoKid, C=VN"
 ```
 
-Script hỏi 2 mật khẩu (mật khẩu keystore, mật khẩu key) rồi in mã base64 của
-keystore. **Ghi nhớ 2 mật khẩu** — script không lưu chúng ở đâu cả.
+(Đường dẫn `jdk-17...` có thể khác số phiên bản; vừa cài xong thì mở cửa sổ mới là gõ `keytool` được.)
 
-Nếu không chạy được script (chưa có keytool), cài Android Studio rồi chạy lại.
+keytool hỏi **một** mật khẩu (nhập 2 lần). Keystore kiểu PKCS12 dùng chung mật khẩu
+này cho cả keystore và key. Thấy `[Storing timokid-release.keystore]` là xong.
+
+Chép mã base64 của keystore vào clipboard:
+
+```powershell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("$PWD\timokid-release.keystore")) | Set-Clipboard
+```
+
+Script `tools/android/create_keystore.ps1` làm cùng việc trên nếu chạy từ repo.
 
 ### 2. Nạp 4 secrets
 
 Vào repo trên GitHub: **Settings > Secrets and variables > Actions > New repository secret**,
-tạo 4 secrets:
+tạo 4 secrets (tên phải đúng từng chữ):
 
 | Secret | Giá trị |
 | --- | --- |
-| `ANDROID_KEYSTORE_BASE64` | Mã base64 mà script in ra (copy hết, một dòng dài) |
-| `ANDROID_KEYSTORE_PASSWORD` | Mật khẩu keystore đã nhập ở bước 1 |
-| `ANDROID_KEY_ALIAS` | `timokid` (alias mặc định của script) |
-| `ANDROID_KEY_PASSWORD` | Mật khẩu key đã nhập ở bước 1 |
+| `ANDROID_KEYSTORE_BASE64` | Mã base64 vừa chép (Ctrl+V, một dòng dài khoảng 3.000 ký tự) |
+| `ANDROID_KEYSTORE_PASSWORD` | Mật khẩu đã nhập ở bước 1 |
+| `ANDROID_KEY_ALIAS` | `timokid` |
+| `ANDROID_KEY_PASSWORD` | **Cùng** mật khẩu ở bước 1 |
 
 ### 3. Sao lưu keystore
 
@@ -41,11 +52,10 @@ keystore này nữa.** Không commit file keystore hay `key.properties` lên rep
 
 1. Kiểm tra version trong `app/pubspec.yaml` (ví dụ `0.1.0+1`): `versionName`
    của APK lấy từ đó. Tag nên trùng số version, dạng `v0.1.0`.
-2. Tạo tag và đẩy lên GitHub (Muse tạo tag khi Claude kết luận Đạt, hoặc tự tạo):
-   ```sh
-   git tag v0.1.0
-   git push origin v0.1.0
-   ```
+2. Tạo tag: trên GitHub vào **Releases > Draft a new release**, ô **Tag** gõ `v0.1.0`
+   rồi chọn **Create new tag on publish**, Target `main`, bấm **Publish release**
+   (bản thử thì tích **Set as a pre-release**). Hoặc dùng git:
+   `git tag v0.1.0 && git push origin v0.1.0`. Claude không tạo tag được (proxy chặn).
 3. Chờ workflow `Release` chạy xong (tab **Actions** của repo), rồi vào
    **Releases** tải file `TimoKid-vX.Y.Z.apk` về cài lên máy.
 
@@ -53,7 +63,9 @@ Bản thử đầu tiên sau khi nạp secrets sẽ dùng tag `v0.0.1`.
 
 ## Sự cố thường gặp
 
-- **Thiếu secrets**: job dừng ngay với thông báo `Thiếu secrets ký APK: ...`.
+- **Thiếu secrets**: job dừng ngay với thông báo `Thiếu secrets ký APK: ...`
+  (thường do gõ sai tên secret). Sửa secret rồi bấm **Re-run all jobs** trên lần chạy lỗi,
+  không cần tạo lại tag.
   Nạp đủ 4 secrets rồi gắn tag lại (xóa tag cũ: `git tag -d vX.Y.Z` rồi
   `git push origin :vX.Y.Z`, sau đó tạo lại tag).
 - **Sai alias hoặc mật khẩu**: bước build lỗi, kiểm tra lại giá trị 4 secrets.
