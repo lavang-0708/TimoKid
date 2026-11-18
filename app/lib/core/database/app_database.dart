@@ -116,30 +116,41 @@ class AppDatabase extends _$AppDatabase {
   /// Tạo dữ liệu lần đầu mở app: một hồ sơ bé mặc định lớp 2, bậc 1 cho
   /// cả 5 mảng, và cài đặt chung mặc định. Gọi lại nhiều lần cũng an toàn
   /// (chỉ tạo phần còn thiếu). Trả về id của bé mặc định.
+  ///
+  /// Bọc trong transaction: hai lần gọi chồng nhau (vd test gọi
+  /// `Future.wait`, hoặc `resetForQa` + khởi động app cùng lúc) đều
+  /// thấy "chưa có" rồi cùng chèn nếu không có transaction — tạo trùng
+  /// hồ sơ bé và trùng khóa cài đặt chung, rồi `getValue` ném
+  /// `Bad state: Too many elements` (cột `child_id` nullable nên
+  /// unique của SQLite không bắt được trùng khóa chung; xem
+  /// `SettingsDao.setValue`). Drift xếp các transaction nối tiếp nhau
+  /// nên kiểm-tra-rồi-chèn trong này là nguyên tử.
   Future<String> ensureSeeded() async {
-    var child = await childrenDao.getFirstChild();
-    child ??= await childrenDao.createChild(name: 'Bé', grade: 2);
-    final childId = child.id;
+    return transaction(() async {
+      var child = await childrenDao.getFirstChild();
+      child ??= await childrenDao.createChild(name: 'Bé', grade: 2);
+      final childId = child.id;
 
-    for (final strand in Strand.all) {
-      final existing = await skillProgressDao.getStrandProgress(
-        childId,
-        strand,
-      );
-      if (existing == null) {
-        await skillProgressDao.setStrandRung(
-          childId: childId,
-          strand: strand,
-          rung: 1,
+      for (final strand in Strand.all) {
+        final existing = await skillProgressDao.getStrandProgress(
+          childId,
+          strand,
         );
+        if (existing == null) {
+          await skillProgressDao.setStrandRung(
+            childId: childId,
+            strand: strand,
+            rung: 1,
+          );
+        }
       }
-    }
 
-    await _seedSetting('rewards', defaultRewardsJson);
-    await _seedSetting('sound_enabled', jsonEncode(true));
-    await _seedSetting('music_enabled', jsonEncode(true));
+      await _seedSetting('rewards', defaultRewardsJson);
+      await _seedSetting('sound_enabled', jsonEncode(true));
+      await _seedSetting('music_enabled', jsonEncode(true));
 
-    return childId;
+      return childId;
+    });
   }
 
   Future<void> _seedSetting(String key, String value) async {
