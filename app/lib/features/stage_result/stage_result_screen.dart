@@ -88,69 +88,72 @@ class StageResultScreen extends StatelessWidget {
     return Scaffold(
       key: const Key('stage-result-screen'),
       appBar: AppBar(title: const Text('Kết quả chặng')),
+      // Cuộn được để không tràn trên màn thấp (640x320 dp).
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(title, style: const TextStyle(fontSize: 30)),
-            const SizedBox(height: 16),
-            Text(
-              'Đúng ${args.correctCount}/${args.totalQuestions} câu',
-              key: const Key('stage-result-correct-count'),
-              style: const TextStyle(fontSize: 26),
-            ),
-            Text(
-              'Đúng ngay lần đầu: ${args.firstTryCorrectCount} câu',
-              style: const TextStyle(fontSize: 22),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Nhận được ${args.xuEarned} xu',
-              key: const Key('stage-result-xu'),
-              style: const TextStyle(fontSize: 26),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Cảm ơn bé nhé, làm tốt lắm!',
-              style: TextStyle(fontSize: 22),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton.icon(
-                  key: const Key('stage-result-back-button'),
-                  icon: const Text('←', style: TextStyle(fontSize: 24)),
-                  label: const Text(
-                    'Về Thị trấn',
-                    style: TextStyle(fontSize: 22),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(56, 56),
-                  ),
-                  onPressed: () => context.go('/'),
-                ),
-                if (args.nextStageIndex != null) ...[
-                  const SizedBox(width: 16),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(title, style: const TextStyle(fontSize: 30)),
+              const SizedBox(height: 16),
+              Text(
+                'Đúng ${args.correctCount}/${args.totalQuestions} câu',
+                key: const Key('stage-result-correct-count'),
+                style: const TextStyle(fontSize: 26),
+              ),
+              Text(
+                'Đúng ngay lần đầu: ${args.firstTryCorrectCount} câu',
+                style: const TextStyle(fontSize: 22),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Nhận được ${args.xuEarned} xu',
+                key: const Key('stage-result-xu'),
+                style: const TextStyle(fontSize: 26),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Cảm ơn bé nhé, làm tốt lắm!',
+                style: TextStyle(fontSize: 22),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   ElevatedButton.icon(
-                    key: const Key('stage-result-next-button'),
-                    icon: const Text('→', style: TextStyle(fontSize: 24)),
+                    key: const Key('stage-result-back-button'),
+                    icon: const Text('←', style: TextStyle(fontSize: 24)),
                     label: const Text(
-                      'Chặng tiếp theo',
+                      'Về Thị trấn',
                       style: TextStyle(fontSize: 22),
                     ),
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(56, 56),
                     ),
-                    onPressed: () => context.go(
-                      MathScreen.route,
-                      extra: MathScreenArgs(stageIndex: args.nextStageIndex),
-                    ),
+                    onPressed: () => context.go('/'),
                   ),
+                  if (args.nextStageIndex != null) ...[
+                    const SizedBox(width: 16),
+                    ElevatedButton.icon(
+                      key: const Key('stage-result-next-button'),
+                      icon: const Text('→', style: TextStyle(fontSize: 24)),
+                      label: const Text(
+                        'Chặng tiếp theo',
+                        style: TextStyle(fontSize: 22),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(56, 56),
+                      ),
+                      onPressed: () => context.go(
+                        MathScreen.route,
+                        extra: MathScreenArgs(stageIndex: args.nextStageIndex),
+                      ),
+                    ),
+                  ],
                 ],
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
