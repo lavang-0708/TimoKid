@@ -90,6 +90,27 @@ void main() {
       expect((await db.skillProgressDao.getAllStrandProgress(first)).length, 5);
       expect((await db.settingsDao.getAllSettings()).length, 3);
     });
+
+    test('hai lần gọi chồng nhau không tạo trùng settings', () async {
+      // Hồi quy T1-13: hai lần gọi chồng nhau (Future.wait) đều thấy
+      // settings chưa có rồi cùng chèn, tạo trùng khóa chung và
+      // `getValue` ném `Bad state: Too many elements` (cột `child_id`
+      // nullable nên unique của SQLite không bắt được trùng).
+      final db = openMemoryDb();
+      addTearDown(db.close);
+
+      final results = await Future.wait([db.ensureSeeded(), db.ensureSeeded()]);
+      expect(results[0], results[1]);
+
+      expect((await db.childrenDao.getAllChildren()).length, 1);
+      expect(
+        (await db.skillProgressDao.getAllStrandProgress(results[0])).length,
+        5,
+      );
+      expect((await db.settingsDao.getAllSettings()).length, 3);
+      // Đọc lại được, không ném lỗi.
+      expect(await db.settingsDao.getValue(key: 'rewards'), isNotNull);
+    });
   });
 
   group('children', () {
