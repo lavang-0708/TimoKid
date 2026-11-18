@@ -1,14 +1,15 @@
 # HANDOVER — TimoKid
 
-Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-06, nhánh `task/T1-06-hinh-ve`).
+Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-07, nhánh `task/T1-07-thang-ai`).
 
 ## Trạng thái hiện tại
 
-- `main` đang ở commit `0526471` — PR #1 (T1-01), #2 (T1-02), #3 (T1-03), #4 (T1-04) đã merge. PLAN.md có mục "Làm rõ ngày 17/11" (a–j), ghi đè mọi chỗ khác trong kế hoạch.
+- `main` đang ở commit `d965746` — PR #1 (T1-01), #2 (T1-02), #3 (T1-03), #4 (T1-04), #5 (T1-05), #7 (T1-06) đã merge. PR #6 đóng vì trùng T1-04. PLAN.md có mục "Làm rõ ngày 17/11" (a–j), ghi đè mọi chỗ khác trong kế hoạch.
 - T1-01 đến T1-04 **Xong**. CI chính và integration test máy ảo (API 30, ~8 phút) đều xanh. Phần ký APK chờ anh Điệp nạp 4 secrets theo `docs/RELEASE.md`, rồi tag thử `v0.0.1`.
 - T1-05 **Xong**: Bộ sinh câu hỏi — chuyển 48/48 dạng bài trong `gen.py` sang Dart (`lib/features/questions/`), test 500 seed × 103 cặp form×mức. PR #5 đã merge.
-- T1-06 **Đang làm**: Hình vẽ cho câu hình học — sinh SVG từ `FigureSpec` (`lib/features/questions/figure_svg.dart`, gói `flutter_svg` 2.4.0), golden test 7 hình, ảnh chụp 7 dạng gửi qua chat cho Claude đếm lại bằng mắt. PR: #7 (https://github.com/lavang-0708/TimoKid/pull/7).
-- Các nhiệm vụ còn lại của bản 0.1 (T1-07 đến T1-14): **Chưa bắt đầu**.
+- T1-06 **Xong**: Hình vẽ cho câu hình học — sinh SVG từ `FigureSpec` (`lib/features/questions/figure_svg.dart`, gói `flutter_svg` 2.4.0), golden test 7 hình, Claude đã đếm lại 7 ảnh bằng mắt: đúng hết. PR #7 đã merge.
+- T1-07 **Đang làm**: Thang ải và thành thạo — bậc 1–6 theo mảng + thành thạo dạng bài (`lib/features/ladder/`, `LadderService` dùng DAO T1-04), 21 unit test mới. PR: (sẽ ghi sau khi mở).
+- Các nhiệm vụ còn lại của bản 0.1 (T1-08 đến T1-14): **Chưa bắt đầu**.
 - **Claude merge PR** (anh Điệp giao).
 
 ## Điểm cần biết khi tiếp tục
