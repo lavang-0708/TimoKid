@@ -47,13 +47,8 @@ void main() {
         .map(ResolvedQuestion.resolve)
         .toList();
 
-    // convertFlutterSurfaceToImage chỉ được gọi một lần cho cả test.
-    var surfaceConverted = false;
+    // Surface đã convert ở trên (chỉ được gọi một lần cho cả test).
     Future<void> takeShot(String name) async {
-      if (!surfaceConverted) {
-        await binding.convertFlutterSurfaceToImage();
-        surfaceConverted = true;
-      }
       await tester.pumpAndSettle();
       final shot = await binding.takeScreenshot(name);
       expect(shot.isNotEmpty, isTrue);
