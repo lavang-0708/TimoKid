@@ -28,6 +28,12 @@ Muse đẩy file lên GitHub qua MCP chỉ được file text UTF-8; thử đẩ
 - Chưa có icon launcher riêng: bỏ `android:icon` khỏi `AndroidManifest.xml`, app dùng icon mặc định của hệ thống; icon thật làm ở T1-12 cùng art Thị trấn.
 - Thiếu `app/android/gradle/wrapper/gradle-wrapper.jar` (file nhị phân): `flutter build apk` chưa chạy được; T1-03 bổ sung trong CI (tải jar chuẩn Gradle 9.5.0 trong workflow rồi commit bằng git của Actions, hoặc cài Gradle hệ thống). `flutter analyze` và `flutter test` không cần jar này.
 
+## 17/11/2026 — Claude chốt sau review PR #2 (ghi đè phần gradle-wrapper.jar ở trên)
+
+- **`gradle-wrapper.jar` tự sinh, không cần tải hay commit**: file nằm trong `app/android/.gitignore` của template vì flutter tool tự sinh khi build (`injectGradleWrapperIfNeeded`). Đính chính quyết định T1-02 ở trên: T1-03 KHÔNG tải jar, KHÔNG commit jar bằng Actions.
+- **File nhị phân từ nay**: Muse liệt kê trong mục "Việc còn lại" của PR (đường dẫn, cách sinh), Claude commit bằng git lên nhánh PR của Muse.
+- **Từ nay Claude merge PR** (anh Điệp giao việc merge cho Claude).
+
 ## 17/11/2026 — T1-04: schema 7 bảng và cách chặn sửa/xóa lịch sử (Muse thiết kế, chờ Claude duyệt trong PR #4)
 
 DESIGN.md chỉ mô tả mỗi bảng bằng một dòng nên Muse tự thiết kế cột cụ thể, căn theo nhu cầu của T1-07 (thang ải), T1-08 (đề ngày), T1-09 (màn làm toán), T1-10 (sổ ôn tập), T1-11 (ví xu):
