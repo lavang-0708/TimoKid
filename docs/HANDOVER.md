@@ -1,14 +1,16 @@
 # HANDOVER — TimoKid
 
-Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-06, nhánh `task/T1-06-hinh-ve`).
+Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-08, nhánh `task/T1-08-de-ngay`).
 
 ## Trạng thái hiện tại
 
-- `main` đang ở commit `0526471` — PR #1 (T1-01), #2 (T1-02), #3 (T1-03), #4 (T1-04) đã merge. PLAN.md có mục "Làm rõ ngày 17/11" (a–j), ghi đè mọi chỗ khác trong kế hoạch.
+- `main` đang ở commit `d965746` — PR #1 (T1-01), #2 (T1-02), #3 (T1-03), #4 (T1-04), #5 (T1-05), #7 (T1-06) đã merge. PR #6 đóng vì trùng T1-04. PLAN.md có mục "Làm rõ ngày 17/11" (a–j), ghi đè mọi chỗ khác trong kế hoạch.
 - T1-01 đến T1-04 **Xong**. CI chính và integration test máy ảo (API 30, ~8 phút) đều xanh. Phần ký APK chờ anh Điệp nạp 4 secrets theo `docs/RELEASE.md`, rồi tag thử `v0.0.1`.
 - T1-05 **Xong**: Bộ sinh câu hỏi — chuyển 48/48 dạng bài trong `gen.py` sang Dart (`lib/features/questions/`), test 500 seed × 103 cặp form×mức. PR #5 đã merge.
-- T1-06 **Đang làm**: Hình vẽ cho câu hình học — sinh SVG từ `FigureSpec` (`lib/features/questions/figure_svg.dart`, gói `flutter_svg` 2.4.0), golden test 7 hình, ảnh chụp 7 dạng gửi qua chat cho Claude đếm lại bằng mắt. PR: #7 (https://github.com/lavang-0708/TimoKid/pull/7).
-- Các nhiệm vụ còn lại của bản 0.1 (T1-07 đến T1-14): **Chưa bắt đầu**.
+- T1-06 **Xong**: Hình vẽ cho câu hình học — sinh SVG từ `FigureSpec` (`lib/features/questions/figure_svg.dart`, gói `flutter_svg` 2.4.0), golden test 7 hình, Claude đã đếm lại 7 ảnh bằng mắt: đúng hết. PR #7 đã merge.
+- T1-07 **Chờ xác nhận**: Thang ải và thành thạo — bậc 1–6 theo mảng + thành thạo dạng bài (`lib/features/ladder/`, `LadderService` dùng DAO T1-04), 21 unit test mới. PR: #8 (https://github.com/lavang-0708/TimoKid/pull/8).
+- T1-08 **Đang làm**: Đề ngày — mỗi ngày một đề 25 câu, 5 chặng theo 5 mảng (`lib/features/daily_set/`, `DailySetService` dùng `LadderService` + DAO T1-04), 27 unit test mới. PR: (sẽ ghi số sau khi mở).
+- Các nhiệm vụ còn lại của bản 0.1 (T1-09 đến T1-14): **Chưa bắt đầu**.
 - **Claude merge PR** (anh Điệp giao).
 
 ## Điểm cần biết khi tiếp tục
@@ -47,3 +49,4 @@ Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-06, nhánh `task/T1-06-hinh-ve`
 - Menu QA: nhấn giữ 5 giây ở góc trên bên trái. `Clock` trả ngày theo `Asia/Ho_Chi_Minh`. Bản 0.1 mở app vào thẳng màn Thị trấn tạm với bé mặc định (mục (i)).
 - Sửa sai trong review trước của Muse: số form đủ 3 mức là 17, không phải 30 như Muse viết lúc đầu. Kết luận review không đổi.
 - T1-05: bộ sinh câu nằm ở `app/lib/features/questions/` (model `question.dart`, 5 file generator theo mảng, `question_registry.dart` liệt kê đủ 48 dạng). Số cặp form×mức thật là **103**, không phải 89 như ghi lúc đầu — đếm lại từ `gen.py` và `questions.json` đều ra 103. Mỗi `Question` giữ `params` (tham số đã dùng) để test giải lại độc lập, và `figure` (`FigureSpec`) để T1-06 sinh SVG. Nhánh `task/T1-05-generator` tách từ main cũ (`04dfe35`); sau khi mở PR sẽ merge main mới (`fa956e4`, có CI) vào nhánh.
+- T1-08: nhánh `task/T1-08-de-ngay` định tách từ `task/T1-07-thang-ai`, nhưng `create_branch` không nhận tên nhánh ở `from` nên nhánh mới rơi về main (`d965746`) — đã kiểm chứng bằng `call-read-tool` (nhánh mới không có `ladder_service.dart`, nhánh T1-07 thì có). Cách xử lý: lần push của T1-08 đẩy kèm toàn bộ file T1-07 (ladder + sửa `daos.dart` + docs) nên diff PR vẫn gồm cả T1-07 như chủ ý; sau khi PR #8 merge, Claude gộp main vào nhánh này như các lần trước (nội dung T1-07 trùng nhau nên gộp sạch). Đề ngày: `DailySetService` (`lib/features/daily_set/`) dùng `LadderService` + DAO T1-04 (`DailySetsDao`, `ReviewQueueDao` đã có sẵn từ T1-04, không cần viết DAO mới); `answerType` lưu trong đề là kiểu hiển thị (theo bậc, trừ dạng choiceOnly luôn trắc nghiệm).
