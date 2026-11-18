@@ -207,7 +207,7 @@ Cách cấu hình cụ thể của Neon Auth và Data API sẽ được kiểm t
 
 ## Hướng dẫn vẽ cho họa sĩ
 
-Mọi lớp của nhân vật được vẽ trên cùng một khung hình và xuất thành file riêng, để app chồng lên nhau là khớp mà không cần căn chỉnh. Phong cách chuẩn là tông pastel mềm, viền trắng kiểu sticker, theo các tấm phác ý tưởng hiện có (nhân vật nữ, pet, trứng, căn phòng). Các tấm này vẽ bằng AI, chỉ dùng làm tham khảo, không phải hình dùng trong app.
+Mọi lớp của nhân vật được vẽ trên cùng một khung hình và xuất thành file riêng, để app chồng lên nhau là khớp mà không cần căn chỉnh. Phong cách chuẩn là tông pastel mềm, viền trắng kiểu sticker, theo các tấm phác ý tưởng hiện có (nhân vật nữ, pet, trứng, căn phòng). Các tấm này vẽ bằng AI. Từ 18/11/2026 anh Điệp chốt dùng chúng làm nguồn hình chính: tách nền, cắt từng lớp và món, sửa lỗi theo bảng trong `assets/concept/README.md`; món thiếu hoặc hỏng thì vẽ bổ sung cùng phong cách (PLAN điểm (k)). Họa sĩ có thể thay dần bằng hình vẽ tay theo cùng quy cách dưới đây.
 
 ### Quy cách file
 
