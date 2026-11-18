@@ -36,6 +36,8 @@ import '../daily_set/daily_set_service.dart';
 import '../ladder/ladder_service.dart';
 import '../questions/figure_svg.dart';
 import '../questions/question.dart';
+import '../rewards/reward_config.dart';
+import '../rewards/reward_service.dart';
 import '../stage_result/stage_result_screen.dart';
 import 'math_session.dart';
 
@@ -152,12 +154,18 @@ class _MathScreenState extends ConsumerState<MathScreen> {
             stageIndex * DailySetConfig.questionsPerStage,
             (stageIndex + 1) * DailySetConfig.questionsPerStage,
           );
+      // Bảng thưởng đọc từ settings (T1-11): đổi settings thì mức
+      // thưởng của phiên này đổi theo.
       final session = StageSession(
         db: db,
         childId: childId,
         dailySetId: set.id,
         stageIndex: stageIndex,
         questions: questions,
+        rewardService: RewardService(
+          db: db,
+          config: await RewardConfig.load(db),
+        ),
       );
       session.addListener(_onSessionChanged);
       await session.markStageInProgress();

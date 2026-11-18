@@ -413,6 +413,10 @@ class DailySetsDao extends DatabaseAccessor<AppDatabase>
             ..where((t) => t.childId.equals(childId) & t.date.equals(date)))
           .getSingleOrNull();
 
+  /// Tìm đề ngày theo id (null nếu không có).
+  Future<DailySet?> getDailySetById(String id) =>
+      (select(db.dailySets)..where((t) => t.id.equals(id))).getSingleOrNull();
+
   Future<List<DailySet>> getDailySetsForChild(String childId) =>
       (select(db.dailySets)
             ..where((t) => t.childId.equals(childId))
@@ -507,6 +511,21 @@ class WalletDao extends DatabaseAccessor<AppDatabase> with _$WalletDaoMixin {
       readsFrom: {db.walletLedger},
     ).getSingle();
     return row.read<int>('total');
+  }
+
+  /// Đã có giao dịch nào với `refId` này của bé chưa (dùng để
+  /// chống cộng trùng thưởng một-lần-mỗi-ngày, xem `RewardService`).
+  Future<bool> hasEntryWithRefId({
+    required String childId,
+    required String refId,
+  }) async {
+    final row = await customSelect(
+      'SELECT COUNT(*) AS n FROM ${db.walletLedger.actualTableName} '
+      'WHERE child_id = ? AND ref_id = ?',
+      variables: [Variable.withString(childId), Variable.withString(refId)],
+      readsFrom: {db.walletLedger},
+    ).getSingle();
+    return row.read<int>('n') > 0;
   }
 
   /// Số dư cả hai loại tiền.

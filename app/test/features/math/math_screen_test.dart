@@ -24,7 +24,6 @@ import 'package:timokid/features/ladder/ladder_service.dart';
 import 'package:timokid/features/math/math_screen.dart';
 import 'package:timokid/features/math/math_session.dart';
 import 'package:timokid/features/questions/question.dart';
-import 'package:timokid/features/rewards/reward_config.dart';
 import 'package:timokid/features/stage_result/stage_result_screen.dart';
 import 'package:timokid/features/town/town_screen.dart';
 
@@ -577,52 +576,5 @@ void main() {
     );
     final set = await db.dailySetsDao.getDailySet(childId, clock.today());
     expect(db.dailySetsDao.readStageStatus(set!).first, StageStatus.done);
-  });
-
-  testWidgets('RewardConfig: bảng xu theo bậc, nửa xu, gấp đôi ôn tập', (
-    tester,
-  ) async {
-    expect(RewardConfig.baseXuForRung(1), 2);
-    expect(RewardConfig.baseXuForRung(2), 2);
-    expect(RewardConfig.baseXuForRung(3), 3);
-    expect(RewardConfig.baseXuForRung(4), 3);
-    expect(RewardConfig.baseXuForRung(5), 5);
-    expect(RewardConfig.baseXuForRung(6), 5);
-    expect(
-      RewardConfig.xuForQuestion(
-        rung: 3,
-        correctFirstTry: true,
-        isReview: false,
-      ),
-      3,
-    );
-    // Đúng sau gợi ý: 3 → 2 (làm tròn lên).
-    expect(
-      RewardConfig.xuForQuestion(
-        rung: 3,
-        correctFirstTry: false,
-        isReview: false,
-      ),
-      2,
-    );
-    // Câu ôn tập: gấp đôi.
-    expect(
-      RewardConfig.xuForQuestion(
-        rung: 3,
-        correctFirstTry: true,
-        isReview: true,
-      ),
-      6,
-    );
-    // Ôn tập + sau gợi ý: chia đôi rồi nhân đôi.
-    expect(
-      RewardConfig.xuForQuestion(
-        rung: 5,
-        correctFirstTry: false,
-        isReview: true,
-      ),
-      6,
-    );
-    expect(RewardConfig.stageCompleteBonusXu, 5);
   });
 }

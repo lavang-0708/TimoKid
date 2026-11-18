@@ -33,6 +33,7 @@ import '../questions/question.dart';
 import '../questions/question_registry.dart';
 import '../review_book/review_book_service.dart';
 import '../rewards/reward_config.dart';
+import '../rewards/reward_service.dart';
 
 /// Tên tiếng Việt của từng mảng, hiện trên thanh tiêu đề màn làm toán
 /// và màn kết quả chặng.
@@ -151,9 +152,9 @@ class StageSession extends ChangeNotifier {
     required this.dailySetId,
     required this.stageIndex,
     required List<DailySetQuestion> questions,
+    RewardService? rewardService,
   }) : _db = db,
        _attemptsDao = db.attemptsDao,
-       _walletDao = db.walletDao,
        _ladder = LadderService(
          attemptsDao: db.attemptsDao,
          skillProgressDao: db.skillProgressDao,
@@ -162,15 +163,18 @@ class StageSession extends ChangeNotifier {
          reviewQueueDao: db.reviewQueueDao,
          clock: db.clock,
        ),
+       _rewards =
+           rewardService ??
+           RewardService(db: db, config: RewardConfig.defaults()),
        resolved = questions.map(ResolvedQuestion.resolve).toList() {
     _questionStartedAt = _db.clock.now();
   }
 
   final AppDatabase _db;
   final AttemptsDao _attemptsDao;
-  final WalletDao _walletDao;
   final LadderService _ladder;
   final ReviewBookService _reviewBook;
+  final RewardService _rewards;
 
   final String childId;
 
@@ -345,22 +349,15 @@ class StageSession extends ChangeNotifier {
     if (correct) {
       correctCount++;
       if (firstTry) firstTryCorrectCount++;
-      final xu = RewardConfig.xuForQuestion(
+      final xu = await _rewards.awardQuestion(
+        childId: childId,
         rung: spec.rung,
         correctFirstTry: firstTry,
         isReview: spec.isReview,
+        refId: dailySetId,
       );
       lastEarnedXu = xu;
       xuEarned += xu;
-      await _walletDao.addEntry(
-        childId: childId,
-        currency: Currency.xu,
-        amount: xu,
-        reason: spec.isReview
-            ? (firstTry ? 'review_correct' : 'review_correct_after_hint')
-            : (firstTry ? 'question_correct' : 'question_correct_after_hint'),
-        refId: dailySetId,
-      );
       state = QuestionState.correct;
     } else {
       lastEarnedXu = 0;
@@ -370,15 +367,15 @@ class StageSession extends ChangeNotifier {
   }
 
   /// Kết thúc chặng: thưởng xong chặng và đánh dấu chặng đã xong
-  /// trong đề ngày (chặng tự chọn không lưu trạng thái).
+  /// trong đề ngày (chặng tự chọn không lưu trạng thái). Nếu đây là
+  /// chặng cuối cùng còn thiếu của đề ngày thì cộng luôn thưởng xong
+  /// đề ngày (+20 xu, +1 kim cương, một lần mỗi ngày) và đánh dấu đề
+  /// đã xong; xu thưởng đề ngày tính vào `xuEarned` của chặng này.
   Future<void> _finishStage() async {
-    xuEarned += RewardConfig.stageCompleteBonusXu;
-    await _walletDao.addEntry(
+    xuEarned += await _rewards.awardStageComplete(
       childId: childId,
-      currency: Currency.xu,
-      amount: RewardConfig.stageCompleteBonusXu,
-      reason: 'stage_complete',
-      refId: dailySetId,
+      dailySetId: dailySetId,
+      stageIndex: stageIndex,
     );
     if (dailySetId != null) {
       await _db.dailySetsDao.updateStageStatus(
@@ -386,6 +383,13 @@ class StageSession extends ChangeNotifier {
         stageIndex: stageIndex,
         status: StageStatus.done,
       );
+      final dailyAwarded = await _rewards.awardDailyCompleteIfDone(
+        childId: childId,
+        dailySetId: dailySetId!,
+      );
+      if (dailyAwarded) {
+        xuEarned += _rewards.config.dailySetCompleteBonusXu;
+      }
     }
   }
 }
