@@ -1,0 +1,600 @@
+/// DAO cho 7 bảng của T1-04.
+///
+/// Các DAO chỉ làm CRUD và truy vấn; luật học (lên/xuống bậc, sổ ôn tập,
+/// tính xu) nằm ở các nhiệm vụ sau (T1-07, T1-08, T1-10, T1-11) và sẽ
+/// gọi các hàm này.
+///
+/// Hai bảng append-only (`attempts`, `wallet_ledger`) cố tình KHÔNG có
+/// hàm sửa/xóa ở tầng DAO, và database chặn thêm bằng trigger SQLite
+/// (xem `app_database.dart`). Mọi kiểm tra "chỉ thêm" trong test đều
+/// dựa trên cả hai lớp chặn này.
+library;
+
+import 'dart:convert';
+
+import 'package:drift/drift.dart';
+import 'package:uuid/uuid.dart';
+
+import 'app_database.dart';
+import 'models.dart';
+import 'tables.dart';
+
+part 'daos.g.dart';
+
+const _uuid = Uuid();
+
+/// Sinh id UUID v4 cho dòng mới.
+String newId() => _uuid.v4();
+
+@DriftAccessor(tables: [Children])
+class ChildrenDao extends DatabaseAccessor<AppDatabase>
+    with _$ChildrenDaoMixin {
+  ChildrenDao(super.db);
+
+  /// Tạo hồ sơ bé mới. Mặc định lớp 2.
+  Future<ChildrenData> createChild({
+    required String name,
+    int grade = 2,
+    String? familyId,
+  }) async {
+    final now = db.clock.now();
+    final companion = ChildrenCompanion.insert(
+      id: newId(),
+      name: name,
+      grade: Value(grade),
+      familyId: Value(familyId),
+      createdAt: now,
+      updatedAt: now,
+    );
+    await into(db.children).insert(companion);
+    return ChildrenData(
+      id: companion.id.value,
+      name: name,
+      grade: grade,
+      familyId: familyId,
+      createdAt: now,
+      updatedAt: now,
+      synced: false,
+    );
+  }
+
+  Future<ChildrenData?> getChild(String id) =>
+      (select(db.children)..where((t) => t.id.equals(id))).getSingleOrNull();
+
+  Future<List<ChildrenData>> getAllChildren() => select(db.children).get();
+
+  /// Hồ sơ bé đầu tiên (bản 0.1 chỉ có một bé mặc định).
+  Future<ChildrenData?> getFirstChild() =>
+      (select(db.children)..limit(1)).getSingleOrNull();
+
+  /// Đổi tên / lớp của bé. `updatedAt` tự cập nhật.
+  Future<void> updateChild(String id, {String? name, int? grade}) async {
+    await (update(db.children)..where((t) => t.id.equals(id))).write(
+      ChildrenCompanion(
+        name: name == null ? const Value.absent() : Value(name),
+        grade: grade == null ? const Value.absent() : Value(grade),
+        updatedAt: Value(db.clock.now()),
+      ),
+    );
+  }
+
+  Future<int> deleteChild(String id) =>
+      (delete(db.children)..where((t) => t.id.equals(id))).go();
+}
+
+@DriftAccessor(tables: [Attempts])
+class AttemptsDao extends DatabaseAccessor<AppDatabase>
+    with _$AttemptsDaoMixin {
+  AttemptsDao(super.db);
+
+  /// Ghi một lượt trả lời. Chỉ thêm dòng, không có hàm sửa/xóa.
+  Future<String> recordAttempt({
+    required String childId,
+    required String formId,
+    required String strand,
+    required int level,
+    required int rung,
+    required String answerType,
+    required bool correctFirstTry,
+    required int attemptsCount,
+    required int durationMs,
+    bool isReview = false,
+    String? dailySetId,
+    int? stage,
+    int? questionSeed,
+  }) async {
+    final now = db.clock.now();
+    final id = newId();
+    await into(db.attempts).insert(
+      AttemptsCompanion.insert(
+        id: id,
+        childId: childId,
+        formId: formId,
+        strand: strand,
+        level: level,
+        rung: rung,
+        answerType: answerType,
+        correctFirstTry: correctFirstTry,
+        attemptsCount: attemptsCount,
+        durationMs: durationMs,
+        isReview: Value(isReview),
+        dailySetId: Value(dailySetId),
+        stage: Value(stage),
+        questionSeed: Value(questionSeed),
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+    return id;
+  }
+
+  /// Các lượt trả lời của bé, mới nhất trước.
+  Future<List<Attempt>> getAttemptsForChild(String childId, {int? limit}) {
+    final query = select(db.attempts)
+      ..where((t) => t.childId.equals(childId))
+      ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]);
+    if (limit != null) query.limit(limit);
+    return query.get();
+  }
+
+  /// Các lượt trả lời gần nhất của một mảng (phục vụ cửa sổ 10 câu
+  /// của T1-07). `since` giới hạn từ mốc đổi bậc gần nhất trở đi.
+  Future<List<Attempt>> getRecentStrandAttempts({
+    required String childId,
+    required String strand,
+    DateTime? since,
+    int limit = 10,
+  }) {
+    final query = select(db.attempts)
+      ..where((t) => t.childId.equals(childId) & t.strand.equals(strand))
+      ..orderBy([(t) => OrderingTerm.desc(t.createdAt)])
+      ..limit(limit);
+    if (since != null) {
+      query.where((t) => t.createdAt.isBiggerThanValue(since));
+    }
+    return query.get();
+  }
+
+  /// Các lượt trả lời gần nhất của một dạng bài (phục vụ tính thành thạo
+  /// 4/5 câu của T1-07).
+  Future<List<Attempt>> getRecentFormAttempts({
+    required String childId,
+    required String formId,
+    int limit = 5,
+  }) =>
+      (select(db.attempts)
+            ..where((t) => t.childId.equals(childId) & t.formId.equals(formId))
+            ..orderBy([(t) => OrderingTerm.desc(t.createdAt)])
+            ..limit(limit))
+          .get();
+}
+
+@DriftAccessor(tables: [SkillProgress])
+class SkillProgressDao extends DatabaseAccessor<AppDatabase>
+    with _$SkillProgressDaoMixin {
+  SkillProgressDao(super.db);
+
+  /// Đặt bậc hiện tại của một mảng. Tạo dòng nếu chưa có, cập nhật nếu
+  /// đã có; đồng thời đặt lại mốc cửa sổ 10 câu (`windowStartedAt`).
+  /// Ghi chú: `insertOnConflictUpdate` của Drift chỉ nhắm vào khóa chính
+  /// (`id` UUID mới mỗi lần gọi) nên không bắt được trùng
+  /// (child_id, scope, key); vì vậy hàm này tự kiểm tra rồi cập nhật.
+  Future<void> setStrandRung({
+    required String childId,
+    required String strand,
+    required int rung,
+  }) async {
+    final now = db.clock.now();
+    final existing = await getStrandProgress(childId, strand);
+    if (existing != null) {
+      await (update(
+        db.skillProgress,
+      )..where((t) => t.id.equals(existing.id))).write(
+        SkillProgressCompanion(
+          rung: Value(rung),
+          windowStartedAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+      return;
+    }
+    await into(db.skillProgress).insert(
+      SkillProgressCompanion.insert(
+        id: newId(),
+        childId: childId,
+        scope: SkillScope.strand,
+        key: strand,
+        rung: Value(rung),
+        windowStartedAt: Value(now),
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+  }
+
+  Future<SkillProgressData?> getStrandProgress(String childId, String strand) =>
+      (select(db.skillProgress)..where(
+            (t) =>
+                t.childId.equals(childId) &
+                t.scope.equals(SkillScope.strand) &
+                t.key.equals(strand),
+          ))
+          .getSingleOrNull();
+
+  /// Bậc hiện tại của cả 5 mảng (thiếu mảng nào thì coi như bậc 1).
+  Future<List<SkillProgressData>> getAllStrandProgress(String childId) =>
+      (select(db.skillProgress)..where(
+            (t) =>
+                t.childId.equals(childId) & t.scope.equals(SkillScope.strand),
+          ))
+          .get();
+
+  /// Đánh dấu một dạng bài đã / chưa thành thạo.
+  /// (Tự kiểm tra rồi cập nhật như [setStrandRung], vì
+  /// `insertOnConflictUpdate` chỉ nhắm vào khóa chính.)
+  Future<void> setFormMastered({
+    required String childId,
+    required String formId,
+    required bool mastered,
+  }) async {
+    final now = db.clock.now();
+    final existing = await getFormProgress(childId, formId);
+    if (existing != null) {
+      await (update(
+        db.skillProgress,
+      )..where((t) => t.id.equals(existing.id))).write(
+        SkillProgressCompanion(
+          mastered: Value(mastered),
+          masteredAt: Value(mastered ? now : null),
+          updatedAt: Value(now),
+        ),
+      );
+      return;
+    }
+    await into(db.skillProgress).insert(
+      SkillProgressCompanion.insert(
+        id: newId(),
+        childId: childId,
+        scope: SkillScope.form,
+        key: formId,
+        mastered: Value(mastered),
+        masteredAt: Value(mastered ? now : null),
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+  }
+
+  Future<SkillProgressData?> getFormProgress(String childId, String formId) =>
+      (select(db.skillProgress)..where(
+            (t) =>
+                t.childId.equals(childId) &
+                t.scope.equals(SkillScope.form) &
+                t.key.equals(formId),
+          ))
+          .getSingleOrNull();
+
+  /// Các dạng bài đã thành thạo của bé.
+  Future<List<SkillProgressData>> getMasteredForms(String childId) =>
+      (select(db.skillProgress)..where(
+            (t) =>
+                t.childId.equals(childId) &
+                t.scope.equals(SkillScope.form) &
+                t.mastered.equals(true),
+          ))
+          .get();
+}
+
+@DriftAccessor(tables: [ReviewQueue])
+class ReviewQueueDao extends DatabaseAccessor<AppDatabase>
+    with _$ReviewQueueDaoMixin {
+  ReviewQueueDao(super.db);
+
+  /// Thêm dạng bài vào sổ ôn tập (hoặc cập nhật mục đã có: đặt lại bậc,
+  /// ngày hỏi lại và chuỗi đúng về 0).
+  Future<String> upsertEntry({
+    required String childId,
+    required String formId,
+    required int rung,
+    required DateTime dueDate,
+  }) async {
+    final now = db.clock.now();
+    final existing = await getEntry(childId, formId);
+    if (existing != null) {
+      await (update(
+        db.reviewQueue,
+      )..where((t) => t.id.equals(existing.id))).write(
+        ReviewQueueCompanion(
+          rung: Value(rung),
+          dueDate: Value(dueDate),
+          correctStreak: const Value(0),
+          updatedAt: Value(now),
+        ),
+      );
+      return existing.id;
+    }
+    final id = newId();
+    await into(db.reviewQueue).insert(
+      ReviewQueueCompanion.insert(
+        id: id,
+        childId: childId,
+        formId: formId,
+        rung: rung,
+        dueDate: dueDate,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+    return id;
+  }
+
+  Future<ReviewQueueData?> getEntry(String childId, String formId) =>
+      (select(db.reviewQueue)
+            ..where((t) => t.childId.equals(childId) & t.formId.equals(formId)))
+          .getSingleOrNull();
+
+  /// Các mục đến hạn hỏi lại (ngày hỏi lại <= `now`).
+  Future<List<ReviewQueueData>> getDueEntries({
+    required String childId,
+    required DateTime now,
+  }) =>
+      (select(db.reviewQueue)
+            ..where(
+              (t) =>
+                  t.childId.equals(childId) &
+                  t.dueDate.isSmallerOrEqualValue(now),
+            )
+            ..orderBy([(t) => OrderingTerm.asc(t.dueDate)]))
+          .get();
+
+  Future<List<ReviewQueueData>> getAllEntries(String childId) =>
+      (select(db.reviewQueue)
+            ..where((t) => t.childId.equals(childId))
+            ..orderBy([(t) => OrderingTerm.asc(t.dueDate)]))
+          .get();
+
+  /// Cập nhật chuỗi đúng liên tiếp và ngày hỏi lại sau một lần hỏi lại.
+  Future<void> updateStreakAndDue({
+    required String id,
+    required int correctStreak,
+    required DateTime dueDate,
+  }) async {
+    await (update(db.reviewQueue)..where((t) => t.id.equals(id))).write(
+      ReviewQueueCompanion(
+        correctStreak: Value(correctStreak),
+        dueDate: Value(dueDate),
+        updatedAt: Value(db.clock.now()),
+      ),
+    );
+  }
+
+  /// Xóa mục khỏi sổ (đủ 3 lần đúng ngay, T1-10).
+  Future<int> removeEntry(String id) =>
+      (delete(db.reviewQueue)..where((t) => t.id.equals(id))).go();
+}
+
+@DriftAccessor(tables: [DailySets])
+class DailySetsDao extends DatabaseAccessor<AppDatabase>
+    with _$DailySetsDaoMixin {
+  DailySetsDao(super.db);
+
+  /// Tạo đề ngày mới. Trạng thái 5 chặng ban đầu đều là `not_started`.
+  Future<String> createDailySet({
+    required String childId,
+    required String date,
+    required List<DailySetQuestion> questions,
+  }) async {
+    final now = db.clock.now();
+    final id = newId();
+    await into(db.dailySets).insert(
+      DailySetsCompanion.insert(
+        id: id,
+        childId: childId,
+        date: date,
+        questions: jsonEncode(questions.map((q) => q.toJson()).toList()),
+        stageStatus: jsonEncode(List.filled(5, StageStatus.notStarted)),
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+    return id;
+  }
+
+  Future<DailySet?> getDailySet(String childId, String date) =>
+      (select(db.dailySets)
+            ..where((t) => t.childId.equals(childId) & t.date.equals(date)))
+          .getSingleOrNull();
+
+  Future<List<DailySet>> getDailySetsForChild(String childId) =>
+      (select(db.dailySets)
+            ..where((t) => t.childId.equals(childId))
+            ..orderBy([(t) => OrderingTerm.desc(t.date)]))
+          .get();
+
+  /// Đọc 25 câu của đề đã lưu.
+  List<DailySetQuestion> readQuestions(DailySet set) {
+    final raw = jsonDecode(set.questions) as List<dynamic>;
+    return raw
+        .map((e) => DailySetQuestion.fromJson(e as Map<String, Object?>))
+        .toList();
+  }
+
+  /// Đọc trạng thái 5 chặng của đề đã lưu.
+  List<String> readStageStatus(DailySet set) {
+    final raw = jsonDecode(set.stageStatus) as List<dynamic>;
+    return raw.map((e) => e as String).toList();
+  }
+
+  /// Đổi trạng thái một chặng (chỉ số 0–4).
+  Future<void> updateStageStatus({
+    required String id,
+    required int stageIndex,
+    required String status,
+  }) async {
+    final set = (await (select(
+      db.dailySets,
+    )..where((t) => t.id.equals(id))).getSingle());
+    final stages = readStageStatus(set);
+    stages[stageIndex] = status;
+    await (update(db.dailySets)..where((t) => t.id.equals(id))).write(
+      DailySetsCompanion(
+        stageStatus: Value(jsonEncode(stages)),
+        updatedAt: Value(db.clock.now()),
+      ),
+    );
+  }
+
+  /// Đánh dấu đã xong cả đề ngày.
+  Future<void> markCompleted(String id) async {
+    final now = db.clock.now();
+    await (update(db.dailySets)..where((t) => t.id.equals(id))).write(
+      DailySetsCompanion(
+        completed: const Value(true),
+        completedAt: Value(now),
+        updatedAt: Value(now),
+      ),
+    );
+  }
+}
+
+@DriftAccessor(tables: [WalletLedger])
+class WalletDao extends DatabaseAccessor<AppDatabase> with _$WalletDaoMixin {
+  WalletDao(super.db);
+
+  /// Ghi một giao dịch xu/kim cương. Chỉ thêm dòng, không có hàm sửa/xóa.
+  /// `amount` dương là cộng, âm là trừ.
+  Future<String> addEntry({
+    required String childId,
+    required String currency,
+    required int amount,
+    required String reason,
+    String? refId,
+  }) async {
+    final now = db.clock.now();
+    final id = newId();
+    await into(db.walletLedger).insert(
+      WalletLedgerCompanion.insert(
+        id: id,
+        childId: childId,
+        currency: currency,
+        amount: amount,
+        reason: reason,
+        refId: Value(refId),
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+    return id;
+  }
+
+  /// Số dư một loại tiền = tổng cột `amount` của bé đó.
+  Future<int> balance({
+    required String childId,
+    required String currency,
+  }) async {
+    final row = await customSelect(
+      'SELECT COALESCE(SUM(amount), 0) AS total FROM ${db.walletLedger.actualTableName} '
+      'WHERE child_id = ? AND currency = ?',
+      variables: [Variable.withString(childId), Variable.withString(currency)],
+      readsFrom: {db.walletLedger},
+    ).getSingle();
+    return row.read<int>('total');
+  }
+
+  /// Số dư cả hai loại tiền.
+  Future<Map<String, int>> balances(String childId) async {
+    return {
+      Currency.xu: await balance(childId: childId, currency: Currency.xu),
+      Currency.gem: await balance(childId: childId, currency: Currency.gem),
+    };
+  }
+
+  /// Lịch sử giao dịch của bé, mới nhất trước.
+  Future<List<WalletLedgerData>> getEntries(String childId, {int? limit}) {
+    final query = select(db.walletLedger)
+      ..where((t) => t.childId.equals(childId))
+      ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]);
+    if (limit != null) query.limit(limit);
+    return query.get();
+  }
+}
+
+@DriftAccessor(tables: [Settings])
+class SettingsDao extends DatabaseAccessor<AppDatabase>
+    with _$SettingsDaoMixin {
+  SettingsDao(super.db);
+
+  /// Đặt giá trị một khóa. `childId` null = cài đặt chung.
+  /// Ghi chú: cột `child_id` nullable nên ràng buộc unique của SQLite
+  /// không bắt được trùng khóa chung (NULL coi như khác nhau); vì vậy
+  /// hàm này tự kiểm tra rồi cập nhật thay vì dựa vào `ON CONFLICT`.
+  Future<void> setValue({
+    String? childId,
+    required String key,
+    required String value,
+  }) async {
+    final now = db.clock.now();
+    final existing = await _find(childId, key);
+    if (existing != null) {
+      await (update(db.settings)..where((t) => t.id.equals(existing.id))).write(
+        SettingsCompanion(value: Value(value), updatedAt: Value(now)),
+      );
+      return;
+    }
+    await into(db.settings).insert(
+      SettingsCompanion.insert(
+        id: newId(),
+        childId: Value(childId),
+        key: key,
+        value: value,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+  }
+
+  /// Đọc giá trị một khóa. Trả null nếu chưa có.
+  Future<String?> getValue({String? childId, required String key}) async {
+    final row = await _find(childId, key);
+    return row?.value;
+  }
+
+  /// Đọc giá trị hiệu lực: cài đặt riêng của bé trước, nếu không có thì
+  /// lấy cài đặt chung.
+  Future<String?> getEffectiveValue({
+    String? childId,
+    required String key,
+  }) async {
+    if (childId != null) {
+      final own = await getValue(childId: childId, key: key);
+      if (own != null) return own;
+    }
+    return getValue(key: key);
+  }
+
+  Future<int> deleteSetting({String? childId, required String key}) async {
+    final row = await _find(childId, key);
+    if (row == null) return 0;
+    return (delete(db.settings)..where((t) => t.id.equals(row.id))).go();
+  }
+
+  Future<List<Setting>> getAllSettings({String? childId}) {
+    final query = select(db.settings);
+    if (childId != null) {
+      query.where((t) => t.childId.equals(childId));
+    } else {
+      query.where((t) => t.childId.isNull());
+    }
+    return query.get();
+  }
+
+  Future<Setting?> _find(String? childId, String key) {
+    final query = select(db.settings)..where((t) => t.key.equals(key));
+    if (childId == null) {
+      query.where((t) => t.childId.isNull());
+    } else {
+      query.where((t) => t.childId.equals(childId));
+    }
+    return query.getSingleOrNull();
+  }
+}
