@@ -11,7 +11,7 @@ Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-09, nhánh `task/T1-09-man-lam-
 - T1-07 **Xong** (PR #8 đã merge): Thang ải và thành thạo — bậc 1–6 theo mảng + thành thạo dạng bài (`lib/features/ladder/`, `LadderService` dùng DAO T1-04), 22 unit test mới (thêm 1 test thành thạo dính sau review PR #8, commit `d08ac67`). PR: #8 (https://github.com/lavang-0708/TimoKid/pull/8).
 - T1-08 **Xong** (PR #9 đã merge): Đề ngày — mỗi ngày một đề 25 câu, 5 chặng theo 5 mảng (`lib/features/daily_set/`, `DailySetService` dùng `LadderService` + DAO T1-04), 27 unit test mới. PR: #9 (https://github.com/lavang-0708/TimoKid/pull/9).
 - T1-10 **Đang làm** (nhánh song song `task/T1-10-so-on-tap`): Sổ ôn tập — `ReviewBookService`, mốc hỏi lại 1-3-7 ngày. PR: #10.
-- T1-09 **Đang làm**: Màn làm toán — đề VI/EN, từ khóa song ngữ, trắc nghiệm trộn đáp án, bàn phím số, gợi ý/lời giải, xu theo bảng (c), ghi `attempts` + cập nhật bậc/thành thạo (`lib/features/math/`, `lib/features/rewards/`, `lib/features/stage_result/`), widget test + golden test 6 trạng thái + integration test đi hết một chặng. PR: (sẽ ghi sau khi mở, sau PR #10).
+- T1-09 **Đang làm**: Màn làm toán — đề VI/EN, từ khóa song ngữ, trắc nghiệm trộn đáp án, bàn phím số, gợi ý/lời giải, xu theo bảng (c), ghi `attempts` + cập nhật bậc/thành thạo (`lib/features/math/`, `lib/features/rewards/`, `lib/features/stage_result/`), widget test + golden test 6 trạng thái + integration test đi hết một chặng. PR: #11 (https://github.com/lavang-0708/TimoKid/pull/11).
 - Các nhiệm vụ còn lại của bản 0.1 (T1-11 đến T1-14): **Chưa bắt đầu**.
 - **Claude merge PR** (anh Điệp giao).
 
