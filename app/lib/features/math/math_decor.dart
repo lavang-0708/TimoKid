@@ -27,6 +27,13 @@ class MathColors {
   /// Số trên nút đáp án.
   static const Color buttonNumber = Color(0xFF4B2E83);
 
+  /// Nút bị vô hiệu: pastel rất nhạt (xám pha tím nhạt).
+  /// Mặc định của theme là `onSurface` mờ 12% — trên viền đào của
+  /// nút nổi nó thành nâu đất trông bẩn (review PR #14). Chữ số
+  /// trên nút vẫn giữ màu tím đậm nên vẫn đọc được (tương phản
+  /// khóa trong `math_contrast_test.dart`).
+  static const Color disabledButtonBg = Color(0xFFF2EEF7);
+
   /// Băng phản hồi đúng: nền xanh nhạt, viền xanh, chữ xanh đậm.
   static const Color bannerGreenBg = Color(0xFFE3F7E6);
   static const Color bannerGreenBorder = Color(0xFF43A047);

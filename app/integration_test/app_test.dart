@@ -42,13 +42,14 @@ void main() {
     final element = tester.element(find.byKey(const Key('math-screen')));
     final db = ProviderScope.containerOf(element).read(databaseProvider);
     final childId = await db.ensureSeeded();
-    // Âm thanh BẬT lại trên máy ảo CI (T1-15): bản cũ tạo AudioPlayer
-    // mới cho mỗi lần phát làm pumpAndSettle treo sau câu đúng nên
-    // main 3ca8934 đã tắt âm thanh ở đây; T1-15 đổi sang pool 4
-    // player cố định tái dùng (xem SoundService) nên bật lại để CI
-    // kiểm chứng — nếu CI vẫn treo thì để Claude quyết, không tự
-    // tắt lại rồi im lặng.
-    await db.settingsDao.setValue(key: 'sound_enabled', value: 'true');
+    // Tắt âm thanh khi chạy trên máy ảo CI: phát WAV qua audioplayers
+    // làm pumpAndSettle không bao giờ dừng (đã khoanh vùng ở PR #13).
+    // T1-15 thử pool 4 player cố định tái dùng (xem SoundService)
+    // rồi bật lại âm thanh để CI kiểm chứng, nhưng máy ảo vẫn treo
+    // nên Claude quyết tắt lại ở đây; không thử gói khác ở PR này.
+    // Âm thanh vẫn bật trong app; kiểm bằng widget test (SoundPlayer
+    // giả) và trên máy thật.
+    await db.settingsDao.setValue(key: 'sound_enabled', value: 'false');
     final set = await db.dailySetsDao.getDailySet(childId, db.clock.today());
     final resolved = db.dailySetsDao
         .readQuestions(set!)

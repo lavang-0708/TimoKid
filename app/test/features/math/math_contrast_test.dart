@@ -64,6 +64,12 @@ void main() {
       _contrast(MathColors.bannerGreenText, white),
       greaterThanOrEqualTo(4.5),
     );
+    // Nút bị vô hiệu (review PR #14): chữ số tím đậm trên nền
+    // pastel rất nhạt thay cho nâu đất.
+    expect(
+      _contrast(MathColors.buttonNumber, MathColors.disabledButtonBg),
+      greaterThanOrEqualTo(4.5),
+    );
     // Chữ tím đậm trên nền từng mảng (AppBar + tiêu đề).
     for (final strand in Strand.all) {
       expect(

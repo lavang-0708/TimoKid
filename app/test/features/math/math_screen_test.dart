@@ -893,6 +893,122 @@ void main() {
     expect(find.byKey(const ValueKey('pet-happy')), findsOneWidget);
   });
 
+  // Review PR #14 (2)(3): pet từng đè dòng tiếng Anh, băng gợi ý /
+  // lời giải từng đè nửa dưới thẻ đề. Nay pet nằm cạnh thanh tiến
+  // độ và băng nằm trong luồng bố cục dưới thẻ đề nên không còn
+  // chồng lấn — kiểm ở cả 640x320 (chật nhất) và 800x360, mỗi cỡ
+  // một test riêng (pumpWidget tái dùng State cũ nên không bơm lại
+  // phiên mới trong cùng một test).
+  Future<void> checkNoOverlap(WidgetTester tester, Size size) async {
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          home: MathScreen(session: session, soundService: soundService),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+
+    Rect rect(Key key) => tester.getRect(find.byKey(key));
+    // Vùng thẻ đề thực sự thấy được = giao của thẻ với khung cuộn
+    // (thẻ có thể dài hơn khung; phần bị cuộn khuất không tính).
+    Rect visibleCardRect() {
+      final card = rect(const Key('math-question-card'));
+      final scroll = tester.getRect(
+        find.ancestor(
+          of: find.byKey(const Key('math-question-card')),
+          matching: find.byType(SingleChildScrollView),
+        ),
+      );
+      return card.intersect(scroll);
+    }
+
+    // Trạng thái đang làm: pet không che đề (cả hai dòng).
+    expect(
+      rect(const ValueKey('pet-happy'))
+          .overlaps(rect(const Key('math-question-text'))),
+      isFalse,
+    );
+    expect(
+      rect(const ValueKey('pet-happy'))
+          .overlaps(rect(const Key('math-question-text-en'))),
+      isFalse,
+    );
+
+    // Sai lần đầu: băng gợi ý không chồng phần thẻ đề đang thấy,
+    // pet không che băng.
+    await tapWrongChoice(tester);
+    final hintBanner = rect(const Key('math-hint-banner'));
+    expect(hintBanner.overlaps(visibleCardRect()), isFalse);
+    expect(
+      rect(const ValueKey('pet-encouraging')).overlaps(hintBanner),
+      isFalse,
+    );
+
+    // Sai lần hai: băng lời giải cũng không chồng thẻ đề.
+    await tapWrongChoice(tester);
+    expect(
+      rect(const Key('math-solution-banner')).overlaps(visibleCardRect()),
+      isFalse,
+    );
+  }
+
+  testWidgets('pet không che chữ nào, băng không chồng thẻ đề ở 640x320', (
+    tester,
+  ) async {
+    await checkNoOverlap(tester, const Size(640, 320));
+  });
+
+  testWidgets('pet không che chữ nào, băng không chồng thẻ đề ở 800x360', (
+    tester,
+  ) async {
+    await checkNoOverlap(tester, const Size(800, 360));
+  });
+
+  testWidgets('nút bị vô hiệu dùng pastel nhạt, nút đúng giữ xanh', (
+    tester,
+  ) async {
+    // Review PR #14 (4): nút vô hiệu từng thành nâu đất (màu mặc
+    // định của theme) — nay nút thường vô hiệu dùng pastel rất nhạt,
+    // nút đúng vẫn xanh lá, nút sai vẫn đỏ.
+    await pumpMath(tester);
+    await tapCorrectChoice(tester);
+
+    Color disabledBg(int choiceIndex) {
+      final button = tester.widget<ElevatedButton>(
+        find.descendant(
+          of: find.byKey(Key('choice-$choiceIndex')),
+          matching: find.byType(ElevatedButton),
+        ),
+      );
+      // `styleFrom(disabledBackgroundColor: ...)` gộp màu vô hiệu
+      // vào `backgroundColor` (phân giải theo trạng thái).
+      final resolved = button.style?.backgroundColor?.resolve({
+        WidgetState.disabled,
+      });
+      expect(
+        resolved,
+        isNotNull,
+        reason: 'nút choice-$choiceIndex phải có màu nền khi vô hiệu',
+      );
+      return resolved!;
+    }
+
+    final correct = session.current.correctDisplayIndex;
+    expect(disabledBg(correct), Colors.green.shade300);
+    for (var i = 0; i < session.current.choiceCount; i++) {
+      if (i == correct) continue;
+      expect(disabledBg(i), MathColors.disabledButtonBg);
+    }
+  });
+
   testWidgets('gợi ý và lời giải luôn thấy ngay ở 640x320', (tester) async {
     // Review PR #13: gợi ý/lời giải cũ nằm dưới đề trong cột cuộn
     // nên ở màn thấp bị khuất; nay nằm trong băng ở đáy cột trái nên

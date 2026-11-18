@@ -13,6 +13,7 @@ library;
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../math/math_decor.dart';
 import '../math/math_screen.dart';
 import '../math/math_session.dart' show strandNames;
 
@@ -85,9 +86,18 @@ class StageResultScreen extends StatelessWidget {
     final title = args.stageIndex >= 0
         ? 'Xong chặng ${args.stageIndex + 1} — $strandName!'
         : 'Xong chặng tự chọn — $strandName!';
+    // Cùng nền và phông với màn làm toán (sửa sau review PR #14,
+    // không chặn): nền pastel theo mảng, phông Nunito đã có sẵn
+    // toàn app qua AppTheme.
+    final background = MathColors.strandBackground(args.strand);
     return Scaffold(
       key: const Key('stage-result-screen'),
-      appBar: AppBar(title: const Text('Kết quả chặng')),
+      backgroundColor: background,
+      appBar: AppBar(
+        title: const Text('Kết quả chặng'),
+        backgroundColor: background,
+        foregroundColor: MathColors.questionText,
+      ),
       // Cuộn được để không tràn trên màn thấp (640x320 dp).
       body: Center(
         child: SingleChildScrollView(

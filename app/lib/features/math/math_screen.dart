@@ -8,10 +8,13 @@
 /// trong app, nút to, có nút xóa.
 ///
 /// Bố cục 2 cột (sửa sau review PR #11, cân lại ở T1-12 theo điểm
-/// (l), sinh động hóa ở T1-15 theo điểm (m)): cột trái là đề trong
-/// thẻ trắng bo tròn có bóng, hình vẽ, gợi ý hoặc lời giải — cuộn
-/// được, khối đề căn giữa dọc; cột phải là 4 nút trắc nghiệm hoặc ô
-/// số + bàn phím, cộng nút "Tiếp" — không cuộn, cả khối căn giữa dọc.
+/// (l), sinh động hóa ở T1-15 theo điểm (m)): cột trái là thanh tiến
+/// độ + pet ở hàng trên, đề trong thẻ trắng bo tròn có bóng (cuộn
+/// được, khối đề căn giữa dọc), gợi ý/lời giải nằm trong băng ở
+/// DƯỚI thẻ đề trong luồng bố cục (không chồng lên — sửa sau review
+/// PR #14); cột phải là 4 nút trắc nghiệm hoặc ô số + bàn phím,
+/// cộng nút "Tiếp" — không cuộn, cả khối căn giữa dọc. Pet không
+/// che chữ nào ở bất kỳ trạng thái nào (nằm cạnh thanh tiến độ).
 /// Bố cục xếp dọc 1 cột cũ không vừa điện thoại ngang cao 360 dp (máy
 /// ảo 640x320: nút choice-3 nằm ngoài màn hình).
 ///
@@ -20,8 +23,9 @@
 /// dưới đậm, nhấn lún xuống); băng phản hồi trượt lên từ đáy (xanh
 /// "Đúng rồi! +N xu" kèm nút Tiếp, cam nhạt "Gần đúng rồi, xem gợi ý
 /// nhé" khi sai lần đầu); xu bay về góc ví; đúng liền 3 câu hiện
-/// "3 câu liền!"; pet mèo nhỏ ở góc phản ứng vui khi đúng, động viên
-/// khi sai. Hiệu ứng dưới 1 giây, không chặn thao tác.
+/// "3 câu liền!"; pet mèo nhỏ cạnh thanh tiến độ phản ứng vui khi
+/// đúng, động viên khi sai (không che chữ nào — sửa sau review
+/// PR #14). Hiệu ứng dưới 1 giây, không chặn thao tác.
 ///
 /// Sai lần đầu hiện gợi ý và cho làm lại; sai lần hai hiện lời giải
 /// từng bước và nút "Tiếp". Đúng thì có hiệu ứng (ngôi sao + số xu)
@@ -323,16 +327,19 @@ class _MathScreenState extends ConsumerState<MathScreen>
         ? 'Chặng ${session.stageIndex + 1} — $strandName'
         : 'Chặng tự chọn — $strandName';
     // Băng phản hồi: đúng thì băng xanh toàn màn (kèm nút Tiếp);
-    // sai lần đầu / sai hai lần thì băng cam / xanh dương hẹp trong
-    // cột trái (không che đáp án — xem [_QuestionColumn]).
+    // sai lần đầu / sai hai lần thì băng cam / xanh dương nằm dưới
+    // thẻ đề trong luồng cột trái (không chồng lên — xem
+    // [_QuestionColumn], sửa sau review PR #14).
     final showGreenBanner = session.state == QuestionState.correct;
     // Pet vui khi đang làm / đúng, động viên khi gợi ý / lời giải.
+    // Pet nằm cạnh thanh tiến độ trong [_QuestionColumn], không
+    // còn ở góc dưới-trái (review PR #14: pet không được che chữ).
     final petHappy =
         session.state != QuestionState.hint &&
         session.state != QuestionState.solution;
     // Chừa chỗ dưới cho băng xanh (cột phải lúc đúng chỉ còn nút
-    // trắc nghiệm/ô số nên vẫn vừa); băng gợi ý/lời giải chỉ nằm
-    // trong cột trái nên không cần chừa chỗ toàn màn.
+    // trắc nghiệm/ô số nên vẫn vừa); băng gợi ý/lời giải nằm trong
+    // luồng cột trái nên không cần chừa chỗ toàn màn.
     const greenBannerReserve = 112.0;
     // Các nút trên thanh tiêu đề là nút biểu tượng, tối thiểu 56x56 dp.
     // Biểu tượng là ký tự chữ (←, Aa) thay vì `Icon` vì font
@@ -410,7 +417,11 @@ class _MathScreenState extends ConsumerState<MathScreen>
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _QuestionColumn(session: session, question: question),
+                _QuestionColumn(
+                  session: session,
+                  question: question,
+                  petHappy: petHappy,
+                ),
                 _AnswerColumn(
                   session: session,
                   question: question,
@@ -421,17 +432,15 @@ class _MathScreenState extends ConsumerState<MathScreen>
             ),
           ),
           // Băng phản hồi đúng: trượt lên từ đáy màn, toàn chiều
-          // rộng (trừ chỗ pet ở góc trái).
+          // rộng. Pet đã chuyển lên cạnh thanh tiến độ nên băng
+          // không cần chừa chỗ trái nữa (sửa sau review PR #14).
           if (showGreenBanner)
             Positioned(
-              left: 96,
+              left: 12,
               right: 12,
               bottom: 12,
               child: _SlideUpBanner(child: _CorrectBanner(session: session)),
             ),
-          // Pet ở góc dưới-trái của body: khi đúng, nó nằm trong
-          // vùng chừa 112 dp cho băng xanh nên không che thẻ đề.
-          Positioned(left: 12, bottom: 12, child: _PetMascot(happy: petHappy)),
         ],
       ),
     );
@@ -562,30 +571,45 @@ class _ProgressCells extends StatelessWidget {
   }
 }
 
-/// Cột trái: thanh tiến độ, đề trong thẻ trắng, hình vẽ, gợi ý/lời
-/// giải — cuộn được, khối đề căn giữa dọc (PLAN điểm (l)). Pet ở góc
-/// dưới trái; băng cam (sai lần đầu) trượt lên ở đáy cột.
-/// Cột trái: thanh tiến độ + đề trong thẻ trắng (cuộn được) và pet
-/// ở góc dưới trái.
+/// Cột trái: hàng trên là thanh tiến độ + pet, dưới là đề trong thẻ
+/// trắng (cuộn được, khối đề căn giữa dọc — PLAN điểm (l)), dưới
+/// cùng là băng gợi ý/lời giải khi có.
 ///
-/// Gợi ý / lời giải KHÔNG còn nằm dưới đề (review PR #13: ở 800x360
-/// và 640x320 chúng bị khuất, phải cuộn mới thấy) mà nằm trong băng
-/// phản hồi ở đáy cột trái — luôn thấy ngay, bé không phải cuộn.
-/// Băng chỉ chiếm cột trái (không che nút đáp án cột phải: bàn phím
-/// số ở 640x320 cần tối thiểu 224 dp trong khi thân màn chỉ 264 dp,
-/// băng toàn màn không còn chỗ); băng cao tối đa 55% cột, nội dung
-/// dài thì cuộn trong băng, băng luôn hiện.
+/// Gợi ý / lời giải KHÔNG nằm dưới đề trong vùng cuộn (review
+/// PR #13: ở 800x360 và 640x320 chúng bị khuất, phải cuộn mới thấy)
+/// mà nằm trong băng phản hồi ở đáy cột trái — luôn thấy ngay, bé
+/// không phải cuộn. Băng chỉ chiếm cột trái (không che nút đáp án
+/// cột phải: bàn phím số ở 640x320 cần tối thiểu 224 dp trong khi
+/// thân màn chỉ 264 dp, băng toàn màn không còn chỗ); băng cao tối
+/// đa 55% cột, nội dung dài thì cuộn trong băng, băng luôn hiện.
+///
+/// Sửa sau review PR #14: băng KHÔNG còn chồng lên thẻ đề bằng
+/// `Positioned` (trước đây nó đè nửa dưới thẻ, che câu hỏi) mà nằm
+/// trong luồng bố cục dưới thẻ — thẻ đề co lại và cuộn phần còn
+/// lại. Đã cân nhắc đặt băng ở cột phải dưới 4 nút (chỗ đó trống
+/// khi trắc nghiệm): ở 640x320 trạng thái lời giải còn nút "Tiếp"
+/// 68 dp nên chỉ còn ~24 dp cho băng, không đủ; giữ băng ở cột
+/// trái cho cả hai loại câu.
+/// Pet cũng chuyển từ góc dưới-trái (đè dòng tiếng Anh) lên cạnh
+/// thanh tiến độ ở hàng trên: nằm trong luồng bố cục nên không che
+/// chữ nào ở bất kỳ trạng thái nào.
 class _QuestionColumn extends StatelessWidget {
-  const _QuestionColumn({required this.session, required this.question});
+  const _QuestionColumn({
+    required this.session,
+    required this.question,
+    required this.petHappy,
+  });
 
   final StageSession session;
   final ResolvedQuestion question;
+
+  /// Pet vui khi đang làm / đúng, động viên khi gợi ý / lời giải.
+  final bool petHappy;
 
   @override
   Widget build(BuildContext context) {
     final showHintBanner = session.state == QuestionState.hint;
     final showSolutionBanner = session.state == QuestionState.solution;
-    final showInfoBanner = showHintBanner || showSolutionBanner;
     return Expanded(
       flex: 6,
       child: LayoutBuilder(
@@ -595,95 +619,107 @@ class _QuestionColumn extends StatelessWidget {
             120.0,
             240.0,
           );
-          // Chừa chỗ dưới cho pet (72 dp + lề) và cho băng khi hiện.
-          // Pet ngồi ở góc dưới-trái của body (Stack ngoài) nên ở
-          // trạng thái đúng nó nằm trong vùng chừa cho băng xanh,
-          // không che thẻ đề; các trạng thái khác nó đè lên vùng
-          // cuộn dưới cùng (chủ yếu là dòng EN phụ), thẻ vẫn cuộn
-          // được để đọc hết. (Đã thử hàng pet riêng dưới vùng cuộn:
-          // vùng đọc bị thu hẹp, thẻ dài bị cắt giữa dòng nên bỏ.)
-          final bottomPad = showInfoBanner ? bannerMaxHeight + 16 : 88.0;
-          return Stack(
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              LayoutBuilder(
-                builder: (context, innerConstraints) {
-                  return SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(20, 12, 20, bottomPad),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: innerConstraints.maxHeight - 12 - bottomPad,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _ProgressCells(
-                            total: session.resolved.length,
-                            currentIndex: session.currentIndex,
-                            state: session.state,
-                          ),
-                          const SizedBox(height: 10),
-                          // Đề trong thẻ trắng bo tròn có bóng (điểm (m)).
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.12),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                // Đề luôn song ngữ (PLAN điểm (l)): tiếng
-                                // Việt chữ to trên, tiếng Anh nhỏ hơn +
-                                // nhạt hơn dưới.
-                                Text(
-                                  question.question.questionVi,
-                                  key: const Key('math-question-text'),
-                                  style: const TextStyle(
-                                    fontSize: 28,
-                                    color: MathColors.questionText,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  question.question.questionEn,
-                                  key: const Key('math-question-text-en'),
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: MathColors.englishText,
-                                  ),
-                                ),
-                                if (question.question.figure != null) ...[
-                                  const SizedBox(height: 12),
-                                  Center(
-                                    child: FigureView(
-                                      key: const Key('math-figure'),
-                                      figure: question.question.figure!,
-                                      width: 220,
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ],
+              // Hàng trên: thanh tiến độ + pet (48 dp). Thanh tiến
+              // độ cố định ở trên thay vì nằm trong vùng cuộn nên
+              // bé luôn thấy đang ở câu mấy; pet trong luồng bố cục
+              // nên không che chữ nào.
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _ProgressCells(
+                        total: session.resolved.length,
+                        currentIndex: session.currentIndex,
+                        state: session.state,
                       ),
                     ),
-                  );
-                },
+                    const SizedBox(width: 8),
+                    _PetMascot(happy: petHappy),
+                  ],
+                ),
               ),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, innerConstraints) {
+                    return SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: innerConstraints.maxHeight - 22,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Đề trong thẻ trắng bo tròn có bóng (điểm (m)).
+                            // Key để test khóa "băng không chồng thẻ đề".
+                            Container(
+                              key: const Key('math-question-card'),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.12),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  // Đề luôn song ngữ (PLAN điểm (l)): tiếng
+                                  // Việt chữ to trên, tiếng Anh nhỏ hơn +
+                                  // nhạt hơn dưới.
+                                  Text(
+                                    question.question.questionVi,
+                                    key: const Key('math-question-text'),
+                                    style: const TextStyle(
+                                      fontSize: 28,
+                                      color: MathColors.questionText,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    question.question.questionEn,
+                                    key: const Key('math-question-text-en'),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: MathColors.englishText,
+                                    ),
+                                  ),
+                                  if (question.question.figure != null) ...[
+                                    const SizedBox(height: 12),
+                                    Center(
+                                      child: FigureView(
+                                        key: const Key('math-figure'),
+                                        figure: question.question.figure!,
+                                        width: 220,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              // Băng gợi ý/lời giải trong luồng bố cục, dưới thẻ đề:
+              // thẻ đề co lại, không bị băng chồng lên (review
+              // PR #14). Băng trượt lên từ đáy khi vừa hiện.
               if (showHintBanner)
-                Positioned(
-                  left: 96,
-                  right: 12,
-                  bottom: 12,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
                   child: _SlideUpBanner(
                     child: _HintBanner(
                       question: question,
@@ -692,10 +728,8 @@ class _QuestionColumn extends StatelessWidget {
                   ),
                 ),
               if (showSolutionBanner)
-                Positioned(
-                  left: 96,
-                  right: 12,
-                  bottom: 12,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
                   child: _SlideUpBanner(
                     child: _SolutionBanner(
                       question: question,
@@ -1201,7 +1235,10 @@ class _CoinFly extends StatelessWidget {
   }
 }
 
-/// Pet mèo nhỏ ở góc: vui khi đúng, động viên khi sai.
+/// Pet mèo nhỏ cạnh thanh tiến độ (48 dp): vui khi đúng, động viên
+/// khi sai. Nằm trong luồng bố cục nên không che chữ nào (sửa sau
+/// review PR #14 — trước đây pet 72 dp ở góc dưới-trái, đè dòng
+/// tiếng Anh).
 class _PetMascot extends StatelessWidget {
   const _PetMascot({required this.happy});
 
@@ -1214,8 +1251,8 @@ class _PetMascot extends StatelessWidget {
     return SvgPicture.string(
       happy ? petCatHappySvg : petCatEncouragingSvg,
       key: ValueKey(happy ? 'pet-happy' : 'pet-encouraging'),
-      width: 72,
-      height: 72,
+      width: 48,
+      height: 48,
     );
   }
 }
@@ -1285,7 +1322,11 @@ class _RaisedButtonState extends State<_RaisedButton> {
                 backgroundColor: widget.backgroundColor,
                 // Nút bị vô hiệu sau khi trả lời đúng/sai hai lần nên
                 // màu phải đặt ở cả hai chỗ, không thì nút nào cũng xám.
-                disabledBackgroundColor: widget.backgroundColor,
+                // Nút đúng giữ xanh, nút sai giữ đỏ; nút thường (nền
+                // null) dùng pastel rất nhạt thay cho màu nâu đất mặc
+                // định của theme (review PR #14).
+                disabledBackgroundColor:
+                    widget.backgroundColor ?? MathColors.disabledButtonBg,
                 padding: EdgeInsets.zero,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
