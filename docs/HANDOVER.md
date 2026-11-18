@@ -1,21 +1,23 @@
 # HANDOVER — TimoKid
 
-Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-04, nhánh `task/T1-04-db`; Claude gộp main vào nhánh).
+Cập nhật cuối: 17/11/2026 (nhiệm vụ T1-04, nhánh `task/T1-04-db`).
 
 ## Trạng thái hiện tại
 
-- `main` đang ở commit `fa956e4` — PR #1 (T1-01), #2 (T1-02), #3 (T1-03) đã merge. PLAN.md có mục "Làm rõ ngày 17/11" (a–j), ghi đè mọi chỗ khác trong kế hoạch.
-- T1-01, T1-02, T1-03 **Xong**. CI chính và integration test máy ảo (API 30, ~8 phút) đều xanh. Phần ký APK chờ anh Điệp nạp 4 secrets theo `docs/RELEASE.md`, rồi tag thử `v0.0.1`.
-- T1-04 **Chờ review PR**: Drift 7 bảng, hồ sơ bé mặc định lớp 2, test DB trong bộ nhớ + test tắt/mở lại app. Claude đã review cục bộ commit `9166a20` (format/analyze sạch, 20 test pass) và gộp `main` vào nhánh.
-- T1-05 **Đang làm** trên `task/T1-05-generator` (chưa có commit).
-- Các nhiệm vụ còn lại của bản 0.1 (T1-06 đến T1-14): **Chưa bắt đầu**.
-- **Claude merge PR** (anh Điệp giao).
+- `main` đang ở commit `fa956e4` — PR #3 (T1-03) đã merge squash; CI + 3 workflow đã có trên main.
+- T1-01 **Xong**: PR #1 đã merge.
+- T1-02 **Xong**: PR #2 đã merge (`04dfe35`). Claude đã rebase nhánh lên main và chạy lại trên máy mình: analyze sạch, 5/5 test pass.
+- T1-03 **Xong**: PR #3 đã merge (`fa956e4`). CI chính xanh trong 11,5 phút, APK debug đúng `vn.timokid.app`; integration test máy ảo đã sửa (build APK trước, cache AVD, API 30, `--use-application-binary`) và chạy lại xanh trước khi merge. Anh Điệp chỉ cần nạp 4 secrets ký APK theo `docs/RELEASE.md`, rồi tag thử `v0.0.1` làm sau.
+- T1-04 **Đang làm**: Drift với 7 bảng, hồ sơ bé mặc định lớp 2, test trên DB trong bộ nhớ + test tắt/mở lại app. PR: (điền số PR sau khi mở). Nhánh tách từ main cũ (`04dfe35`); sau khi mở PR sẽ merge main mới (`fa956e4`, có CI) vào nhánh.
+- Các nhiệm vụ còn lại của bản 0.1 (T1-05 đến T1-14): **Chưa bắt đầu**. T1-05 làm song song với T1-04 trên nhánh riêng.
+- **Từ nay Claude merge PR** (anh Điệp giao).
 
 ## Điểm cần biết khi tiếp tục
 
 - **Muse không đẩy được file nhị phân lên GitHub qua MCP** (kênh push-files chỉ nhận file text UTF-8; thử đẩy base64 qua `push_files` thì file lên sai dạng text). Quy tắc từ nay (Claude chốt sau review PR #2): Muse liệt kê file nhị phân cần có trong mục "Việc còn lại" của PR (đường dẫn, cách sinh), Claude commit bằng git lên nhánh PR. Áp dụng ở T1-02: (1) ảnh golden nhúng base64 trong `app/test/goldens/golden_data.dart`, test tự giải mã ra PNG trước khi so sánh; (2) chưa có icon launcher riêng — `AndroidManifest.xml` bỏ `android:icon`, app dùng icon mặc định của hệ thống, icon thật làm ở T1-12.
 - **`gradle-wrapper.jar` không cần commit**: file này nằm trong `app/android/.gitignore` của template vì flutter tool tự sinh khi build (`injectGradleWrapperIfNeeded` trong flutter_tools). T1-03 KHÔNG tải jar hay commit bằng Actions như dự định ban đầu. Tương tự, `gradlew`/`gradlew.bat` cũng tự sinh, nhưng đã commit kèm ở T1-02 nên cứ để đó.
 - CI chạy trên GitHub Actions, ghim Flutter 3.50.0. Máy Muse không có Android SDK nên không chạy được `flutter build apk` hay máy ảo ở local — CI là nơi kiểm chứng. Workflow release cần 4 secrets ký APK (xem `docs/RELEASE.md`); thiếu secrets thì job dừng với thông báo rõ ràng, không build bản ký debug.
+- **Muse không đẩy được file trong `.github/workflows/`** (GitHub App không có quyền `workflows`, lỗi 403). 3 file workflow của T1-03 do Claude commit giúp bằng git. T1-04 không có file workflow.
 - **Database T1-04**: Drift 2.35.4 + drift_flutter 0.3.1, schema v1, 7 bảng (`children`, `attempts`, `skill_progress`, `review_queue`, `daily_sets`, `wallet_ledger`, `settings`). File sinh bởi build_runner (`app_database.g.dart`, `daos.g.dart`) được commit cùng code vì CI chưa có bước build_runner. Chi tiết schema và các quyết định xem `docs/DECISIONS.md` (mục 17/11/2026 — T1-04).
 - **Clock**: mọi code lấy thời gian qua lớp `Clock` (`lib/core/time/clock.dart`); giờ Việt Nam = UTC+7 cố định, không cần gói `timezone`. Test dùng `FakeClock`.
 - Flutter SDK của Muse: `~/workspace/flutter-sdk/flutter`, bản 3.50.0 stable, Dart 3.14.0. Build APK và máy ảo chỉ qua GitHub Actions (T1-03).
