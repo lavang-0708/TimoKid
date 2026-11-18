@@ -1,13 +1,12 @@
 # HANDOVER — TimoKid
 
-Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-04, nhánh `task/T1-04-db`; Claude gộp main vào nhánh).
+Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-05, nhánh `task/T1-05-generator`; Claude gộp main vào nhánh).
 
 ## Trạng thái hiện tại
 
-- `main` đang ở commit `fa956e4` — PR #1 (T1-01), #2 (T1-02), #3 (T1-03) đã merge. PLAN.md có mục "Làm rõ ngày 17/11" (a–j), ghi đè mọi chỗ khác trong kế hoạch.
-- T1-01, T1-02, T1-03 **Xong**. CI chính và integration test máy ảo (API 30, ~8 phút) đều xanh. Phần ký APK chờ anh Điệp nạp 4 secrets theo `docs/RELEASE.md`, rồi tag thử `v0.0.1`.
-- T1-04 **Chờ review PR**: Drift 7 bảng, hồ sơ bé mặc định lớp 2, test DB trong bộ nhớ + test tắt/mở lại app. Claude đã review cục bộ commit `9166a20` (format/analyze sạch, 20 test pass) và gộp `main` vào nhánh.
-- T1-05 **Đang làm** trên `task/T1-05-generator` (chưa có commit).
+- `main` đang ở commit `0526471` — PR #1 (T1-01), #2 (T1-02), #3 (T1-03), #4 (T1-04) đã merge. PLAN.md có mục "Làm rõ ngày 17/11" (a–j), ghi đè mọi chỗ khác trong kế hoạch.
+- T1-01 đến T1-04 **Xong**. CI chính và integration test máy ảo (API 30, ~8 phút) đều xanh. Phần ký APK chờ anh Điệp nạp 4 secrets theo `docs/RELEASE.md`, rồi tag thử `v0.0.1`.
+- T1-05 **Chờ review PR**: Bộ sinh câu hỏi — chuyển 48/48 dạng bài trong `gen.py` sang Dart (`lib/features/questions/`), test 500 seed × 103 cặp form×mức. PR: #5 (https://github.com/lavang-0708/TimoKid/pull/5).
 - Các nhiệm vụ còn lại của bản 0.1 (T1-06 đến T1-14): **Chưa bắt đầu**.
 - **Claude merge PR** (anh Điệp giao).
 
@@ -45,3 +44,4 @@ Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-04, nhánh `task/T1-04-db`; Cla
 - Tag phát hành do Muse tạo sau khi Claude kết luận Đạt. Ký APK chờ anh Điệp nạp keystore vào GitHub Secrets.
 - Menu QA: nhấn giữ 5 giây ở góc trên bên trái. `Clock` trả ngày theo `Asia/Ho_Chi_Minh`. Bản 0.1 mở app vào thẳng màn Thị trấn tạm với bé mặc định (mục (i)).
 - Sửa sai trong review trước của Muse: số form đủ 3 mức là 17, không phải 30 như Muse viết lúc đầu. Kết luận review không đổi.
+- T1-05: bộ sinh câu nằm ở `app/lib/features/questions/` (model `question.dart`, 5 file generator theo mảng, `question_registry.dart` liệt kê đủ 48 dạng). Số cặp form×mức thật là **103**, không phải 89 như ghi lúc đầu — đếm lại từ `gen.py` và `questions.json` đều ra 103. Mỗi `Question` giữ `params` (tham số đã dùng) để test giải lại độc lập, và `figure` (`FigureSpec`) để T1-06 sinh SVG. Nhánh `task/T1-05-generator` tách từ main cũ (`04dfe35`); sau khi mở PR sẽ merge main mới (`fa956e4`, có CI) vào nhánh.
