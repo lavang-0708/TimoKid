@@ -1,13 +1,14 @@
 # HANDOVER — TimoKid
 
-Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-05, nhánh `task/T1-05-generator`; Claude gộp main vào nhánh).
+Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-06, nhánh `task/T1-06-hinh-ve`).
 
 ## Trạng thái hiện tại
 
 - `main` đang ở commit `0526471` — PR #1 (T1-01), #2 (T1-02), #3 (T1-03), #4 (T1-04) đã merge. PLAN.md có mục "Làm rõ ngày 17/11" (a–j), ghi đè mọi chỗ khác trong kế hoạch.
 - T1-01 đến T1-04 **Xong**. CI chính và integration test máy ảo (API 30, ~8 phút) đều xanh. Phần ký APK chờ anh Điệp nạp 4 secrets theo `docs/RELEASE.md`, rồi tag thử `v0.0.1`.
-- T1-05 **Chờ review PR**: Bộ sinh câu hỏi — chuyển 48/48 dạng bài trong `gen.py` sang Dart (`lib/features/questions/`), test 500 seed × 103 cặp form×mức. PR: #5 (https://github.com/lavang-0708/TimoKid/pull/5).
-- Các nhiệm vụ còn lại của bản 0.1 (T1-06 đến T1-14): **Chưa bắt đầu**.
+- T1-05 **Xong**: Bộ sinh câu hỏi — chuyển 48/48 dạng bài trong `gen.py` sang Dart (`lib/features/questions/`), test 500 seed × 103 cặp form×mức. PR #5 đã merge.
+- T1-06 **Đang làm**: Hình vẽ cho câu hình học — sinh SVG từ `FigureSpec` (`lib/features/questions/figure_svg.dart`, gói `flutter_svg` 2.4.0), golden test 7 hình, ảnh chụp 7 dạng gửi qua chat cho Claude đếm lại bằng mắt. PR: (điền số PR sau khi mở).
+- Các nhiệm vụ còn lại của bản 0.1 (T1-07 đến T1-14): **Chưa bắt đầu**.
 - **Claude merge PR** (anh Điệp giao).
 
 ## Điểm cần biết khi tiếp tục
@@ -18,6 +19,7 @@ Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-05, nhánh `task/T1-05-generato
 - **Database T1-04**: Drift 2.35.4 + drift_flutter 0.3.1, schema v1, 7 bảng (`children`, `attempts`, `skill_progress`, `review_queue`, `daily_sets`, `wallet_ledger`, `settings`). File sinh bởi build_runner (`app_database.g.dart`, `daos.g.dart`) được commit cùng code vì CI chưa có bước build_runner. Chi tiết schema và các quyết định xem `docs/DECISIONS.md` (mục 17/11/2026 — T1-04).
 - **Clock**: mọi code lấy thời gian qua lớp `Clock` (`lib/core/time/clock.dart`); giờ Việt Nam = UTC+7 cố định, không cần gói `timezone`. Test dùng `FakeClock`.
 - Flutter SDK của Muse: `~/workspace/flutter-sdk/flutter`, bản 3.50.0 stable, Dart 3.14.0. Build APK và máy ảo chỉ qua GitHub Actions (T1-03).
+- **Hình vẽ T1-06**: `flutter_svg` 2.4.0; `buildFigureSvg` sinh chuỗi SVG khớp từng ký tự với các hàm `svg_*` của `gen.py`; golden 7 hình nhúng base64 trong `app/test/goldens/figure_golden_data.dart` (test tự giải mã ra PNG trước khi so sánh); ảnh chụp 7 dạng ở `docs/screenshots-t1-06/` chỉ lưu local, không đẩy lên GitHub (file nhị phân).
 
 ## Cách build và chạy test
 
