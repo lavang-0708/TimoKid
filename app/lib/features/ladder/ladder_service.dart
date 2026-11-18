@@ -129,16 +129,25 @@ class LadderService {
 
   /// Đánh giá thành thạo một dạng bài (mục (b)): đúng ngay lần đầu
   /// 4/5 câu gần nhất ở mức thành thạo của dạng (mức cao nhất dạng hỗ
-  /// trợ, không thấp hơn Vừa nếu dạng có Vừa). Kết quả được ghi vào
-  /// `skill_progress` (dòng `form`) và trả về.
+  /// trợ, không thấp hơn Vừa nếu dạng có Vừa).
   ///
-  /// Chỉ tính các lượt trả lời ĐÚNG ở mức thành thạo: câu làm ở mức thấp
+  /// Thành thạo là dính (sticky): một khi đã đạt thì giữ nguyên, kể
+  /// cả khi 5 câu gần nhất sau đó không đạt — vì thành thạo quyết định
+  /// pet lớn, mở tòa nhà và sticker. Đã thành thạo thì trả `true` luôn
+  /// mà không ghi lại; chưa thành thạo thì chỉ ghi khi đạt, và
+  /// `masteredAt` là lần đầu đạt (DAO giữ nguyên giá trị cũ nếu có).
+  ///
+  /// Chỉ tính các lượt trả lời ở mức thành thạo: câu làm ở mức thấp
   /// hơn không tính vào cửa sổ 5 câu. Chưa đủ 5 câu ở mức đó thì chưa
   /// thành thạo.
   Future<bool> evaluateFormMastery({
     required String childId,
     required String formId,
   }) async {
+    final existing = await _skillProgressDao.getFormProgress(childId, formId);
+    if (existing?.mastered ?? false) {
+      return true;
+    }
     final generator = questionGeneratorFor(formId);
     if (generator == null) {
       throw ArgumentError('Không có dạng bài nào mang mã $formId');
@@ -156,11 +165,13 @@ class LadderService {
     final mastered =
         attempts.length >= LadderConfig.masteryWindow &&
         correctCount >= LadderConfig.masteryCorrectNeeded;
-    await _skillProgressDao.setFormMastered(
-      childId: childId,
-      formId: formId,
-      mastered: mastered,
-    );
+    if (mastered) {
+      await _skillProgressDao.setFormMastered(
+        childId: childId,
+        formId: formId,
+        mastered: true,
+      );
+    }
     return mastered;
   }
 

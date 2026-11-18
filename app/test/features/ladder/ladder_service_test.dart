@@ -391,6 +391,61 @@ void main() {
       );
     });
 
+    test('đã thành thạo rồi sai 5 câu liền vẫn thành thạo', () async {
+      // 4/5 đúng ngay ở mức Khó → thành thạo.
+      await answerForm(
+        formId: 'logic.balance',
+        strand: Strand.logic,
+        level: 3,
+        count: 5,
+        correct: 4,
+      );
+      expect(
+        await ladder.evaluateFormMastery(
+          childId: childId,
+          formId: 'logic.balance',
+        ),
+        isTrue,
+      );
+      final masteredAt = (await db.skillProgressDao.getFormProgress(
+        childId,
+        'logic.balance',
+      ))?.masteredAt;
+      expect(masteredAt, isNotNull);
+
+      // Sai 5 câu liền ở mức Khó rồi đánh giá lại: vẫn thạo,
+      // mastered_at giữ nguyên lần đầu đạt.
+      await answerForm(
+        formId: 'logic.balance',
+        strand: Strand.logic,
+        level: 3,
+        count: 5,
+        correct: 0,
+      );
+      expect(
+        await ladder.evaluateFormMastery(
+          childId: childId,
+          formId: 'logic.balance',
+        ),
+        isTrue,
+      );
+      expect(
+        await ladder.isFormMastered(childId: childId, formId: 'logic.balance'),
+        isTrue,
+      );
+      expect(
+        await ladder.masteredForms(childId: childId),
+        contains('logic.balance'),
+      );
+      expect(
+        (await db.skillProgressDao.getFormProgress(
+          childId,
+          'logic.balance',
+        ))?.masteredAt,
+        masteredAt,
+      );
+    });
+
     test('dạng có 3 mức: chỉ đúng ngay 3/5 ở mức Khó thì chưa thạo', () async {
       await answerForm(
         formId: 'logic.balance',

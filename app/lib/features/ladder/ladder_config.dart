@@ -45,10 +45,6 @@ class LadderConfig {
   /// cửa sổ thành thạo.
   static const int masteryCorrectNeeded = 4;
 
-  /// Mức nội dung thấp nhất dùng làm mức thành thạo: mức Vừa (2).
-  /// Dạng có mức Vừa thì không xét thành thạo ở mức Dễ.
-  static const int minMasteryLevel = 2;
-
   /// Mức nội dung (1 Dễ, 2 Vừa, 3 Khó) của một bậc.
   /// Bậc 1–2 Dễ, 3–4 Vừa, 5–6 Khó.
   static int levelForRung(int rung) {
@@ -69,13 +65,12 @@ class LadderConfig {
   /// mức cao nhất dạng hỗ trợ, nhưng không thấp hơn Vừa nếu dạng có Vừa.
   /// - Dạng có 3 mức → Khó (3); dạng chỉ Dễ–Vừa → Vừa (2);
   ///   dạng chỉ có 1 mức → mức duy nhất đó.
+  ///
+  /// Chỉ cần mức cao nhất: dạng nào có Vừa (2) thì mức cao nhất của nó
+  /// đã ≥ 2, nên điều kiện "không thấp hơn Vừa" không cần kiểm tra riêng
+  /// (nhánh cũ `contains(2) && highest < 2` không bao giờ đúng).
   static int masteryLevelForForm(Set<int> supportedLevels) {
     assert(supportedLevels.isNotEmpty, 'Dạng bài phải hỗ trợ ít nhất 1 mức');
-    final highest = supportedLevels.reduce((a, b) => a > b ? a : b);
-    if (supportedLevels.contains(minMasteryLevel) &&
-        highest < minMasteryLevel) {
-      return minMasteryLevel;
-    }
-    return highest;
+    return supportedLevels.reduce((a, b) => a > b ? a : b);
   }
 }

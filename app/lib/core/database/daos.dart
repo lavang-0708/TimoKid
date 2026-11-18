@@ -251,7 +251,9 @@ class SkillProgressDao extends DatabaseAccessor<AppDatabase>
       )..where((t) => t.id.equals(existing.id))).write(
         SkillProgressCompanion(
           mastered: Value(mastered),
-          masteredAt: Value(mastered ? now : null),
+          // Giữ mastered_at lần đầu đạt: ghi true lần nữa không đẩy
+          // ngày thành thạo lên hiện tại.
+          masteredAt: Value(mastered ? (existing.masteredAt ?? now) : null),
           updatedAt: Value(now),
         ),
       );
