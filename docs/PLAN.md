@@ -54,6 +54,7 @@ Các điểm dưới đây ghi đè mọi chỗ nói khác trong kế hoạch.
 | h | CI và phát hành | Integration test trên máy ảo tách ra workflow riêng, chạy cho pull request có thay đổi trong `app/lib/**` phần giao diện hoặc khi gắn nhãn `ui`, ngân sách 25 phút. Workflow chính (analyze, test, build APK debug) giữ dưới 15 phút. Tag phát hành do Muse tạo sau khi Claude kết luận Đạt cho nhiệm vụ nghiệm thu. Phần ký APK của T1-03 chờ anh Điệp nạp keystore; các phần khác của T1-03 làm trước. |
 | i | Điểm nhỏ | Nghiệm thu T1-01 là log chạy tay `check.py`. Menu QA mở bằng nhấn giữ 5 giây ở góc trên bên trái. `Clock` trả ngày theo múi giờ Asia/Ho_Chi_Minh. Bản 0.1 mở app vào thẳng màn Thị trấn tạm với bé mặc định. |
 | j | Môi trường build | Muse được cài Flutter SDK trong workspace của mình để chạy `flutter create`, `analyze`, unit test và widget test. Build APK và test máy ảo chạy trên GitHub Actions. |
+| k | Nguồn hình (chốt 18/11) | Các tấm trong `assets/concept/` là nguồn hình chính: tách nền, cắt từng món, sửa lỗi theo bảng trong `assets/concept/README.md`. Món thiếu hoặc hỏng thì Muse vẽ bổ sung cùng phong cách pastel viền trắng sticker. Áp dụng từ T1-12 (icon app, nền Thị trấn, biểu tượng nút) và cả bản 0.2. |
 
 ## Quy ước kỹ thuật
 
@@ -82,7 +83,7 @@ app/        App Flutter
   test/            unit test
   integration_test/ test chạy trên máy ảo, có chụp màn hình
 admin/      Web admin (từ bản 0.3)
-assets/     Tài sản hình: concept/ (tấm phác ý tưởng, chỉ tham khảo), templates/ (khung vẽ SVG)
+assets/     Tài sản hình: concept/ (nguồn hình chính, xem README trong đó), templates/ (khung vẽ SVG)
 content/    Hình và gói nội dung thêm về sau, phát qua Cloudflare Pages
 tools/      Script Python sinh và kiểm tra ngân hàng câu hỏi mẫu
 docs/       DESIGN, PLAN, HANDOVER, DECISIONS, ASSETS
