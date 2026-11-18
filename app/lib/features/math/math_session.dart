@@ -14,8 +14,10 @@
 /// Mỗi câu đã giải quyết (đúng lần 1, đúng sau gợi ý, hoặc sai cả hai
 /// lần) ghi đúng một dòng `attempts` (số lần thử, đúng ngay lần đầu,
 /// thời gian làm), rồi gọi `LadderService.evaluateStrand` và
-/// `evaluateFormMastery` để cập nhật bậc/thành thạo. Xu cộng vào
-/// `wallet_ledger` qua `WalletDao` theo [RewardConfig].
+/// `evaluateFormMastery` để cập nhật bậc/thành thạo, và ghi sổ ôn tập
+/// qua `ReviewBookService` (câu thường → `recordAnswer`, câu ôn tập →
+/// `recordReviewAnswer`). Xu cộng vào `wallet_ledger` qua `WalletDao`
+/// theo [RewardConfig].
 library;
 
 import 'dart:math';
@@ -29,6 +31,7 @@ import '../../core/database/tables.dart' hide AnswerType;
 import '../ladder/ladder_service.dart';
 import '../questions/question.dart';
 import '../questions/question_registry.dart';
+import '../review_book/review_book_service.dart';
 import '../rewards/reward_config.dart';
 
 /// Tên tiếng Việt của từng mảng, hiện trên thanh tiêu đề màn làm toán
@@ -155,6 +158,10 @@ class StageSession extends ChangeNotifier {
          attemptsDao: db.attemptsDao,
          skillProgressDao: db.skillProgressDao,
        ),
+       _reviewBook = ReviewBookService(
+         reviewQueueDao: db.reviewQueueDao,
+         clock: db.clock,
+       ),
        resolved = questions.map(ResolvedQuestion.resolve).toList() {
     _questionStartedAt = _db.clock.now();
   }
@@ -163,6 +170,7 @@ class StageSession extends ChangeNotifier {
   final AttemptsDao _attemptsDao;
   final WalletDao _walletDao;
   final LadderService _ladder;
+  final ReviewBookService _reviewBook;
 
   final String childId;
 
@@ -290,10 +298,11 @@ class StageSession extends ChangeNotifier {
 
   /// Ghi một câu đã giải quyết: một dòng `attempts` (đúng ngay lần đầu,
   /// số lần thử, thời gian làm), rồi cập nhật bậc của mảng và thành
-  /// thạo của dạng. Đúng thì cộng xu theo bảng thưởng.
+  /// thạo của dạng, và ghi sổ ôn tập. Đúng thì cộng xu theo bảng thưởng.
   Future<void> _resolveQuestion({required bool correct}) async {
     final spec = current.spec;
     final firstTry = triesUsed == 1;
+    final firstTryCorrect = correct && firstTry;
     final durationMs = _db.clock
         .now()
         .difference(_questionStartedAt)
@@ -305,7 +314,7 @@ class StageSession extends ChangeNotifier {
       level: spec.level,
       rung: spec.rung,
       answerType: spec.answerType,
-      correctFirstTry: correct && firstTry,
+      correctFirstTry: firstTryCorrect,
       attemptsCount: triesUsed,
       durationMs: durationMs,
       isReview: spec.isReview,
@@ -315,6 +324,24 @@ class StageSession extends ChangeNotifier {
     );
     await _ladder.evaluateStrand(childId: childId, strand: spec.strand);
     await _ladder.evaluateFormMastery(childId: childId, formId: spec.formId);
+    // Sổ ôn tập (T1-10): câu thường ghi qua recordAnswer (sai hoặc
+    // đúng sau gợi ý thì vào sổ), câu ôn tập ghi qua recordReviewAnswer
+    // (đúng ngay thì tăng chuỗi, sai thì quay về mốc 1 ngày).
+    if (spec.isReview) {
+      await _reviewBook.recordReviewAnswer(
+        childId: childId,
+        formId: spec.formId,
+        rung: spec.rung,
+        correctFirstTry: firstTryCorrect,
+      );
+    } else {
+      await _reviewBook.recordAnswer(
+        childId: childId,
+        formId: spec.formId,
+        rung: spec.rung,
+        correctFirstTry: firstTryCorrect,
+      );
+    }
     if (correct) {
       correctCount++;
       if (firstTry) firstTryCorrectCount++;

@@ -2,6 +2,12 @@
 /// chặng — số câu đúng, số câu đúng ngay lần đầu, xu nhận được trong
 /// chặng, lời cảm ơn của cư dân. Bé về Thị trấn hoặc làm chặng tiếp
 /// theo (nếu còn chặng sau trong đề ngày).
+///
+/// Hai nút là nút có biểu tượng, tối thiểu 56x56 dp, chữ to
+/// (sửa sau review PR #11). Biểu tượng là ký tự chữ (←, →) thay vì
+/// `Icon` vì font MaterialIcons không có trong môi trường test nên
+/// golden test sẽ bị ô vuông; các ký tự này có trong font DejaVu
+/// dùng ở test và trong Roboto trên máy thật.
 library;
 
 import 'package:go_router/go_router.dart';
@@ -58,13 +64,17 @@ class StageResultScreen extends StatelessWidget {
             children: [
               const Text('Chưa có kết quả chặng nào.'),
               const SizedBox(height: 16),
-              SizedBox(
-                height: 56,
-                child: ElevatedButton(
-                  key: const Key('stage-result-back-button'),
-                  onPressed: () => context.go('/'),
-                  child: const Text('Về Thị trấn'),
+              ElevatedButton.icon(
+                key: const Key('stage-result-back-button'),
+                icon: const Text('←', style: TextStyle(fontSize: 24)),
+                label: const Text(
+                  'Về Thị trấn',
+                  style: TextStyle(fontSize: 22),
                 ),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(56, 56),
+                ),
+                onPressed: () => context.go('/'),
               ),
             ],
           ),
@@ -108,25 +118,33 @@ class StageResultScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(
-                  height: 56,
-                  child: ElevatedButton(
-                    key: const Key('stage-result-back-button'),
-                    onPressed: () => context.go('/'),
-                    child: const Text('Về Thị trấn'),
+                ElevatedButton.icon(
+                  key: const Key('stage-result-back-button'),
+                  icon: const Text('←', style: TextStyle(fontSize: 24)),
+                  label: const Text(
+                    'Về Thị trấn',
+                    style: TextStyle(fontSize: 22),
                   ),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(56, 56),
+                  ),
+                  onPressed: () => context.go('/'),
                 ),
                 if (args.nextStageIndex != null) ...[
                   const SizedBox(width: 16),
-                  SizedBox(
-                    height: 56,
-                    child: ElevatedButton(
-                      key: const Key('stage-result-next-button'),
-                      onPressed: () => context.go(
-                        MathScreen.route,
-                        extra: MathScreenArgs(stageIndex: args.nextStageIndex),
-                      ),
-                      child: const Text('Chặng tiếp theo'),
+                  ElevatedButton.icon(
+                    key: const Key('stage-result-next-button'),
+                    icon: const Text('→', style: TextStyle(fontSize: 24)),
+                    label: const Text(
+                      'Chặng tiếp theo',
+                      style: TextStyle(fontSize: 22),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(56, 56),
+                    ),
+                    onPressed: () => context.go(
+                      MathScreen.route,
+                      extra: MathScreenArgs(stageIndex: args.nextStageIndex),
                     ),
                   ),
                 ],

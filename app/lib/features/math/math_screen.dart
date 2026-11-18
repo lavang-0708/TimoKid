@@ -6,12 +6,18 @@
 /// của câu — xem [shuffledChoiceOrder]). Điền số: bàn phím số riêng
 /// trong app, nút to, có nút xóa.
 ///
+/// Bố cục 2 cột (sửa sau review PR #11): cột trái là đề, hình vẽ,
+/// gợi ý hoặc lời giải — cuộn được; cột phải là 4 nút trắc nghiệm
+/// hoặc ô số + bàn phím, cộng nút "Tiếp" — không cuộn. Bố cục xếp
+/// dọc 1 cột cũ không vừa điện thoại ngang cao 360 dp (máy ảo
+/// 640x320: nút choice-3 nằm ngoài màn hình).
+///
 /// Sai lần đầu hiện gợi ý và cho làm lại; sai lần hai hiện lời giải
 /// từng bước và nút "Tiếp". Đúng thì có hiệu ứng (ngôi sao + số xu)
 /// và âm thanh ngắn ([SystemSound], không cần asset), rồi nút "Tiếp".
 /// Mỗi câu đã giải quyết ghi một dòng `attempts`, cập nhật bậc/thành
-/// thạo và cộng xu (xem [StageSession]). Cuối chặng chuyển sang màn
-/// Kết quả chặng.
+/// thạo, ghi sổ ôn tập và cộng xu (xem [StageSession]). Cuối chặng
+/// chuyển sang màn Kết quả chặng.
 ///
 /// Màn nhận một [StageSession] có sẵn (test dùng) hoặc tự tải đề ngày
 /// hôm nay và làm chặng đầu tiên chưa xong (nút "Làm toán" ở Thị trấn
@@ -223,142 +229,198 @@ class _MathScreenState extends ConsumerState<MathScreen> {
     final title = session.stageIndex >= 0
         ? 'Chặng ${session.stageIndex + 1} — $strandName'
         : 'Chặng tự chọn — $strandName';
+    // Các nút trên thanh tiêu đề là nút biểu tượng, tối thiểu 56x56 dp.
+    // Biểu tượng là ký tự chữ (←, EN/VI, Aa) thay vì `Icon` vì font
+    // MaterialIcons không có trong môi trường test nên golden test sẽ
+    // bị ô vuông; các ký tự này có trong font DejaVu dùng ở test và
+    // trong Roboto trên máy thật.
     return Scaffold(
       key: const Key('math-screen'),
       appBar: AppBar(
         title: Text(title),
         // Bé được rời chặng giữa chừng: chặng đang làm giữ trạng thái
         // `in_progress` nên vào lại vẫn làm tiếp từ đầu chặng.
-        leading: TextButton(
+        leading: IconButton(
           key: const Key('math-back-button'),
+          icon: const Text('←', style: TextStyle(fontSize: 30)),
+          tooltip: 'Về',
           onPressed: () => context.go('/'),
-          child: const Text('Về'),
+          style: IconButton.styleFrom(
+            minimumSize: const Size(56, 56),
+            iconSize: 30,
+          ),
         ),
         actions: [
-          SizedBox(
-            width: 56,
-            height: 56,
-            child: TextButton(
-              key: const Key('math-en-toggle'),
-              onPressed: () => setState(() => _showEnglish = !_showEnglish),
-              child: Text(_showEnglish ? 'VI' : 'EN'),
+          IconButton(
+            key: const Key('math-en-toggle'),
+            icon: Text(
+              _showEnglish ? 'VI' : 'EN',
+              style: const TextStyle(fontSize: 22),
+            ),
+            tooltip: _showEnglish ? 'Tiếng Việt' : 'English',
+            onPressed: () => setState(() => _showEnglish = !_showEnglish),
+            style: IconButton.styleFrom(
+              minimumSize: const Size(56, 56),
+              iconSize: 30,
             ),
           ),
-          SizedBox(
-            height: 56,
-            child: TextButton(
-              key: const Key('math-keywords-button'),
-              onPressed: () => _showKeywords(context, question.question),
-              child: const Text('Từ khóa'),
+          IconButton(
+            key: const Key('math-keywords-button'),
+            icon: const Text('Aa', style: TextStyle(fontSize: 22)),
+            tooltip: 'Từ khóa',
+            onPressed: () => _showKeywords(context, question.question),
+            style: IconButton.styleFrom(
+              minimumSize: const Size(56, 56),
+              iconSize: 30,
             ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Câu ${session.currentIndex + 1}/${session.resolved.length}',
-              key: const Key('math-progress'),
-              style: const TextStyle(fontSize: 20),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _showEnglish
-                  ? question.question.questionEn
-                  : question.question.questionVi,
-              key: const Key('math-question-text'),
-              style: const TextStyle(fontSize: 28),
-            ),
-            if (question.question.figure != null) ...[
-              const SizedBox(height: 12),
-              Center(
-                child: FigureView(
-                  key: const Key('math-figure'),
-                  figure: question.question.figure!,
-                  width: 220,
-                ),
-              ),
-            ],
-            const SizedBox(height: 12),
-            if (session.state == QuestionState.hint)
-              Container(
-                key: const Key('math-hint'),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.amber.shade100,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Sai rồi, xem gợi ý rồi thử lại nhé!\n${_showEnglish ? question.question.hintEn : question.question.hintVi}',
-                  style: const TextStyle(fontSize: 22),
-                ),
-              ),
-            if (session.state == QuestionState.solution)
-              Container(
-                key: const Key('math-solution'),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Lời giải:\n${_showEnglish ? question.question.explanationEn : question.question.explanationVi}',
-                  style: const TextStyle(fontSize: 22),
-                ),
-              ),
-            if (session.state == QuestionState.correct)
-              Container(
-                key: const Key('math-correct'),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.green.shade100,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      '★',
-                      style: TextStyle(fontSize: 36, color: Colors.amber),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Đúng rồi! +${session.lastEarnedXu ?? 0} xu',
-                      style: const TextStyle(fontSize: 26),
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Cột trái: đề, hình vẽ, gợi ý/lời giải — cuộn được.
+          Expanded(
+            flex: 6,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Câu ${session.currentIndex + 1}/${session.resolved.length}',
+                    key: const Key('math-progress'),
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _showEnglish
+                        ? question.question.questionEn
+                        : question.question.questionVi,
+                    key: const Key('math-question-text'),
+                    style: const TextStyle(fontSize: 28),
+                  ),
+                  if (question.question.figure != null) ...[
+                    const SizedBox(height: 12),
+                    Center(
+                      child: FigureView(
+                        key: const Key('math-figure'),
+                        figure: question.question.figure!,
+                        width: 220,
+                      ),
                     ),
                   ],
-                ),
+                  const SizedBox(height: 12),
+                  if (session.state == QuestionState.hint)
+                    Container(
+                      key: const Key('math-hint'),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        'Sai rồi, xem gợi ý rồi thử lại nhé!\n${_showEnglish ? question.question.hintEn : question.question.hintVi}',
+                        style: const TextStyle(fontSize: 22),
+                      ),
+                    ),
+                  if (session.state == QuestionState.solution)
+                    Container(
+                      key: const Key('math-solution'),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        'Lời giải:\n${_showEnglish ? question.question.explanationEn : question.question.explanationVi}',
+                        style: const TextStyle(fontSize: 22),
+                      ),
+                    ),
+                  if (session.state == QuestionState.correct)
+                    Container(
+                      key: const Key('math-correct'),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            '★',
+                            style: TextStyle(fontSize: 36, color: Colors.amber),
+                          ),
+                          const SizedBox(width: 8),
+                          // Chữ phải bọc Expanded để xuống dòng khi cột
+                          // trái hẹp (640x320): không bọc thì Row tràn
+                          // ngang vì chữ ở fontSize 26 dài hơn chỗ còn.
+                          Expanded(
+                            child: Text(
+                              'Đúng rồi! +${session.lastEarnedXu ?? 0} xu',
+                              style: const TextStyle(fontSize: 26),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
               ),
-            const SizedBox(height: 12),
-            if (question.displayType == AnswerType.choice)
-              _ChoiceAnswers(
-                session: session,
-                question: question,
-                showEnglish: _showEnglish,
-                onCorrect: _playCorrectSound,
-              )
-            else
-              _NumberPad(session: session, onCorrect: _playCorrectSound),
-            if (session.state == QuestionState.correct ||
-                session.state == QuestionState.solution) ...[
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 56,
-                child: ElevatedButton(
-                  key: const Key('math-next-button'),
-                  onPressed: () => session.next(),
-                  child: Text(
-                    session.isLastQuestion ? 'Xem kết quả' : 'Tiếp',
-                    style: const TextStyle(fontSize: 22),
-                  ),
-                ),
+            ),
+          ),
+          // Cột phải: đáp án + nút "Tiếp" — không cuộn, phải vừa cả
+          // ở màn thấp 320 dp nên chiều cao phím số tính theo chỗ còn
+          // lại (xem [_NumberPad]).
+          Expanded(
+            flex: 5,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(4, 12, 20, 12),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final showNext =
+                      session.state == QuestionState.correct ||
+                      session.state == QuestionState.solution;
+                  final nextSpace = showNext ? 56.0 + 12 : 0.0;
+                  final available = constraints.maxHeight - nextSpace;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: question.displayType == AnswerType.choice
+                            ? _ChoiceAnswers(
+                                session: session,
+                                question: question,
+                                showEnglish: _showEnglish,
+                                onCorrect: _playCorrectSound,
+                              )
+                            : _NumberPad(
+                                session: session,
+                                onCorrect: _playCorrectSound,
+                                availableHeight: available,
+                              ),
+                      ),
+                      if (showNext) ...[
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 56,
+                          child: ElevatedButton(
+                            key: const Key('math-next-button'),
+                            onPressed: () => session.next(),
+                            child: Text(
+                              session.isLastQuestion ? 'Xem kết quả' : 'Tiếp',
+                              style: const TextStyle(fontSize: 22),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  );
+                },
               ),
-            ],
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -461,7 +523,9 @@ class _ChoiceAnswers extends StatelessWidget {
         rows.add(const SizedBox(height: 12));
       }
     }
-    return Column(children: rows);
+    // Căn giữa dọc trong cột phải: 2 hàng nút cao 64 vừa cả ở màn
+    // thấp 320 dp (cột phải còn ~240 dp sau lề), chỗ thừa để trống.
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: rows);
   }
 
   Color? _choiceColor(int displayIndex) {
@@ -479,78 +543,108 @@ class _ChoiceAnswers extends StatelessWidget {
 }
 
 /// Bàn phím số riêng trong app: số đã gõ, các phím 0–9, xóa, gửi.
+///
+/// Chiều cao phím tính theo chỗ còn lại của cột phải ([availableHeight],
+/// đã trừ nút "Tiếp" nếu có): ô số 56 + 4 hàng phím + khe 8. Ở màn
+/// thấp 320 dp phím còn ~38 dp, ở màn 360 dp ~48 dp, từ 800 dp trở lên
+/// đủ 64 dp. Cột phải không cuộn nên phím không được cố định 64 dp.
+/// Khi câu đã giải quyết xong (đúng/lời giải) thì ẩn các hàng phím —
+/// bàn phím đã vô hiệu, chỉ giữ ô số đã gõ để bé còn thấy đáp án
+/// của mình; nút "Tiếp" ở cột phải lúc này mới có chỗ.
 class _NumberPad extends StatelessWidget {
-  const _NumberPad({required this.session, required this.onCorrect});
+  const _NumberPad({
+    required this.session,
+    required this.onCorrect,
+    required this.availableHeight,
+  });
 
   final StageSession session;
   final Future<void> Function() onCorrect;
+
+  /// Chiều cao còn lại của cột phải (đã trừ nút "Tiếp" nếu có).
+  final double availableHeight;
 
   @override
   Widget build(BuildContext context) {
     final answering =
         session.state == QuestionState.answering ||
         session.state == QuestionState.hint;
+    final resolved = !answering;
+    final keyHeight = ((availableHeight - 56 - 8 - 3 * 8) / 4).clamp(
+      36.0,
+      64.0,
+    );
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          key: const Key('math-typed-answer'),
+        SizedBox(
+          height: 56,
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            session.typedAnswer.isEmpty ? '?' : session.typedAnswer,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 32),
-          ),
-        ),
-        const SizedBox(height: 12),
-        _PadRow(
-          keys: [
-            _PadKeySpec('1', answering, () => session.appendDigit('1')),
-            _PadKeySpec('2', answering, () => session.appendDigit('2')),
-            _PadKeySpec('3', answering, () => session.appendDigit('3')),
-          ],
-        ),
-        const SizedBox(height: 10),
-        _PadRow(
-          keys: [
-            _PadKeySpec('4', answering, () => session.appendDigit('4')),
-            _PadKeySpec('5', answering, () => session.appendDigit('5')),
-            _PadKeySpec('6', answering, () => session.appendDigit('6')),
-          ],
-        ),
-        const SizedBox(height: 10),
-        _PadRow(
-          keys: [
-            _PadKeySpec('7', answering, () => session.appendDigit('7')),
-            _PadKeySpec('8', answering, () => session.appendDigit('8')),
-            _PadKeySpec('9', answering, () => session.appendDigit('9')),
-          ],
-        ),
-        const SizedBox(height: 10),
-        _PadRow(
-          keys: [
-            _PadKeySpec(
-              'Xóa',
-              answering && session.typedAnswer.isNotEmpty,
-              session.deleteDigit,
-              key: const Key('keypad-delete'),
+          child: Container(
+            key: const Key('math-typed-answer'),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(12),
             ),
-            _PadKeySpec('0', answering, () => session.appendDigit('0')),
-            _PadKeySpec(
-              '✓',
-              answering && session.typedAnswer.isNotEmpty,
-              () async {
-                final correct = await session.submitNumber();
-                if (correct) await onCorrect();
-              },
-              key: const Key('keypad-submit'),
+            child: Center(
+              child: Text(
+                session.typedAnswer.isEmpty ? '?' : session.typedAnswer,
+                style: const TextStyle(fontSize: 32),
+              ),
             ),
-          ],
+          ),
         ),
+        if (!resolved) ...[
+          const SizedBox(height: 8),
+          _PadRow(
+            keyHeight: keyHeight,
+            keys: [
+              _PadKeySpec('1', answering, () => session.appendDigit('1')),
+              _PadKeySpec('2', answering, () => session.appendDigit('2')),
+              _PadKeySpec('3', answering, () => session.appendDigit('3')),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _PadRow(
+            keyHeight: keyHeight,
+            keys: [
+              _PadKeySpec('4', answering, () => session.appendDigit('4')),
+              _PadKeySpec('5', answering, () => session.appendDigit('5')),
+              _PadKeySpec('6', answering, () => session.appendDigit('6')),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _PadRow(
+            keyHeight: keyHeight,
+            keys: [
+              _PadKeySpec('7', answering, () => session.appendDigit('7')),
+              _PadKeySpec('8', answering, () => session.appendDigit('8')),
+              _PadKeySpec('9', answering, () => session.appendDigit('9')),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _PadRow(
+            keyHeight: keyHeight,
+            keys: [
+              _PadKeySpec(
+                'Xóa',
+                answering && session.typedAnswer.isNotEmpty,
+                session.deleteDigit,
+                key: const Key('keypad-delete'),
+              ),
+              _PadKeySpec('0', answering, () => session.appendDigit('0')),
+              _PadKeySpec(
+                '✓',
+                answering && session.typedAnswer.isNotEmpty,
+                () async {
+                  final correct = await session.submitNumber();
+                  if (correct) await onCorrect();
+                },
+                key: const Key('keypad-submit'),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }
@@ -558,9 +652,12 @@ class _NumberPad extends StatelessWidget {
 
 /// Một hàng 3 phím của bàn phím số.
 class _PadRow extends StatelessWidget {
-  const _PadRow({required this.keys});
+  const _PadRow({required this.keys, required this.keyHeight});
 
   final List<_PadKeySpec> keys;
+
+  /// Chiều cao mỗi phím (tính theo chỗ còn lại, xem [_NumberPad]).
+  final double keyHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -574,6 +671,7 @@ class _PadRow extends StatelessWidget {
             label: spec.label,
             enabled: spec.enabled,
             onPressed: spec.onPressed,
+            height: keyHeight,
           ),
         ),
       );
@@ -592,24 +690,26 @@ class _PadKeySpec {
   final Key? key;
 }
 
-/// Một phím của bàn phím số, tối thiểu 56 x 56 dp.
+/// Một phím của bàn phím số (chiều cao theo chỗ còn lại, tối đa 64 dp;
+/// ở màn 1280x720 vẫn là 64x64 như trước).
 class _PadKey extends StatelessWidget {
   const _PadKey({
     super.key,
     required this.label,
     required this.enabled,
     required this.onPressed,
+    required this.height,
   });
 
   final String label;
   final bool enabled;
   final VoidCallback onPressed;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 64,
-      height: 64,
+      height: height,
       child: ElevatedButton(
         onPressed: enabled ? onPressed : null,
         child: Text(label, style: const TextStyle(fontSize: 26)),

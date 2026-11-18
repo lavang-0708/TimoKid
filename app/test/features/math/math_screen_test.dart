@@ -198,6 +198,89 @@ void main() {
     expect(find.text('Câu 2/5'), findsOneWidget);
   });
 
+  testWidgets('câu thường sai thì vào sổ ôn tập, đúng ngay thì không', (
+    tester,
+  ) async {
+    await pumpMath(tester);
+
+    // Câu 1 sai hai lần → vào sổ (dạng + bậc của câu vừa làm).
+    await tapWrongChoice(tester);
+    await tapWrongChoice(tester);
+    var entry = await db.reviewQueueDao.getEntry(
+      childId,
+      session.resolved[0].spec.formId,
+    );
+    expect(entry, isNotNull);
+    expect(entry!.rung, session.resolved[0].spec.rung);
+    expect(entry.correctStreak, 0);
+
+    // Câu 2 đúng ngay lần đầu → không vào sổ.
+    await tapNext(tester);
+    await tapCorrectChoice(tester);
+    entry = await db.reviewQueueDao.getEntry(
+      childId,
+      session.resolved[1].spec.formId,
+    );
+    expect(entry, isNull);
+  });
+
+  testWidgets('câu ôn tập: đúng ngay tăng chuỗi, sai quay về mốc 1 ngày', (
+    tester,
+  ) async {
+    // Gieo một mục ôn tập đến hạn rồi làm câu ôn tập của dạng đó.
+    await db.reviewQueueDao.upsertEntry(
+      childId: childId,
+      formId: 'logic.balance',
+      rung: 3,
+      dueDate: clock.now(),
+    );
+    // Một phiên hai câu ôn tập của cùng dạng (seed khác nhau): câu 1
+    // đúng ngay, câu 2 sai hai lần. Dùng một phiên vì bơm lại một
+    // phiên mới trong cùng test sẽ tái dùng State cũ của màn hình.
+    final reviewQuestions = <DailySetQuestion>[
+      DailySetQuestion(
+        formId: 'logic.balance',
+        strand: Strand.logic,
+        level: 3,
+        rung: 3,
+        answerType: 'choice',
+        seed: 1,
+        isReview: true,
+      ),
+      DailySetQuestion(
+        formId: 'logic.balance',
+        strand: Strand.logic,
+        level: 3,
+        rung: 3,
+        answerType: 'choice',
+        seed: 2,
+        isReview: true,
+      ),
+    ];
+    session = StageSession(
+      db: db,
+      childId: childId,
+      dailySetId: null,
+      stageIndex: -1,
+      questions: reviewQuestions,
+    );
+    await pumpMath(tester);
+
+    // Câu 1 đúng ngay lần đầu → chuỗi 1, còn trong sổ.
+    await tapCorrectChoice(tester);
+    var entry = await db.reviewQueueDao.getEntry(childId, 'logic.balance');
+    expect(entry, isNotNull);
+    expect(entry!.correctStreak, 1);
+
+    // Câu 2 sai hai lần → chuỗi về 0.
+    await tapNext(tester);
+    await tapWrongChoice(tester);
+    await tapWrongChoice(tester);
+    entry = await db.reviewQueueDao.getEntry(childId, 'logic.balance');
+    expect(entry, isNotNull);
+    expect(entry!.correctStreak, 0);
+  });
+
   testWidgets('điền số: gõ số, xóa, gửi đúng', (tester) async {
     await pumpMath(tester);
 
@@ -243,6 +326,9 @@ void main() {
     final choiceSize = tester.getSize(find.byKey(const Key('choice-0')));
     expect(choiceSize.height, greaterThanOrEqualTo(56));
     expect(choiceSize.width, greaterThanOrEqualTo(56));
+    final backSize = tester.getSize(find.byKey(const Key('math-back-button')));
+    expect(backSize.height, greaterThanOrEqualTo(56));
+    expect(backSize.width, greaterThanOrEqualTo(56));
     final enSize = tester.getSize(find.byKey(const Key('math-en-toggle')));
     expect(enSize.height, greaterThanOrEqualTo(56));
     expect(enSize.width, greaterThanOrEqualTo(56));
@@ -255,7 +341,101 @@ void main() {
     await tapCorrectChoice(tester);
     final nextSize = tester.getSize(find.byKey(const Key('math-next-button')));
     expect(nextSize.height, greaterThanOrEqualTo(56));
+    expect(nextSize.width, greaterThanOrEqualTo(56));
   });
+
+  testWidgets('nút màn Kết quả chặng tối thiểu 56x56 dp', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: StageResultScreen(
+          result: StageResultArgs(
+            stageIndex: 0,
+            strand: 'logic',
+            correctCount: 4,
+            firstTryCorrectCount: 3,
+            totalQuestions: 5,
+            xuEarned: 12,
+            nextStageIndex: 1,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final backSize = tester.getSize(
+      find.byKey(const Key('stage-result-back-button')),
+    );
+    expect(backSize.height, greaterThanOrEqualTo(56));
+    expect(backSize.width, greaterThanOrEqualTo(56));
+    final nextSize = tester.getSize(
+      find.byKey(const Key('stage-result-next-button')),
+    );
+    expect(nextSize.height, greaterThanOrEqualTo(56));
+    expect(nextSize.width, greaterThanOrEqualTo(56));
+  });
+
+  // Lỗi integration test máy ảo 640x320: nút choice-3 nằm ngoài màn
+  // hình (y=357) vì bố cục cũ xếp dọc 1 cột. Bố cục 2 cột mới phải
+  // vừa ở cả 3 cỡ: cột trái cuộn được, cột phải không cuộn, mọi nút
+  // đều bấm được (bấm choice-3 sai thì hiện gợi ý).
+  // Mỗi cỡ là một test riêng: pumpWidget với cùng loại widget sẽ tái
+  // dùng State cũ (không chạy lại initState) nên không thể bơm lại
+  // một phiên mới trong cùng một test.
+  Future<void> walkStageAtSize(WidgetTester tester, Size size) async {
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(home: MathScreen(session: session)),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+
+    // Bấm nút choice-3 (nút từng nằm ngoài màn hình ở 640x320).
+    final correct = session.current.correctDisplayIndex;
+    await tester.tap(find.byKey(Key('choice-${correct == 3 ? 0 : 3}')));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.byKey(const Key('math-hint')), findsOneWidget);
+
+    // Sai lần hai → lời giải, bấm Tiếp sang câu 2.
+    await tapWrongChoice(tester);
+    expect(find.byKey(const Key('math-solution')), findsOneWidget);
+    await tapNext(tester);
+    expect(find.text('Câu 2/5'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    // Làm đúng 3 câu trắc nghiệm còn lại để sang câu điền số.
+    for (var i = 0; i < 3; i++) {
+      await tapCorrectChoice(tester);
+      await tapNext(tester);
+    }
+    expect(find.text('Câu 5/5'), findsOneWidget);
+    expect(find.byKey(const Key('keypad-1')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    // Bàn phím bấm được ở cỡ này: gõ đáp án rồi gửi.
+    final answer = '${session.current.question.answer}';
+    for (final ch in answer.split('')) {
+      await tester.tap(find.byKey(Key('keypad-$ch')));
+    }
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('keypad-submit')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('math-correct')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  }
+
+  for (final size in const [Size(640, 320), Size(800, 360), Size(1280, 800)]) {
+    testWidgets(
+      'bố cục vừa ở ${size.width.toInt()}x${size.height.toInt()}',
+      (tester) async => walkStageAtSize(tester, size),
+    );
+  }
 
   testWidgets('nút bàn phím số tối thiểu 56x56 dp', (tester) async {
     await pumpMath(tester);

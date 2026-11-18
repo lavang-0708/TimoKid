@@ -5,7 +5,12 @@
 /// Làm theo mẫu `figure_golden_test.dart` của T1-06: nạp font DejaVu
 /// Sans của máy làm font 'Roboto' để chữ đọc được, ảnh kỳ vọng nhúng
 /// base64 trong `goldens/math_golden_data.dart` và được giải mã ra file
-/// PNG trước khi so sánh. Mặt phẳng ngang 1280x720 như máy bé dùng.
+/// PNG trước khi so sánh.
+///
+/// Bố cục 2 cột (sửa sau review PR #11): 6 trạng thái chụp ở 800x360
+/// (mặt phẳng ngang nhỏ, gần máy ảo 640x320 nhất trong các cỡ chuẩn),
+/// thêm trắc nghiệm và bàn phím ở 1280x800 (màn lớn). Ảnh cũ ở
+/// 1280x720 đã lỗi thời vì đổi bố cục nên sinh lại toàn bộ.
 library;
 
 import 'dart:convert';
@@ -40,6 +45,8 @@ void _restoreGoldens() {
     'test/goldens/math_correct.png': mathCorrectBase64,
     'test/goldens/math_number.png': mathNumberBase64,
     'test/goldens/math_result.png': mathResultBase64,
+    'test/goldens/math_choice_1280x800.png': mathChoice1280x800Base64,
+    'test/goldens/math_number_1280x800.png': mathNumber1280x800Base64,
   };
   for (final entry in goldens.entries) {
     File(entry.key).writeAsBytesSync(base64Decode(entry.value));
@@ -91,8 +98,13 @@ void main() {
     );
   });
 
-  Future<void> pumpMath(WidgetTester tester) async {
-    tester.view.physicalSize = const Size(1280, 720);
+  /// Bơm màn làm toán ở một cỡ mặt phẳng cho trước (mặc định 800x360
+  /// cho 6 trạng thái chính).
+  Future<void> pumpMath(
+    WidgetTester tester, {
+    Size size = const Size(800, 360),
+  }) async {
+    tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
       tester.view.resetPhysicalSize();
@@ -172,8 +184,28 @@ void main() {
     );
   });
 
+  testWidgets('màn trắc nghiệm ở 1280x800', (tester) async {
+    await pumpMath(tester, size: const Size(1280, 800));
+    await expectLater(
+      find.byKey(const Key('math-screen')),
+      matchesGoldenFile('../../goldens/math_choice_1280x800.png'),
+    );
+  });
+
+  testWidgets('màn bàn phím số ở 1280x800', (tester) async {
+    await pumpMath(tester, size: const Size(1280, 800));
+    for (var i = 0; i < 4; i++) {
+      await tapCorrectChoice(tester);
+      await tapNext(tester);
+    }
+    await expectLater(
+      find.byKey(const Key('math-screen')),
+      matchesGoldenFile('../../goldens/math_number_1280x800.png'),
+    );
+  });
+
   testWidgets('màn kết quả chặng', (tester) async {
-    tester.view.physicalSize = const Size(1280, 720);
+    tester.view.physicalSize = const Size(800, 360);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
       tester.view.resetPhysicalSize();
