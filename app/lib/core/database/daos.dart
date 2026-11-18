@@ -156,17 +156,23 @@ class AttemptsDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Các lượt trả lời gần nhất của một dạng bài (phục vụ tính thành thạo
-  /// 4/5 câu của T1-07).
+  /// 4/5 câu của T1-07). `level` giới hạn chỉ các câu ở một mức
+  /// (vd: mức thành thạo của dạng); bỏ trống thì lấy mọi mức.
   Future<List<Attempt>> getRecentFormAttempts({
     required String childId,
     required String formId,
+    int? level,
     int limit = 5,
-  }) =>
-      (select(db.attempts)
-            ..where((t) => t.childId.equals(childId) & t.formId.equals(formId))
-            ..orderBy([(t) => OrderingTerm.desc(t.createdAt)])
-            ..limit(limit))
-          .get();
+  }) {
+    final query = select(db.attempts)
+      ..where((t) => t.childId.equals(childId) & t.formId.equals(formId))
+      ..orderBy([(t) => OrderingTerm.desc(t.createdAt)])
+      ..limit(limit);
+    if (level != null) {
+      query.where((t) => t.level.equals(level));
+    }
+    return query.get();
+  }
 }
 
 @DriftAccessor(tables: [SkillProgress])
@@ -245,7 +251,9 @@ class SkillProgressDao extends DatabaseAccessor<AppDatabase>
       )..where((t) => t.id.equals(existing.id))).write(
         SkillProgressCompanion(
           mastered: Value(mastered),
-          masteredAt: Value(mastered ? now : null),
+          // Giữ mastered_at lần đầu đạt: ghi true lần nữa không đẩy
+          // ngày thành thạo lên hiện tại.
+          masteredAt: Value(mastered ? (existing.masteredAt ?? now) : null),
           updatedAt: Value(now),
         ),
       );
