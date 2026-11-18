@@ -185,7 +185,7 @@ Kết quả của bản 0.1 là một file APK bé cài được, làm đề ng�
 
 ## Bản 0.2: lõi game
 
-Kết quả của bản 0.2 là bé tạo nhân vật, ấp trứng, có phòng riêng, mua đồ và thay đồ bằng xu kiếm từ đề ngày. Bắt đầu sau khi bé đã chơi thử bản 0.1 và anh Điệp chốt các chỉnh sửa. Hình dùng bộ tạm từ các tấm phác ý tưởng (trứng, pet, phòng) cho đến khi có hình thật.
+Kết quả của bản 0.2 là bé tạo nhân vật, ấp trứng, có phòng riêng, mua đồ và thay đồ bằng xu kiếm từ đề ngày. Bắt đầu sau khi bé đã chơi thử bản 0.1 và anh Điệp chốt các chỉnh sửa. **Cập nhật 19/11: anh Điệp chốt làm song song**, bắt đầu T2-01, T2-02 ngay sau T1-15, không chờ bé chơi thử bản 0.1; anh xem một thể khi có nhân vật, trứng pet và cửa hàng chạy được. Hình dùng bộ tạm từ các tấm phác ý tưởng (trứng, pet, phòng) cho đến khi có hình thật.
 
 ### T2-01 Quy trình nạp hình
 
