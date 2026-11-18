@@ -1,17 +1,22 @@
 # HANDOVER — TimoKid
 
-Cập nhật cuối: 17/11/2026 (nhiệm vụ T1-02, nhánh `task/T1-02-khung-app`).
+Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-05, nhánh `task/T1-05-generator`).
 
 ## Trạng thái hiện tại
 
-- `main` đang ở commit `c0eca20` — PLAN.md đã có mục "Làm rõ ngày 17/11" (a–j), ghi đè mọi chỗ khác trong kế hoạch.
-- T1-01 **Chờ merge**: PR #1 (https://github.com/lavang-0708/TimoKid/pull/1) đã được Claude review Đạt. Nhánh T1-02 này tách từ `main` trước khi PR #1 merge nên mang theo lại các file của T1-01; rebase sau khi PR #1 merge.
-- T1-02 **Đang làm**: khung app Flutter (package `vn.timokid.app`, 3 màn trống, mở đầu vào Thị trấn). PR: #2 (https://github.com/lavang-0708/TimoKid/pull/2).
-- Các nhiệm vụ còn lại của bản 0.1 (T1-03 đến T1-14): **Chưa bắt đầu**.
+- `main` đang ở commit `fa956e4` (đã merge PR #1, PR #2 và PR #3) — PLAN.md đã có mục "Làm rõ ngày 17/11" (a–j), ghi đè mọi chỗ khác trong kế hoạch.
+- T1-01 **Xong**: PR #1 đã merge.
+- T1-02 **Xong**: PR #2 đã merge (`04dfe35`). Claude đã rebase nhánh lên main và chạy lại trên máy mình: analyze sạch, 5/5 test pass.
+- T1-03 **Xong**: PR #3 đã merge squash vào main (`fa956e4`). CI chính xanh (11,5 phút, APK debug tải về đúng `vn.timokid.app`); integration test chạy lại sau khi Claude sửa (build APK trước, cache AVD, API 30, `--use-application-binary`).
+- T1-05 **Đang làm**: Bộ sinh câu hỏi — chuyển 48/48 dạng bài trong `gen.py` sang Dart (`lib/features/questions/`), test 500 seed × 103 cặp form×mức. PR: (điền số PR sau khi mở).
+- T1-04 đang làm song song trên nhánh riêng (`task/T1-04-db`). Các nhiệm vụ còn lại của bản 0.1 (T1-06 đến T1-14): **Chưa bắt đầu**.
+- **Từ nay Claude merge PR** (anh Điệp giao). Anh Điệp chỉ cần nạp 4 secrets ký APK theo `docs/RELEASE.md`, rồi tag thử `v0.0.1` làm sau.
 
 ## Điểm cần biết khi tiếp tục
 
-- **Muse không đẩy được file nhị phân lên GitHub qua MCP** (kênh push-files chỉ nhận file text UTF-8; thử đẩy base64 qua `push_files` thì file lên sai dạng text). Vì vậy T1-02 có 3 chỗ làm khác thường, ghi trong `docs/DECISIONS.md`: (1) ảnh golden nhúng base64 trong `app/test/goldens/golden_data.dart`, test tự giải mã ra PNG trước khi so sánh; (2) chưa có icon launcher riêng — `AndroidManifest.xml` bỏ `android:icon`, app dùng icon mặc định của hệ thống, icon thật làm ở T1-12; (3) thiếu `app/android/gradle/wrapper/gradle-wrapper.jar` nên `flutter build apk` chưa chạy được — T1-03 bổ sung trong CI (tải jar chuẩn của Gradle 9.5.0 trong workflow rồi commit bằng git của Actions, hoặc cài Gradle hệ thống). `flutter analyze` và `flutter test` vẫn chạy đủ trên máy Muse.
+- **Muse không đẩy được file nhị phân lên GitHub qua MCP** (kênh push-files chỉ nhận file text UTF-8; thử đẩy base64 qua `push_files` thì file lên sai dạng text). Quy tắc từ nay (Claude chốt sau review PR #2): Muse liệt kê file nhị phân cần có trong mục "Việc còn lại" của PR (đường dẫn, cách sinh), Claude commit bằng git lên nhánh PR. Áp dụng ở T1-02: (1) ảnh golden nhúng base64 trong `app/test/goldens/golden_data.dart`, test tự giải mã ra PNG trước khi so sánh; (2) chưa có icon launcher riêng — `AndroidManifest.xml` bỏ `android:icon`, app dùng icon mặc định của hệ thống, icon thật làm ở T1-12.
+- **`gradle-wrapper.jar` không cần commit**: file này nằm trong `app/android/.gitignore` của template vì flutter tool tự sinh khi build (`injectGradleWrapperIfNeeded` trong flutter_tools). T1-03 KHÔNG tải jar hay commit bằng Actions như dự định ban đầu. Tương tự, `gradlew`/`gradlew.bat` cũng tự sinh, nhưng đã commit kèm ở T1-02 nên cứ để đó.
+- CI chạy trên GitHub Actions, ghim Flutter 3.50.0. Máy Muse không có Android SDK nên không chạy được `flutter build apk` hay máy ảo ở local — CI là nơi kiểm chứng. Workflow release cần 4 secrets ký APK (xem `docs/RELEASE.md`); thiếu secrets thì job dừng với thông báo rõ ràng, không build bản ký debug.
 - Flutter SDK của Muse: `~/workspace/flutter-sdk/flutter`, bản 3.50.0 stable, Dart 3.14.0. Build APK và máy ảo chỉ qua GitHub Actions (T1-03).
 
 ## Cách build và chạy test
@@ -38,3 +43,4 @@ Cập nhật cuối: 17/11/2026 (nhiệm vụ T1-02, nhánh `task/T1-02-khung-ap
 - Tag phát hành do Muse tạo sau khi Claude kết luận Đạt. Ký APK chờ anh Điệp nạp keystore vào GitHub Secrets.
 - Menu QA: nhấn giữ 5 giây ở góc trên bên trái. `Clock` trả ngày theo `Asia/Ho_Chi_Minh`. Bản 0.1 mở app vào thẳng màn Thị trấn tạm với bé mặc định (mục (i)).
 - Sửa sai trong review trước của Muse: số form đủ 3 mức là 17, không phải 30 như Muse viết lúc đầu. Kết luận review không đổi.
+- T1-05: bộ sinh câu nằm ở `app/lib/features/questions/` (model `question.dart`, 5 file generator theo mảng, `question_registry.dart` liệt kê đủ 48 dạng). Số cặp form×mức thật là **103**, không phải 89 như ghi lúc đầu — đếm lại từ `gen.py` và `questions.json` đều ra 103. Mỗi `Question` giữ `params` (tham số đã dùng) để test giải lại độc lập, và `figure` (`FigureSpec`) để T1-06 sinh SVG. Nhánh `task/T1-05-generator` tách từ main cũ (`04dfe35`); sau khi mở PR sẽ merge main mới (`fa956e4`, có CI) vào nhánh.
