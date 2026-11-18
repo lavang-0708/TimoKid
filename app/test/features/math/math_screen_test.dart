@@ -24,8 +24,19 @@ import 'package:timokid/features/ladder/ladder_service.dart';
 import 'package:timokid/features/math/math_screen.dart';
 import 'package:timokid/features/math/math_session.dart';
 import 'package:timokid/features/questions/question.dart';
+import 'package:timokid/features/sound/sound_service.dart';
 import 'package:timokid/features/stage_result/stage_result_screen.dart';
 import 'package:timokid/features/town/town_screen.dart';
+
+/// [SoundPlayer] giả ghi lại đường dẫn đã phát (PLAN điểm (m)).
+class FakeSoundPlayer implements SoundPlayer {
+  final played = <String>[];
+
+  @override
+  Future<void> play(String assetPath) async {
+    played.add(assetPath);
+  }
+}
 
 AppDatabase openMemoryDb({Clock? clock}) => AppDatabase(
   executor: NativeDatabase.memory(),
@@ -37,6 +48,8 @@ void main() {
   late AppDatabase db;
   late String childId;
   late StageSession session;
+  late FakeSoundPlayer fakePlayer;
+  late SoundService soundService;
 
   Future<DailySet> buildTodaySet() async {
     final service = DailySetService(
@@ -66,6 +79,13 @@ void main() {
       stageIndex: 0,
       questions: questions,
     );
+    fakePlayer = FakeSoundPlayer();
+    // coinDelay bằng 0 để test không phải chờ 300 ms thật.
+    soundService = SoundService(
+      db: db,
+      player: fakePlayer,
+      coinDelay: Duration.zero,
+    );
   });
 
   /// Bơm màn làm toán với phiên có sẵn, mặt phẳng ngang 1280x720.
@@ -78,7 +98,9 @@ void main() {
     });
     await tester.pumpWidget(
       ProviderScope(
-        child: MaterialApp(home: MathScreen(session: session)),
+        child: MaterialApp(
+          home: MathScreen(session: session, soundService: soundService),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -103,23 +125,23 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('hiện câu 1 trắc nghiệm, nút EN đổi đề VI/EN', (tester) async {
+  testWidgets('đề luôn hiện song ngữ, không còn nút đổi EN', (tester) async {
     await pumpMath(tester);
 
     expect(find.byKey(const Key('math-screen')), findsOneWidget);
     expect(find.text('Câu 1/5'), findsOneWidget);
+    // Đề tiếng Việt và tiếng Anh hiện cùng lúc (PLAN điểm (l)):
+    // VI chữ to (key math-question-text), EN nhỏ hơn nhạt hơn dưới
+    // (key math-question-text-en). Nút đổi EN đã bỏ, nút từ khóa giữ.
     expect(find.text(session.current.question.questionVi), findsOneWidget);
+    expect(find.text(session.current.question.questionEn), findsOneWidget);
+    expect(find.byKey(const Key('math-question-text')), findsOneWidget);
+    expect(find.byKey(const Key('math-question-text-en')), findsOneWidget);
+    expect(find.byKey(const Key('math-en-toggle')), findsNothing);
+    expect(find.byKey(const Key('math-keywords-button')), findsOneWidget);
     for (var i = 0; i < 4; i++) {
       expect(find.byKey(Key('choice-$i')), findsOneWidget);
     }
-
-    await tester.tap(find.byKey(const Key('math-en-toggle')));
-    await tester.pumpAndSettle();
-    expect(find.text(session.current.question.questionEn), findsOneWidget);
-
-    await tester.tap(find.byKey(const Key('math-en-toggle')));
-    await tester.pumpAndSettle();
-    expect(find.text(session.current.question.questionVi), findsOneWidget);
   });
 
   testWidgets('nút từ khóa mở bảng song ngữ', (tester) async {
@@ -136,6 +158,48 @@ void main() {
     expect(find.byKey(const Key('keywords-dialog')), findsNothing);
   });
 
+  testWidgets('đúng phát correct rồi coin, sai phát wrong', (tester) async {
+    await pumpMath(tester);
+
+    await tapCorrectChoice(tester);
+    // Cho timer coin (coinDelay bằng 0) và lần đọc settings chạy xong.
+    await tester.pump(const Duration(milliseconds: 50));
+    expect(fakePlayer.played, ['sounds/correct.wav', 'sounds/coin.wav']);
+  });
+
+  testWidgets('sai lần đầu phát wrong', (tester) async {
+    await pumpMath(tester);
+
+    await tapWrongChoice(tester);
+    await tester.pump(const Duration(milliseconds: 50));
+    expect(fakePlayer.played, ['sounds/wrong.wav']);
+  });
+
+  testWidgets('tắt sound_enabled thì không phát gì', (tester) async {
+    await db.settingsDao.setValue(key: 'sound_enabled', value: 'false');
+    await pumpMath(tester);
+
+    await tapCorrectChoice(tester);
+    await tapWrongChoice(tester);
+    await tester.pump(const Duration(milliseconds: 50));
+    expect(fakePlayer.played, isEmpty);
+  });
+
+  testWidgets('phím Xóa là biểu tượng backspace, không phải ký tự ⌫', (
+    tester,
+  ) async {
+    await pumpMath(tester);
+
+    // Đi tới câu điền số (câu 5): trả lời đúng 4 câu trắc nghiệm.
+    for (var i = 0; i < 4; i++) {
+      await tapCorrectChoice(tester);
+      await tapNext(tester);
+    }
+    expect(find.byKey(const Key('keypad-delete')), findsOneWidget);
+    expect(find.byIcon(Icons.backspace_outlined), findsOneWidget);
+    expect(find.text('⌫'), findsNothing);
+  });
+
   testWidgets('chọn đúng ngay hiện xu, ghi attempts và cộng xu vào ví', (
     tester,
   ) async {
@@ -144,7 +208,7 @@ void main() {
     await tapCorrectChoice(tester);
 
     expect(find.byKey(const Key('math-correct')), findsOneWidget);
-    expect(find.text('Đúng rồi! +2 xu'), findsOneWidget);
+    expect(find.text('★ Đúng rồi! +2 xu'), findsOneWidget);
     final attempts = await db.attemptsDao.getAttemptsForChild(childId);
     expect(attempts, hasLength(1));
     expect(attempts.single.correctFirstTry, isTrue);
@@ -167,7 +231,7 @@ void main() {
     await tapCorrectChoice(tester);
     expect(find.byKey(const Key('math-correct')), findsOneWidget);
     // Xu cơ số bậc 1 là 2, đúng sau gợi ý còn 1.
-    expect(find.text('Đúng rồi! +1 xu'), findsOneWidget);
+    expect(find.text('★ Đúng rồi! +1 xu'), findsOneWidget);
     final attempts = await db.attemptsDao.getAttemptsForChild(childId);
     expect(attempts, hasLength(1));
     expect(attempts.single.correctFirstTry, isFalse);
@@ -316,7 +380,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('math-correct')), findsOneWidget);
     // Xu cơ số bậc 2 là 2, đúng ngay lần đầu.
-    expect(find.text('Đúng rồi! +2 xu'), findsOneWidget);
+    expect(find.text('★ Đúng rồi! +2 xu'), findsOneWidget);
   });
 
   testWidgets('nút bấm tối thiểu 56x56 dp', (tester) async {
@@ -328,9 +392,6 @@ void main() {
     final backSize = tester.getSize(find.byKey(const Key('math-back-button')));
     expect(backSize.height, greaterThanOrEqualTo(56));
     expect(backSize.width, greaterThanOrEqualTo(56));
-    final enSize = tester.getSize(find.byKey(const Key('math-en-toggle')));
-    expect(enSize.height, greaterThanOrEqualTo(56));
-    expect(enSize.width, greaterThanOrEqualTo(56));
     final keywordsSize = tester.getSize(
       find.byKey(const Key('math-keywords-button')),
     );
@@ -509,7 +570,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('town-math-button')));
+    // Đi từ Thị trấn bằng nút khu 0 (Lâu đài Lôgic) của T1-12;
+    // key cũ `town-math-button` đã bỏ khi viết lại màn Thị trấn.
+    await tester.tap(find.byKey(const Key('town-stage-0-button')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('math-screen')), findsOneWidget);
 

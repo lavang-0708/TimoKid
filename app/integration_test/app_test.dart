@@ -32,7 +32,9 @@ void main() {
     expect(bytes.isNotEmpty, isTrue);
 
     // --- T1-09: đi hết chặng 1 (mảng logic, bậc 1) ---
-    await tester.tap(find.byKey(const Key('town-math-button')));
+    // Nút khu 0 của màn Thị trấn T1-12 (tên key cũ `town-math-button`
+    // đã bỏ khi viết lại màn Thị trấn).
+    await tester.tap(find.byKey(const Key('town-stage-0-button')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('math-screen')), findsOneWidget);
 
@@ -40,6 +42,10 @@ void main() {
     final element = tester.element(find.byKey(const Key('math-screen')));
     final db = ProviderScope.containerOf(element).read(databaseProvider);
     final childId = await db.ensureSeeded();
+    // Tắt âm thanh khi chạy trên máy ảo CI: phát WAV qua audioplayers
+    // làm pumpAndSettle không bao giờ dừng (đã khoanh vùng ở PR #13).
+    // Âm thanh kiểm bằng widget test (SoundPlayer giả) và trên máy thật.
+    await db.settingsDao.setValue(key: 'sound_enabled', value: 'false');
     final set = await db.dailySetsDao.getDailySet(childId, db.clock.today());
     final resolved = db.dailySetsDao
         .readQuestions(set!)

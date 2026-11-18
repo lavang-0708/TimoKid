@@ -1,10 +1,10 @@
 # HANDOVER — TimoKid
 
-Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-11, nhánh `task/T1-11-vi-xu`).
+Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-12, nhánh `task/T1-12-thi-tran`).
 
 ## Trạng thái hiện tại
 
-- `main` đang ở commit `a2906c3` — PR #1 (T1-01), #2 (T1-02), #3 (T1-03), #4 (T1-04), #5 (T1-05), #7 (T1-06), #8 (T1-07), #9 (T1-08), #10 (T1-10), #11 (T1-09) đã merge. PR #6 đóng vì trùng T1-04. PLAN.md có mục "Làm rõ ngày 17/11" (a–k), ghi đè mọi chỗ khác trong kế hoạch.
+- `main` đang ở commit `5f5104d` — PR #1 (T1-01), #2 (T1-02), #3 (T1-03), #4 (T1-04), #5 (T1-05), #7 (T1-06), #8 (T1-07), #9 (T1-08), #10 (T1-10), #11 (T1-09), #12 (T1-11) đã merge. PR #6 đóng vì trùng T1-04. PLAN.md có mục "Làm rõ ngày 17/11" (a–k), ghi đè mọi chỗ khác trong kế hoạch; thêm điểm (l) (đề song ngữ + hai cột cân nhau, 18/11) và điểm (m) (màn làm toán sinh động: âm thanh + phông Nunito + giao diện, 18/11).
 - T1-01 đến T1-04 **Xong**. CI chính và integration test máy ảo (API 30, ~8 phút) đều xanh. Phần ký APK chờ anh Điệp nạp 4 secrets theo `docs/RELEASE.md`, rồi tag thử `v0.0.1`.
 - T1-05 **Xong**: Bộ sinh câu hỏi — chuyển 48/48 dạng bài trong `gen.py` sang Dart (`lib/features/questions/`), test 500 seed × 103 cặp form×mức. PR #5 đã merge.
 - T1-06 **Xong**: Hình vẽ cho câu hình học — sinh SVG từ `FigureSpec` (`lib/features/questions/figure_svg.dart`, gói `flutter_svg` 2.4.0), golden test 7 hình, Claude đã đếm lại 7 ảnh bằng mắt: đúng hết. PR #7 đã merge.
@@ -12,8 +12,9 @@ Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-11, nhánh `task/T1-11-vi-xu`).
 - T1-08 **Xong** (PR #9 đã merge): Đề ngày — mỗi ngày một đề 25 câu, 5 chặng theo 5 mảng (`lib/features/daily_set/`, `DailySetService` dùng `LadderService` + DAO T1-04), 27 unit test mới. PR: #9 (https://github.com/lavang-0708/TimoKid/pull/9).
 - T1-10 **Xong** (PR #10 đã merge): Sổ ôn tập — vòng mốc 1–3–7 ngày, đúng ngay đủ 3 lần thì ra khỏi sổ (`lib/features/review_book/`, `ReviewBookService` dùng `ReviewQueueDao` + `Clock`), mốc hỏi lại 0h ngày VN (sửa sau review, commit `f9fdb4b`). PR: #10 (https://github.com/lavang-0708/TimoKid/pull/10).
 - T1-09 **Xong** (PR #11 đã merge, main `a2906c3`): Màn làm toán — đề VI/EN, từ khóa song ngữ, trắc nghiệm trộn đáp án, bàn phím số, gợi ý/lời giải, xu theo bảng (c), ghi `attempts` + cập nhật bậc/thành thạo + ghi sổ ôn tập (`lib/features/math/`, `lib/features/rewards/`, `lib/features/stage_result/`), bố cục 2 cột vừa 640x320/800x360/1280x800, nút ≥ 56x56 dp. PR: #11 (https://github.com/lavang-0708/TimoKid/pull/11). Claude sửa thêm trên nhánh trước khi merge: bỏ `convertFlutterSurfaceToImage` gọi lặp trong `takeShot`, bọc `SingleChildScrollView` cho màn Kết quả chặng (tràn 27 px ở 640x320).
-- T1-11 **Đang làm**: Ví xu — `RewardConfig` đọc từ `settings`, `RewardService` cộng thưởng (câu/chặng/đề ngày) và đọc số dư từ `wallet_ledger` (`lib/features/rewards/`), 14 unit test mới gồm nghiệm thu (c) 120 xu + 1 kim cương. PR: #12 (https://github.com/lavang-0708/TimoKid/pull/12).
-- Các nhiệm vụ còn lại của bản 0.1 (T1-12 đến T1-14): **Chưa bắt đầu**.
+- T1-11 **Xong** (PR #12 đã merge): Ví xu — `RewardConfig` đọc từ `settings`, `RewardService` cộng thưởng (câu/chặng/đề ngày) và đọc số dư từ `wallet_ledger` (`lib/features/rewards/`), 14 unit test mới gồm nghiệm thu (c) 120 xu + 1 kim cương. PR: #12 (https://github.com/lavang-0708/TimoKid/pull/12).
+- T1-12 **Đang làm**: Màn Thị trấn tạm — 5 nút khu theo DESIGN hiện trạng thái chặng hôm nay + thanh tiến độ đề ngày + số xu/kim cương qua `RewardService.balances` (`lib/features/town/`), icon app thật (adaptive icon mặt thỏ), đề song ngữ + hai cột căn giữa (PLAN điểm (l)), âm thanh 4 file WAV qua `SoundService` + `audioplayers` và phông Nunito toàn app (PLAN điểm (m), chỉ phần âm thanh + phông; phần giao diện của (m) là T1-15). PR: #13 (https://github.com/lavang-0708/TimoKid/pull/13).
+- Các nhiệm vụ còn lại của bản 0.1 (T1-13, T1-14): **Chưa bắt đầu**. T1-15 "Màn làm toán sinh động" (phần giao diện của PLAN điểm (m)): **Chưa bắt đầu**, làm sau khi PR T1-12 mở.
 - **Claude merge PR** (anh Điệp giao).
 
 ## Điểm cần biết khi tiếp tục
