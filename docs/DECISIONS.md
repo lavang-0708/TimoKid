@@ -60,3 +60,10 @@ Các quyết định kèm theo:
 ## 17/11/2026 — Vị trí Flutter SDK của Muse
 
 Flutter SDK stable đặt tại `~/workspace/flutter-sdk/flutter` (nằm trong workspace nên tồn tại qua các lần thay máy ảo). Dùng cho `flutter create`, `analyze`, unit test và widget test. Không dùng để build APK hay chạy máy ảo — hai việc đó qua GitHub Actions. Người quyết: Claude (mục (j) ở trên).
+
+## 18/11/2026 — T1-06: sinh SVG từ FigureSpec
+
+- **Giữ đúng hình học của `gen.py`**: `buildFigureSvg` trong `app/lib/features/questions/figure_svg.dart` viết lại từng dòng các hàm `svg_grid`/`svg_fan`/`svg_path_grid` (cùng lề, cùng thứ tự kẻ, cùng tọa độ) nên chuỗi SVG khớp từng ký tự với `gen.py` cho cùng tham số — test so sánh chuỗi (`figure_svg_test.dart`, 7 trường hợp đại diện) là bằng chứng. Nét `#333` dày 3 như `gen.py`, đã đủ đậm; `FigureView` chỉ co giãn toàn bộ hình theo tỉ lệ nên nét giữ nguyên tỉ lệ.
+- **Thêm gói `flutter_svg` 2.4.0** (duy nhất): hiển thị SVG bằng `SvgPicture.string` trong widget `FigureView`. Widget nhận `FigureSpec` và chiều rộng hiển thị tùy chọn (bỏ trống: dùng kích thước tự nhiên từ `figureSvgSize`).
+- **Golden test 7 hình** (`figure_golden_test.dart`): countsq 2x3, countrect 1x4, counttri quạt 3 đoạn, matches 1 hàng 4 ô, matches 2 hàng 3 ô, shapeperim 1 hàng 3 ô, gridpath 2x2. Ảnh kỳ vọng nhúng base64 trong `app/test/goldens/figure_golden_data.dart`, test tự giải mã ra PNG trước khi so sánh (mẫu T1-02); đã kiểm chứng tự phục hồi bằng cách xóa PNG rồi chạy lại test. Chữ A/B trong lưới đường đi dùng font-family `sans-serif` của `gen.py` nên test nạp DejaVu Sans làm cả hai font 'Roboto' và 'sans-serif'.
+- **Ảnh chụp cho Claude đếm lại bằng mắt**: 7 ảnh PNG 2x trong `docs/screenshots-t1-06/` (chỉ lưu local, không đẩy lên GitHub vì file nhị phân). File test chụp ảnh (`figure_screenshots_test.dart`) đã XÓA khỏi repo vì nó làm treo tiến trình test khi tắt (`Bad state: Cannot add event while adding stream` sau khi chụp xong bằng `RepaintBoundary.toImage` trong `tester.runAsync`) — ảnh đã chụp xong một lần, golden test là kiểm chứng lặp lại được.
