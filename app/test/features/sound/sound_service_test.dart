@@ -10,6 +10,22 @@ import 'package:timokid/core/database/app_database.dart';
 import 'package:timokid/core/time/clock.dart';
 import 'package:timokid/features/sound/sound_service.dart';
 
+/// Player giả cho test pool: ghi lại các lần phát, đánh dấu dispose.
+class _FakePooledPlayer implements PooledPlayer {
+  final played = <String>[];
+  var disposed = false;
+
+  @override
+  Future<void> play(String assetPath) async {
+    played.add(assetPath);
+  }
+
+  @override
+  Future<void> dispose() async {
+    disposed = true;
+  }
+}
+
 /// Ghi lại các đường dẫn đã phát, theo đúng thứ tự.
 class FakeSoundPlayer implements SoundPlayer {
   final played = <String>[];
@@ -18,6 +34,9 @@ class FakeSoundPlayer implements SoundPlayer {
   Future<void> play(String assetPath) async {
     played.add(assetPath);
   }
+
+  @override
+  Future<void> dispose() async {}
 }
 
 void main() {
@@ -67,6 +86,35 @@ void main() {
 
     await Future<void>.delayed(const Duration(milliseconds: 10));
     expect(fake.played, isEmpty);
+  });
+
+  test('pool tái dùng player, không tạo mới mỗi lần phát', () async {
+    // T1-15 (review PR #13): bản cũ tạo AudioPlayer mới cho mỗi lần
+    // phát — nghi là nguyên nhân máy ảo CI treo pumpAndSettle.
+    // Pool cố định tạo đúng poolSize player lúc dựng, phát 10 lần
+    // cũng không tạo thêm player nào; các lần phát chia đều vòng
+    // tròn cho các player (âm chồng nhau không cắt nhau).
+    final created = <_FakePooledPlayer>[];
+    final pool = AudioPlayersSoundPlayer(
+      poolSize: 3,
+      createPlayer: () {
+        final player = _FakePooledPlayer();
+        created.add(player);
+        return player;
+      },
+    );
+    addTearDown(pool.dispose);
+
+    expect(created, hasLength(3));
+    for (var i = 0; i < 10; i++) {
+      await pool.play('sounds/correct.wav');
+    }
+    expect(created, hasLength(3));
+    // 10 lần phát chia vòng tròn 4-3-3 cho 3 player.
+    expect(created.map((p) => p.played.length), [4, 3, 3]);
+
+    await pool.dispose();
+    expect(created.every((p) => p.disposed), isTrue);
   });
 
   test('chưa có khóa sound_enabled thì mặc định bật', () async {

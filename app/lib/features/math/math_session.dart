@@ -198,6 +198,11 @@ class StageSession extends ChangeNotifier {
   int xuEarned = 0;
   bool finished = false;
 
+  /// Số câu đúng liên tiếp trong chặng (đúng sau gợi ý vẫn tính là
+  /// đúng — chỉ sai cả hai lần mới ngắt chuỗi). Màn hình hiện
+  /// "N câu liền!" khi chuỗi này đạt 3 trở lên (PLAN điểm (m)).
+  int consecutiveCorrect = 0;
+
   late DateTime _questionStartedAt;
 
   ResolvedQuestion get current => resolved[currentIndex];
@@ -348,6 +353,7 @@ class StageSession extends ChangeNotifier {
     }
     if (correct) {
       correctCount++;
+      consecutiveCorrect++;
       if (firstTry) firstTryCorrectCount++;
       final xu = await _rewards.awardQuestion(
         childId: childId,
@@ -361,6 +367,7 @@ class StageSession extends ChangeNotifier {
       state = QuestionState.correct;
     } else {
       lastEarnedXu = 0;
+      consecutiveCorrect = 0;
       state = QuestionState.solution;
     }
     notifyListeners();
