@@ -1,4 +1,4 @@
-/// Màn làm toán (T1-09): bé làm một chặng 5 câu của đề ngày.
+/// Màn làm toán (T1-09, sinh động hóa ở T1-15 theo PLAN điểm (m)).
 ///
 /// Đề luôn hiện song ngữ (PLAN điểm (l)): tiếng Việt chữ to trên,
 /// tiếng Anh nhỏ hơn + nhạt hơn dưới; gợi ý và lời giải cũng song ngữ.
@@ -8,11 +8,24 @@
 /// trong app, nút to, có nút xóa.
 ///
 /// Bố cục 2 cột (sửa sau review PR #11, cân lại ở T1-12 theo điểm
-/// (l)): cột trái là đề, hình vẽ, gợi ý hoặc lời giải — cuộn được,
-/// khối đề căn giữa dọc; cột phải là 4 nút trắc nghiệm hoặc ô số +
-/// bàn phím, cộng nút "Tiếp" — không cuộn, cả khối căn giữa dọc. Bố
-/// cục xếp dọc 1 cột cũ không vừa điện thoại ngang cao 360 dp (máy
+/// (l), sinh động hóa ở T1-15 theo điểm (m)): cột trái là thanh tiến
+/// độ + pet ở hàng trên, đề trong thẻ trắng bo tròn có bóng (cuộn
+/// được, khối đề căn giữa dọc), gợi ý/lời giải nằm trong băng ở
+/// DƯỚI thẻ đề trong luồng bố cục (không chồng lên — sửa sau review
+/// PR #14); cột phải là 4 nút trắc nghiệm hoặc ô số + bàn phím,
+/// cộng nút "Tiếp" — không cuộn, cả khối căn giữa dọc. Pet không
+/// che chữ nào ở bất kỳ trạng thái nào (nằm cạnh thanh tiến độ).
+/// Bố cục xếp dọc 1 cột cũ không vừa điện thoại ngang cao 360 dp (máy
 /// ảo 640x320: nút choice-3 nằm ngoài màn hình).
+///
+/// Sinh động (T1-15): thanh tiến độ 5 ô thay chữ "Câu 1/5"; nền theo
+/// mảng (màu pastel + họa tiết SVG nhẹ); nút đáp án kiểu nổi (viền
+/// dưới đậm, nhấn lún xuống); băng phản hồi trượt lên từ đáy (xanh
+/// "Đúng rồi! +N xu" kèm nút Tiếp, cam nhạt "Gần đúng rồi, xem gợi ý
+/// nhé" khi sai lần đầu); xu bay về góc ví; đúng liền 3 câu hiện
+/// "3 câu liền!"; pet mèo nhỏ cạnh thanh tiến độ phản ứng vui khi
+/// đúng, động viên khi sai (không che chữ nào — sửa sau review
+/// PR #14). Hiệu ứng dưới 1 giây, không chặn thao tác.
 ///
 /// Sai lần đầu hiện gợi ý và cho làm lại; sai lần hai hiện lời giải
 /// từng bước và nút "Tiếp". Đúng thì có hiệu ứng (ngôi sao + số xu)
@@ -26,7 +39,10 @@
 /// đi đường này). Chặng cụ thể chọn qua [MathScreenArgs].
 library;
 
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -41,6 +57,7 @@ import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
 import '../sound/sound_service.dart';
 import '../stage_result/stage_result_screen.dart';
+import 'math_decor.dart';
 import 'math_session.dart';
 
 /// Tham số vào màn làm toán qua GoRouter `extra`.
@@ -72,13 +89,26 @@ class MathScreen extends ConsumerStatefulWidget {
   ConsumerState<MathScreen> createState() => _MathScreenState();
 }
 
-class _MathScreenState extends ConsumerState<MathScreen> {
+class _MathScreenState extends ConsumerState<MathScreen>
+    with TickerProviderStateMixin {
   StageSession? _session;
   SoundService? _soundService;
+
+  /// Màn tự dựng [SoundService] (không chích từ ngoài) thì tự giải
+  /// phóng pool player khi dispose; service chích từ test thì test
+  /// là chủ, màn không dispose.
+  bool _ownsSoundService = false;
   bool _loading = true;
   bool _allDone = false;
   String? _error;
   bool _navigated = false;
+
+  /// Ví xu trên AppBar — đích đến của hiệu ứng xu bay.
+  final GlobalKey _walletKey = GlobalKey();
+
+  /// Hiệu ứng xu bay: điều khiển + mục overlay (null khi không bay).
+  AnimationController? _coinController;
+  OverlayEntry? _coinEntry;
 
   @override
   void initState() {
@@ -95,7 +125,9 @@ class _MathScreenState extends ConsumerState<MathScreen> {
 
   @override
   void dispose() {
+    _removeCoinFly();
     _session?.removeListener(_onSessionChanged);
+    if (_ownsSoundService) unawaited(_soundService?.dispose());
     super.dispose();
   }
 
@@ -103,7 +135,18 @@ class _MathScreenState extends ConsumerState<MathScreen> {
     if (!mounted) return;
     setState(() {});
     final session = _session;
-    if (session != null && session.finished && !_navigated) {
+    if (session == null) return;
+    if (session.state == QuestionState.correct) {
+      // Đúng: xu bay về góc ví (chỉ khi có xu để cộng).
+      if ((session.lastEarnedXu ?? 0) > 0) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _startCoinFly();
+        });
+      }
+    } else {
+      _removeCoinFly();
+    }
+    if (session.finished && !_navigated) {
       _navigated = true;
       // Xong chặng: phát hợp âm rải sau 600 ms để tiếng "ting" và
       // tiếng xu của câu cuối dứt hẳn rồi mới tới tiếng xong chặng,
@@ -117,6 +160,38 @@ class _MathScreenState extends ConsumerState<MathScreen> {
         context.go(StageResultScreen.route, extra: _resultArgs(session));
       });
     }
+  }
+
+  /// Xu bay từ băng phản hồi lên góc ví (600 ms, không chặn thao tác).
+  void _startCoinFly() {
+    if (_coinEntry != null || !mounted) return;
+    final walletBox =
+        _walletKey.currentContext?.findRenderObject() as RenderBox?;
+    if (walletBox == null) return;
+    final end = walletBox.localToGlobal(walletBox.size.center(Offset.zero));
+    final size = MediaQuery.sizeOf(context);
+    // Điểm xuất phát: gần ô xu của băng phản hồi (đáy màn, giữa).
+    final start = Offset(size.width * 0.55, size.height - 70);
+    final controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _coinController = controller;
+    final entry = OverlayEntry(
+      builder: (_) => _CoinFly(controller: controller, start: start, end: end),
+    );
+    _coinEntry = entry;
+    Overlay.of(context).insert(entry);
+    controller.forward().whenComplete(() {
+      if (mounted) _removeCoinFly();
+    });
+  }
+
+  void _removeCoinFly() {
+    _coinEntry?.remove();
+    _coinEntry = null;
+    _coinController?.dispose();
+    _coinController = null;
   }
 
   StageResultArgs _resultArgs(StageSession session) {
@@ -188,8 +263,12 @@ class _MathScreenState extends ConsumerState<MathScreen> {
       setState(() {
         _session = session;
         // Âm thanh (PLAN điểm (m)): dựng cùng lúc với phiên, dùng
-        // chung DB để đọc `sound_enabled`.
-        _soundService ??= SoundService(db: db);
+        // chung DB để đọc `sound_enabled`. Màn tự dựng thì tự giải
+        // phóng pool player khi dispose (xem [_ownsSoundService]).
+        if (_soundService == null) {
+          _soundService = SoundService(db: db);
+          _ownsSoundService = true;
+        }
         _loading = false;
       });
     } catch (e) {
@@ -241,11 +320,27 @@ class _MathScreenState extends ConsumerState<MathScreen> {
       );
     }
     final question = session.current;
-    final strandName =
-        strandNames[question.spec.strand] ?? question.spec.strand;
+    final strand = question.spec.strand;
+    final strandName = strandNames[strand] ?? strand;
+    final background = MathColors.strandBackground(strand);
     final title = session.stageIndex >= 0
         ? 'Chặng ${session.stageIndex + 1} — $strandName'
         : 'Chặng tự chọn — $strandName';
+    // Băng phản hồi: đúng thì băng xanh toàn màn (kèm nút Tiếp);
+    // sai lần đầu / sai hai lần thì băng cam / xanh dương nằm dưới
+    // thẻ đề trong luồng cột trái (không chồng lên — xem
+    // [_QuestionColumn], sửa sau review PR #14).
+    final showGreenBanner = session.state == QuestionState.correct;
+    // Pet vui khi đang làm / đúng, động viên khi gợi ý / lời giải.
+    // Pet nằm cạnh thanh tiến độ trong [_QuestionColumn], không
+    // còn ở góc dưới-trái (review PR #14: pet không được che chữ).
+    final petHappy =
+        session.state != QuestionState.hint &&
+        session.state != QuestionState.solution;
+    // Chừa chỗ dưới cho băng xanh (cột phải lúc đúng chỉ còn nút
+    // trắc nghiệm/ô số nên vẫn vừa); băng gợi ý/lời giải nằm trong
+    // luồng cột trái nên không cần chừa chỗ toàn màn.
+    const greenBannerReserve = 112.0;
     // Các nút trên thanh tiêu đề là nút biểu tượng, tối thiểu 56x56 dp.
     // Biểu tượng là ký tự chữ (←, Aa) thay vì `Icon` vì font
     // MaterialIcons không có trong môi trường test nên golden test sẽ
@@ -254,7 +349,10 @@ class _MathScreenState extends ConsumerState<MathScreen> {
     // Nút đổi EN đã bỏ (PLAN điểm (l)): đề luôn hiện song ngữ cùng lúc.
     return Scaffold(
       key: const Key('math-screen'),
+      backgroundColor: background,
       appBar: AppBar(
+        backgroundColor: background,
+        foregroundColor: MathColors.questionText,
         title: Text(title),
         // Bé được rời chặng giữa chừng: chặng đang làm giữ trạng thái
         // `in_progress` nên vào lại vẫn làm tiếp từ đầu chặng.
@@ -269,6 +367,33 @@ class _MathScreenState extends ConsumerState<MathScreen> {
           ),
         ),
         actions: [
+          // Ví xu của chặng (đích đến của hiệu ứng xu bay).
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: Container(
+              key: _walletKey,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(28),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const _CoinIcon(size: 22),
+                  const SizedBox(width: 6),
+                  Text(
+                    '${session.xuEarned} xu',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: MathColors.questionText,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           IconButton(
             key: const Key('math-keywords-button'),
             icon: const Text('Aa', style: TextStyle(fontSize: 22)),
@@ -281,200 +406,41 @@ class _MathScreenState extends ConsumerState<MathScreen> {
           ),
         ],
       ),
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: Stack(
         children: [
-          // Cột trái: đề, hình vẽ, gợi ý/lời giải — cuộn được, khối đề
-          // căn giữa dọc khi vừa màn (PLAN điểm (l)): đề dài thì cuộn,
-          // đề ngắn thì khối đề nằm giữa vùng dưới thanh trên, không
-          // dính góc trên trái. Banner "Đúng rồi! +N xu" ở cột phải
-          // (không cuộn) nên không có ở đây.
-          Expanded(
-            flex: 6,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight - 24,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          'Câu ${session.currentIndex + 1}/${session.resolved.length}',
-                          key: const Key('math-progress'),
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                        const SizedBox(height: 8),
-                        // Đề luôn song ngữ (PLAN điểm (l)): tiếng Việt
-                        // chữ to trên, tiếng Anh nhỏ hơn + nhạt hơn dưới.
-                        Text(
-                          question.question.questionVi,
-                          key: const Key('math-question-text'),
-                          style: const TextStyle(fontSize: 28),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          question.question.questionEn,
-                          key: const Key('math-question-text-en'),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            color: Colors.black54,
-                          ),
-                        ),
-                        if (question.question.figure != null) ...[
-                          const SizedBox(height: 12),
-                          Center(
-                            child: FigureView(
-                              key: const Key('math-figure'),
-                              figure: question.question.figure!,
-                              width: 220,
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: 12),
-                        if (session.state == QuestionState.hint)
-                          Container(
-                            key: const Key('math-hint'),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.amber.shade100,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Text(
-                                  'Sai rồi, xem gợi ý rồi thử lại nhé!\n${question.question.hintVi}',
-                                  style: const TextStyle(fontSize: 22),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  question.question.hintEn,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black54,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        if (session.state == QuestionState.solution)
-                          Container(
-                            key: const Key('math-solution'),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade50,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Text(
-                                  'Lời giải:\n${question.question.explanationVi}',
-                                  style: const TextStyle(fontSize: 22),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  question.question.explanationEn,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black54,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+          // Nền theo mảng: màu pastel + họa tiết SVG nhẹ.
+          const Positioned.fill(child: _MathPattern()),
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: showGreenBanner ? greenBannerReserve : 0,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _QuestionColumn(
+                  session: session,
+                  question: question,
+                  petHappy: petHappy,
+                ),
+                _AnswerColumn(
+                  session: session,
+                  question: question,
+                  onCorrect: () => _soundService?.playCorrect(),
+                  onWrong: () => _soundService?.playWrong(),
+                ),
+              ],
             ),
           ),
-          // Cột phải: đáp án + nút "Tiếp" — không cuộn. Cả khối
-          // (banner "Đúng rồi" + đáp án + nút Tiếp) căn giữa dọc
-          // trong vùng dưới thanh trên (PLAN điểm (l)), không để đáp
-          // án lệch xuống góc dưới phải; nút Tiếp nằm ngay dưới đáp án
-          // chứ không dính đáy. Đề song ngữ dài hơn nên ở màn thấp
-          // 320 dp chiều cao nút trắc nghiệm tính theo chỗ còn lại
-          // (kẹp 48–64 dp), phím số theo [_NumberPad].
-          Expanded(
-            flex: 5,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(4, 12, 20, 12),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final isCorrect = session.state == QuestionState.correct;
-                  final showNext =
-                      isCorrect || session.state == QuestionState.solution;
-                  final bannerSpace = isCorrect ? 48.0 + 8 : 0.0;
-                  final nextSpace = showNext ? 56.0 + 12 : 0.0;
-                  final available =
-                      constraints.maxHeight - bannerSpace - nextSpace;
-                  // 2 hàng nút trắc nghiệm + khoảng cách 12 dp.
-                  final choiceHeight = ((available - 12) / 2).clamp(48.0, 64.0);
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (isCorrect) ...[
-                        Container(
-                          key: const Key('math-correct'),
-                          height: 48,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: Colors.green.shade100,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            '★ Đúng rồi! +${session.lastEarnedXu ?? 0} xu',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 22),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                      ],
-                      question.displayType == AnswerType.choice
-                          ? _ChoiceAnswers(
-                              session: session,
-                              question: question,
-                              buttonHeight: choiceHeight,
-                              onCorrect: () => _soundService?.playCorrect(),
-                              onWrong: () => _soundService?.playWrong(),
-                            )
-                          : _NumberPad(
-                              session: session,
-                              onCorrect: () => _soundService?.playCorrect(),
-                              onWrong: () => _soundService?.playWrong(),
-                              availableHeight: available,
-                            ),
-                      if (showNext) ...[
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          height: 56,
-                          child: ElevatedButton(
-                            key: const Key('math-next-button'),
-                            onPressed: () => session.next(),
-                            child: Text(
-                              session.isLastQuestion ? 'Xem kết quả' : 'Tiếp',
-                              style: const TextStyle(fontSize: 22),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  );
-                },
-              ),
+          // Băng phản hồi đúng: trượt lên từ đáy màn, toàn chiều
+          // rộng. Pet đã chuyển lên cạnh thanh tiến độ nên băng
+          // không cần chừa chỗ trái nữa (sửa sau review PR #14).
+          if (showGreenBanner)
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 12,
+              child: _SlideUpBanner(child: _CorrectBanner(session: session)),
             ),
-          ),
         ],
       ),
     );
@@ -515,14 +481,875 @@ class _MathScreenState extends ConsumerState<MathScreen> {
   }
 }
 
+/// Màu viền dưới đậm của nút nổi: mặc định (nút đào), đúng (xanh),
+/// sai (đỏ).
+const Color _raisedPeachBottom = Color(0xFFF0B48C);
+const Color _raisedGreenBottom = Color(0xFF2E7D32);
+const Color _raisedRedBottom = Color(0xFFC62828);
+
+/// Họa tiết nền nhẹ theo mảng (PLAN điểm (m)): lát ô SVG trắng mờ
+/// trên nền pastel.
+class _MathPattern extends StatelessWidget {
+  const _MathPattern();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const tile = 120.0;
+        final cols = (constraints.maxWidth / tile).ceil();
+        final rows = (constraints.maxHeight / tile).ceil();
+        // Wrap thay vì lưới Row/Column: ô cuối hàng không vừa sẽ
+        // xuống hàng dưới thay vì tràn (Row báo lỗi tràn dù có
+        // ClipRect); phần thừa chiều cao được ClipRect cắt.
+        return ClipRect(
+          child: Opacity(
+            opacity: 0.5,
+            child: Wrap(
+              spacing: 0,
+              runSpacing: 0,
+              children: [
+                for (var i = 0; i < cols * rows; i++)
+                  SvgPicture.string(mathPatternSvg, width: tile, height: tile),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Thanh tiến độ 5 ô thay chữ "Câu 1/5" (PLAN điểm (m)): ô đã làm
+/// tô xanh, ô hiện tại tím đậm nổi bật, ô chưa làm trắng viền mờ.
+class _ProgressCells extends StatelessWidget {
+  const _ProgressCells({
+    required this.total,
+    required this.currentIndex,
+    required this.state,
+  });
+
+  final int total;
+  final int currentIndex;
+  final QuestionState state;
+
+  bool _done(int i) =>
+      i < currentIndex ||
+      (i == currentIndex &&
+          (state == QuestionState.correct || state == QuestionState.solution));
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      key: const Key('math-progress'),
+      children: [
+        for (var i = 0; i < total; i++) ...[
+          if (i > 0) const SizedBox(width: 6),
+          Expanded(
+            child: Container(
+              key: Key('math-progress-cell-$i'),
+              height: 14,
+              decoration: BoxDecoration(
+                color: _done(i)
+                    ? MathColors.progressDone
+                    : i == currentIndex
+                    ? MathColors.progressCurrent
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(7),
+                border: _done(i) || i == currentIndex
+                    ? null
+                    : Border.all(
+                        color: MathColors.progressUpcomingBorder,
+                        width: 2,
+                      ),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Cột trái: hàng trên là thanh tiến độ + pet, dưới là đề trong thẻ
+/// trắng (cuộn được, khối đề căn giữa dọc — PLAN điểm (l)), dưới
+/// cùng là băng gợi ý/lời giải khi có.
+///
+/// Gợi ý / lời giải KHÔNG nằm dưới đề trong vùng cuộn (review
+/// PR #13: ở 800x360 và 640x320 chúng bị khuất, phải cuộn mới thấy)
+/// mà nằm trong băng phản hồi ở đáy cột trái — luôn thấy ngay, bé
+/// không phải cuộn. Băng chỉ chiếm cột trái (không che nút đáp án
+/// cột phải: bàn phím số ở 640x320 cần tối thiểu 224 dp trong khi
+/// thân màn chỉ 264 dp, băng toàn màn không còn chỗ); băng cao tối
+/// đa 55% cột, nội dung dài thì cuộn trong băng, băng luôn hiện.
+///
+/// Sửa sau review PR #14: băng KHÔNG còn chồng lên thẻ đề bằng
+/// `Positioned` (trước đây nó đè nửa dưới thẻ, che câu hỏi) mà nằm
+/// trong luồng bố cục dưới thẻ — thẻ đề co lại và cuộn phần còn
+/// lại. Đã cân nhắc đặt băng ở cột phải dưới 4 nút (chỗ đó trống
+/// khi trắc nghiệm): ở 640x320 trạng thái lời giải còn nút "Tiếp"
+/// 68 dp nên chỉ còn ~24 dp cho băng, không đủ; giữ băng ở cột
+/// trái cho cả hai loại câu.
+/// Pet cũng chuyển từ góc dưới-trái (đè dòng tiếng Anh) lên cạnh
+/// thanh tiến độ ở hàng trên: nằm trong luồng bố cục nên không che
+/// chữ nào ở bất kỳ trạng thái nào.
+class _QuestionColumn extends StatelessWidget {
+  const _QuestionColumn({
+    required this.session,
+    required this.question,
+    required this.petHappy,
+  });
+
+  final StageSession session;
+  final ResolvedQuestion question;
+
+  /// Pet vui khi đang làm / đúng, động viên khi gợi ý / lời giải.
+  final bool petHappy;
+
+  @override
+  Widget build(BuildContext context) {
+    final showHintBanner = session.state == QuestionState.hint;
+    final showSolutionBanner = session.state == QuestionState.solution;
+    return Expanded(
+      flex: 6,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Băng gợi ý/lời giải cao tối đa 55% cột (120..240 dp).
+          final bannerMaxHeight = (constraints.maxHeight * 0.55).clamp(
+            120.0,
+            240.0,
+          );
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Hàng trên: thanh tiến độ + pet (48 dp). Thanh tiến
+              // độ cố định ở trên thay vì nằm trong vùng cuộn nên
+              // bé luôn thấy đang ở câu mấy; pet trong luồng bố cục
+              // nên không che chữ nào.
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _ProgressCells(
+                        total: session.resolved.length,
+                        currentIndex: session.currentIndex,
+                        state: session.state,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    _PetMascot(happy: petHappy),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, innerConstraints) {
+                    return SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: innerConstraints.maxHeight - 22,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Đề trong thẻ trắng bo tròn có bóng (điểm (m)).
+                            // Key để test khóa "băng không chồng thẻ đề".
+                            Container(
+                              key: const Key('math-question-card'),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.12),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  // Đề luôn song ngữ (PLAN điểm (l)): tiếng
+                                  // Việt chữ to trên, tiếng Anh nhỏ hơn +
+                                  // nhạt hơn dưới.
+                                  Text(
+                                    question.question.questionVi,
+                                    key: const Key('math-question-text'),
+                                    style: const TextStyle(
+                                      fontSize: 28,
+                                      color: MathColors.questionText,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    question.question.questionEn,
+                                    key: const Key('math-question-text-en'),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: MathColors.englishText,
+                                    ),
+                                  ),
+                                  if (question.question.figure != null) ...[
+                                    const SizedBox(height: 12),
+                                    Center(
+                                      child: FigureView(
+                                        key: const Key('math-figure'),
+                                        figure: question.question.figure!,
+                                        width: 220,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              // Băng gợi ý/lời giải trong luồng bố cục, dưới thẻ đề:
+              // thẻ đề co lại, không bị băng chồng lên (review
+              // PR #14). Băng trượt lên từ đáy khi vừa hiện.
+              if (showHintBanner)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                  child: _SlideUpBanner(
+                    child: _HintBanner(
+                      question: question,
+                      maxHeight: bannerMaxHeight,
+                    ),
+                  ),
+                ),
+              if (showSolutionBanner)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                  child: _SlideUpBanner(
+                    child: _SolutionBanner(
+                      question: question,
+                      maxHeight: bannerMaxHeight,
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Cột phải: đáp án + nút "Tiếp" (chỉ khi sai hai lần — khi đúng,
+/// nút Tiếp nằm trong băng phản hồi) — không cuộn, cả khối căn giữa
+/// dọc trong vùng dưới thanh trên (PLAN điểm (l)).
+class _AnswerColumn extends StatelessWidget {
+  const _AnswerColumn({
+    required this.session,
+    required this.question,
+    required this.onCorrect,
+    required this.onWrong,
+  });
+
+  final StageSession session;
+  final ResolvedQuestion question;
+
+  /// Đúng: "ting" + xu; sai: "è" nhẹ (âm thanh phát nền, không await).
+  final VoidCallback onCorrect;
+  final VoidCallback onWrong;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      flex: 5,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(4, 12, 20, 12),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final showInlineNext = session.state == QuestionState.solution;
+            final nextSpace = showInlineNext ? 56.0 + 12 : 0.0;
+            final available = constraints.maxHeight - nextSpace;
+            // 2 hàng nút trắc nghiệm + khe 12 dp + viền nổi 4 dp/hàng.
+            final choiceHeight = ((available - 12) / 2 - 4).clamp(48.0, 64.0);
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                question.displayType == AnswerType.choice
+                    ? _ChoiceAnswers(
+                        session: session,
+                        question: question,
+                        buttonHeight: choiceHeight,
+                        onCorrect: onCorrect,
+                        onWrong: onWrong,
+                      )
+                    : _NumberPad(
+                        session: session,
+                        onCorrect: onCorrect,
+                        onWrong: onWrong,
+                        availableHeight: available,
+                      ),
+                if (showInlineNext) ...[
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 56,
+                    child: ElevatedButton(
+                      key: const Key('math-next-button'),
+                      onPressed: () => session.next(),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          session.isLastQuestion ? 'Xem kết quả' : 'Tiếp',
+                          softWrap: false,
+                          style: const TextStyle(fontSize: 22),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+/// Trượt lên từ đáy khi vừa hiện (350 ms). Chỉ trượt vào; khi ẩn
+/// thì widget bị gỡ khỏi cây (không trượt ra).
+class _SlideUpBanner extends StatelessWidget {
+  const _SlideUpBanner({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<Offset>(
+      tween: Tween(begin: const Offset(0, 1), end: Offset.zero),
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOutCubic,
+      builder: (context, offset, child) =>
+          FractionalTranslation(translation: offset, child: child),
+      child: child,
+    );
+  }
+}
+
+/// Băng phản hồi đúng (mẫu đã chốt với anh Điệp, PLAN điểm (m)): bo
+/// tròn, nền xanh nhạt, viền xanh dày 3, bóng dưới, dấu tích tròn bên
+/// trái, số xu trong ô vàng có hình đồng xu, kèm nút Tiếp. Đúng liền
+/// 3 câu thì thêm dòng "N câu liền!".
+class _CorrectBanner extends StatelessWidget {
+  const _CorrectBanner({required this.session});
+
+  final StageSession session;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('math-correct'),
+      decoration: BoxDecoration(
+        color: MathColors.bannerGreenBg,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: MathColors.bannerGreenBorder, width: 3),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.18),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: const BoxDecoration(
+              color: MathColors.bannerGreenBorder,
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: const Text(
+              '✓',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Đúng rồi!',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: MathColors.bannerGreenText,
+                  ),
+                ),
+                if (session.consecutiveCorrect >= 3)
+                  Text(
+                    '★ ${session.consecutiveCorrect} câu liền!',
+                    key: const Key('math-streak'),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: MathColors.bannerGreenText,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: MathColors.coinYellow,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const _CoinIcon(size: 22),
+                const SizedBox(width: 6),
+                Text(
+                  '+${session.lastEarnedXu ?? 0} xu',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: MathColors.questionText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Nút Tiếp tối đa 180 dp: nhãn "Xem kết quả" dài, ở màn hẹp
+          // (640x320) nút phình ra sẽ bóp cột chữ "Đúng rồi!" về 0
+          // rồi tràn ngang; nhãn thu nhỏ bằng FittedBox khi cần
+          // (trên máy thật chữ Nunito ~130 px nên không bị thu).
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 180),
+            child: SizedBox(
+              height: 56,
+              child: ElevatedButton(
+                key: const Key('math-next-button'),
+                onPressed: () => session.next(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: MathColors.bannerGreenText,
+                ),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    session.isLastQuestion ? 'Xem kết quả' : 'Tiếp',
+                    softWrap: false,
+                    style: const TextStyle(fontSize: 22),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Vỏ chung cho băng gợi ý / lời giải ở đáy cột trái: cùng kiểu với
+/// băng đúng (bo tròn, viền dày 3, bóng dưới) nhưng hẹp trong cột
+/// trái; cao tối đa [maxHeight], nội dung dài thì cuộn trong băng,
+/// băng luôn hiện (review PR #13).
+class _InfoBanner extends StatelessWidget {
+  const _InfoBanner({
+    required this.bannerKey,
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.iconGlyph,
+    required this.header,
+    required this.headerColor,
+    required this.maxHeight,
+    required this.child,
+  });
+
+  final Key bannerKey;
+  final Color backgroundColor;
+  final Color borderColor;
+  final String iconGlyph;
+  final String header;
+  final Color headerColor;
+  final double maxHeight;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: bannerKey,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: borderColor, width: 3),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.18),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: borderColor,
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    iconGlyph,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    header,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: headerColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Băng gợi ý sau sai lần đầu: màu cam nhạt, không có nút Tiếp
+/// (bé làm lại ngay). Nội dung gợi ý song ngữ nằm trong băng
+/// (key `math-hint` giữ nguyên cho integration test).
+class _HintBanner extends StatelessWidget {
+  const _HintBanner({required this.question, required this.maxHeight});
+
+  final ResolvedQuestion question;
+  final double maxHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    return _InfoBanner(
+      bannerKey: const Key('math-hint-banner'),
+      backgroundColor: MathColors.bannerOrangeBg,
+      borderColor: MathColors.bannerOrangeBorder,
+      iconGlyph: '?',
+      header: 'Gần đúng rồi, xem gợi ý nhé',
+      headerColor: MathColors.bannerOrangeText,
+      maxHeight: maxHeight,
+      child: Container(
+        key: const Key('math-hint'),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              question.question.hintVi,
+              style: const TextStyle(
+                fontSize: 18,
+                color: MathColors.questionText,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              question.question.hintEn,
+              style: const TextStyle(
+                fontSize: 14,
+                color: MathColors.englishText,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Băng lời giải sau sai hai lần: màu xanh dương nhạt (cùng tông với
+/// hộp lời giải cũ ở T1-09). Nút Tiếp vẫn ở cột phải như trước.
+/// Nội dung lời giải song ngữ nằm trong băng (key `math-solution`
+/// giữ nguyên cho integration test).
+class _SolutionBanner extends StatelessWidget {
+  const _SolutionBanner({required this.question, required this.maxHeight});
+
+  final ResolvedQuestion question;
+  final double maxHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    return _InfoBanner(
+      bannerKey: const Key('math-solution-banner'),
+      backgroundColor: MathColors.bannerBlueBg,
+      borderColor: MathColors.bannerBlueBorder,
+      iconGlyph: 'i',
+      header: 'Lời giải từng bước',
+      headerColor: MathColors.bannerBlueText,
+      maxHeight: maxHeight,
+      child: Container(
+        key: const Key('math-solution'),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              question.question.explanationVi,
+              style: const TextStyle(
+                fontSize: 18,
+                color: MathColors.questionText,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              question.question.explanationEn,
+              style: const TextStyle(
+                fontSize: 14,
+                color: MathColors.englishText,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Đồng xu vẽ bằng hình khối (không dùng ký tự hay `Icon` để golden
+/// test không bị ô vuông).
+class _CoinIcon extends StatelessWidget {
+  const _CoinIcon({super.key, required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: MathColors.coinYellow,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: MathColors.coinYellowDark,
+          width: size * 0.12,
+        ),
+      ),
+      child: Center(
+        child: Container(
+          width: size * 0.45,
+          height: size * 0.45,
+          decoration: BoxDecoration(
+            color: MathColors.coinYellowDark.withValues(alpha: 0.55),
+            shape: BoxShape.circle,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Đồng xu bay từ băng phản hồi lên góc ví theo đường cong (600 ms).
+class _CoinFly extends StatelessWidget {
+  const _CoinFly({
+    required this.controller,
+    required this.start,
+    required this.end,
+  });
+
+  final Animation<double> controller;
+  final Offset start;
+  final Offset end;
+
+  Offset _quadBezier(Offset p0, Offset p1, Offset p2, double t) {
+    final u = 1 - t;
+    return Offset(
+      u * u * p0.dx + 2 * u * t * p1.dx + t * t * p2.dx,
+      u * u * p0.dy + 2 * u * t * p1.dy + t * t * p2.dy,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        final t = controller.value;
+        final control = Offset(
+          (start.dx + end.dx) / 2,
+          (start.dy + end.dy) / 2 - 90,
+        );
+        final pos = _quadBezier(start, control, end, t);
+        return Stack(
+          children: [
+            Positioned(
+              left: pos.dx - 14,
+              top: pos.dy - 14,
+              child: IgnorePointer(
+                child: Opacity(
+                  opacity: 1 - 0.3 * t,
+                  child: const _CoinIcon(size: 28, key: Key('math-coin-fly')),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Pet mèo nhỏ cạnh thanh tiến độ (48 dp): vui khi đúng, động viên
+/// khi sai. Nằm trong luồng bố cục nên không che chữ nào (sửa sau
+/// review PR #14 — trước đây pet 72 dp ở góc dưới-trái, đè dòng
+/// tiếng Anh).
+class _PetMascot extends StatelessWidget {
+  const _PetMascot({required this.happy});
+
+  final bool happy;
+
+  @override
+  Widget build(BuildContext context) {
+    // Key theo tâm trạng để test phân biệt được pet vui/động viên
+    // (chuỗi SVG không đọc được từ ngoài widget).
+    return SvgPicture.string(
+      happy ? petCatHappySvg : petCatEncouragingSvg,
+      key: ValueKey(happy ? 'pet-happy' : 'pet-encouraging'),
+      width: 48,
+      height: 48,
+    );
+  }
+}
+
+/// Nút kiểu nổi (PLAN điểm (m)): viền dưới đậm, nhấn thì lún xuống
+/// 4 dp (hiệu ứng 90 ms, không chặn thao tác).
+class _RaisedButton extends StatefulWidget {
+  const _RaisedButton({
+    super.key,
+    required this.height,
+    required this.bottomColor,
+    required this.backgroundColor,
+    required this.enabled,
+    required this.onPressed,
+    required this.child,
+  });
+
+  final double height;
+  final Color bottomColor;
+  final Color? backgroundColor;
+  final bool enabled;
+  final VoidCallback? onPressed;
+  final Widget child;
+
+  @override
+  State<_RaisedButton> createState() => _RaisedButtonState();
+}
+
+class _RaisedButtonState extends State<_RaisedButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      onPointerDown: (_) {
+        if (widget.enabled) setState(() => _pressed = true);
+      },
+      onPointerUp: (_) {
+        if (_pressed) setState(() => _pressed = false);
+      },
+      onPointerCancel: (_) {
+        if (_pressed) setState(() => _pressed = false);
+      },
+      // Chiều cao ngoài CỐ ĐỊNH (không hoạt hình): khi nút thu nhỏ
+      // theo trạng thái (64 -> 54 lúc đúng), AnimatedContainer cũ
+      // thu chiều cao dần trong 90 ms nên hàng nút vẫn cao trong lúc
+      // cột đã hẹp lại -> tràn 20 px ở 640x320. Chỉ padding mới
+      // hoạt hình: nhấn thì nút lún xuống 3 px (trên 0->3, dưới
+      // 4->1, tổng vẫn height+4).
+      child: Container(
+        height: widget.height + 4,
+        decoration: BoxDecoration(
+          color: widget.bottomColor,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: AnimatedPadding(
+          duration: const Duration(milliseconds: 90),
+          padding: EdgeInsets.only(
+            top: _pressed ? 3 : 0,
+            bottom: _pressed ? 1 : 4,
+          ),
+          child: SizedBox(
+            height: widget.height,
+            child: ElevatedButton(
+              onPressed: widget.enabled ? widget.onPressed : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: widget.backgroundColor,
+                // Nút bị vô hiệu sau khi trả lời đúng/sai hai lần nên
+                // màu phải đặt ở cả hai chỗ, không thì nút nào cũng xám.
+                // Nút đúng giữ xanh, nút sai giữ đỏ; nút thường (nền
+                // null) dùng pastel rất nhạt thay cho màu nâu đất mặc
+                // định của theme (review PR #14).
+                disabledBackgroundColor:
+                    widget.backgroundColor ?? MathColors.disabledButtonBg,
+                padding: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: widget.child,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// 4 nút lựa chọn lớn, xếp 2 cột. Nút đã chọn sai thì đỏ, đáp án đúng
 /// thì xanh (chỉ khi đã trả lời đúng).
 ///
-/// Chiều cao nút lấy từ cột phải ([buttonHeight], đã trừ banner và nút
-/// "Tiếp" nếu có, kẹp 48–64 dp) để cả khối vừa màn thấp 320 dp.
-/// Đáp án luôn tiếng Việt (PLAN điểm (l) bỏ nút đổi EN; đề, gợi ý và
-/// lời giải đã song ngữ, còn đáp án trắc nghiệm là số hoặc từ ngắn
-/// nên chỉ hiện tiếng Việt).
+/// Chiều cao nút lấy từ cột phải ([buttonHeight], đã trừ nút "Tiếp"
+/// nếu có, kẹp 48–64 dp) để cả khối vừa màn thấp 320 dp.
+/// Đáp án hiện song ngữ khi VI khác EN (dạng `choiceOnly` có lựa chọn
+/// là chữ song ngữ — dữ liệu đã có sẵn trong [ResolvedQuestion],
+/// PLAN điểm (l) chỉ nói đề song ngữ chứ không cấm đáp án song ngữ);
+/// đáp án là số thì VI và EN giống nhau nên chỉ hiện một dòng.
 class _ChoiceAnswers extends StatelessWidget {
   const _ChoiceAnswers({
     required this.session,
@@ -547,31 +1374,61 @@ class _ChoiceAnswers extends StatelessWidget {
         session.state == QuestionState.hint;
     // Hai hàng, mỗi hàng hai nút.
     Widget choiceButton(int i) {
+      final (bg, bottom) = _choiceColors(i);
+      final vi = question.choiceTextsVi[i];
+      final en = question.choiceTextsEn[i];
+      final bilingual = en != vi;
       return Expanded(
-        child: SizedBox(
+        child: _RaisedButton(
+          key: Key('choice-$i'),
           height: buttonHeight,
-          child: ElevatedButton(
-            key: Key('choice-$i'),
-            onPressed: answering
-                ? () async {
-                    final correct = await session.submitChoice(i);
-                    if (correct) {
-                      onCorrect();
-                    } else {
-                      onWrong();
-                    }
-                  }
-                : null,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _choiceColor(i),
-              // Nút bị vô hiệu sau khi trả lời đúng/sai hai lần nên màu
-              // phải đặt ở cả hai chỗ, không thì nút nào cũng xám.
-              disabledBackgroundColor: _choiceColor(i),
-            ),
-            child: Text(
-              question.choiceTextsVi[i],
-              style: const TextStyle(fontSize: 24),
-            ),
+          bottomColor: bottom,
+          backgroundColor: bg,
+          enabled: answering,
+          onPressed: () async {
+            final correct = await session.submitChoice(i);
+            if (correct) {
+              onCorrect();
+            } else {
+              onWrong();
+            }
+          },
+          // FittedBox scaleDown: đáp án là chữ dài ("Thứ Năm" ~130 px
+          // ở 20sp) không được ngắt dòng trong nút hẹp 640x320 — thu
+          // nhỏ lại thay vì tràn (nội dung song ngữ 46 px vừa nút
+          // 54 px ở trạng thái đúng).
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: bilingual
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        vi,
+                        softWrap: false,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: MathColors.buttonNumber,
+                        ),
+                      ),
+                      Text(
+                        en,
+                        softWrap: false,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: MathColors.englishText,
+                        ),
+                      ),
+                    ],
+                  )
+                : Text(
+                    vi,
+                    softWrap: false,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      color: MathColors.buttonNumber,
+                    ),
+                  ),
           ),
         ),
       );
@@ -594,29 +1451,30 @@ class _ChoiceAnswers extends StatelessWidget {
     return Column(children: rows);
   }
 
-  Color? _choiceColor(int displayIndex) {
+  (Color?, Color) _choiceColors(int displayIndex) {
     if (session.state == QuestionState.correct &&
         displayIndex == question.correctDisplayIndex) {
-      return Colors.green.shade300;
+      return (Colors.green.shade300, _raisedGreenBottom);
     }
     if (session.selectedDisplayIndex == displayIndex &&
         (session.state == QuestionState.hint ||
             session.state == QuestionState.solution)) {
-      return Colors.red.shade200;
+      return (Colors.red.shade200, _raisedRedBottom);
     }
-    return null;
+    return (null, _raisedPeachBottom);
   }
 }
 
 /// Bàn phím số riêng trong app: số đã gõ, các phím 0–9, xóa, gửi.
 ///
 /// Chiều cao phím tính theo chỗ còn lại của cột phải ([availableHeight],
-/// đã trừ nút "Tiếp" nếu có): ô số 56 + 4 hàng phím + khe 8. Ở màn
-/// thấp 320 dp phím còn ~38 dp, ở màn 360 dp ~48 dp, từ 800 dp trở lên
-/// đủ 64 dp. Cột phải không cuộn nên phím không được cố định 64 dp.
-/// Khi câu đã giải quyết xong (đúng/lời giải) thì ẩn các hàng phím —
-/// bàn phím đã vô hiệu, chỉ giữ ô số đã gõ để bé còn thấy đáp án
-/// của mình; nút "Tiếp" ở cột phải lúc này mới có chỗ.
+/// đã trừ nút "Tiếp" nếu có): ô số 56 + 4 hàng phím + khe 8 + viền
+/// nổi 4 dp/hàng. Ở màn thấp 320 dp phím còn ~34 dp, ở màn 360 dp
+/// ~44 dp, từ 800 dp trở lên đủ 64 dp. Cột phải không cuộn nên phím
+/// không được cố định 64 dp. Khi câu đã giải quyết xong (đúng/lời
+/// giải) thì ẩn các hàng phím — bàn phím đã vô hiệu, chỉ giữ ô số đã
+/// gõ để bé còn thấy đáp án của mình; nút "Tiếp" ở cột phải lúc này
+/// mới có chỗ.
 class _NumberPad extends StatelessWidget {
   const _NumberPad({
     required this.session,
@@ -640,8 +1498,8 @@ class _NumberPad extends StatelessWidget {
         session.state == QuestionState.answering ||
         session.state == QuestionState.hint;
     final resolved = !answering;
-    final keyHeight = ((availableHeight - 56 - 8 - 3 * 8) / 4).clamp(
-      36.0,
+    final keyHeight = ((availableHeight - 56 - 8 - 3 * 8 - 4 * 4) / 4).clamp(
+      30.0,
       64.0,
     );
     return Column(
@@ -653,13 +1511,17 @@ class _NumberPad extends StatelessWidget {
           child: Container(
             key: const Key('math-typed-answer'),
             decoration: BoxDecoration(
+              color: Colors.white,
               border: Border.all(color: Colors.grey),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
               child: Text(
                 session.typedAnswer.isEmpty ? '?' : session.typedAnswer,
-                style: const TextStyle(fontSize: 32),
+                style: const TextStyle(
+                  fontSize: 32,
+                  color: MathColors.questionText,
+                ),
               ),
             ),
           ),
@@ -794,14 +1656,21 @@ class _PadKey extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final icon = this.icon;
-    return SizedBox(
+    return _RaisedButton(
       height: height,
-      child: ElevatedButton(
-        onPressed: enabled ? onPressed : null,
-        child: icon != null
-            ? Icon(icon, size: 28)
-            : Text(label, style: const TextStyle(fontSize: 26)),
-      ),
+      bottomColor: _raisedPeachBottom,
+      backgroundColor: null,
+      enabled: enabled,
+      onPressed: onPressed,
+      child: icon != null
+          ? Icon(icon, size: 28, color: MathColors.buttonNumber)
+          : Text(
+              label,
+              style: const TextStyle(
+                fontSize: 26,
+                color: MathColors.buttonNumber,
+              ),
+            ),
     );
   }
 }

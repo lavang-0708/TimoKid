@@ -44,7 +44,11 @@ void main() {
     final childId = await db.ensureSeeded();
     // Tắt âm thanh khi chạy trên máy ảo CI: phát WAV qua audioplayers
     // làm pumpAndSettle không bao giờ dừng (đã khoanh vùng ở PR #13).
-    // Âm thanh kiểm bằng widget test (SoundPlayer giả) và trên máy thật.
+    // T1-15 thử pool 4 player cố định tái dùng (xem SoundService)
+    // rồi bật lại âm thanh để CI kiểm chứng, nhưng máy ảo vẫn treo
+    // nên Claude quyết tắt lại ở đây; không thử gói khác ở PR này.
+    // Âm thanh vẫn bật trong app; kiểm bằng widget test (SoundPlayer
+    // giả) và trên máy thật.
     await db.settingsDao.setValue(key: 'sound_enabled', value: 'false');
     final set = await db.dailySetsDao.getDailySet(childId, db.clock.today());
     final resolved = db.dailySetsDao

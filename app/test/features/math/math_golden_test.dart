@@ -27,6 +27,8 @@ import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timokid/core/database/app_database.dart';
+import 'package:timokid/core/database/models.dart';
+import 'package:timokid/core/database/tables.dart';
 import 'package:timokid/core/theme/app_theme.dart';
 import 'package:timokid/core/time/clock.dart';
 import 'package:timokid/features/daily_set/daily_set_service.dart';
@@ -45,6 +47,7 @@ AppDatabase openMemoryDb({Clock? clock}) => AppDatabase(
 void _restoreGoldens() {
   const goldens = {
     'test/goldens/math_choice.png': mathChoiceBase64,
+    'test/goldens/math_choice_bilingual.png': mathChoiceBilingualBase64,
     'test/goldens/math_hint.png': mathHintBase64,
     'test/goldens/math_solution.png': mathSolutionBase64,
     'test/goldens/math_correct.png': mathCorrectBase64,
@@ -162,6 +165,33 @@ void main() {
     await expectLater(
       find.byKey(const Key('math-screen')),
       matchesGoldenFile('../../goldens/math_choice.png'),
+    );
+  });
+
+  testWidgets('màn trắc nghiệm song ngữ (thứ trong tuần)', (tester) async {
+    // Đáp án có chữ (logic.weekday) hiện VI to trên, EN nhỏ nhạt
+    // dưới trong cùng nút — chụp riêng để kiểm bằng mắt.
+    session = StageSession(
+      db: db,
+      childId: childId,
+      dailySetId: null,
+      stageIndex: -1,
+      questions: [
+        for (var i = 0; i < 5; i++)
+          DailySetQuestion(
+            formId: 'logic.weekday',
+            strand: Strand.logic,
+            level: 1,
+            rung: 1,
+            answerType: 'choice',
+            seed: i + 1,
+          ),
+      ],
+    );
+    await pumpMath(tester);
+    await expectLater(
+      find.byKey(const Key('math-screen')),
+      matchesGoldenFile('../../goldens/math_choice_bilingual.png'),
     );
   });
 
