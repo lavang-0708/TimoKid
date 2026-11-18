@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:drift/native.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:timokid/core/database/app_database.dart';
+import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/main.dart';
 
 import 'goldens/golden_data.dart';
@@ -12,11 +15,18 @@ import 'goldens/golden_data.dart';
 /// Ảnh chụp màn Thị trấn ở 2 kích thước trong T1-02, bằng golden test.
 ///
 /// Widget test mặc định vẽ chữ bằng font Ahem (chữ thành khối vuông) nên
-/// test này nạp DejaVu Sans của máy làm font 'Roboto' — đúng fontFamily mà
-/// AppTheme khai báo — để chữ trong ảnh chụp đọc được và kiểm tra được tràn
-/// chữ. File font nằm ở đường dẫn chuẩn của Ubuntu (gói fonts-dejavu-core),
-/// máy chạy CI cũng có. Nếu font khác đi (máy khác, FreeType khác), ảnh
-/// golden có thể lệch và cần chạy lại `flutter test --update-goldens`.
+/// test này nạp DejaVu Sans của máy làm font 'Nunito' — đúng fontFamily
+/// mà AppTheme khai báo (PLAN điểm (m)) — để chữ trong ảnh chụp đọc
+/// được và kiểm tra được tràn chữ. Dùng DejaVu làm phông đứng chỗ cho
+/// Nunito (cùng file trên máy local và CI nên ảnh golden khớp nhau);
+/// Nunito thật chỉ kiểm bằng mắt trên máy thật. File font nằm ở đường
+/// dẫn chuẩn của Ubuntu (gói fonts-dejavu-core), máy chạy CI cũng có.
+/// Nếu font khác đi (máy khác, FreeType khác), ảnh golden có thể lệch
+/// và cần chạy lại `flutter test --update-goldens`.
+///
+/// Phím Xóa dùng Icons.backspace_outlined (PLAN điểm (m)) nên test nạp
+/// thêm MaterialIcons từ cache của Flutter SDK để icon hiện đúng trong
+/// ảnh; không tìm thấy thì bỏ qua (chỉ phím Xóa thành ô vuông).
 ///
 /// Ảnh kỳ vọng nhúng base64 trong goldens/golden_data.dart (xem ghi chú ở
 /// đó): trước khi so sánh, test giải mã và ghi ra file PNG trong
@@ -32,7 +42,7 @@ void _restoreGoldens() {
 }
 
 Future<void> _loadTestFonts() async {
-  final loader = FontLoader('Roboto')
+  final loader = FontLoader('Nunito')
     ..addFont(
       Future.value(
         ByteData.view(
@@ -43,13 +53,43 @@ Future<void> _loadTestFonts() async {
       ),
     );
   await loader.load();
+  final testerExe = File(Platform.resolvedExecutable);
+  final iconsFile = File(
+    '${testerExe.parent.parent.parent.parent.path}/artifacts/material_fonts/MaterialIcons-Regular.otf',
+  );
+  if (await iconsFile.exists()) {
+    final icons = FontLoader(
+      'MaterialIcons',
+    )..addFont(Future.value(ByteData.view(iconsFile.readAsBytesSync().buffer)));
+    await icons.load();
+  }
 }
 
 void main() {
+  late AppDatabase db;
+
   setUpAll(() async {
     await _loadTestFonts();
     _restoreGoldens();
   });
+
+  setUp(() {
+    // Màn Thị trấn T1-12 đọc DB (đề ngày + số dư) nên phải có DB bộ
+    // nhớ: DB file của app không mở được trong widget test — để DB
+    // file thì màn kẹt ở vòng xoay tải và pumpAndSettle hết giờ.
+    db = AppDatabase(executor: NativeDatabase.memory());
+    addTearDown(db.close);
+  });
+
+  Future<void> pumpApp(WidgetTester tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [databaseProvider.overrideWithValue(db)],
+        child: const TimoKidApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+  }
 
   testWidgets('màn Thị trấn 800x360 dp', (tester) async {
     tester.view.physicalSize = const Size(800, 360);
@@ -57,8 +97,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const ProviderScope(child: TimoKidApp()));
-    await tester.pumpAndSettle();
+    await pumpApp(tester);
 
     await expectLater(
       find.byKey(const Key('town-screen')),
@@ -72,8 +111,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const ProviderScope(child: TimoKidApp()));
-    await tester.pumpAndSettle();
+    await pumpApp(tester);
 
     await expectLater(
       find.byKey(const Key('town-screen')),

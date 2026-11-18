@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- Hội chợ Tổ hợp: lều hội chợ mái sọc, cờ vàng, tông pastel, viền trắng kiểu sticker. -->
+  <g stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Cờ trên đỉnh -->
+    <line x1="60" y1="28" x2="60" y2="14" stroke="#6C4C8C" stroke-width="3" />
+    <path d="M60,14 L76,18 L60,23 Z" fill="#FFD166" stroke="none" />
+    <!-- Mái lều: 3 sọc -->
+    <path d="M20,62 L60,28 L46,62 Z" fill="#FF8A7A" />
+    <path d="M46,62 L60,28 L74,62 Z" fill="#FFFFFF" />
+    <path d="M74,62 L60,28 L100,62 Z" fill="#FF8A7A" />
+    <!-- Thân lều -->
+    <path d="M28,62 L92,62 L88,98 L32,98 Z" fill="#FFD9C0" />
+    <!-- Cờ đuôi hai bên -->
+    <path d="M28,66 L20,72 L28,78 Z" fill="#BFE0F5" stroke="none" />
+    <path d="M92,66 L100,72 L92,78 Z" fill="#BFE0F5" stroke="none" />
+    <!-- Cửa vòm -->
+    <path d="M52,98 L52,82 A8,8 0 0 1 68,82 L68,98 Z" fill="#6C4C8C" />
+  </g>
+</svg>

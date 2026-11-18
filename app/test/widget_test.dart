@@ -31,29 +31,25 @@ void main() {
 
     expect(find.byKey(const Key('town-screen')), findsOneWidget);
     expect(find.text('Thị trấn Diệu Kỳ'), findsOneWidget);
-    expect(find.byKey(const Key('town-math-button')), findsOneWidget);
-    expect(find.byKey(const Key('town-result-button')), findsOneWidget);
+    // 5 nút khu của T1-12 (nút "Làm toán"/"Kết quả chặng" tạm của
+    // T1-02 đã bỏ); đề mới nên cả 5 chặng đều chưa làm.
+    for (var i = 0; i < 5; i++) {
+      expect(find.byKey(Key('town-stage-$i-button')), findsOneWidget);
+    }
+    expect(find.text('Đề ngày: 0/5 chặng'), findsOneWidget);
   });
 
-  testWidgets('bấm Làm toán thì sang màn Làm toán, bấm về thì quay lại', (
+  testWidgets('bấm nút khu thì sang màn Làm toán, bấm về thì quay lại', (
     tester,
   ) async {
     await pumpApp(tester);
 
-    await tester.tap(find.byKey(const Key('town-math-button')));
+    await tester.tap(find.byKey(const Key('town-stage-0-button')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('math-screen')), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('math-back-button')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('town-screen')), findsOneWidget);
-  });
-
-  testWidgets('bấm Kết quả chặng thì sang màn Kết quả chặng', (tester) async {
-    await pumpApp(tester);
-
-    await tester.tap(find.byKey(const Key('town-result-button')));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('stage-result-screen')), findsOneWidget);
   });
 }

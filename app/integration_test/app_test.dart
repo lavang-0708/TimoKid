@@ -32,7 +32,9 @@ void main() {
     expect(bytes.isNotEmpty, isTrue);
 
     // --- T1-09: đi hết chặng 1 (mảng logic, bậc 1) ---
-    await tester.tap(find.byKey(const Key('town-math-button')));
+    // Nút khu 0 của màn Thị trấn T1-12 (tên key cũ `town-math-button`
+    // đã bỏ khi viết lại màn Thị trấn).
+    await tester.tap(find.byKey(const Key('town-stage-0-button')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('math-screen')), findsOneWidget);
 

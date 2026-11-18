@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- Tháp Con số: ba khối xếp chồng, số chấm 1-2-3, tông pastel, viền trắng kiểu sticker. -->
+  <g stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Khối dưới: 3 chấm -->
+    <rect x="28" y="78" width="64" height="22" rx="6" fill="#BFE0F5" />
+    <circle cx="44" cy="89" r="4" fill="#6C4C8C" stroke="none" />
+    <circle cx="60" cy="89" r="4" fill="#6C4C8C" stroke="none" />
+    <circle cx="76" cy="89" r="4" fill="#6C4C8C" stroke="none" />
+    <!-- Khối giữa: 2 chấm -->
+    <rect x="36" y="52" width="48" height="22" rx="6" fill="#BFE8CF" />
+    <circle cx="52" cy="63" r="4" fill="#6C4C8C" stroke="none" />
+    <circle cx="68" cy="63" r="4" fill="#6C4C8C" stroke="none" />
+    <!-- Khối trên: 1 chấm -->
+    <rect x="44" y="26" width="32" height="22" rx="6" fill="#FFD9C0" />
+    <circle cx="60" cy="37" r="4" fill="#6C4C8C" stroke="none" />
+  </g>
+</svg>

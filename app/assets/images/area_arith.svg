@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- Tiệm bánh Số học: bánh cupcake, kem hồng, quả cherry, tông pastel, viền trắng kiểu sticker. -->
+  <g stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Đĩa -->
+    <ellipse cx="60" cy="100" rx="34" ry="7" fill="#BFE8CF" />
+    <!-- Thân bánh (giấy gói) -->
+    <path d="M38,66 L82,66 L76,98 L44,98 Z" fill="#FFD9C0" />
+    <line x1="50" y1="70" x2="48" y2="94" stroke="#F5B895" stroke-width="3" />
+    <line x1="60" y1="70" x2="60" y2="94" stroke="#F5B895" stroke-width="3" />
+    <line x1="70" y1="70" x2="72" y2="94" stroke="#F5B895" stroke-width="3" />
+    <!-- Lớp kem -->
+    <path d="M36,66 C30,52 44,44 52,50 C56,40 68,40 72,50 C80,44 90,52 84,66 Z" fill="#F5A9B8" />
+    <!-- Quả cherry + cuống -->
+    <line x1="60" y1="42" x2="66" y2="34" stroke="#7FBF8A" stroke-width="3" />
+    <circle cx="60" cy="42" r="7" fill="#FF6B6B" />
+    <!-- Kẹo rắc -->
+    <rect x="48" y="56" width="8" height="3" rx="1.5" fill="#FFD166" stroke="none" transform="rotate(-20 52 57)" />
+    <rect x="64" y="58" width="8" height="3" rx="1.5" fill="#BFE0F5" stroke="none" transform="rotate(15 68 59)" />
+    <rect x="56" y="50" width="8" height="3" rx="1.5" fill="#FFFFFF" stroke="none" transform="rotate(-8 60 51)" />
+  </g>
+</svg>

@@ -3,9 +3,13 @@
 /// màn kết quả chặng.
 ///
 /// Làm theo mẫu `figure_golden_test.dart` của T1-06: nạp font DejaVu
-/// Sans của máy làm font 'Roboto' để chữ đọc được, ảnh kỳ vọng nhúng
-/// base64 trong `goldens/math_golden_data.dart` và được giải mã ra file
-/// PNG trước khi so sánh.
+/// Sans của máy làm font 'Nunito' (fontFamily của AppTheme, PLAN điểm
+/// (m)) để chữ đọc được — DejaVu là phông đứng chỗ cho Nunito để ảnh
+/// golden khớp nhau giữa máy local và CI; Nunito thật kiểm bằng mắt
+/// trên máy thật. Ảnh kỳ vọng nhúng base64 trong
+/// `goldens/math_golden_data.dart` và được giải mã ra file PNG trước
+/// khi so sánh. Nạp thêm MaterialIcons để phím Xóa
+/// (Icons.backspace_outlined) hiện đúng trong ảnh.
 ///
 /// Bố cục 2 cột (sửa sau review PR #11): 6 trạng thái chụp ở 800x360
 /// (mặt phẳng ngang nhỏ, gần máy ảo 640x320 nhất trong các cỡ chuẩn),
@@ -23,6 +27,7 @@ import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timokid/core/database/app_database.dart';
+import 'package:timokid/core/theme/app_theme.dart';
 import 'package:timokid/core/time/clock.dart';
 import 'package:timokid/features/daily_set/daily_set_service.dart';
 import 'package:timokid/features/ladder/ladder_service.dart';
@@ -56,9 +61,19 @@ void _restoreGoldens() {
 Future<void> _loadTestFonts() async {
   final bytes = File('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf')
       .readAsBytesSync();
-  final loader = FontLoader('Roboto')
+  final loader = FontLoader('Nunito')
     ..addFont(Future.value(ByteData.view(bytes.buffer)));
   await loader.load();
+  final testerExe = File(Platform.resolvedExecutable);
+  final iconsFile = File(
+    '${testerExe.parent.parent.parent.parent.path}/artifacts/material_fonts/MaterialIcons-Regular.otf',
+  );
+  if (await iconsFile.exists()) {
+    final icons = FontLoader(
+      'MaterialIcons',
+    )..addFont(Future.value(ByteData.view(iconsFile.readAsBytesSync().buffer)));
+    await icons.load();
+  }
 }
 
 void main() {
@@ -112,7 +127,13 @@ void main() {
     });
     await tester.pumpWidget(
       ProviderScope(
-        child: MaterialApp(home: MathScreen(session: session)),
+        // Dùng đúng theme của app (fontFamily Nunito, màu pastel):
+        // không có theme thì chữ dùng phông mặc định của engine
+        // (Roboto — không nạp ở đây) nên ảnh golden toàn ô vuông.
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: MathScreen(session: session),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -212,8 +233,9 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
     await tester.pumpWidget(
-      const MaterialApp(
-        home: StageResultScreen(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: const StageResultScreen(
           result: StageResultArgs(
             stageIndex: 0,
             strand: 'logic',

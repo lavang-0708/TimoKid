@@ -1,30 +1,31 @@
 /// Màn làm toán (T1-09): bé làm một chặng 5 câu của đề ngày.
 ///
-/// Đề hiện bằng tiếng Việt, chữ to; nút "EN" đổi sang đề tiếng Anh,
-/// nút từ khóa mở bảng từ khóa song ngữ, hình vẽ hiện nếu câu có hình.
+/// Đề luôn hiện song ngữ (PLAN điểm (l)): tiếng Việt chữ to trên,
+/// tiếng Anh nhỏ hơn + nhạt hơn dưới; gợi ý và lời giải cũng song ngữ.
+/// Nút từ khóa mở bảng từ khóa song ngữ, hình vẽ hiện nếu câu có hình.
 /// Trắc nghiệm: 4 nút lớn, thứ tự trộn ngẫu nhiên (xác định theo seed
 /// của câu — xem [shuffledChoiceOrder]). Điền số: bàn phím số riêng
 /// trong app, nút to, có nút xóa.
 ///
-/// Bố cục 2 cột (sửa sau review PR #11): cột trái là đề, hình vẽ,
-/// gợi ý hoặc lời giải — cuộn được; cột phải là 4 nút trắc nghiệm
-/// hoặc ô số + bàn phím, cộng nút "Tiếp" — không cuộn. Bố cục xếp
-/// dọc 1 cột cũ không vừa điện thoại ngang cao 360 dp (máy ảo
-/// 640x320: nút choice-3 nằm ngoài màn hình).
+/// Bố cục 2 cột (sửa sau review PR #11, cân lại ở T1-12 theo điểm
+/// (l)): cột trái là đề, hình vẽ, gợi ý hoặc lời giải — cuộn được,
+/// khối đề căn giữa dọc; cột phải là 4 nút trắc nghiệm hoặc ô số +
+/// bàn phím, cộng nút "Tiếp" — không cuộn, cả khối căn giữa dọc. Bố
+/// cục xếp dọc 1 cột cũ không vừa điện thoại ngang cao 360 dp (máy
+/// ảo 640x320: nút choice-3 nằm ngoài màn hình).
 ///
 /// Sai lần đầu hiện gợi ý và cho làm lại; sai lần hai hiện lời giải
 /// từng bước và nút "Tiếp". Đúng thì có hiệu ứng (ngôi sao + số xu)
-/// và âm thanh ngắn ([SystemSound], không cần asset), rồi nút "Tiếp".
-/// Mỗi câu đã giải quyết ghi một dòng `attempts`, cập nhật bậc/thành
-/// thạo, ghi sổ ôn tập và cộng xu (xem [StageSession]). Cuối chặng
-/// chuyển sang màn Kết quả chặng.
+/// và âm thanh ngắn ([SoundService], xem PLAN điểm (m)), rồi nút
+/// "Tiếp". Mỗi câu đã giải quyết ghi một dòng `attempts`, cập nhật
+/// bậc/thành thạo, ghi sổ ôn tập và cộng xu (xem [StageSession]).
+/// Cuối chặng chuyển sang màn Kết quả chặng.
 ///
 /// Màn nhận một [StageSession] có sẵn (test dùng) hoặc tự tải đề ngày
 /// hôm nay và làm chặng đầu tiên chưa xong (nút "Làm toán" ở Thị trấn
 /// đi đường này). Chặng cụ thể chọn qua [MathScreenArgs].
 library;
 
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -38,6 +39,7 @@ import '../questions/figure_svg.dart';
 import '../questions/question.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
+import '../sound/sound_service.dart';
 import '../stage_result/stage_result_screen.dart';
 import 'math_session.dart';
 
@@ -51,7 +53,7 @@ class MathScreenArgs {
 
 /// Màn làm toán — route `/math`.
 class MathScreen extends ConsumerStatefulWidget {
-  const MathScreen({super.key, this.session, this.args});
+  const MathScreen({super.key, this.session, this.args, this.soundService});
 
   static const String route = '/math';
 
@@ -61,21 +63,27 @@ class MathScreen extends ConsumerStatefulWidget {
 
   final MathScreenArgs? args;
 
+  /// Âm thanh (test chích [SoundService] với [SoundPlayer] giả).
+  /// Bỏ trống: màn tự dựng [SoundService] khi tải đề; bỏ trống cùng
+  /// với `session` thì màn im lặng.
+  final SoundService? soundService;
+
   @override
   ConsumerState<MathScreen> createState() => _MathScreenState();
 }
 
 class _MathScreenState extends ConsumerState<MathScreen> {
   StageSession? _session;
+  SoundService? _soundService;
   bool _loading = true;
   bool _allDone = false;
   String? _error;
-  bool _showEnglish = false;
   bool _navigated = false;
 
   @override
   void initState() {
     super.initState();
+    _soundService = widget.soundService;
     if (widget.session != null) {
       _session = widget.session;
       _session!.addListener(_onSessionChanged);
@@ -97,6 +105,13 @@ class _MathScreenState extends ConsumerState<MathScreen> {
     final session = _session;
     if (session != null && session.finished && !_navigated) {
       _navigated = true;
+      // Xong chặng: phát hợp âm rải sau 600 ms để tiếng "ting" và
+      // tiếng xu của câu cuối dứt hẳn rồi mới tới tiếng xong chặng,
+      // lúc này màn Kết quả chặng đã hiện.
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (!mounted) return;
+        _soundService?.playStageComplete();
+      });
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         context.go(StageResultScreen.route, extra: _resultArgs(session));
@@ -172,6 +187,9 @@ class _MathScreenState extends ConsumerState<MathScreen> {
       if (!mounted) return;
       setState(() {
         _session = session;
+        // Âm thanh (PLAN điểm (m)): dựng cùng lúc với phiên, dùng
+        // chung DB để đọc `sound_enabled`.
+        _soundService ??= SoundService(db: db);
         _loading = false;
       });
     } catch (e) {
@@ -180,15 +198,6 @@ class _MathScreenState extends ConsumerState<MathScreen> {
         _error = '$e';
         _loading = false;
       });
-    }
-  }
-
-  Future<void> _playCorrectSound() async {
-    try {
-      await SystemSound.play(SystemSoundType.alert);
-    } catch (_) {
-      // Máy test không có kênh âm thanh hệ thống: bỏ qua, không làm
-      // hỏng luồng làm bài.
     }
   }
 
@@ -238,10 +247,11 @@ class _MathScreenState extends ConsumerState<MathScreen> {
         ? 'Chặng ${session.stageIndex + 1} — $strandName'
         : 'Chặng tự chọn — $strandName';
     // Các nút trên thanh tiêu đề là nút biểu tượng, tối thiểu 56x56 dp.
-    // Biểu tượng là ký tự chữ (←, EN/VI, Aa) thay vì `Icon` vì font
+    // Biểu tượng là ký tự chữ (←, Aa) thay vì `Icon` vì font
     // MaterialIcons không có trong môi trường test nên golden test sẽ
     // bị ô vuông; các ký tự này có trong font DejaVu dùng ở test và
     // trong Roboto trên máy thật.
+    // Nút đổi EN đã bỏ (PLAN điểm (l)): đề luôn hiện song ngữ cùng lúc.
     return Scaffold(
       key: const Key('math-screen'),
       appBar: AppBar(
@@ -260,19 +270,6 @@ class _MathScreenState extends ConsumerState<MathScreen> {
         ),
         actions: [
           IconButton(
-            key: const Key('math-en-toggle'),
-            icon: Text(
-              _showEnglish ? 'VI' : 'EN',
-              style: const TextStyle(fontSize: 22),
-            ),
-            tooltip: _showEnglish ? 'Tiếng Việt' : 'English',
-            onPressed: () => setState(() => _showEnglish = !_showEnglish),
-            style: IconButton.styleFrom(
-              minimumSize: const Size(56, 56),
-              iconSize: 30,
-            ),
-          ),
-          IconButton(
             key: const Key('math-keywords-button'),
             icon: const Text('Aa', style: TextStyle(fontSize: 22)),
             tooltip: 'Từ khóa',
@@ -287,127 +284,177 @@ class _MathScreenState extends ConsumerState<MathScreen> {
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Cột trái: đề, hình vẽ, gợi ý/lời giải — cuộn được.
+          // Cột trái: đề, hình vẽ, gợi ý/lời giải — cuộn được, khối đề
+          // căn giữa dọc khi vừa màn (PLAN điểm (l)): đề dài thì cuộn,
+          // đề ngắn thì khối đề nằm giữa vùng dưới thanh trên, không
+          // dính góc trên trái. Banner "Đúng rồi! +N xu" ở cột phải
+          // (không cuộn) nên không có ở đây.
           Expanded(
             flex: 6,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Câu ${session.currentIndex + 1}/${session.resolved.length}',
-                    key: const Key('math-progress'),
-                    style: const TextStyle(fontSize: 20),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _showEnglish
-                        ? question.question.questionEn
-                        : question.question.questionVi,
-                    key: const Key('math-question-text'),
-                    style: const TextStyle(fontSize: 28),
-                  ),
-                  if (question.question.figure != null) ...[
-                    const SizedBox(height: 12),
-                    Center(
-                      child: FigureView(
-                        key: const Key('math-figure'),
-                        figure: question.question.figure!,
-                        width: 220,
-                      ),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight - 24,
                     ),
-                  ],
-                  const SizedBox(height: 12),
-                  if (session.state == QuestionState.hint)
-                    Container(
-                      key: const Key('math-hint'),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.amber.shade100,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        'Sai rồi, xem gợi ý rồi thử lại nhé!\n${_showEnglish ? question.question.hintEn : question.question.hintVi}',
-                        style: const TextStyle(fontSize: 22),
-                      ),
-                    ),
-                  if (session.state == QuestionState.solution)
-                    Container(
-                      key: const Key('math-solution'),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        'Lời giải:\n${_showEnglish ? question.question.explanationEn : question.question.explanationVi}',
-                        style: const TextStyle(fontSize: 22),
-                      ),
-                    ),
-                  if (session.state == QuestionState.correct)
-                    Container(
-                      key: const Key('math-correct'),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade100,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            '★',
-                            style: TextStyle(fontSize: 36, color: Colors.amber),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Câu ${session.currentIndex + 1}/${session.resolved.length}',
+                          key: const Key('math-progress'),
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        const SizedBox(height: 8),
+                        // Đề luôn song ngữ (PLAN điểm (l)): tiếng Việt
+                        // chữ to trên, tiếng Anh nhỏ hơn + nhạt hơn dưới.
+                        Text(
+                          question.question.questionVi,
+                          key: const Key('math-question-text'),
+                          style: const TextStyle(fontSize: 28),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          question.question.questionEn,
+                          key: const Key('math-question-text-en'),
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.black54,
                           ),
-                          const SizedBox(width: 8),
-                          // Chữ phải bọc Expanded để xuống dòng khi cột
-                          // trái hẹp (640x320): không bọc thì Row tràn
-                          // ngang vì chữ ở fontSize 26 dài hơn chỗ còn.
-                          Expanded(
-                            child: Text(
-                              'Đúng rồi! +${session.lastEarnedXu ?? 0} xu',
-                              style: const TextStyle(fontSize: 26),
+                        ),
+                        if (question.question.figure != null) ...[
+                          const SizedBox(height: 12),
+                          Center(
+                            child: FigureView(
+                              key: const Key('math-figure'),
+                              figure: question.question.figure!,
+                              width: 220,
                             ),
                           ),
                         ],
-                      ),
+                        const SizedBox(height: 12),
+                        if (session.state == QuestionState.hint)
+                          Container(
+                            key: const Key('math-hint'),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.shade100,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  'Sai rồi, xem gợi ý rồi thử lại nhé!\n${question.question.hintVi}',
+                                  style: const TextStyle(fontSize: 22),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  question.question.hintEn,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if (session.state == QuestionState.solution)
+                          Container(
+                            key: const Key('math-solution'),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  'Lời giải:\n${question.question.explanationVi}',
+                                  style: const TextStyle(fontSize: 22),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  question.question.explanationEn,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
                     ),
-                ],
-              ),
+                  ),
+                );
+              },
             ),
           ),
-          // Cột phải: đáp án + nút "Tiếp" — không cuộn, phải vừa cả
-          // ở màn thấp 320 dp nên chiều cao phím số tính theo chỗ còn
-          // lại (xem [_NumberPad]).
+          // Cột phải: đáp án + nút "Tiếp" — không cuộn. Cả khối
+          // (banner "Đúng rồi" + đáp án + nút Tiếp) căn giữa dọc
+          // trong vùng dưới thanh trên (PLAN điểm (l)), không để đáp
+          // án lệch xuống góc dưới phải; nút Tiếp nằm ngay dưới đáp án
+          // chứ không dính đáy. Đề song ngữ dài hơn nên ở màn thấp
+          // 320 dp chiều cao nút trắc nghiệm tính theo chỗ còn lại
+          // (kẹp 48–64 dp), phím số theo [_NumberPad].
           Expanded(
             flex: 5,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(4, 12, 20, 12),
               child: LayoutBuilder(
                 builder: (context, constraints) {
+                  final isCorrect = session.state == QuestionState.correct;
                   final showNext =
-                      session.state == QuestionState.correct ||
-                      session.state == QuestionState.solution;
+                      isCorrect || session.state == QuestionState.solution;
+                  final bannerSpace = isCorrect ? 48.0 + 8 : 0.0;
                   final nextSpace = showNext ? 56.0 + 12 : 0.0;
-                  final available = constraints.maxHeight - nextSpace;
+                  final available =
+                      constraints.maxHeight - bannerSpace - nextSpace;
+                  // 2 hàng nút trắc nghiệm + khoảng cách 12 dp.
+                  final choiceHeight = ((available - 12) / 2).clamp(48.0, 64.0);
                   return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Expanded(
-                        child: question.displayType == AnswerType.choice
-                            ? _ChoiceAnswers(
-                                session: session,
-                                question: question,
-                                showEnglish: _showEnglish,
-                                onCorrect: _playCorrectSound,
-                              )
-                            : _NumberPad(
-                                session: session,
-                                onCorrect: _playCorrectSound,
-                                availableHeight: available,
-                              ),
-                      ),
+                      if (isCorrect) ...[
+                        Container(
+                          key: const Key('math-correct'),
+                          height: 48,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade100,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '★ Đúng rồi! +${session.lastEarnedXu ?? 0} xu',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 22),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      question.displayType == AnswerType.choice
+                          ? _ChoiceAnswers(
+                              session: session,
+                              question: question,
+                              buttonHeight: choiceHeight,
+                              onCorrect: () => _soundService?.playCorrect(),
+                              onWrong: () => _soundService?.playWrong(),
+                            )
+                          : _NumberPad(
+                              session: session,
+                              onCorrect: () => _soundService?.playCorrect(),
+                              onWrong: () => _soundService?.playWrong(),
+                              availableHeight: available,
+                            ),
                       if (showNext) ...[
                         const SizedBox(height: 12),
                         SizedBox(
@@ -470,36 +517,49 @@ class _MathScreenState extends ConsumerState<MathScreen> {
 
 /// 4 nút lựa chọn lớn, xếp 2 cột. Nút đã chọn sai thì đỏ, đáp án đúng
 /// thì xanh (chỉ khi đã trả lời đúng).
+///
+/// Chiều cao nút lấy từ cột phải ([buttonHeight], đã trừ banner và nút
+/// "Tiếp" nếu có, kẹp 48–64 dp) để cả khối vừa màn thấp 320 dp.
+/// Đáp án luôn tiếng Việt (PLAN điểm (l) bỏ nút đổi EN; đề, gợi ý và
+/// lời giải đã song ngữ, còn đáp án trắc nghiệm là số hoặc từ ngắn
+/// nên chỉ hiện tiếng Việt).
 class _ChoiceAnswers extends StatelessWidget {
   const _ChoiceAnswers({
     required this.session,
     required this.question,
-    required this.showEnglish,
+    required this.buttonHeight,
     required this.onCorrect,
+    required this.onWrong,
   });
 
   final StageSession session;
   final ResolvedQuestion question;
-  final bool showEnglish;
-  final Future<void> Function() onCorrect;
+  final double buttonHeight;
+
+  /// Đúng: "ting" + xu; sai: "è" nhẹ (âm thanh phát nền, không await).
+  final VoidCallback onCorrect;
+  final VoidCallback onWrong;
 
   @override
   Widget build(BuildContext context) {
     final answering =
         session.state == QuestionState.answering ||
         session.state == QuestionState.hint;
-    // Hai hàng, mỗi hàng hai nút: chiều cao cố định để cả màn vừa
-    // khung ngang 1280x720 mà không phải cuộn.
+    // Hai hàng, mỗi hàng hai nút.
     Widget choiceButton(int i) {
       return Expanded(
         child: SizedBox(
-          height: 64,
+          height: buttonHeight,
           child: ElevatedButton(
             key: Key('choice-$i'),
             onPressed: answering
                 ? () async {
                     final correct = await session.submitChoice(i);
-                    if (correct) await onCorrect();
+                    if (correct) {
+                      onCorrect();
+                    } else {
+                      onWrong();
+                    }
                   }
                 : null,
             style: ElevatedButton.styleFrom(
@@ -509,9 +569,7 @@ class _ChoiceAnswers extends StatelessWidget {
               disabledBackgroundColor: _choiceColor(i),
             ),
             child: Text(
-              showEnglish
-                  ? question.choiceTextsEn[i]
-                  : question.choiceTextsVi[i],
+              question.choiceTextsVi[i],
               style: const TextStyle(fontSize: 24),
             ),
           ),
@@ -531,9 +589,9 @@ class _ChoiceAnswers extends StatelessWidget {
         rows.add(const SizedBox(height: 12));
       }
     }
-    // Căn giữa dọc trong cột phải: 2 hàng nút cao 64 vừa cả ở màn
-    // thấp 320 dp (cột phải còn ~240 dp sau lề), chỗ thừa để trống.
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: rows);
+    // Chiều cao khối = 2 hàng nút + khe 12 dp; cột cha đã căn giữa
+    // nên không cần căn lại ở đây.
+    return Column(children: rows);
   }
 
   Color? _choiceColor(int displayIndex) {
@@ -563,11 +621,15 @@ class _NumberPad extends StatelessWidget {
   const _NumberPad({
     required this.session,
     required this.onCorrect,
+    required this.onWrong,
     required this.availableHeight,
   });
 
   final StageSession session;
-  final Future<void> Function() onCorrect;
+
+  /// Đúng: "ting" + xu; sai: "è" nhẹ (âm thanh phát nền, không await).
+  final VoidCallback onCorrect;
+  final VoidCallback onWrong;
 
   /// Chiều cao còn lại của cột phải (đã trừ nút "Tiếp" nếu có).
   final double availableHeight;
@@ -634,8 +696,10 @@ class _NumberPad extends StatelessWidget {
           _PadRow(
             keyHeight: keyHeight,
             keys: [
-              _PadKeySpec(
-                'Xóa',
+              // Phông Nunito không có ký tự ⌫ (PLAN điểm (m)): phím
+              // xóa dùng Icons.backspace_outlined.
+              _PadKeySpec.icon(
+                Icons.backspace_outlined,
                 answering && session.typedAnswer.isNotEmpty,
                 session.deleteDigit,
                 key: const Key('keypad-delete'),
@@ -646,7 +710,11 @@ class _NumberPad extends StatelessWidget {
                 answering && session.typedAnswer.isNotEmpty,
                 () async {
                   final correct = await session.submitNumber();
-                  if (correct) await onCorrect();
+                  if (correct) {
+                    onCorrect();
+                  } else {
+                    onWrong();
+                  }
                 },
                 key: const Key('keypad-submit'),
               ),
@@ -677,6 +745,7 @@ class _PadRow extends StatelessWidget {
           child: _PadKey(
             key: spec.key ?? Key('keypad-${spec.label}'),
             label: spec.label,
+            icon: spec.icon,
             enabled: spec.enabled,
             onPressed: spec.onPressed,
             height: keyHeight,
@@ -688,11 +757,17 @@ class _PadRow extends StatelessWidget {
   }
 }
 
-/// Mô tả một phím: nhãn, có bấm được không, bấm thì làm gì.
+/// Mô tả một phím: nhãn (chữ) hoặc biểu tượng, có bấm được không,
+/// bấm thì làm gì.
 class _PadKeySpec {
-  const _PadKeySpec(this.label, this.enabled, this.onPressed, {this.key});
+  const _PadKeySpec(this.label, this.enabled, this.onPressed, {this.key})
+    : icon = null;
+
+  const _PadKeySpec.icon(this.icon, this.enabled, this.onPressed, {this.key})
+    : label = '';
 
   final String label;
+  final IconData? icon;
   final bool enabled;
   final VoidCallback onPressed;
   final Key? key;
@@ -704,23 +779,28 @@ class _PadKey extends StatelessWidget {
   const _PadKey({
     super.key,
     required this.label,
+    this.icon,
     required this.enabled,
     required this.onPressed,
     required this.height,
   });
 
   final String label;
+  final IconData? icon;
   final bool enabled;
   final VoidCallback onPressed;
   final double height;
 
   @override
   Widget build(BuildContext context) {
+    final icon = this.icon;
     return SizedBox(
       height: height,
       child: ElevatedButton(
         onPressed: enabled ? onPressed : null,
-        child: Text(label, style: const TextStyle(fontSize: 26)),
+        child: icon != null
+            ? Icon(icon, size: 28)
+            : Text(label, style: const TextStyle(fontSize: 26)),
       ),
     );
   }

@@ -14,9 +14,11 @@ class AppTheme {
 
   static final ThemeData light = ThemeData(
     useMaterial3: true,
-    // Roboto là font hệ thống trên Android; trong widget test, font này
-    // được nạp từ DejaVu Sans của máy (xem test/golden_test.dart).
-    fontFamily: 'Roboto',
+    // Nunito (PLAN điểm (m)): nét tròn, dễ đọc cho trẻ, đủ dấu tiếng
+    // Việt; khai báo trong pubspec. Trong golden test, phông này được
+    // nạp từ file TTF local (xem test/golden_test.dart); trong widget
+    // test không nạp phông nên chữ đo bằng phông dự phòng như trước.
+    fontFamily: 'Nunito',
     colorScheme: ColorScheme.fromSeed(
       seedColor: mint,
       brightness: Brightness.light,
