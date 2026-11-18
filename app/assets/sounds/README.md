@@ -4,7 +4,7 @@ Claude tự tổng hợp bằng Python (sóng sin có hòa âm và đường bao
 
 | File | Dùng khi | Mô tả |
 | --- | --- | --- |
-| `correct.wav` | Trả lời đúng | Tiếng "ting" chuông 2 nốt đi lên |
+| `correct.wav` | Trả lời đúng | Ba nốt mộc cầm rải nhanh (Đô–Mi–Sol), anh Điệp chọn ngày 18/11 |
 | `wrong.wav` | Trả lời sai | Tiếng "è" nhẹ, 2 nốt trầm đi xuống. Cố ý mềm vì sai không bị phạt (DESIGN nguyên tắc 3) |
 | `coin.wav` | Xu bay vào ví | 2 nốt cao nhanh |
 | `stage_complete.wav` | Xong chặng | Hợp âm rải 4 nốt |
