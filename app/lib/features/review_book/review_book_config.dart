@@ -20,7 +20,8 @@ class ReviewBookConfig {
   static const int retryDays = 1;
 
   /// Thời gian chờ trước lần hỏi lại tiếp theo khi chuỗi đúng hiện tại
-  /// là [streak] (0..2). Mốc tính từ thời điểm trả lời vừa xong.
+  /// là [streak] (0..2). Mốc tính từ 0h ngày trả lời vừa xong
+  /// (xem `ReviewBookService._dueDate`), không giữ giờ trong ngày.
   static Duration dueDelayForStreak(int streak) {
     assert(
       streak >= 0 && streak < requiredStreak,

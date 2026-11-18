@@ -44,7 +44,10 @@ void main() {
     late String childId;
 
     setUp(() async {
-      clock = FakeClock(DateTime(2026, 11, 18, 8, 0));
+      // Dùng DateTime.utc để khớp quy ước của Clock (now() trả về
+      // DateTime vùng UTC nhưng các trường giờ là giờ Việt Nam) và để
+      // test không phụ thuộc múi giờ của máy chạy test.
+      clock = FakeClock(DateTime.utc(2026, 11, 18, 8, 0));
       db = openMemoryDb(clock: clock);
       addTearDown(db.close);
       book = ReviewBookService(reviewQueueDao: db.reviewQueueDao, clock: clock);
@@ -68,7 +71,8 @@ void main() {
         expect(entry, isNotNull);
         expect(entry!.rung, 2);
         expect(entry.correctStreak, 0);
-        expect(entry.dueDate, DateTime(2026, 11, 19, 8, 0));
+        // Mốc là 0h ngày 19/11, không giữ giờ 08:00 lúc ghi.
+        expect(entry.dueDate.toUtc(), DateTime.utc(2026, 11, 19));
 
         // Chưa đến hạn: chưa có mục nào.
         expect(await book.dueEntries(childId: childId), isEmpty);
@@ -78,6 +82,27 @@ void main() {
         expect(due.map((e) => e.formId), ['logic.balance']);
       },
     );
+
+    test('sai lúc 20:00 thì 07:00 hôm sau đã đến hạn', () async {
+      clock.set(DateTime.utc(2026, 11, 18, 20, 0));
+      await book.recordAnswer(
+        childId: childId,
+        formId: 'logic.balance',
+        rung: 2,
+        correctFirstTry: false,
+      );
+
+      // Mốc hỏi lại là 0h ngày 19/11, không phải 20:00 ngày 19/11.
+      final entry = await db.reviewQueueDao.getEntry(childId, 'logic.balance');
+      expect(entry!.dueDate.toUtc(), DateTime.utc(2026, 11, 19));
+
+      // 20:00 cùng ngày chưa đến hạn; 07:00 hôm sau đã đến hạn.
+      expect(await book.dueEntries(childId: childId), isEmpty);
+      clock.set(DateTime.utc(2026, 11, 19, 7, 0));
+      expect((await book.dueEntries(childId: childId)).map((e) => e.formId), [
+        'logic.balance',
+      ]);
+    });
 
     test('câu thường đúng ngay lần đầu thì không vào sổ', () async {
       await book.recordAnswer(
@@ -113,7 +138,7 @@ void main() {
         );
         var entry = await db.reviewQueueDao.getEntry(childId, 'logic.balance');
         expect(entry!.correctStreak, 1);
-        expect(entry.dueDate, DateTime(2026, 11, 22, 8, 1));
+        expect(entry.dueDate.toUtc(), DateTime.utc(2026, 11, 22));
 
         // Chưa đủ 3 ngày: chưa đến hạn.
         clock.advance(const Duration(days: 2));
@@ -131,7 +156,7 @@ void main() {
         );
         entry = await db.reviewQueueDao.getEntry(childId, 'logic.balance');
         expect(entry!.correctStreak, 2);
-        expect(entry.dueDate, DateTime(2026, 11, 29, 8, 2));
+        expect(entry.dueDate.toUtc(), DateTime.utc(2026, 11, 29));
 
         // Chưa đủ 7 ngày: chưa đến hạn.
         clock.advance(const Duration(days: 6));
@@ -183,7 +208,7 @@ void main() {
       );
       final entry = await db.reviewQueueDao.getEntry(childId, 'logic.balance');
       expect(entry!.correctStreak, 0);
-      expect(entry.dueDate, DateTime(2026, 11, 23, 8, 2));
+      expect(entry.dueDate.toUtc(), DateTime.utc(2026, 11, 23));
 
       // Lại đúng ngay 3 lần liên tiếp thì vẫn ra khỏi sổ (vòng làm lại).
       clock.advance(const Duration(days: 1, minutes: 1));
@@ -251,7 +276,7 @@ void main() {
       );
       final entry = await db.reviewQueueDao.getEntry(childId, 'logic.balance');
       expect(entry!.correctStreak, 0);
-      expect(entry.dueDate, DateTime(2026, 11, 30, 8, 3));
+      expect(entry.dueDate.toUtc(), DateTime.utc(2026, 11, 30));
     });
 
     test('đúng sau gợi ý tính như sai: vào sổ và quay về mốc 1 ngày', () async {
@@ -284,7 +309,7 @@ void main() {
       );
       final entry = await db.reviewQueueDao.getEntry(childId, 'logic.balance');
       expect(entry!.correctStreak, 0);
-      expect(entry.dueDate, DateTime(2026, 11, 23, 8, 2));
+      expect(entry.dueDate.toUtc(), DateTime.utc(2026, 11, 23));
     });
 
     test(
@@ -309,7 +334,8 @@ void main() {
         expect(entries.single.formId, 'logic.balance');
         expect(entries.single.rung, 4);
         expect(entries.single.correctStreak, 0);
-        expect(entries.single.dueDate, DateTime(2026, 11, 19, 10, 0));
+        // Ghi lại lúc 10:00 cùng ngày vẫn giữ mốc 0h ngày 19/11.
+        expect(entries.single.dueDate.toUtc(), DateTime.utc(2026, 11, 19));
       },
     );
 
@@ -362,7 +388,10 @@ void main() {
         rung: 2,
         correctFirstTry: false,
       );
-      clock.advance(const Duration(hours: 2));
+      // Sang ngày sau mới ghi dạng thứ hai: mốc của nó muộn hơn 1 ngày
+      // (mốc theo ngày nên hai dạng cùng ghi trong một ngày sẽ chung
+      // một mốc 0h, không phân biệt được thứ tự trong ngày).
+      clock.advance(const Duration(days: 1, minutes: 1));
       await book.recordAnswer(
         childId: childId,
         formId: 'geo.sides',
@@ -370,14 +399,13 @@ void main() {
         correctFirstTry: false,
       );
 
-      // 22 tiếng 1 phút sau (11-19 08:01): chỉ dạng đầu đến hạn
-      // (đến 08:00), dạng sau đến 10:00 nên chưa đến hạn.
-      clock.advance(const Duration(hours: 22, minutes: 1));
+      // 08:01 ngày 19/11: chỉ dạng đầu đến hạn (mốc 0h 19/11),
+      // dạng sau mốc 0h 20/11 nên chưa đến hạn.
       expect((await book.dueEntries(childId: childId)).map((e) => e.formId), [
         'logic.balance',
       ]);
-      // Thêm 2 tiếng: cả hai đến hạn, sớm nhất trước.
-      clock.advance(const Duration(hours: 2));
+      // Thêm 1 ngày: cả hai đến hạn, sớm nhất trước.
+      clock.advance(const Duration(days: 1));
       expect((await book.dueEntries(childId: childId)).map((e) => e.formId), [
         'logic.balance',
         'geo.sides',

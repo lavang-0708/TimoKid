@@ -57,6 +57,22 @@ class ReviewBookService {
   /// điều khiển được cả hai.
   final Clock _clock;
 
+  /// Ngày hỏi lại: 0h giờ Việt Nam của ngày (hôm nay + [delay] ngày).
+  ///
+  /// Mốc theo ngày, không giữ giờ trong ngày: đề ngày tạo ở lần mở app
+  /// đầu tiên trong ngày, nên sai lúc 20h thì 7h sáng hôm sau câu đó đã
+  /// đến hạn — giữ giờ sẽ thành 20h hôm sau, lỡ đề và trễ thêm 1 ngày
+  /// (1-3-7 thành 2-4-8). Dùng chung cho cả [recordAnswer] và
+  /// [recordReviewAnswer].
+  ///
+  /// `Clock.now()` trả về DateTime vùng UTC nhưng các trường giờ là giờ
+  /// Việt Nam, nên dựng 0h bằng `DateTime.utc` để không phụ thuộc múi
+  /// giờ của máy.
+  DateTime _dueDate(Duration delay) {
+    final now = _clock.now();
+    return DateTime.utc(now.year, now.month, now.day).add(delay);
+  }
+
   /// Ghi kết quả một câu THƯỜNG (không phải câu ôn tập):
   /// - Sai hoặc đúng sau gợi ý (`correctFirstTry` false) → đưa dạng
   ///   vào sổ (hoặc cập nhật mục đã có: bậc của câu vừa làm, chuỗi
@@ -74,9 +90,7 @@ class ReviewBookService {
       childId: childId,
       formId: formId,
       rung: rung,
-      dueDate: _clock.now().add(
-        const Duration(days: ReviewBookConfig.retryDays),
-      ),
+      dueDate: _dueDate(const Duration(days: ReviewBookConfig.retryDays)),
     );
   }
 
@@ -98,13 +112,12 @@ class ReviewBookService {
   }) async {
     final entry = await _reviewQueueDao.getEntry(childId, formId);
     if (entry == null) return ReviewAnswerOutcome.noEntry;
-    final now = _clock.now();
     if (!correctFirstTry) {
       await _reviewQueueDao.upsertEntry(
         childId: childId,
         formId: formId,
         rung: rung,
-        dueDate: now.add(const Duration(days: ReviewBookConfig.retryDays)),
+        dueDate: _dueDate(const Duration(days: ReviewBookConfig.retryDays)),
       );
       return ReviewAnswerOutcome.reset;
     }
@@ -116,7 +129,7 @@ class ReviewBookService {
     await _reviewQueueDao.updateStreakAndDue(
       id: entry.id,
       correctStreak: streak,
-      dueDate: now.add(ReviewBookConfig.dueDelayForStreak(streak)),
+      dueDate: _dueDate(ReviewBookConfig.dueDelayForStreak(streak)),
     );
     return ReviewAnswerOutcome.streakAdvanced;
   }
