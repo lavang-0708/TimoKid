@@ -8,7 +8,7 @@ Cập nhật cuối: 17/11/2026 (nhiệm vụ T1-04, nhánh `task/T1-04-db`).
 - T1-01 **Xong**: PR #1 đã merge.
 - T1-02 **Xong**: PR #2 đã merge (`04dfe35`). Claude đã rebase nhánh lên main và chạy lại trên máy mình: analyze sạch, 5/5 test pass.
 - T1-03 **Xong**: PR #3 đã merge (`fa956e4`). CI chính xanh trong 11,5 phút, APK debug đúng `vn.timokid.app`; integration test máy ảo đã sửa (build APK trước, cache AVD, API 30, `--use-application-binary`) và chạy lại xanh trước khi merge. Anh Điệp chỉ cần nạp 4 secrets ký APK theo `docs/RELEASE.md`, rồi tag thử `v0.0.1` làm sau.
-- T1-04 **Đang làm**: Drift với 7 bảng, hồ sơ bé mặc định lớp 2, test trên DB trong bộ nhớ + test tắt/mở lại app. PR: (điền số PR sau khi mở). Nhánh tách từ main cũ (`04dfe35`); sau khi mở PR sẽ merge main mới (`fa956e4`, có CI) vào nhánh.
+- T1-04 **Đang làm**: Drift với 7 bảng, hồ sơ bé mặc định lớp 2, test trên DB trong bộ nhớ + test tắt/mở lại app. PR: #6 (https://github.com/lavang-0708/TimoKid/pull/6). Nhánh tách từ main cũ (`04dfe35`); sau khi mở PR sẽ merge main mới (`fa956e4`, có CI) vào nhánh.
 - Các nhiệm vụ còn lại của bản 0.1 (T1-05 đến T1-14): **Chưa bắt đầu**. T1-05 làm song song với T1-04 trên nhánh riêng.
 - **Từ nay Claude merge PR** (anh Điệp giao).
 
