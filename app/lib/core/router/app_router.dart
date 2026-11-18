@@ -17,11 +17,13 @@ class AppRouter {
       ),
       GoRoute(
         path: MathScreen.route,
-        builder: (context, state) => const MathScreen(),
+        builder: (context, state) =>
+            MathScreen(args: state.extra as MathScreenArgs?),
       ),
       GoRoute(
         path: StageResultScreen.route,
-        builder: (context, state) => const StageResultScreen(),
+        builder: (context, state) =>
+            StageResultScreen(result: state.extra as StageResultArgs?),
       ),
     ],
   );
