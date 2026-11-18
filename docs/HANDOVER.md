@@ -8,7 +8,7 @@ Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-05, nhánh `task/T1-05-generato
 - T1-01 **Xong**: PR #1 đã merge.
 - T1-02 **Xong**: PR #2 đã merge (`04dfe35`). Claude đã rebase nhánh lên main và chạy lại trên máy mình: analyze sạch, 5/5 test pass.
 - T1-03 **Xong**: PR #3 đã merge squash vào main (`fa956e4`). CI chính xanh (11,5 phút, APK debug tải về đúng `vn.timokid.app`); integration test chạy lại sau khi Claude sửa (build APK trước, cache AVD, API 30, `--use-application-binary`).
-- T1-05 **Đang làm**: Bộ sinh câu hỏi — chuyển 48/48 dạng bài trong `gen.py` sang Dart (`lib/features/questions/`), test 500 seed × 103 cặp form×mức. PR: (điền số PR sau khi mở).
+- T1-05 **Đang làm**: Bộ sinh câu hỏi — chuyển 48/48 dạng bài trong `gen.py` sang Dart (`lib/features/questions/`), test 500 seed × 103 cặp form×mức. PR: #5 (https://github.com/lavang-0708/TimoKid/pull/5).
 - T1-04 đang làm song song trên nhánh riêng (`task/T1-04-db`). Các nhiệm vụ còn lại của bản 0.1 (T1-06 đến T1-14): **Chưa bắt đầu**.
 - **Từ nay Claude merge PR** (anh Điệp giao). Anh Điệp chỉ cần nạp 4 secrets ký APK theo `docs/RELEASE.md`, rồi tag thử `v0.0.1` làm sau.
 
