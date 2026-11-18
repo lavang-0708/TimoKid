@@ -169,24 +169,4 @@ flutter test test/assets_manifest_test.dart
 
 ## Nối CI
 
-Muse không đẩy được file `.github/workflows/` qua MCP (GitHub App
-thiếu quyền `workflows`, trả 403) nên bước CI dưới đây nhờ Claude
-commit giúp bằng git. Thêm vào `.github/workflows/ci.yml`, ngay sau
-step "Câu hỏi mẫu (check.py)" (xem thêm
-`tools/assets/ci-step-snippet.yml`):
-
-```yaml
-      - name: Kiểm tra hình (manifest)
-        working-directory: .
-        run: python3 tools/assets/check_assets.py
-
-      - name: Test script kiểm tra hình
-        working-directory: .
-        run: python3 tools/assets/check_assets_test.py
-```
-
-Trong lúc chờ step này lên CI, test Dart
-`app/test/assets_manifest_test.dart` đã gọi script kiểm tra trong
-bước `flutter test` sẵn có, nên PR vẫn được kiểm tra hình trên CI.
-Khi step CI trực tiếp đã chạy ổn, test Dart có thể giữ nguyên làm
-kiểm tra dự phòng khi chạy `flutter test` ở local.
+`.github/workflows/ci.yml` chạy `python3 tools/assets/check_assets.py` và `python3 tools/assets/check_assets_test.py` ngay sau bước "Câu hỏi mẫu (check.py)" (Claude thêm ngày 19/11). Test Dart `app/test/assets_manifest_test.dart` giữ làm kiểm tra dự phòng khi chạy `flutter test` ở local.
