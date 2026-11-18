@@ -10,7 +10,7 @@ Cập nhật cuối: 18/11/2026 (nhiệm vụ T1-10, nhánh `task/T1-10-so-on-ta
 - T1-06 **Xong**: Hình vẽ cho câu hình học — sinh SVG từ `FigureSpec` (`lib/features/questions/figure_svg.dart`, gói `flutter_svg` 2.4.0), golden test 7 hình, Claude đã đếm lại 7 ảnh bằng mắt: đúng hết. PR #7 đã merge.
 - T1-07 **Xong** (PR #8 đã merge): Thang ải và thành thạo — bậc 1–6 theo mảng + thành thạo dạng bài (`lib/features/ladder/`, `LadderService` dùng DAO T1-04), 22 unit test mới (thêm 1 test thành thạo dính sau review PR #8, commit `d08ac67`). PR: #8 (https://github.com/lavang-0708/TimoKid/pull/8).
 - T1-08 **Xong** (PR #9 đã merge): Đề ngày — mỗi ngày một đề 25 câu, 5 chặng theo 5 mảng (`lib/features/daily_set/`, `DailySetService` dùng `LadderService` + DAO T1-04), 27 unit test mới. PR: #9 (https://github.com/lavang-0708/TimoKid/pull/9).
-- T1-10 **Đang làm**: Sổ ôn tập — vòng mốc 1–3–7 ngày, đúng ngay đủ 3 lần thì ra khỏi sổ (`lib/features/review_book/`, `ReviewBookService` dùng `ReviewQueueDao` + `Clock`), 12 unit test mới. PR: (sẽ ghi số sau khi mở).
+- T1-10 **Đang làm**: Sổ ôn tập — vòng mốc 1–3–7 ngày, đúng ngay đủ 3 lần thì ra khỏi sổ (`lib/features/review_book/`, `ReviewBookService` dùng `ReviewQueueDao` + `Clock`), 12 unit test mới. PR: #10 (https://github.com/lavang-0708/TimoKid/pull/10).
 - T1-09 **Đang làm song song** trên nhánh riêng `task/T1-09-man-lam-toan` (tách từ main, PR mở sau T1-10).
 - Các nhiệm vụ còn lại của bản 0.1 (T1-11 đến T1-14): **Chưa bắt đầu**.
 - **Claude merge PR** (anh Điệp giao).
