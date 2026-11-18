@@ -55,6 +55,7 @@ Các điểm dưới đây ghi đè mọi chỗ nói khác trong kế hoạch.
 | i | Điểm nhỏ | Nghiệm thu T1-01 là log chạy tay `check.py`. Menu QA mở bằng nhấn giữ 5 giây ở góc trên bên trái. `Clock` trả ngày theo múi giờ Asia/Ho_Chi_Minh. Bản 0.1 mở app vào thẳng màn Thị trấn tạm với bé mặc định. |
 | j | Môi trường build | Muse được cài Flutter SDK trong workspace của mình để chạy `flutter create`, `analyze`, unit test và widget test. Build APK và test máy ảo chạy trên GitHub Actions. |
 | k | Nguồn hình (chốt 18/11) | Các tấm trong `assets/concept/` là nguồn hình chính: tách nền, cắt từng món, sửa lỗi theo bảng trong `assets/concept/README.md`. Món thiếu hoặc hỏng thì Muse vẽ bổ sung cùng phong cách pastel viền trắng sticker. Áp dụng từ T1-12 (icon app, nền Thị trấn, biểu tượng nút) và cả bản 0.2. |
+| l | Màn làm toán sau khi anh Điệp dùng thử v0.0.1 (chốt 18/11) | (1) Đề luôn hiện song ngữ: dòng trên tiếng Việt chữ to, dòng dưới tiếng Anh chữ nhỏ hơn, màu nhạt hơn; bỏ nút đổi EN. Gợi ý và lời giải cũng hiện song ngữ theo cùng cách. Nút xem từ khóa giữ nguyên. (2) Hai cột cân nhau: khối đề (cột trái) và khối đáp án (cột phải) cùng căn giữa theo chiều dọc trong vùng dưới thanh trên, không để đề dính góc trên trái còn đáp án lệch xuống góc dưới phải. Gợi ý, lời giải nằm ngay dưới đề trong cột trái; nút Tiếp nằm dưới đáp án trong cột phải. |
 
 ## Quy ước kỹ thuật
 
