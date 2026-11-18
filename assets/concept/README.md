@@ -1,10 +1,16 @@
 # Tấm phác ý tưởng (concept sheets)
 
-Các tấm này vẽ bằng công cụ AI, **chỉ dùng làm tham khảo phong cách**, không phải hình dùng trong app: nền đặc (không trong suốt), nhiều món chung một tấm, chưa đúng khung 1024 x 1536.
+Các tấm này vẽ bằng công cụ AI. **Từ 18/11/2026 anh Điệp chốt: đây là nguồn hình chính của app**, không còn chỉ để tham khảo.
 
-Phong cách chuẩn: **tông pastel mềm, viền trắng kiểu sticker** (theo `girl_character_sheet.png`, `pet_*.png`, `room.png`). Các tấm xám (`*_gray.png`) minh họa cách tách lớp và tô xám để app đổi màu.
+Cách dùng:
 
-Ngoại lệ cho bản 0.2: được phép tách nền 3 quả trứng (`pet_eggs.png`), 9 hình pet (`pet_evolution.png`) và căn phòng (`room.png`, xóa dòng chữ) để làm **hình tạm**.
+1. **Ưu tiên lấy từ các tấm này**: tách nền cho trong suốt, cắt từng món ra file riêng, đưa về đúng khung trong `assets/templates/` (nhân vật 1024 x 1536, pet và đồ vật theo `khung_pet_do_vat.svg`).
+2. **Sửa theo bảng lỗi bên dưới** khi cắt: bỏ nhãn và tên sẵn, đổi tên pet đúng, bỏ chữ trên tường, tách lớp tóc và áo cho đủ.
+3. **Thiếu hình hoặc hình lỗi không sửa được thì Muse vẽ bổ sung** theo đúng phong cách của các tấm này. Ví dụ: icon app, nền Thị trấn, biểu tượng nút, hiệu ứng khi đúng, phần thú cưng thiếu.
+4. Tông chuẩn là **pastel mềm, viền trắng kiểu sticker** (theo `girl_character_sheet.png`, `pet_*.png`, `room.png`). Hai tấm màu đậm (`boy_character_sheet.png`, `chibi_board_vivid.png`) phải chỉnh màu về pastel khi dùng.
+5. Các tấm xám (`*_gray.png`) minh họa cách tách lớp và tô xám để app đổi màu.
+
+Hình sau khi cắt và sửa để ở `app/assets/images/`. File PNG do Muse làm thì gửi qua chat, Claude commit bằng git; hình vẽ mới ưu tiên SVG để Muse tự đẩy được.
 
 ## Lỗi đã biết trong các tấm, không làm theo
 
