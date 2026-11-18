@@ -56,7 +56,11 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'timokid.sqlite'));
 
   /// Nguồn thời gian của app (giờ Việt Nam). Test truyền [FakeClock].
-  final Clock clock;
+  ///
+  /// Không `final`: chỉ menu QA (bản debug, T1-13) mới gán lại bằng
+  /// [DebugClock] để nhảy ngày; production không bao giờ đổi đồng hồ
+  /// sau khi mở database.
+  Clock clock;
 
   @override
   int get schemaVersion => 1;
@@ -65,24 +69,49 @@ class AppDatabase extends _$AppDatabase {
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (migrator) async {
       await migrator.createAll();
-      // Chặn sửa/xóa lịch sử ở tầng SQLite (bổ sung cho việc DAO
-      // không có hàm sửa/xóa). Trigger sống cùng file DB nên còn
-      // hiệu lực cả sau khi tắt/mở lại app.
-      for (final name in [
-        attempts.actualTableName,
-        walletLedger.actualTableName,
-      ]) {
-        await customStatement(
-          'CREATE TRIGGER ${name}_no_update BEFORE UPDATE ON $name '
-          'BEGIN SELECT RAISE(ABORT, \'$name is append-only\'); END;',
-        );
-        await customStatement(
-          'CREATE TRIGGER ${name}_no_delete BEFORE DELETE ON $name '
-          'BEGIN SELECT RAISE(ABORT, \'$name is append-only\'); END;',
-        );
-      }
+      await _createAppendOnlyTriggers();
     },
   );
+
+  /// Tạo trigger chặn sửa/xóa trên hai bảng append-only (xem ghi chú
+  /// ở đầu file). Gọi trong [migration] lúc tạo DB mới, và gọi lại
+  /// trong [resetForQa] sau khi tạo lại bảng — trigger không thuộc
+  /// định nghĩa bảng nên `Migrator.createAll()` không tạo lại chúng.
+  Future<void> _createAppendOnlyTriggers() async {
+    // Chặn sửa/xóa lịch sử ở tầng SQLite (bổ sung cho việc DAO
+    // không có hàm sửa/xóa). Trigger sống cùng file DB nên còn
+    // hiệu lực cả sau khi tắt/mở lại app.
+    for (final name in [
+      attempts.actualTableName,
+      walletLedger.actualTableName,
+    ]) {
+      await customStatement(
+        'CREATE TRIGGER ${name}_no_update BEFORE UPDATE ON $name '
+        'BEGIN SELECT RAISE(ABORT, \'$name is append-only\'); END;',
+      );
+      await customStatement(
+        'CREATE TRIGGER ${name}_no_delete BEFORE DELETE ON $name '
+        'BEGIN SELECT RAISE(ABORT, \'$name is append-only\'); END;',
+      );
+    }
+  }
+
+  /// Đặt lại toàn bộ database về trạng thái mới cài (CHỈ menu QA debug
+  /// gọi, xem `QaService.clearAllData`): DROP toàn bộ 7 bảng rồi tạo
+  /// lại (kể cả trigger append-only) + gieo dữ liệu mặc định.
+  ///
+  /// Không dùng DELETE: trigger append-only chặn DELETE trên
+  /// `attempts` và `wallet_ledger`, nên cách duy nhất xóa sạch lịch
+  /// sử là bỏ bảng rồi tạo lại. Sau khi gọi, mọi màn hình/service
+  /// đang giữ dữ liệu cũ phải tải lại (menu QA tự về màn Thị trấn).
+  Future<void> resetForQa() async {
+    for (final table in allTables) {
+      await customStatement('DROP TABLE IF EXISTS ${table.actualTableName}');
+    }
+    await Migrator(this).createAll();
+    await _createAppendOnlyTriggers();
+    await ensureSeeded();
+  }
 
   /// Tạo dữ liệu lần đầu mở app: một hồ sơ bé mặc định lớp 2, bậc 1 cho
   /// cả 5 mảng, và cài đặt chung mặc định. Gọi lại nhiều lần cũng an toàn
