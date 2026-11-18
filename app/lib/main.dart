@@ -6,6 +6,7 @@ import 'core/database/app_database.dart';
 import 'core/database/database_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/qa/qa_menu_opener.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +42,11 @@ class TimoKidApp extends StatelessWidget {
       title: 'TimoKid',
       theme: AppTheme.light,
       routerConfig: AppRouter.router,
+      // Menu QA (T1-13): vùng nhấn giữ 5 giây ở góc trên-trái, chỉ
+      // gắn khi bật QA (bản debug hoặc --dart-define=QA_MENU=true).
+      // Bản release giao cho bé không có vùng này.
+      builder: (context, child) =>
+          QaMenuOpener(child: child ?? const SizedBox.shrink()),
     );
   }
 }
