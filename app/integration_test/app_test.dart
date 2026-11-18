@@ -42,8 +42,9 @@ void main() {
     final element = tester.element(find.byKey(const Key('math-screen')));
     final db = ProviderScope.containerOf(element).read(databaseProvider);
     final childId = await db.ensureSeeded();
-    // Thử nghiệm: tắt âm thanh để khoanh vùng lỗi pumpAndSettle treo
-    // sau khi trả lời đúng (PR #13).
+    // Tắt âm thanh khi chạy trên máy ảo CI: phát WAV qua audioplayers
+    // làm pumpAndSettle không bao giờ dừng (đã khoanh vùng ở PR #13).
+    // Âm thanh kiểm bằng widget test (SoundPlayer giả) và trên máy thật.
     await db.settingsDao.setValue(key: 'sound_enabled', value: 'false');
     final set = await db.dailySetsDao.getDailySet(childId, db.clock.today());
     final resolved = db.dailySetsDao
