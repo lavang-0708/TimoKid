@@ -176,6 +176,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         eggSpecies: _selectedEgg!,
       );
       if (!mounted) return;
+      // Bỏ focus ở gốc trước khi sang Thị trấn (vòng 3 review
+      // PR #19): bàn phím ảo mở ở bước tên có thể còn mở trên máy
+      // ảo CI dù `_next()` đã unfocus — yêu cầu đóng bàn phím lần
+      // nữa ở điểm rời mở đầu duy nhất, để Thị trấn/màn toán
+      // không bị bóp viewport. Không có gì focus thì đây là no-op.
+      FocusManager.instance.primaryFocus?.unfocus();
       context.go(TownScreen.route);
     } catch (_) {
       if (!mounted) return;

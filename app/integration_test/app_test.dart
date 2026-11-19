@@ -39,6 +39,20 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    // Bấm nút sau khi cuộn nó vào tầm nhìn (vòng 3 review PR #19):
+    // bàn phím ảo mở ở bước tên có thể KHÔNG đóng trên máy ảo CI
+    // dù app đã unfocus (receiveAction(done) không tới được IME
+    // thật) nên viewport màn toán bị bóp — nút đáp án nằm dưới nếp
+    // gấp, bấm trực tiếp chạm hụt, không ra băng xanh (lỗi ở dòng
+    // 148 trước sửa). Cuộn tới nút trước khi bấm là hành vi đúng
+    // của màn cuộn, giống người dùng thật.
+    Future<void> tapVisible(Key key) async {
+      await tester.ensureVisible(find.byKey(key));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(key));
+      await tester.pumpAndSettle();
+    }
+
     // --- T2-03: màn mở đầu nữ (DB mới: chưa xong mở đầu) ---
     expect(find.byKey(const Key('onboarding-screen')), findsOneWidget);
     expect(find.text('Bước 1/5'), findsOneWidget);
@@ -91,8 +105,7 @@ void main() {
     // --- T1-09: đi hết chặng 1 (mảng logic, bậc 1) ---
     // Nút khu 0 của màn Thị trấn T1-12 (tên key cũ `town-math-button`
     // đã bỏ khi viết lại màn Thị trấn).
-    await tester.tap(find.byKey(const Key('town-stage-0-button')));
-    await tester.pumpAndSettle();
+    await tapVisible(const Key('town-stage-0-button'));
     expect(find.byKey(const Key('math-screen')), findsOneWidget);
 
     // Đọc đề ngày đã lưu từ DB của app để tính đáp án đúng.
@@ -117,21 +130,16 @@ void main() {
     // Surface đã convert ở trên (chỉ được gọi một lần cho cả test);
     // `takeShot` đã định nghĩa ở đầu test, dùng chung cho cả luồng.
     Future<void> tapCorrect(int qi) async {
-      await tester.tap(
-        find.byKey(Key('choice-${resolved[qi].correctDisplayIndex}')),
-      );
-      await tester.pumpAndSettle();
+      await tapVisible(Key('choice-${resolved[qi].correctDisplayIndex}'));
     }
 
     Future<void> tapWrong(int qi) async {
       final correct = resolved[qi].correctDisplayIndex;
-      await tester.tap(find.byKey(Key('choice-${correct == 0 ? 1 : 0}')));
-      await tester.pumpAndSettle();
+      await tapVisible(Key('choice-${correct == 0 ? 1 : 0}'));
     }
 
     Future<void> tapNext() async {
-      await tester.tap(find.byKey(const Key('math-next-button')));
-      await tester.pumpAndSettle();
+      await tapVisible(const Key('math-next-button'));
     }
 
     // Câu 1 đúng ngay lần đầu.
@@ -161,12 +169,11 @@ void main() {
     // Câu 5 điền số đúng ngay lần đầu.
     final answer = '${resolved[4].question.answer}';
     for (final ch in answer.split('')) {
-      await tester.tap(find.byKey(Key('keypad-$ch')));
+      await tapVisible(Key('keypad-$ch'));
     }
     await tester.pumpAndSettle();
     await takeShot('math-number');
-    await tester.tap(find.byKey(const Key('keypad-submit')));
-    await tester.pumpAndSettle();
+    await tapVisible(const Key('keypad-submit'));
     expect(find.byKey(const Key('math-correct')), findsOneWidget);
     await tapNext();
 

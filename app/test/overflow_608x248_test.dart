@@ -19,11 +19,23 @@
 /// + viewInsets như máy ảo CI), đi tiếp tới Thị trấn/màn toán/kết
 /// quả chặng, khóa không tràn và focus phải được bỏ khi rời bước tên.
 ///
+/// Vòng 3 (review PR #19 lần 3, lỗi ở app_test.dart:148): bàn phím
+/// mở ở bước tên KHÔNG đóng trên máy ảo CI dù app đã unfocus
+/// (receiveAction(done) không tới được IME thật) nên viewport màn
+/// toán bị bóp, nút đáp án nằm dưới nếp gấp, bấm trực tiếp chạm hụt,
+/// sau gợi ý không ra băng xanh. Nhóm 'bàn phím kẹt mở tới màn toán'
+/// khóa ca này ở 640x320 (giữ viewInsets.bottom = 200 tới hết
+/// chặng, bấm bằng ensureVisible); integration test cũng bấm bằng
+/// ensureVisible từ vòng này. Giả thuyết lệch childId/đề ngày/chặng
+/// đã loại: đáp án tính từ đề ngày trong DB khớp câu đang hiện ở
+/// mọi seed/kích cỡ đã thử (xem chẩn đoán vòng 3, không đẩy kèm).
+///
 /// Lưu ý: ở 608x248 vài nút nằm dưới nếp gấp cuộn (nút váy, thẻ
 /// trứng, nút Tiếp lúc xem lời giải, nút gửi bàn phím) nên test dùng
 /// `ensureVisible` trước khi bấm — đó là hành vi đúng của màn cuộn,
-/// không phải lỗi; integration test trên máy ảo CI cao hơn không cần
-/// cuộn tới các nút này.
+/// không phải lỗi; integration test cũng dùng `ensureVisible` từ vòng
+/// 3 (bàn phím kẹt mở trên máy ảo CI bóp viewport, bấm trực tiếp
+/// chạm hụt — xem nhóm 'bàn phím kẹt mở tới màn toán' bên dưới).
 library;
 
 import 'dart:math';
@@ -465,7 +477,7 @@ void main() {
       // Vào màn toán, làm hết chặng 0 tới màn kết quả (kịch bản
       // app_test.dart:168): bàn phím đã đóng nên cột phải không bị
       // bóp, tapCorrect phải chạm trúng và có math-next-button.
-      await tester.tap(find.byKey(const Key('town-stage-0-button')));
+      await _tapVisible(tester, find.byKey(const Key('town-stage-0-button')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('math-screen')), findsOneWidget);
       _checkNoError(tester, 'mở màn toán');
@@ -541,5 +553,164 @@ void main() {
         (tester) async => runFlow(tester, size),
       );
     }
+  });
+
+  group('bàn phím kẹt mở tới màn toán (vòng 3)', () {
+    // Ca review PR #19 vòng 3 (lỗi integration test ở
+    // app_test.dart:148): bàn phím ảo mở ở bước tên KHÔNG đóng
+    // trên máy ảo CI dù app đã unfocus khi rời bước tên
+    // (receiveAction(done) không tới được IME thật) — viewport màn
+    // toán bị bóp, nút đáp án nằm dưới nếp gấp, bấm trực tiếp chạm
+    // hụt nên sau gợi ý không ra băng xanh, không có
+    // math-next-button. Test này khóa ca đó ở 731x411 (cỡ máy ảo
+    // CI mặc định, ngang) với viewInsets.bottom = 250 (bàn phím
+    // ngang toàn màn hình kẹt mở, còn ~161 dp nhìn thấy): mở đầu
+    // xong qua service rồi giữ viewInsets từ Thị trấn tới hết
+    // chặng, bấm bằng _tapVisible (ensureVisible trước khi bấm)
+    // như integration test sau sửa. Mở đầu qua UI + bỏ focus khi
+    // rời bước tên đã có nhóm 'bàn phím mở ở bước tên' khóa.
+    //
+    // Không khóa "không tràn" ở đây: bàn phím kẹt mở là trạng thái
+    // bất thường, cột trái có thể tràn nhẹ (12 px ở 731x411 sau
+    // gợi ý); khóa là luồng vẫn đi hết (băng xanh + nút Tiếp +
+    // màn kết quả). Không tràn ở luồng thường đã có các nhóm trên.
+    // Vì vậy mỗi bước xả hết exception tràn (drain) rồi mới khóa
+    // trạng thái — exception tràn không được để rớt test này.
+    late FakeClock clock;
+    late AppDatabase db;
+    late String childId;
+
+    setUp(() async {
+      clock = FakeClock(DateTime(2026, 11, 18, 8, 0));
+      db = AppDatabase(executor: NativeDatabase.memory(), clock: clock);
+      addTearDown(db.close);
+      childId = await db.ensureSeeded();
+      await OnboardingService(db: db).completeOnboarding(
+        childId: childId,
+        profile: CharacterProfile.defaults().copyWith(
+          name: 'An',
+          dress: 'girl_top_02',
+        ),
+        eggSpecies: 'dog',
+      );
+      final service = DailySetService(
+        dailySetsDao: db.dailySetsDao,
+        reviewQueueDao: db.reviewQueueDao,
+        ladderService: LadderService(
+          attemptsDao: db.attemptsDao,
+          skillProgressDao: db.skillProgressDao,
+        ),
+        clock: clock,
+        random: Random(42),
+      );
+      await service.getOrCreateTodaySet(childId: childId);
+    });
+
+    testWidgets('bàn phím kẹt mở → hết chặng 0 (731x411)', (tester) async {
+      const size = Size(731, 411);
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+        tester.view.resetViewInsets();
+      });
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [databaseProvider.overrideWithValue(db)],
+          child: TimoKidApp(router: AppRouter.create(showOnboarding: false)),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('town-screen')), findsOneWidget);
+      expect(find.text('An'), findsOneWidget);
+
+      // Xả exception tràn (xem chú thích nhóm): bàn phím kẹt mở
+      // làm cột trái tràn nhẹ, không phải lỗi luồng — xả để nó
+      // không rớt test, trạng thái vẫn khóa bằng expect bên dưới.
+      void drain() {
+        while (tester.takeException() != null) {}
+      }
+
+      // Bàn phím kẹt mở từ bước tên (mô phỏng máy ảo CI):
+      // viewport còn ~161 dp cho tới hết chặng.
+      tester.view.viewInsets = const FakeViewPadding(bottom: 250);
+      await tester.pumpAndSettle();
+      drain();
+
+      await _tapVisible(tester, find.byKey(const Key('town-stage-0-button')));
+      drain();
+      expect(find.byKey(const Key('math-screen')), findsOneWidget);
+
+      final todaySet = await db.dailySetsDao.getDailySet(
+        childId,
+        clock.today(),
+      );
+      final resolved = db.dailySetsDao
+          .readQuestions(todaySet!)
+          .sublist(0, 5)
+          .map(ResolvedQuestion.resolve)
+          .toList();
+      var qi = 0;
+
+      Future<void> tapCorrect() async {
+        await _tapVisible(
+          tester,
+          find.byKey(Key('choice-${resolved[qi].correctDisplayIndex}')),
+        );
+        drain();
+      }
+
+      Future<void> tapWrong() async {
+        final correct = resolved[qi].correctDisplayIndex;
+        await _tapVisible(
+          tester,
+          find.byKey(Key('choice-${correct == 0 ? 1 : 0}')),
+        );
+        drain();
+      }
+
+      Future<void> tapNextHere() async {
+        await _tapVisible(tester, find.byKey(const Key('math-next-button')));
+        drain();
+        qi++;
+      }
+
+      await tapCorrect();
+      expect(find.byKey(const Key('math-correct')), findsOneWidget);
+      await tapNextHere();
+      await tapWrong();
+      expect(find.byKey(const Key('math-hint')), findsOneWidget);
+      // Điểm lỗi CI 148: sau gợi ý, bấm đáp án đúng phải ra băng
+      // xanh + nút Tiếp — bấm trực tiếp chạm hụt, cuộn tới nút
+      // trước khi bấm thì trúng.
+      await tapCorrect();
+      expect(
+        find.byKey(const Key('math-correct')),
+        findsOneWidget,
+        reason: 'sau gợi ý, đáp án đúng phải ra băng xanh (CI 148)',
+      );
+      expect(find.byKey(const Key('math-next-button')), findsOneWidget);
+      await tapNextHere();
+      await tapWrong();
+      await tapWrong();
+      expect(find.byKey(const Key('math-solution')), findsOneWidget);
+      await tapNextHere();
+      await tapCorrect();
+      await tapNextHere();
+      final answer = '${resolved[4].question.answer}';
+      for (final ch in answer.split('')) {
+        await _tapVisible(tester, find.byKey(Key('keypad-$ch')));
+        drain();
+      }
+      await _tapVisible(tester, find.byKey(const Key('keypad-submit')));
+      drain();
+      expect(find.byKey(const Key('math-correct')), findsOneWidget);
+      await tapNextHere();
+
+      expect(find.byKey(const Key('stage-result-screen')), findsOneWidget);
+      expect(find.text('Đúng 4/5 câu'), findsOneWidget);
+      expect(find.text('Nhận được 12 xu'), findsOneWidget);
+    });
   });
 }
