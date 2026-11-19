@@ -1,0 +1,7 @@
+<!-- HÌNH TẠM (T2-03): vết nứt phủ lên trứng ở màn nở (giai đoạn
+  nứt). Vẽ đơn giản bằng SVG, dùng chung cho cả 3 loài. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240">
+  <polyline points="100,45 82,80 108,105 78,135 104,165 88,195" fill="none" stroke="#8A6D4B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="108,105 135,118 150,112" fill="none" stroke="#8A6D4B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="78,135 52,148 40,142" fill="none" stroke="#8A6D4B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

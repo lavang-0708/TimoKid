@@ -1,0 +1,10 @@
+<!-- HÌNH TẠM (T2-03): trứng Mèo Mũm Mĩm vẽ đơn giản bằng SVG để
+  chọn trứng ở màn mở đầu. Hình thật (cắt từ tấm concept, 512x512)
+  về sẽ thay file này; màu theo bảng màu v1: hồng + sọc đậm hơn. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240">
+  <ellipse cx="100" cy="125" rx="72" ry="92" fill="#F2A7B8" stroke="#DE7F9D" stroke-width="4"/>
+  <path d="M 38 105 Q 100 125 162 105" fill="none" stroke="#DE7F9D" stroke-width="10" stroke-linecap="round"/>
+  <path d="M 36 140 Q 100 160 164 140" fill="none" stroke="#DE7F9D" stroke-width="10" stroke-linecap="round"/>
+  <path d="M 44 175 Q 100 192 156 175" fill="none" stroke="#DE7F9D" stroke-width="10" stroke-linecap="round"/>
+  <ellipse cx="70" cy="70" rx="18" ry="26" fill="#FFFFFF" opacity="0.45" transform="rotate(-20 70 70)"/>
+</svg>

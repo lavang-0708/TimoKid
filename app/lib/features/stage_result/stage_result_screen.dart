@@ -10,12 +10,16 @@
 /// dùng ở test và trong Roboto trên máy thật.
 library;
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../core/database/database_provider.dart';
 import '../math/math_decor.dart';
 import '../math/math_screen.dart';
 import '../math/math_session.dart' show strandNames;
+import '../onboarding/egg_service.dart';
+import '../onboarding/hatch_screen.dart';
 
 /// Kết quả một chặng, màn làm toán truyền qua GoRouter `extra`.
 class StageResultArgs {
@@ -52,6 +56,26 @@ class StageResultScreen extends StatelessWidget {
   /// (đi thẳng vào route mà không qua màn làm toán).
   final StageResultArgs? result;
 
+  /// Rời màn kết quả: nếu có lần nở trứng đang chờ (bé vừa xong
+  /// chặng đầu tiên sau khi chọn trứng) thì rẽ sang màn nở trứng
+  /// trước, không cho bé bỏ qua màn ăn mừng bằng cách bấm sang
+  /// chặng tiếp theo; còn lại thì đi theo `next` (về Thị trấn hoặc
+  /// sang chặng tiếp theo).
+  Future<void> _continue(
+    BuildContext context, {
+    required VoidCallback next,
+  }) async {
+    final db = ProviderScope.containerOf(context).read(databaseProvider);
+    final childId = await db.ensureSeeded();
+    final pending = await EggService(db: db).isHatchPending(childId);
+    if (!context.mounted) return;
+    if (pending) {
+      context.go(HatchScreen.route);
+      return;
+    }
+    next();
+  }
+
   @override
   Widget build(BuildContext context) {
     final args = result;
@@ -75,7 +99,8 @@ class StageResultScreen extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(56, 56),
                 ),
-                onPressed: () => context.go('/'),
+                onPressed: () =>
+                    _continue(context, next: () => context.go('/')),
               ),
             ],
           ),
@@ -127,8 +152,15 @@ class StageResultScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 22),
               ),
               const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              // Hai nút xuống dòng khi không vừa một hàng (màn hẹp /
+              // font test DejaVu rộng hơn Nunito nên ở 608 dp hai nút
+              // cộng lại vượt chiều rộng 127 px): màn cuộn dọc sẵn
+              // nên xuống dòng vẫn thấy đủ nút; khi chạy app (Nunito)
+              // vẫn một hàng như trước.
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 16,
+                runSpacing: 16,
                 children: [
                   ElevatedButton.icon(
                     key: const Key('stage-result-back-button'),
@@ -140,10 +172,10 @@ class StageResultScreen extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(56, 56),
                     ),
-                    onPressed: () => context.go('/'),
+                    onPressed: () =>
+                        _continue(context, next: () => context.go('/')),
                   ),
-                  if (args.nextStageIndex != null) ...[
-                    const SizedBox(width: 16),
+                  if (args.nextStageIndex != null)
                     ElevatedButton.icon(
                       key: const Key('stage-result-next-button'),
                       icon: const Text('→', style: TextStyle(fontSize: 24)),
@@ -154,12 +186,16 @@ class StageResultScreen extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(56, 56),
                       ),
-                      onPressed: () => context.go(
-                        MathScreen.route,
-                        extra: MathScreenArgs(stageIndex: args.nextStageIndex),
+                      onPressed: () => _continue(
+                        context,
+                        next: () => context.go(
+                          MathScreen.route,
+                          extra: MathScreenArgs(
+                            stageIndex: args.nextStageIndex,
+                          ),
+                        ),
                       ),
                     ),
-                  ],
                 ],
               ),
             ],

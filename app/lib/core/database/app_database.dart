@@ -70,6 +70,13 @@ class AppDatabase extends _$AppDatabase {
     onCreate: (migrator) async {
       await migrator.createAll();
       await _createAppendOnlyTriggers();
+      // Mở đầu (T2-03): DB mới tạo thì chưa xong mở đầu → lần đầu
+      // mở app hiện màn tạo nhân vật. Máy đã cài bản 0.1 không có
+      // khóa này (không chạy onCreate) nên được coi là đã xong, xem
+      // `OnboardingService.isCompleted`. Khóa ghi bằng chữ để tránh
+      // lớp database phải import feature mở đầu; tên khóa giữ đồng
+      // bộ với `OnboardingService.onboardingCompletedKey`.
+      await _seedSetting('onboarding_completed', 'false');
     },
   );
 
@@ -111,6 +118,9 @@ class AppDatabase extends _$AppDatabase {
     await Migrator(this).createAll();
     await _createAppendOnlyTriggers();
     await ensureSeeded();
+    // Về trạng thái mới cài: mở đầu chưa xong nên lần mở sau hiện
+    // lại màn tạo nhân vật (để QA kiểm được luồng mở đầu).
+    await settingsDao.setValue(key: 'onboarding_completed', value: 'false');
   }
 
   /// Tạo dữ liệu lần đầu mở app: một hồ sơ bé mặc định lớp 2, bậc 1 cho

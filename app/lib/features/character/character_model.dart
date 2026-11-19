@@ -175,4 +175,45 @@ class CharacterOutfit {
 
     return CharacterOutfit(form: 'girl', layers: specs);
   }
+
+  /// Bộ nhân vật nữ 1 (PR #18, `docs/ASSETS.md` mục "Bộ nhân vật nữ
+  /// 1"): thân đã có sẵn mắt, miệng, tất, giày và bộ đồ gốc nên
+  /// KHÔNG chồng thêm lớp eyes/mouth/shoes/bottom; chỉ có tóc (xám,
+  /// đổi màu được) + váy (màu thật). `top` null = mặc bộ đồ gốc.
+  ///
+  /// Đúng cờ `recolorable` của bộ này: thân và váy màu thật nên
+  /// không có tint; chỉ hai lớp tóc nhân màu [hairColor]. Không có
+  /// file `_line` đi kèm bộ này. Bộ tóc sau để trống (trong suốt)
+  /// nhưng vẫn phải có mặt để đủ bộ `girl_hair_01`.
+  factory CharacterOutfit.girlSet1({required Color hairColor, String? top}) {
+    // Danh sách lớp đúng thứ tự z — tóc sau, thân, váy, tóc trước.
+    return CharacterOutfit(
+      form: 'girl',
+      layers: <CharacterLayerSpec>[
+        CharacterLayerSpec(
+          id: 'girl_hair_back_01',
+          layer: 'hair_back',
+          assetPath: 'assets/images/character/girl/girl_hair_back_01.png',
+          tint: hairColor,
+        ),
+        const CharacterLayerSpec(
+          id: 'girl_body_01',
+          layer: 'body',
+          assetPath: 'assets/images/character/girl/girl_body_01.png',
+        ),
+        if (top != null)
+          CharacterLayerSpec(
+            id: top,
+            layer: 'top',
+            assetPath: 'assets/images/character/girl/$top.png',
+          ),
+        CharacterLayerSpec(
+          id: 'girl_hair_front_01',
+          layer: 'hair_front',
+          assetPath: 'assets/images/character/girl/girl_hair_front_01.png',
+          tint: hairColor,
+        ),
+      ],
+    );
+  }
 }

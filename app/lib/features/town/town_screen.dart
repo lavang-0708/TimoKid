@@ -6,10 +6,16 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/models.dart';
 import '../../core/database/tables.dart';
+import '../character/character_model.dart';
+import '../character/character_view.dart';
+import '../character/placeholder_layers.dart';
 import '../daily_set/daily_set_config.dart';
 import '../daily_set/daily_set_service.dart';
 import '../ladder/ladder_service.dart';
 import '../math/math_screen.dart';
+import '../onboarding/onboarding_config.dart';
+import '../onboarding/onboarding_model.dart';
+import '../onboarding/onboarding_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
 import 'town_assets.dart';
@@ -19,6 +25,11 @@ import 'town_assets.dart';
 /// 5 nút lớn cho 5 khu theo DESIGN, mỗi nút hiện trạng thái chặng hôm
 /// nay (chưa làm / đang làm / xong), thanh tiến độ đề ngày, số xu và
 /// kim cương. Chưa có bản đồ hay cư dân (theo PLAN mục T1-12).
+///
+/// Từ T2-03, nhân vật bé đã tạo hiện ở cột trái (tên bên dưới):
+/// nữ dùng bộ nhân vật nữ 1 thật (PR #18), nam tạm dùng lớp xám
+/// như ở màn mở đầu. Chưa tạo nhân vật (máy 0.1 cũ) thì không có
+/// cột nhân vật.
 ///
 /// Số dư đọc qua [RewardService.balances] của T1-11 (đã merge, tổng
 /// `wallet_ledger` của bé), bảng thưởng đọc từ settings như màn làm
@@ -38,6 +49,7 @@ class _TownScreenState extends ConsumerState<TownScreen> {
   int _gems = 0;
   bool _loading = true;
   String? _error;
+  CharacterProfile? _profile;
 
   @override
   void initState() {
@@ -73,11 +85,13 @@ class _TownScreenState extends ConsumerState<TownScreen> {
         config: await RewardConfig.load(db),
       );
       final balances = await rewardService.balances(childId);
+      final profile = await OnboardingService(db: db).loadProfile(childId);
       if (!mounted) return;
       setState(() {
         _statuses = statuses;
         _xu = balances[Currency.xu] ?? 0;
         _gems = balances[Currency.gem] ?? 0;
+        _profile = profile;
         _loading = false;
         _error = null;
       });
@@ -108,6 +122,7 @@ class _TownScreenState extends ConsumerState<TownScreen> {
     }
     final done = statuses.where((s) => s == StageStatus.done).length;
     final total = DailySetConfig.stagesPerDay;
+    final profile = _profile;
     return Scaffold(
       key: const Key('town-screen'),
       appBar: AppBar(title: const Text('Thị trấn Diệu Kỳ')),
@@ -151,16 +166,57 @@ class _TownScreenState extends ConsumerState<TownScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  for (var i = 0; i < townAreas.length; i++) ...[
-                    if (i > 0) const SizedBox(width: 10),
-                    Expanded(
-                      child: _AreaButton(
-                        area: townAreas[i],
-                        status: statuses[i],
-                        stageIndex: i,
+                  // Nhân vật đã tạo đứng ở cột trái (chỉ khi đã có hồ
+                  // sơ); tên bên dưới. Không có hồ sơ (máy 0.1 cũ)
+                  // thì 5 nút khu chiếm hết chiều rộng như trước.
+                  if (profile != null) ...[
+                    SizedBox(
+                      width: 120,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: CharacterView(
+                              key: const Key('town-character'),
+                              outfit: _outfitFor(profile),
+                              loader: _loaderFor(profile),
+                              // Tĩnh ở Thị trấn (không thở/chớp mắt):
+                              // hiệu ứng lặp vô hạn làm `pumpAndSettle`
+                              // trong test và integration test không bao
+                              // giờ dừng; phòng (T2-04) sẽ bật lại.
+                              animationsEnabled: false,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            profile.name,
+                            key: const Key('town-character-name'),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ],
                       ),
                     ),
+                    const SizedBox(width: 12),
                   ],
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        for (var i = 0; i < townAreas.length; i++) ...[
+                          if (i > 0) const SizedBox(width: 10),
+                          Expanded(
+                            child: _AreaButton(
+                              area: townAreas[i],
+                              status: statuses[i],
+                              stageIndex: i,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -169,6 +225,39 @@ class _TownScreenState extends ConsumerState<TownScreen> {
       ),
     );
   }
+
+  /// Bộ đồ xem trước cho hồ sơ đã lưu (giữ đồng bộ với
+  /// `_previewOutfit` ở màn mở đầu): nữ dùng bộ nhân vật nữ 1
+  /// (thân + tóc + váy), nam dùng bộ đủ lớp manifest v1.
+  CharacterOutfit _outfitFor(CharacterProfile profile) {
+    if (profile.gender == 'girl') {
+      return CharacterOutfit.girlSet1(
+        hairColor: Color(profile.hairColor),
+        top: profile.dress,
+      );
+    }
+    return CharacterOutfit.girl(
+      palette: CharacterPalette(
+        skin: Color(profile.skinColor),
+        hair: Color(profile.hairColor),
+        eyes: Color(profile.eyeColor),
+        mouth: const Color(onboardingMouthColor),
+        top: const Color(0xFFF2A7C3),
+        bottom: const Color(0xFFB5A8E8),
+        shoes: const Color(0xFF8FCB9B),
+        accessoryHead: const Color(0xFFF28BB0),
+      ),
+      hairSet: profile.hairStyle,
+      eyes: profile.eyeStyle,
+      mouth: profile.mouthStyle,
+    );
+  }
+
+  /// Bộ nạp lớp: nữ dùng `AssetImage` mặc định (hình thật đã có
+  /// trên main từ PR #18); nam chưa có hình thật nên dùng lớp tạm
+  /// xám như ở màn mở đầu.
+  CharacterLayerLoader? _loaderFor(CharacterProfile profile) =>
+      profile.gender == 'girl' ? null : placeholderLayerLoader;
 }
 
 /// Một nút khu: biểu tượng SVG, tên khu, nhãn trạng thái chặng hôm nay.
@@ -206,35 +295,57 @@ class _AreaButton extends StatelessWidget {
         // + nhãn trạng thái giữ chiều cao cố định, icon co theo chỗ
         // còn lại nên không bao giờ tràn — ở màn 640x320 icon còn
         // ~40 dp, ở màn lớn cũng không phình vô hạn vì nút cao hữu hạn.
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: SvgPicture.asset(area.asset),
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              area.name,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: chipColor,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                label,
-                style: const TextStyle(fontSize: 16, color: Colors.white),
-              ),
-            ),
-          ],
+        // Màn thấp (nút cao < 120 dp, vd 608x248): tên + nhãn cố định
+        // đã 91 dp mà nút chỉ còn 85 dp nên tràn 6 px — lúc này co
+        // gọn (tên 16, khe 4) để vừa; ở cỡ thường vẫn 18/6 như cũ
+        // nên golden không đổi.
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = constraints.maxHeight < 120;
+            final gap = compact ? 4.0 : 6.0;
+            final nameSize = compact ? 16.0 : 18.0;
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: SvgPicture.asset(area.asset),
+                  ),
+                ),
+                SizedBox(height: gap),
+                Text(
+                  area.name,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  style: TextStyle(fontSize: nameSize),
+                ),
+                SizedBox(height: gap),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: chipColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  // Nhãn trạng thái không được xuống dòng: ở màn hẹp
+                  // (có cột nhân vật, nút chỉ rộng ~65 dp) "Chưa làm"
+                  // wrap thành 5 dòng cao 92 dp làm nút tràn 79 px.
+                  // `FittedBox` thu chữ lại vừa chiều rộng thay vì
+                  // wrap; khi chạy app (font Nunito) vẫn vừa như trước.
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      label,
+                      style: const TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
