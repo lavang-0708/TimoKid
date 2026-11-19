@@ -170,3 +170,14 @@ flutter test test/assets_manifest_test.dart
 ## Nối CI
 
 `.github/workflows/ci.yml` chạy `python3 tools/assets/check_assets.py` và `python3 tools/assets/check_assets_test.py` ngay sau bước "Câu hỏi mẫu (check.py)" (Claude thêm ngày 19/11). Test Dart `app/test/assets_manifest_test.dart` giữ làm kiểm tra dự phòng khi chạy `flutter test` ở local.
+
+## Bộ nhân vật nữ 1 (Claude ghép, 19/11)
+
+Anh Điệp đã duyệt bản xem trước ngày 19/11. Bộ này cắt nguyên cô bé chính trên `girl_character_sheet` thay cho cách vẽ lại từng lớp (các bản vẽ lại v1–v5 và v3b đều chưa đạt phong cách).
+
+- Khung 1024 x 1536. Cô bé đặt theo tỉ lệ 1300/678: đỉnh nơ y = 100, gót y ≈ 1400, tâm ngang x = 512. Mốc mắt/miệng cũ không áp dụng cho bộ này.
+- `girl_body_01`: cả cô bé, màu thật, `recolorable: false`. Đã có sẵn mắt, miệng, tất, giày và bộ đồ gốc (váy hầu gái hồng). Khi dùng thân này thì **không** vẽ thêm lớp `eyes`/`mouth`/`shoes`.
+- `girl_hair_front_01`: tóc xám đặt đúng chỗ tóc trên thân, app nhân màu để đổi màu tóc. Lớp tóc trước nằm trên váy (z 7), nên đuôi tóc phủ lên mép váy rộng, nhìn tự nhiên. Màu gốc gần với nhân (255, 180, 150).
+- `girl_hair_back_01`: để trống (trong suốt), chỉ để đủ bộ `girl_hair_01`.
+- `girl_top_01` (váy hồng), `girl_top_02` (váy tím): cắt từ tấm concept, kéo giãn riêng phần chân váy để phủ kín bộ đồ gốc. Tay áo trắng dài của bộ gốc vẫn lộ ra như áo sơ mi mặc trong váy, đây là chủ ý.
+- Không chọn váy nào thì cô bé mặc bộ đồ gốc.
