@@ -27,7 +27,7 @@ python3 tools/question_bank/check.py
 
 ## Quy trình làm việc
 
-Mỗi nhiệm vụ trong `docs/PLAN.md` (mã `T1-01` đến `T5-06`) đi qua đúng một pull request. Không đẩy thẳng lên `main`. Muse viết code, Claude review thay anh Điệp, anh Điệp bấm merge và cài thử APK trên máy thật.
+Mỗi nhiệm vụ trong `docs/PLAN.md` (mã `T1-01` đến `T5-06`) đi qua đúng một pull request. Không đẩy thẳng lên `main`. Muse viết code, Claude review thay chủ dự án, chủ dự án bấm merge và cài thử APK trên máy thật.
 
 ## Bí mật
 

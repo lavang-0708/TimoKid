@@ -5,7 +5,7 @@ thứ tự chồng, khung, cách đặt tên, cách đổi màu. Người cắt/
 theo đúng tài liệu này; script `tools/assets/check_assets.py` kiểm tra
 tự động theo cùng các quy tắc (và chạy trong CI).
 
-Nguồn hình chính là các tấm trong `assets/concept/` (anh Điệp chốt
+Nguồn hình chính là các tấm trong `assets/concept/` (chủ dự án chốt
 18/11, PLAN điểm (k)): tách nền, cắt từng món, sửa lỗi theo bảng trong
 `assets/concept/README.md`. Món thiếu hoặc hỏng thì vẽ bổ sung cùng
 phong cách pastel mềm, viền trắng kiểu sticker. Chi tiết quy cách vẽ
@@ -140,7 +140,7 @@ Mã (`id`) của mỗi mục **trùng với tên file** (không tính đuôi):
 ## Đường đưa ảnh lên repo
 
 Muse không đẩy được file nhị phân qua GitHub MCP. Ảnh PNG đưa lên
-bằng đường vòng base64 (anh Điệp chốt 19/11):
+bằng đường vòng base64 (chủ dự án chốt 19/11):
 
 1. Muse đẩy mỗi ảnh thành file text `app/assets/_incoming/
    <đường dẫn đích>.b64` (nội dung chỉ một chuỗi base64 của PNG),
@@ -148,7 +148,7 @@ bằng đường vòng base64 (anh Điệp chốt 19/11):
 2. Claude chạy `python3 tools/assets/decode_incoming.py` trên nhánh
    PR: script giải mã thành PNG đúng đường dẫn, xóa file `.b64` và
    commit lên cùng nhánh.
-3. Ảnh xem trước gửi qua chat cho Claude và anh Điệp duyệt mắt
+3. Ảnh xem trước gửi qua chat cho Claude và chủ dự án duyệt mắt
    trước khi đẩy cả bộ.
 
 Thư mục `app/assets/_incoming/` không nằm trong diện kiểm tra của
@@ -173,7 +173,7 @@ flutter test test/assets_manifest_test.dart
 
 ## Bộ nhân vật nữ 1 (Claude ghép, 19/11)
 
-Anh Điệp đã duyệt bản xem trước ngày 19/11. Bộ này cắt nguyên cô bé chính trên `girl_character_sheet` thay cho cách vẽ lại từng lớp (các bản vẽ lại v1–v5 và v3b đều chưa đạt phong cách).
+Chủ dự án đã duyệt bản xem trước ngày 19/11. Bộ này cắt nguyên cô bé chính trên `girl_character_sheet` thay cho cách vẽ lại từng lớp (các bản vẽ lại v1–v5 và v3b đều chưa đạt phong cách).
 
 - Khung 1024 x 1536. Cô bé đặt theo tỉ lệ 1300/678: đỉnh nơ y = 100, gót y ≈ 1400, tâm ngang x = 512. Mốc mắt/miệng cũ không áp dụng cho bộ này.
 - `girl_body_01`: cả cô bé, màu thật, `recolorable: false`. Đã có sẵn mắt, miệng, tất, giày và bộ đồ gốc (váy hầu gái hồng). Khi dùng thân này thì **không** vẽ thêm lớp `eyes`/`mouth`/`shoes`.

@@ -872,7 +872,7 @@ class _SlideUpBanner extends StatelessWidget {
   }
 }
 
-/// Băng phản hồi đúng (mẫu đã chốt với anh Điệp, PLAN điểm (m)): bo
+/// Băng phản hồi đúng (mẫu đã chốt với chủ dự án, PLAN điểm (m)): bo
 /// tròn, nền xanh nhạt, viền xanh dày 3, bóng dưới, dấu tích tròn bên
 /// trái, số xu trong ô vàng có hình đồng xu, kèm nút Tiếp. Đúng liền
 /// 3 câu thì thêm dòng "N câu liền!".

@@ -1,8 +1,8 @@
 # Giao việc cho Muse: nhân vật nữ bản 3 (vẽ lại theo khuôn)
 
-> **Đã thay thế (19/11):** Muse vẽ lại chưa đạt, anh Điệp chọn bộ Claude cắt từ tấm concept. Xem `docs/ASSETS.md` mục "Bộ nhân vật nữ 1".
+> **Đã thay thế (19/11):** Muse vẽ lại chưa đạt, chủ dự án chọn bộ Claude cắt từ tấm concept. Xem `docs/ASSETS.md` mục "Bộ nhân vật nữ 1".
 
-Anh Điệp đã chốt hướng này ngày 19/11. Claude giao, Muse vẽ.
+Chủ dự án đã chốt hướng này ngày 19/11. Claude giao, Muse vẽ.
 
 ## Mục tiêu
 

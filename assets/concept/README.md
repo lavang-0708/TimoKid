@@ -1,6 +1,6 @@
 # Tấm phác ý tưởng (concept sheets)
 
-Các tấm này vẽ bằng công cụ AI. **Từ 18/11/2026 anh Điệp chốt: đây là nguồn hình chính của app**, không còn chỉ để tham khảo.
+Các tấm này vẽ bằng công cụ AI. **Từ 18/11/2026 chủ dự án chốt: đây là nguồn hình chính của app**, không còn chỉ để tham khảo.
 
 Cách dùng:
 

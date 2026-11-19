@@ -1,6 +1,6 @@
 /// Unit test tương phản cho T1-15 (PLAN điểm (m)): mọi chữ chính trên
 /// màn làm toán đạt tối thiểu 4,5:1 (WCAG AA). Dòng tiếng Anh là chữ
-/// phụ theo mẫu đã chốt với anh Điệp, tối thiểu 3:1.
+/// phụ theo mẫu đã chốt với chủ dự án, tối thiểu 3:1.
 library;
 
 import 'dart:math' as math;

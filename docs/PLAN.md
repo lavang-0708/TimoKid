@@ -2,7 +2,7 @@
 
 > Bản markdown của kế hoạch, xuất ngày 2026-11-17. Claude cập nhật file này khi kế hoạch thay đổi.
 
-Muse viết code, Claude ra yêu cầu và review thay anh Điệp, anh Điệp duyệt các quyết định và cài thử trên máy thật. Kế hoạch này đi kèm `docs/DESIGN.md`. Khi hai tài liệu lệch nhau, bản thiết kế là chuẩn về sản phẩm, kế hoạch này là chuẩn về cách làm.
+Muse viết code, Claude ra yêu cầu và review thay chủ dự án, chủ dự án duyệt các quyết định và cài thử trên máy thật. Kế hoạch này đi kèm `docs/DESIGN.md`. Khi hai tài liệu lệch nhau, bản thiết kế là chuẩn về sản phẩm, kế hoạch này là chuẩn về cách làm.
 
 ## Vai trò và quy trình
 
@@ -10,15 +10,15 @@ Mỗi nhiệm vụ trong kế hoạch có một mã (ví dụ `T1-05`) và đi q
 
 | Ai | Làm gì |
 | --- | --- |
-| Anh Điệp | Duyệt quyết định sản phẩm, cài APK lên máy thật cho bé chơi thử, cấp tài khoản và bí mật (keystore, Neon, Cloudflare) |
-| Claude | Viết yêu cầu cho từng nhiệm vụ, review pull request theo tiêu chí nghiệm thu, kiểm tra bằng chứng chạy thật, merge pull request đạt (anh Điệp giao từ 17/11), báo anh Điệp tiến độ |
+| Chủ dự án | Duyệt quyết định sản phẩm, cài APK lên máy thật cho bé chơi thử, cấp tài khoản và bí mật (keystore, Neon, Cloudflare) |
+| Claude | Viết yêu cầu cho từng nhiệm vụ, review pull request theo tiêu chí nghiệm thu, kiểm tra bằng chứng chạy thật, merge pull request đạt (chủ dự án giao từ 17/11), báo chủ dự án tiến độ |
 | Muse | Viết code, test và tài liệu theo yêu cầu, mở pull request, sửa theo review |
 
 ### Vòng làm một nhiệm vụ
 
 1. Claude gửi Muse yêu cầu: mã nhiệm vụ, phạm vi, tiêu chí nghiệm thu, những gì không được làm.
 2. Muse tạo nhánh `task/T1-05-ten-ngan`, làm việc, mở pull request theo mẫu bên dưới.
-3. Claude review: đọc code, đối chiếu tiêu chí, xem log CI và ảnh chụp màn hình. Kết luận một trong ba: Đạt, Cần sửa (kèm danh sách cụ thể), hoặc Cần anh Điệp quyết.
+3. Claude review: đọc code, đối chiếu tiêu chí, xem log CI và ảnh chụp màn hình. Kết luận một trong ba: Đạt, Cần sửa (kèm danh sách cụ thể), hoặc Cần chủ dự án quyết.
 4. Khi Đạt, Claude merge (squash). Mỗi bản 0.x xong thì gắn tag, CI phát hành APK.
 
 ### Mẫu mô tả pull request
@@ -51,11 +51,11 @@ Các điểm dưới đây ghi đè mọi chỗ nói khác trong kế hoạch.
 | e | Bảng dữ liệu | T1-04 tạo 7 bảng như ghi. `inventory` tạo ở T2-05, `pets` ở T2-07 (bằng migration). `families`, `messages`, `custom_questions`, `content_packs` thuộc bản 0.3 và 0.5. Ngoại lệ cột: `children` không có `child_id` (có `family_id` để trống tới bản 0.3); `settings` có `child_id` để trống cho cài đặt chung. |
 | f | Định nghĩa "đúng" và cửa sổ 10 câu | "Đúng" cho lên bậc, xuống bậc và thành thạo luôn là đúng ngay lần đầu. Xuống bậc khi số câu đúng ngay lần đầu dưới 5 trong 10. Giữ quy tắc tính lại từ 10 câu mới sau mỗi lần đổi bậc. |
 | g | Đề ngày: thiếu dạng và câu ôn tập | Thiếu dạng thì được lặp, ưu tiên lặp dạng ít gặp nhất trong 7 ngày gần đây. Câu 4 (ôn tập) dùng bậc đã lưu trong `review_queue`. Nếu dạng ôn tập trùng dạng đã có trong chặng thì giữ câu ôn tập, đổi dạng của câu kia. |
-| h | CI và phát hành | Integration test trên máy ảo tách ra workflow riêng, chạy cho pull request có thay đổi trong `app/lib/**` phần giao diện hoặc khi gắn nhãn `ui`, ngân sách 25 phút. Workflow chính (analyze, test, build APK debug) giữ dưới 15 phút. Tag phát hành do Muse tạo sau khi Claude kết luận Đạt cho nhiệm vụ nghiệm thu. Phần ký APK của T1-03 chờ anh Điệp nạp keystore; các phần khác của T1-03 làm trước. |
+| h | CI và phát hành | Integration test trên máy ảo tách ra workflow riêng, chạy cho pull request có thay đổi trong `app/lib/**` phần giao diện hoặc khi gắn nhãn `ui`, ngân sách 25 phút. Workflow chính (analyze, test, build APK debug) giữ dưới 15 phút. Tag phát hành do Muse tạo sau khi Claude kết luận Đạt cho nhiệm vụ nghiệm thu. Phần ký APK của T1-03 chờ chủ dự án nạp keystore; các phần khác của T1-03 làm trước. |
 | i | Điểm nhỏ | Nghiệm thu T1-01 là log chạy tay `check.py`. Menu QA mở bằng nhấn giữ 5 giây ở góc trên bên trái. `Clock` trả ngày theo múi giờ Asia/Ho_Chi_Minh. Bản 0.1 mở app vào thẳng màn Thị trấn tạm với bé mặc định. |
 | j | Môi trường build | Muse được cài Flutter SDK trong workspace của mình để chạy `flutter create`, `analyze`, unit test và widget test. Build APK và test máy ảo chạy trên GitHub Actions. |
 | k | Nguồn hình (chốt 18/11) | Các tấm trong `assets/concept/` là nguồn hình chính: tách nền, cắt từng món, sửa lỗi theo bảng trong `assets/concept/README.md`. Món thiếu hoặc hỏng thì Muse vẽ bổ sung cùng phong cách pastel viền trắng sticker. Áp dụng từ T1-12 (icon app, nền Thị trấn, biểu tượng nút) và cả bản 0.2. |
-| l | Màn làm toán sau khi anh Điệp dùng thử v0.0.1 (chốt 18/11) | (1) Đề luôn hiện song ngữ: dòng trên tiếng Việt chữ to, dòng dưới tiếng Anh chữ nhỏ hơn, màu nhạt hơn; bỏ nút đổi EN. Gợi ý và lời giải cũng hiện song ngữ theo cùng cách. Nút xem từ khóa giữ nguyên. (2) Hai cột cân nhau: khối đề (cột trái) và khối đáp án (cột phải) cùng căn giữa theo chiều dọc trong vùng dưới thanh trên, không để đề dính góc trên trái còn đáp án lệch xuống góc dưới phải. Gợi ý, lời giải nằm ngay dưới đề trong cột trái; nút Tiếp nằm dưới đáp án trong cột phải. |
+| l | Màn làm toán sau khi chủ dự án dùng thử v0.0.1 (chốt 18/11) | (1) Đề luôn hiện song ngữ: dòng trên tiếng Việt chữ to, dòng dưới tiếng Anh chữ nhỏ hơn, màu nhạt hơn; bỏ nút đổi EN. Gợi ý và lời giải cũng hiện song ngữ theo cùng cách. Nút xem từ khóa giữ nguyên. (2) Hai cột cân nhau: khối đề (cột trái) và khối đáp án (cột phải) cùng căn giữa theo chiều dọc trong vùng dưới thanh trên, không để đề dính góc trên trái còn đáp án lệch xuống góc dưới phải. Gợi ý, lời giải nằm ngay dưới đề trong cột trái; nút Tiếp nằm dưới đáp án trong cột phải. |
 | m | Màn làm toán sinh động (chốt 18/11, tham khảo Duolingo và iSmart) | Âm thanh: đúng phát `correct.wav` ("ting"), sai phát `wrong.wav` ("è" nhẹ), xu phát `coin.wav`, xong chặng phát `stage_complete.wav` (có sẵn trong `app/assets/sounds/`), tắt được theo `sound_enabled`. Giao diện: thanh tiến độ 5 ô ở trên thay chữ "Câu 1/5"; nền theo khu, mỗi mảng một màu pastel kèm họa tiết nhẹ (SVG); đề nằm trong thẻ trắng bo tròn có bóng; nút đáp án to kiểu nổi (viền dưới đậm, nhấn thì lún xuống); kết quả hiện bằng băng trượt lên từ đáy màn: xanh "Đúng rồi! +2 xu" kèm nút Tiếp (băng bo tròn, nền xanh nhạt `#E3F7E6`, viền xanh `#43A047` dày 3, bóng dưới, biểu tượng dấu tích tròn bên trái, số xu trong ô vàng có hình đồng xu; nút đáp án đúng chuyển xanh; xem `docs/preview_font_mau.png`), cam nhạt "Gần đúng rồi, xem gợi ý nhé" khi sai lần đầu (không dùng đỏ gắt); xu bay về góc ví; đúng liền 3 câu hiện "3 câu liền!". Có một pet hoặc nhân vật nhỏ ở góc phản ứng vui khi đúng, động viên khi sai (lấy từ tấm concept pet). Hiệu ứng ngắn dưới 1 giây, không chặn thao tác. Phông chữ: dùng Nunito có sẵn trong `app/assets/fonts/` cho toàn app (khai báo trong pubspec, đặt làm `fontFamily` của theme). Tương phản: chữ đề màu tím đậm `#3B2E5A` trên thẻ trắng, dòng tiếng Anh `#8A7FA6`, số trên nút `#4B2E83`, nền màn và nền thẻ phải khác hẳn nhau (ảnh mẫu `docs/preview_font_mau.png`); mọi chữ chính đạt tương phản tối thiểu 4,5:1. |
 
 ## Quy ước kỹ thuật
@@ -125,8 +125,8 @@ Kết quả của bản 0.1 là một file APK bé cài được, làm đề ng�
 
 ### T1-03 CI và phát hành APK
 
-- **Làm:** các workflow như bảng CI. Workflow release đọc keystore từ GitHub Secrets (`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`). Kèm script và hướng dẫn để anh Điệp tự tạo keystore trên máy mình; keystore không bao giờ nằm trong repo.
-- **Nghiệm thu:** pull request thử có APK debug tải về được. Gắn tag thử `v0.0.1` tạo Release có APK đã ký (sau khi anh Điệp nạp secrets).
+- **Làm:** các workflow như bảng CI. Workflow release đọc keystore từ GitHub Secrets (`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`). Kèm script và hướng dẫn để chủ dự án tự tạo keystore trên máy mình; keystore không bao giờ nằm trong repo.
+- **Nghiệm thu:** pull request thử có APK debug tải về được. Gắn tag thử `v0.0.1` tạo Release có APK đã ký (sau khi chủ dự án nạp secrets).
 
 ### T1-04 Cơ sở dữ liệu trên máy
 
@@ -181,11 +181,11 @@ Kết quả của bản 0.1 là một file APK bé cài được, làm đề ng�
 ### T1-14 Nghiệm thu và phát hành v0.1.0
 
 - **Làm:** kiểm tra toàn bộ bản 0.1 trên máy ảo, sửa lỗi, cập nhật tài liệu, gắn tag `v0.1.0`.
-- **Nghiệm thu:** APK release cài trên máy thật của anh Điệp, bé làm trọn một đề ngày không gặp lỗi. Sau đó bé chơi khoảng một tuần; anh Điệp ghi lại nhận xét (đề có quá dài không, bé có đọc lời giải không) để chỉnh trước bản 0.2.
+- **Nghiệm thu:** APK release cài trên máy thật của chủ dự án, bé làm trọn một đề ngày không gặp lỗi. Sau đó bé chơi khoảng một tuần; chủ dự án ghi lại nhận xét (đề có quá dài không, bé có đọc lời giải không) để chỉnh trước bản 0.2.
 
 ## Bản 0.2: lõi game
 
-Kết quả của bản 0.2 là bé tạo nhân vật, ấp trứng, có phòng riêng, mua đồ và thay đồ bằng xu kiếm từ đề ngày. Bắt đầu sau khi bé đã chơi thử bản 0.1 và anh Điệp chốt các chỉnh sửa. **Cập nhật 19/11: anh Điệp chốt làm song song**, bắt đầu T2-01, T2-02 ngay sau T1-15, không chờ bé chơi thử bản 0.1; anh xem một thể khi có nhân vật, trứng pet và cửa hàng chạy được. Hình dùng bộ tạm từ các tấm phác ý tưởng (trứng, pet, phòng) cho đến khi có hình thật.
+Kết quả của bản 0.2 là bé tạo nhân vật, ấp trứng, có phòng riêng, mua đồ và thay đồ bằng xu kiếm từ đề ngày. Bắt đầu sau khi bé đã chơi thử bản 0.1 và chủ dự án chốt các chỉnh sửa. **Cập nhật 19/11: chủ dự án chốt làm song song**, bắt đầu T2-01, T2-02 ngay sau T1-15, không chờ bé chơi thử bản 0.1; anh xem một thể khi có nhân vật, trứng pet và cửa hàng chạy được. Hình dùng bộ tạm từ các tấm phác ý tưởng (trứng, pet, phòng) cho đến khi có hình thật.
 
 ### T2-01 Quy trình nạp hình
 
@@ -225,7 +225,7 @@ Kết quả của bản 0.2 là bé tạo nhân vật, ấp trứng, có phòng 
 ### T2-08 Âm thanh và hiệu ứng
 
 - **Làm:** âm thanh ngắn cho bấm nút, trả lời đúng, sai, nhận xu, nở trứng; nhạc nền nhẹ. Nút nảy khi bấm, sao bay khi nhận xu, pháo giấy khi xong đề ngày. Âm thanh lấy từ nguồn giấy phép CC0, ghi nguồn trong `docs/ASSETS.md`. Bật tắt âm thanh và nhạc riêng.
-- **Nghiệm thu:** anh Điệp hoặc bé xác nhận trên máy thật; app không giật khi có hiệu ứng.
+- **Nghiệm thu:** chủ dự án hoặc bé xác nhận trên máy thật; app không giật khi có hiệu ứng.
 
 ### T2-09 Nghiệm thu và phát hành v0.2.0
 
@@ -234,7 +234,7 @@ Kết quả của bản 0.2 là bé tạo nhân vật, ấp trứng, có phòng 
 
 ## Bản 0.3: đồng bộ và web admin
 
-Kết quả của bản 0.3 là anh Điệp xem được tiến độ của từng bé và gửi thư, quà từ một trang web, còn app vẫn chạy được khi không có mạng. Toàn bộ nằm trong gói miễn phí của Neon và Cloudflare. Trước khi làm, Muse đọc tài liệu hiện hành của Neon Auth và Data API và viết một trang thiết kế ngắn `docs/SYNC.md` để Claude duyệt.
+Kết quả của bản 0.3 là chủ dự án xem được tiến độ của từng bé và gửi thư, quà từ một trang web, còn app vẫn chạy được khi không có mạng. Toàn bộ nằm trong gói miễn phí của Neon và Cloudflare. Trước khi làm, Muse đọc tài liệu hiện hành của Neon Auth và Data API và viết một trang thiết kế ngắn `docs/SYNC.md` để Claude duyệt.
 
 ### T3-01 Thiết kế đồng bộ
 
@@ -243,7 +243,7 @@ Kết quả của bản 0.3 là anh Điệp xem được tiến độ của từ
 
 ### T3-02 Neon project và schema
 
-- **Làm:** project Neon riêng tên `timokid`, tách hẳn khỏi FB_Predict. Migration SQL trong repo (`db/migrations/`), bật RLS cho mọi bảng, bật Data API và Neon Auth. Anh Điệp hoặc Claude tạo project theo hướng dẫn của Muse; Muse không cần quyền quản trị Neon.
+- **Làm:** project Neon riêng tên `timokid`, tách hẳn khỏi FB_Predict. Migration SQL trong repo (`db/migrations/`), bật RLS cho mọi bảng, bật Data API và Neon Auth. Chủ dự án hoặc Claude tạo project theo hướng dẫn của Muse; Muse không cần quyền quản trị Neon.
 - **Nghiệm thu:** test SQL chứng minh tài khoản gia đình A không đọc, không ghi được dữ liệu gia đình B.
 
 ### T3-03 Đăng nhập và nhiều bé trong app
@@ -258,7 +258,7 @@ Kết quả của bản 0.3 là anh Điệp xem được tiến độ của từ
 
 ### T3-05 Web admin
 
-- **Làm:** trang tĩnh trong `admin/`, đăng nhập cùng tài khoản với app. Các khu vực: Thống kê (chọn bé; số câu, tỉ lệ đúng theo 5 mảng, bậc hiện tại, thời gian học mỗi ngày, số ngày xong đề), Dạng bài (thành thạo, đang yếu, trong sổ ôn tập), Thư và quà, Cài đặt (hồ sơ bé, lớp, mức thưởng, khóa kiểu trả lời theo bé). Hiện thời điểm đồng bộ gần nhất. Dùng tốt trên điện thoại của anh Điệp.
+- **Làm:** trang tĩnh trong `admin/`, đăng nhập cùng tài khoản với app. Các khu vực: Thống kê (chọn bé; số câu, tỉ lệ đúng theo 5 mảng, bậc hiện tại, thời gian học mỗi ngày, số ngày xong đề), Dạng bài (thành thạo, đang yếu, trong sổ ôn tập), Thư và quà, Cài đặt (hồ sơ bé, lớp, mức thưởng, khóa kiểu trả lời theo bé). Hiện thời điểm đồng bộ gần nhất. Dùng tốt trên điện thoại của chủ dự án.
 - **Nghiệm thu:** ảnh chụp mỗi khu vực với dữ liệu thật từ máy thử, trên màn hình điện thoại và máy tính.
 
 ### T3-06 Thư và quà từ bố
@@ -269,7 +269,7 @@ Kết quả của bản 0.3 là anh Điệp xem được tiến độ của từ
 ### T3-07 Triển khai và phát hành v0.3.0
 
 - **Làm:** web admin deploy tự động lên Cloudflare Pages khi merge vào `main`. Cấu hình (URL Data API, khóa công khai) nằm trong biến môi trường, không có khóa bí mật nào trong trang tĩnh. Phát hành APK v0.3.0.
-- **Nghiệm thu:** sau một tuần dùng thật, Claude kiểm tra mức dùng compute, dung lượng và egress trên Neon, báo anh Điệp.
+- **Nghiệm thu:** sau một tuần dùng thật, Claude kiểm tra mức dùng compute, dung lượng và egress trên Neon, báo chủ dự án.
 
 ## Bản 0.4 và 0.5
 
@@ -322,7 +322,7 @@ Một nhiệm vụ chỉ được tính là Xong khi đủ bốn điều kiện:
 
 `HANDOVER.md` là file đầu tiên một phiên làm việc mới của Muse hoặc Claude phải đọc, nên luôn phản ánh đúng trạng thái nhánh `main` và các pull request đang mở. Không làm lại việc đã xong; tiếp tục từ trạng thái thật của repo.
 
-## Việc cần anh Điệp
+## Việc cần chủ dự án
 
 Những việc này cần tài khoản hoặc quyết định của anh, Muse và Claude không tự làm được.
 
