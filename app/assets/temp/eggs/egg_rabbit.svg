@@ -1,0 +1,11 @@
+<!-- HÌNH TẠM (T2-03): trứng Thỏ Bánh Bao vẽ đơn giản bằng SVG để
+  chọn trứng ở màn mở đầu. Hình thật (cắt từ tấm concept, 512x512)
+  về sẽ thay file này; màu theo bảng màu v1: kem + chấm hồng. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240">
+  <ellipse cx="100" cy="125" rx="72" ry="92" fill="#FFF3DC" stroke="#F2A7B8" stroke-width="4"/>
+  <circle cx="75" cy="100" r="10" fill="#F2A7B8"/>
+  <circle cx="125" cy="115" r="12" fill="#F2A7B8"/>
+  <circle cx="85" cy="150" r="9" fill="#F2A7B8"/>
+  <circle cx="120" cy="170" r="10" fill="#F2A7B8"/>
+  <ellipse cx="70" cy="70" rx="18" ry="26" fill="#FFFFFF" opacity="0.45" transform="rotate(-20 70 70)"/>
+</svg>

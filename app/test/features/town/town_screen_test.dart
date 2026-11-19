@@ -12,9 +12,12 @@ import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/core/database/models.dart';
 import 'package:timokid/core/database/tables.dart';
 import 'package:timokid/core/time/clock.dart';
+import 'package:timokid/features/character/character_view.dart';
 import 'package:timokid/features/daily_set/daily_set_service.dart';
 import 'package:timokid/features/ladder/ladder_service.dart';
 import 'package:timokid/features/math/math_screen.dart';
+import 'package:timokid/features/onboarding/onboarding_model.dart';
+import 'package:timokid/features/onboarding/onboarding_service.dart';
 import 'package:timokid/features/stage_result/stage_result_screen.dart';
 import 'package:timokid/features/town/town_screen.dart';
 
@@ -217,5 +220,62 @@ void main() {
       expect(find.byKey(Key('town-stage-$i-button')), findsOneWidget);
     }
     expect(find.text('45 xu'), findsOneWidget);
+  });
+
+  testWidgets('chưa có hồ sơ thì không hiện nhân vật', (tester) async {
+    await pumpTown(tester);
+
+    expect(find.byKey(const Key('town-character')), findsNothing);
+    expect(find.byKey(const Key('town-character-name')), findsNothing);
+  });
+
+  testWidgets('đã tạo nhân vật nữ thì hiện đúng nhân vật + tên (640x320)', (
+    tester,
+  ) async {
+    await OnboardingService(db: db).completeOnboarding(
+      childId: childId,
+      profile: CharacterProfile.defaults().copyWith(
+        hairColor: 0xFFA9715C,
+        dress: 'girl_top_02',
+        name: 'An',
+      ),
+      eggSpecies: 'dog',
+    );
+    await pumpTown(tester, size: const Size(640, 320));
+
+    expect(find.byKey(const Key('town-character')), findsOneWidget);
+    expect(find.text('An'), findsOneWidget);
+    // Đúng bộ nữ 1: tóc sau + thân + váy tím + tóc trước, không
+    // mắt/miệng/giày; dùng hình thật (AssetImage mặc định).
+    final view = tester.widget<CharacterView>(
+      find.byKey(const Key('town-character')),
+    );
+    expect(view.outfit.layers.map((layer) => layer.id).toList(), <String>[
+      'girl_hair_back_01',
+      'girl_body_01',
+      'girl_top_02',
+      'girl_hair_front_01',
+    ]);
+    expect(view.loader, isNull);
+  });
+
+  testWidgets('đã tạo nhân vật nam thì hiện nhân vật tạm', (tester) async {
+    await OnboardingService(db: db).completeOnboarding(
+      childId: childId,
+      profile: CharacterProfile.defaults().copyWith(
+        gender: 'boy',
+        name: 'Bình',
+      ),
+      eggSpecies: 'cat',
+    );
+    await pumpTown(tester);
+
+    expect(find.byKey(const Key('town-character')), findsOneWidget);
+    expect(find.text('Bình'), findsOneWidget);
+    // Nam chưa có hình thật nên dùng lớp tạm xám.
+    final view = tester.widget<CharacterView>(
+      find.byKey(const Key('town-character')),
+    );
+    expect(view.loader, isNotNull);
   });
 }

@@ -88,7 +88,9 @@ void main() {
 
       expect((await db.childrenDao.getAllChildren()).length, 1);
       expect((await db.skillProgressDao.getAllStrandProgress(first)).length, 5);
-      expect((await db.settingsDao.getAllSettings()).length, 3);
+      // 4 cài đặt chung: rewards, sound_enabled, music_enabled +
+      // onboarding_completed (T2-03).
+      expect((await db.settingsDao.getAllSettings()).length, 4);
     });
 
     test('hai lần gọi chồng nhau không tạo trùng settings', () async {
@@ -107,7 +109,7 @@ void main() {
         (await db.skillProgressDao.getAllStrandProgress(results[0])).length,
         5,
       );
-      expect((await db.settingsDao.getAllSettings()).length, 3);
+      expect((await db.settingsDao.getAllSettings()).length, 4);
       // Đọc lại được, không ném lỗi.
       expect(await db.settingsDao.getValue(key: 'rewards'), isNotNull);
     });
@@ -493,7 +495,7 @@ void main() {
         ),
         contains('"easy":2'),
       );
-      expect((await db.settingsDao.getAllSettings()).length, 3);
+      expect((await db.settingsDao.getAllSettings()).length, 4);
 
       await db.settingsDao.deleteSetting(key: 'sound_enabled');
       expect(await db.settingsDao.getValue(key: 'sound_enabled'), isNull);

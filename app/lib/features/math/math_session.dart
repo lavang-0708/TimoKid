@@ -29,6 +29,7 @@ import '../../core/database/daos.dart';
 import '../../core/database/models.dart';
 import '../../core/database/tables.dart' hide AnswerType;
 import '../ladder/ladder_service.dart';
+import '../onboarding/egg_service.dart';
 import '../questions/question.dart';
 import '../questions/question_registry.dart';
 import '../review_book/review_book_service.dart';
@@ -163,6 +164,7 @@ class StageSession extends ChangeNotifier {
          reviewQueueDao: db.reviewQueueDao,
          clock: db.clock,
        ),
+       _eggs = EggService(db: db),
        _rewards =
            rewardService ??
            RewardService(db: db, config: RewardConfig.defaults()),
@@ -174,6 +176,7 @@ class StageSession extends ChangeNotifier {
   final AttemptsDao _attemptsDao;
   final LadderService _ladder;
   final ReviewBookService _reviewBook;
+  final EggService _eggs;
   final RewardService _rewards;
 
   final String childId;
@@ -384,6 +387,11 @@ class StageSession extends ChangeNotifier {
       dailySetId: dailySetId,
       stageIndex: stageIndex,
     );
+    // Nở trứng (T2-03): xong chặng (kể cả chặng tự chọn) mà bé đã
+    // chọn trứng mà trứng chưa nở thì đặt cờ chờ nở — màn Kết quả
+    // chặng sẽ rẽ sang màn nở trứng. Chỉ xảy ra một lần duy nhất
+    // (xem `EggService.noteStageCompleted`).
+    await _eggs.noteStageCompleted(childId);
     if (dailySetId != null) {
       await _db.dailySetsDao.updateStageStatus(
         id: dailySetId!,

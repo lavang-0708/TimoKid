@@ -6,7 +6,8 @@ import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/features/math/math_session.dart';
 import 'package:timokid/main.dart' as app;
 
-/// Integration test: mở app thật trên máy ảo, vào thẳng màn Thị trấn,
+/// Integration test: mở app thật trên máy ảo, đi hết màn mở đầu nữ
+/// (T2-03: giới tính, màu tóc, váy, tên, trứng) rồi vào Thị trấn,
 /// chụp màn hình, rồi đi hết chặng 1 của đề ngày (T1-09): câu đúng
 /// ngay, câu đúng sau gợi ý, câu sai hai lần, câu điền số; chụp màn
 /// hình mỗi trạng thái. Chạy bằng `flutter drive` (xem workflow
@@ -18,18 +19,68 @@ import 'package:timokid/main.dart' as app;
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('mở app vào thẳng màn Thị trấn, làm hết chặng 1', (tester) async {
+  testWidgets('mở đầu nữ, vào Thị trấn, làm hết chặng 1', (tester) async {
     await app.main();
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('town-screen')), findsOneWidget);
-    expect(find.text('Thị trấn Diệu Kỳ'), findsOneWidget);
-
-    // Trên Android phải convert surface trước rồi mới chụp được.
+    // Trên Android phải convert surface trước rồi mới chụp được
+    // (chỉ được gọi một lần cho cả test).
     await binding.convertFlutterSurfaceToImage();
     await tester.pumpAndSettle();
-    final bytes = await binding.takeScreenshot('town');
-    expect(bytes.isNotEmpty, isTrue);
+
+    Future<void> takeShot(String name) async {
+      await tester.pumpAndSettle();
+      final shot = await binding.takeScreenshot(name);
+      expect(shot.isNotEmpty, isTrue);
+    }
+
+    Future<void> tapOnboardingNext() async {
+      await tester.tap(find.byKey(const Key('onboarding-next-button')));
+      await tester.pumpAndSettle();
+    }
+
+    // --- T2-03: màn mở đầu nữ (DB mới: chưa xong mở đầu) ---
+    expect(find.byKey(const Key('onboarding-screen')), findsOneWidget);
+    expect(find.text('Bước 1/5'), findsOneWidget);
+    await takeShot('onboarding-gender');
+
+    await tester.tap(find.byKey(const Key('onboarding-gender-girl')));
+    await tapOnboardingNext();
+    expect(find.text('Bước 2/5'), findsOneWidget);
+    await takeShot('onboarding-hair');
+
+    // Màu tóc giữ mặc định (hồng); sang bước chọn váy.
+    await tapOnboardingNext();
+    expect(find.text('Bước 3/5'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('onboarding-dress-girl_top_02')));
+    await tester.pumpAndSettle();
+    await takeShot('onboarding-dress');
+    await tapOnboardingNext();
+
+    // Bước đặt tên.
+    expect(find.text('Bước 4/5'), findsOneWidget);
+    await tester.enterText(
+      find.byKey(const Key('onboarding-name-field')),
+      'An',
+    );
+    await tester.pumpAndSettle();
+    await takeShot('onboarding-name');
+    await tapOnboardingNext();
+
+    // Bước chọn trứng.
+    expect(find.text('Bước 5/5'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('onboarding-egg-dog')));
+    await tester.pumpAndSettle();
+    await takeShot('onboarding-egg');
+    await tester.tap(find.byKey(const Key('onboarding-finish-button')));
+    await tester.pumpAndSettle();
+
+    // Vào Thị trấn: nhân vật nữ đã tạo đứng ở cột trái.
+    expect(find.byKey(const Key('town-screen')), findsOneWidget);
+    expect(find.text('Thị trấn Diệu Kỳ'), findsOneWidget);
+    expect(find.byKey(const Key('town-character')), findsOneWidget);
+    expect(find.text('An'), findsOneWidget);
+    await takeShot('town');
 
     // --- T1-09: đi hết chặng 1 (mảng logic, bậc 1) ---
     // Nút khu 0 của màn Thị trấn T1-12 (tên key cũ `town-math-button`
@@ -57,13 +108,8 @@ void main() {
         .map(ResolvedQuestion.resolve)
         .toList();
 
-    // Surface đã convert ở trên (chỉ được gọi một lần cho cả test).
-    Future<void> takeShot(String name) async {
-      await tester.pumpAndSettle();
-      final shot = await binding.takeScreenshot(name);
-      expect(shot.isNotEmpty, isTrue);
-    }
-
+    // Surface đã convert ở trên (chỉ được gọi một lần cho cả test);
+    // `takeShot` đã định nghĩa ở đầu test, dùng chung cho cả luồng.
     Future<void> tapCorrect(int qi) async {
       await tester.tap(
         find.byKey(Key('choice-${resolved[qi].correctDisplayIndex}')),
