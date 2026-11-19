@@ -13,8 +13,11 @@
 /// được, khối đề căn giữa dọc), gợi ý/lời giải nằm trong băng ở
 /// DƯỚI thẻ đề trong luồng bố cục (không chồng lên — sửa sau review
 /// PR #14); cột phải là 4 nút trắc nghiệm hoặc ô số + bàn phím,
-/// cộng nút "Tiếp" — không cuộn, cả khối căn giữa dọc. Pet không
-/// che chữ nào ở bất kỳ trạng thái nào (nằm cạnh thanh tiến độ).
+/// cộng nút "Tiếp" — cả khối căn giữa dọc, chỉ cuộn khi màn thấp
+/// quá không vừa (dưới cỡ thiết kế 320 dp; sửa sau review PR #19:
+/// máy ảo CI thấp hơn 320 dp nên cột phải tràn 39 px khi băng xanh
+/// hiện). Pet không che chữ nào ở bất kỳ trạng thái nào (nằm cạnh
+/// thanh tiến độ).
 /// Bố cục xếp dọc 1 cột cũ không vừa điện thoại ngang cao 360 dp (máy
 /// ảo 640x320: nút choice-3 nằm ngoài màn hình).
 ///
@@ -40,6 +43,7 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -614,11 +618,18 @@ class _QuestionColumn extends StatelessWidget {
       flex: 6,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // Băng gợi ý/lời giải cao tối đa 55% cột (120..240 dp).
-          final bannerMaxHeight = (constraints.maxHeight * 0.55).clamp(
-            120.0,
-            240.0,
-          );
+          // Băng gợi ý/lời giải cao tối đa 55% cột (tối đa 240 dp),
+          // và luôn chừa chỗ cho hàng tiến độ + pet (60 dp) ở trên:
+          // ở màn thấp (máy ảo CI dưới 320 dp) mức tối thiểu 120 dp
+          // cũ làm băng + hàng trên vượt chiều cao cột nên tràn, đồng
+          // thời thẻ đề bị `minHeight` âm. Băng tự cuộn trong khi
+          // nội dung dài (xem [_InfoBanner]) nên thu hẹp vẫn đọc được.
+          final bannerMaxHeight = math
+              .min(
+                constraints.maxHeight * 0.55,
+                math.max(0.0, constraints.maxHeight - 60.0),
+              )
+              .clamp(0.0, 240.0);
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -649,7 +660,14 @@ class _QuestionColumn extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
-                          minHeight: innerConstraints.maxHeight - 22,
+                          // Màn thấp: chỗ còn lại cho thẻ đề có thể
+                          // nhỏ hơn 22 dp (thậm chí 0 khi băng gợi
+                          // ý/lời giải chiếm gần hết cột) — kẹp về 0
+                          // để không ném lỗi `BoxConstraints` âm.
+                          minHeight: math.max(
+                            0.0,
+                            innerConstraints.maxHeight - 22,
+                          ),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -776,43 +794,56 @@ class _AnswerColumn extends StatelessWidget {
             final available = constraints.maxHeight - nextSpace;
             // 2 hàng nút trắc nghiệm + khe 12 dp + viền nổi 4 dp/hàng.
             final choiceHeight = ((available - 12) / 2 - 4).clamp(48.0, 64.0);
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                question.displayType == AnswerType.choice
-                    ? _ChoiceAnswers(
-                        session: session,
-                        question: question,
-                        buttonHeight: choiceHeight,
-                        onCorrect: onCorrect,
-                        onWrong: onWrong,
-                      )
-                    : _NumberPad(
-                        session: session,
-                        onCorrect: onCorrect,
-                        onWrong: onWrong,
-                        availableHeight: available,
-                      ),
-                if (showInlineNext) ...[
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 56,
-                    child: ElevatedButton(
-                      key: const Key('math-next-button'),
-                      onPressed: () => session.next(),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          session.isLastQuestion ? 'Xem kết quả' : 'Tiếp',
-                          softWrap: false,
-                          style: const TextStyle(fontSize: 22),
+            // Màn thấp (máy ảo CI dưới 320 dp): khi băng xanh hiện,
+            // phần chừa 112 dp cho băng làm cột phải chỉ còn ~56 dp
+            // mà 2 hàng nút trắc nghiệm cần tối thiểu 116 dp nên tràn
+            // 39–60 px. Bọc cuộn để không tràn: vừa thì
+            // `ConstrainedBox` giữ khối căn giữa dọc như trước, không
+            // vừa thì cuộn (nút Tiếp lúc đúng nằm ở băng xanh ngoài
+            // cột nên luôn bấm được; nút Tiếp lúc xem lời giải và nút
+            // gửi bàn phím thì cuộn tới mới thấy).
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    question.displayType == AnswerType.choice
+                        ? _ChoiceAnswers(
+                            session: session,
+                            question: question,
+                            buttonHeight: choiceHeight,
+                            onCorrect: onCorrect,
+                            onWrong: onWrong,
+                          )
+                        : _NumberPad(
+                            session: session,
+                            onCorrect: onCorrect,
+                            onWrong: onWrong,
+                            availableHeight: available,
+                          ),
+                    if (showInlineNext) ...[
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        height: 56,
+                        child: ElevatedButton(
+                          key: const Key('math-next-button'),
+                          onPressed: () => session.next(),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              session.isLastQuestion ? 'Xem kết quả' : 'Tiếp',
+                              softWrap: false,
+                              style: const TextStyle(fontSize: 22),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ],
-              ],
+                    ],
+                  ],
+                ),
+              ),
             );
           },
         ),
@@ -1470,11 +1501,13 @@ class _ChoiceAnswers extends StatelessWidget {
 /// Chiều cao phím tính theo chỗ còn lại của cột phải ([availableHeight],
 /// đã trừ nút "Tiếp" nếu có): ô số 56 + 4 hàng phím + khe 8 + viền
 /// nổi 4 dp/hàng. Ở màn thấp 320 dp phím còn ~34 dp, ở màn 360 dp
-/// ~44 dp, từ 800 dp trở lên đủ 64 dp. Cột phải không cuộn nên phím
-/// không được cố định 64 dp. Khi câu đã giải quyết xong (đúng/lời
-/// giải) thì ẩn các hàng phím — bàn phím đã vô hiệu, chỉ giữ ô số đã
-/// gõ để bé còn thấy đáp án của mình; nút "Tiếp" ở cột phải lúc này
-/// mới có chỗ.
+/// ~44 dp, từ 800 dp trở lên đủ 64 dp. Phím nhỏ nhất 20 dp (chữ và
+/// icon co theo bằng `FittedBox` trong [_PadKey]) để ở màn ~269 dp
+/// (máy ảo CI) bàn phím vừa đúng, nút gửi vẫn bấm được; dưới nữa thì
+/// cột phải cuộn (xem [_AnswerColumn]). Khi câu đã giải quyết xong
+/// (đúng/lời giải) thì ẩn các hàng phím — bàn phím đã vô hiệu, chỉ giữ
+/// ô số đã gõ để bé còn thấy đáp án của mình; nút "Tiếp" ở cột phải
+/// lúc này mới có chỗ.
 class _NumberPad extends StatelessWidget {
   const _NumberPad({
     required this.session,
@@ -1498,8 +1531,12 @@ class _NumberPad extends StatelessWidget {
         session.state == QuestionState.answering ||
         session.state == QuestionState.hint;
     final resolved = !answering;
+    // Phím nhỏ nhất 20 dp (chữ/icon co theo bằng `FittedBox` trong
+    // [_PadKey]): ở màn ~269 dp (máy ảo CI) bàn phím vừa đúng
+    // 189 dp nên không cần cuộn, nút gửi vẫn bấm được; dưới nữa
+    // thì cột phải cuộn (xem [_AnswerColumn]).
     final keyHeight = ((availableHeight - 56 - 8 - 3 * 8 - 4 * 4) / 4).clamp(
-      30.0,
+      20.0,
       64.0,
     );
     return Column(
@@ -1662,15 +1699,20 @@ class _PadKey extends StatelessWidget {
       backgroundColor: null,
       enabled: enabled,
       onPressed: onPressed,
-      child: icon != null
-          ? Icon(icon, size: 28, color: MathColors.buttonNumber)
-          : Text(
-              label,
-              style: const TextStyle(
-                fontSize: 26,
-                color: MathColors.buttonNumber,
+      // Chữ/icon co lại khi phím thấp (màn thấp): `FittedBox` chỉ
+      // thu nhỏ, không phóng to, nên ở cỡ thiết kế không đổi gì.
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: icon != null
+            ? Icon(icon, size: 28, color: MathColors.buttonNumber)
+            : Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 26,
+                  color: MathColors.buttonNumber,
+                ),
               ),
-            ),
+      ),
     );
   }
 }

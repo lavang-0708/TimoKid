@@ -92,7 +92,9 @@ void main() {
         overrides: [databaseProvider.overrideWithValue(db)],
         child: MaterialApp(
           theme: AppTheme.light,
-          home: const OnboardingScreen(),
+          // Golden giữ nguyên ảnh lớp tạm (không cần file hình thật
+          // ở local); khi chạy app thì xem trước dùng hình thật.
+          home: OnboardingScreen(previewLoader: placeholderLayerLoader),
         ),
       ),
     );

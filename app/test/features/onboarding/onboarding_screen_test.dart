@@ -13,6 +13,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:timokid/core/database/app_database.dart';
 import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/core/router/app_router.dart';
+import 'package:timokid/features/character/placeholder_layers.dart';
 import 'package:timokid/features/onboarding/onboarding_service.dart';
 import 'package:timokid/main.dart';
 
@@ -30,7 +31,14 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [databaseProvider.overrideWithValue(db)],
-        child: TimoKidApp(router: AppRouter.create(showOnboarding: true)),
+        // Xem trước dùng lớp tạm (không có file hình thật ở local);
+        // khi chạy app thì router mặc định dùng hình thật.
+        child: TimoKidApp(
+          router: AppRouter.create(
+            showOnboarding: true,
+            previewLoader: placeholderLayerLoader,
+          ),
+        ),
       ),
     );
     await tester.pumpAndSettle();

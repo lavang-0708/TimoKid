@@ -295,35 +295,57 @@ class _AreaButton extends StatelessWidget {
         // + nhãn trạng thái giữ chiều cao cố định, icon co theo chỗ
         // còn lại nên không bao giờ tràn — ở màn 640x320 icon còn
         // ~40 dp, ở màn lớn cũng không phình vô hạn vì nút cao hữu hạn.
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: SvgPicture.asset(area.asset),
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              area.name,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: chipColor,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                label,
-                style: const TextStyle(fontSize: 16, color: Colors.white),
-              ),
-            ),
-          ],
+        // Màn thấp (nút cao < 120 dp, vd 608x248): tên + nhãn cố định
+        // đã 91 dp mà nút chỉ còn 85 dp nên tràn 6 px — lúc này co
+        // gọn (tên 16, khe 4) để vừa; ở cỡ thường vẫn 18/6 như cũ
+        // nên golden không đổi.
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = constraints.maxHeight < 120;
+            final gap = compact ? 4.0 : 6.0;
+            final nameSize = compact ? 16.0 : 18.0;
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: SvgPicture.asset(area.asset),
+                  ),
+                ),
+                SizedBox(height: gap),
+                Text(
+                  area.name,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  style: TextStyle(fontSize: nameSize),
+                ),
+                SizedBox(height: gap),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: chipColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  // Nhãn trạng thái không được xuống dòng: ở màn hẹp
+                  // (có cột nhân vật, nút chỉ rộng ~65 dp) "Chưa làm"
+                  // wrap thành 5 dòng cao 92 dp làm nút tràn 79 px.
+                  // `FittedBox` thu chữ lại vừa chiều rộng thay vì
+                  // wrap; khi chạy app (font Nunito) vẫn vừa như trước.
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      label,
+                      style: const TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

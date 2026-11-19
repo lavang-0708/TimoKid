@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/character/character_view.dart';
 import '../../features/math/math_screen.dart';
 import '../../features/onboarding/hatch_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
@@ -24,9 +25,13 @@ class AppRouter {
   static final GoRouter router = create();
 
   /// Dựng router với màn đầu theo trạng thái mở đầu/nở trứng.
+  /// [previewLoader] chỉ dùng trong test: bơm loader tạm cho xem
+  /// trước mở đầu (xem [OnboardingScreen.previewLoader]); khi chạy
+  /// app thì null để dùng hình thật.
   static GoRouter create({
     bool showOnboarding = false,
     bool showHatch = false,
+    CharacterLayerLoader? previewLoader,
   }) {
     final initialLocation = showOnboarding
         ? OnboardingScreen.route
@@ -42,7 +47,8 @@ class AppRouter {
         ),
         GoRoute(
           path: OnboardingScreen.route,
-          builder: (context, state) => const OnboardingScreen(),
+          builder: (context, state) =>
+              OnboardingScreen(previewLoader: previewLoader),
         ),
         GoRoute(
           path: HatchScreen.route,

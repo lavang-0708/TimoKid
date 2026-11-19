@@ -1,7 +1,6 @@
 /// Màn mở đầu (T2-03, PLAN + DESIGN "Lần đầu mở app").
 ///
-/// Dáng nữ (bộ nhân vật nữ 1, PR #18 — chưa merge vào main lúc viết
-/// T2-03) chỉ có 5 bước: giới tính, màu tóc, váy, đặt tên, chọn
+/// Dáng nữ (bộ nhân vật nữ 1, PR #18 đã merge) chỉ có 5 bước: giới tính, màu tóc, váy, đặt tên, chọn
 /// trứng. Thân đã có sẵn mắt/miệng/tất/giày/bộ đồ gốc nên KHÔNG có
 /// bước màu da/kiểu mắt/kiểu miệng; kiểu tóc cố định `girl_hair_01`.
 /// Dáng nam chưa có hình thật nên giữ 7 bước cũ với xem trước tạm.
@@ -9,12 +8,13 @@
 /// trừ bước đầu). Lưu một lần ở cuối (xem [OnboardingService]) rồi
 /// vào Thị trấn; tắt app giữa chừng thì lần sau mở lại từ đầu.
 ///
-/// Xem trước nhân vật bằng [CharacterView] với lớp tạm xám
-/// ([placeholderLayerLoader]) — hình thật chưa có trên main, chỉ
-/// hiện đúng màu bé chọn và vị trí các lớp; có nhãn "Hình tạm".
-/// Cách dựng bộ nữ là đúng bộ thật ([CharacterOutfit.girlSet1]:
-/// thân + tóc + váy, không mắt/miệng/giày) nên khi PR #18 merge,
-/// chỉ cần bỏ `loader` ở xem trước để dùng `AssetImage` mặc định.
+/// Xem trước nhân vật bằng [CharacterView]: dáng nữ dùng hình thật
+/// bộ girlSet1 ([CharacterOutfit.girlSet1]: thân + tóc + váy, không
+/// mắt/miệng/giày) qua `AssetImage` mặc định — PR #18 đã merge nên
+/// không còn lớp tạm ở đây; dáng nam chưa có hình thật nên vẫn dùng
+/// lớp tạm xám ([placeholderLayerLoader]) và có nhãn "Hình tạm".
+/// Test bơm loader tạm qua [OnboardingScreen.previewLoader] để
+/// golden cũ vẫn dùng lớp tạm xám (không cần file hình thật ở local).
 /// Tắt animation của [CharacterView] ở đây (thở/chớp mắt lặp vô hạn
 /// làm `pumpAndSettle` trong test không bao giờ dừng); phòng (T2-04)
 /// sẽ bật lại.
@@ -81,9 +81,17 @@ const List<String> _boyStepKeys = <String>[
 ];
 
 class OnboardingScreen extends ConsumerStatefulWidget {
-  const OnboardingScreen({super.key});
+  const OnboardingScreen({super.key, this.previewLoader});
 
   static const String route = '/onboarding';
+
+  /// Bộ nạp lớp cho xem trước nhân vật, chỉ dùng trong test: bơm
+  /// [placeholderLayerLoader] để golden/test cũ vẫn dùng lớp tạm
+  /// xám (không cần file hình thật `girl_body_01.png` ở local).
+  /// Khi chạy app thì để null để [CharacterView] dùng `AssetImage`
+  /// mặc định và tải hình thật bộ girlSet1 từ bundle. Chỉ áp dụng
+  /// cho dáng nữ; dáng nam chưa có hình thật nên luôn dùng lớp tạm.
+  final CharacterLayerLoader? previewLoader;
 
   @override
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -171,6 +179,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
   }
 
+  /// Bộ nạp lớp cho xem trước: nữ dùng `AssetImage` mặc định (hình
+  /// thật bộ girlSet1 đã có từ PR #18) trừ khi test bơm loader tạm
+  /// qua [OnboardingScreen.previewLoader]; nam chưa có hình thật
+  /// nên vẫn dùng lớp tạm xám.
+  CharacterLayerLoader? get _previewLoader =>
+      _draft.gender == 'girl' ? widget.previewLoader : placeholderLayerLoader;
+
   /// Bộ đồ xem trước từ nháp hiện tại.
   ///
   /// Nữ: bộ nhân vật nữ 1 ([CharacterOutfit.girlSet1]) — thân + tóc
@@ -249,15 +264,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             child: CharacterView(
                               key: const Key('onboarding-preview'),
                               outfit: _previewOutfit(),
-                              loader: placeholderLayerLoader,
+                              loader: _previewLoader,
                               // Tắt thở/chớp mắt (xem ghi chú đầu file).
                               animationsEnabled: false,
                             ),
                           ),
-                          const Text(
-                            'Hình tạm',
-                            style: TextStyle(fontSize: 16),
-                          ),
+                          // Nhãn "Hình tạm" chỉ khi xem trước đúng là
+                          // lớp tạm: dáng nam (chưa có hình thật) hoặc
+                          // test đang bơm loader tạm. Dáng nữ khi chạy
+                          // app dùng hình thật nên không có nhãn.
+                          if (_previewLoader != null)
+                            const Text(
+                              'Hình tạm',
+                              style: TextStyle(fontSize: 16),
+                            ),
                         ],
                       ),
                     ),
@@ -268,43 +288,57 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ),
             const SizedBox(height: 8),
+            // Hai nút điều hướng co lại khi màn hẹp (chữ trong nút
+            // thu nhỏ theo, không tràn): nút "Xong — vào Thị trấn" ở
+            // bước trứng dài nên ở màn 608 dp (font DejaVu trong
+            // test) hai nút cộng lại vượt chiều rộng; khi chạy app
+            // (font Nunito) vẫn vừa như trước, không đổi gì.
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (_step > 0)
-                  ElevatedButton.icon(
-                    key: const Key('onboarding-back-button'),
-                    icon: const Text('←', style: TextStyle(fontSize: 24)),
-                    label: const Text(
-                      'Quay lại',
-                      style: TextStyle(fontSize: 20),
+                  Flexible(
+                    child: ElevatedButton.icon(
+                      key: const Key('onboarding-back-button'),
+                      icon: const Text('←', style: TextStyle(fontSize: 24)),
+                      label: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text('Quay lại', style: TextStyle(fontSize: 20)),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(56, 56),
+                      ),
+                      onPressed: _saving ? null : _back,
                     ),
+                  )
+                else
+                  const SizedBox.shrink(),
+                Flexible(
+                  child: ElevatedButton.icon(
+                    key: Key(
+                      _isEggStep
+                          ? 'onboarding-finish-button'
+                          : 'onboarding-next-button',
+                    ),
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        _isEggStep ? 'Xong — vào Thị trấn' : 'Tiếp theo',
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                    ),
+                    icon: _saving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 3),
+                          )
+                        : const Text('→', style: TextStyle(fontSize: 24)),
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(56, 56),
                     ),
-                    onPressed: _saving ? null : _back,
+                    onPressed: (_canContinue && !_saving) ? _next : null,
                   ),
-                const Spacer(),
-                ElevatedButton.icon(
-                  key: Key(
-                    _isEggStep
-                        ? 'onboarding-finish-button'
-                        : 'onboarding-next-button',
-                  ),
-                  label: Text(
-                    _isEggStep ? 'Xong — vào Thị trấn' : 'Tiếp theo',
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  icon: _saving
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 3),
-                        )
-                      : const Text('→', style: TextStyle(fontSize: 24)),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(56, 56),
-                  ),
-                  onPressed: (_canContinue && !_saving) ? _next : null,
                 ),
               ],
             ),
