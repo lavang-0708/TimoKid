@@ -39,6 +39,23 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    // Bỏ focus (đóng bàn phím ảo thật) rồi chờ tới khi viewport hết bị bóp
+    // (Claude, PR #19 vòng 4): `receiveAction(done)` chỉ tới
+    // TestTextInput, không tới IME thật của máy ảo, và
+    // pumpAndSettle không chờ hiệu ứng bàn phím trượt xuống (phía
+    // nền tảng gửi kích thước viewport dần dần). Bấm khi bàn phím
+    // còn đang trượt thì tọa độ lệch, chạm hụt thẻ trứng.
+    Future<void> closeKeyboard() async {
+      FocusManager.instance.primaryFocus?.unfocus();
+      for (var i = 0; i < 30; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+        await tester.pump();
+        if (tester.view.viewInsets.bottom == 0) break;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      await tester.pumpAndSettle();
+    }
+
     // Bấm nút sau khi cuộn nó vào tầm nhìn (vòng 3 review PR #19):
     // bàn phím ảo mở ở bước tên có thể KHÔNG đóng trên máy ảo CI
     // dù app đã unfocus (receiveAction(done) không tới được IME
@@ -84,13 +101,19 @@ void main() {
     // math-next-button. App cũng tự unfocus trong _next/_back.
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
+    await closeKeyboard();
     await takeShot('onboarding-name');
     await tapOnboardingNext();
+    await closeKeyboard();
 
     // Bước chọn trứng.
     expect(find.text('Bước 5/5'), findsOneWidget);
-    await tester.tap(find.byKey(const Key('onboarding-egg-dog')));
-    await tester.pumpAndSettle();
+    await tapVisible(const Key('onboarding-egg-dog'));
+    // Thẻ trứng đã chọn thì nút Xong phải bấm được.
+    final finish = tester.widget<ButtonStyleButton>(
+      find.byKey(const Key('onboarding-finish-button')),
+    );
+    expect(finish.onPressed, isNotNull);
     await takeShot('onboarding-egg');
     await tester.tap(find.byKey(const Key('onboarding-finish-button')));
     await tester.pumpAndSettle();
