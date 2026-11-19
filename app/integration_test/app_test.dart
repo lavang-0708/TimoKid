@@ -64,6 +64,12 @@ void main() {
       'An',
     );
     await tester.pumpAndSettle();
+    // Bấm Done trên bàn phím ảo để đóng bàn phím trước khi sang
+    // bước sau (review PR #19 vòng 2): bàn phím mở mà sang màn
+    // khác thì bóp cột, tapCorrect(1) chạm hụt rồi không có
+    // math-next-button. App cũng tự unfocus trong _next/_back.
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
     await takeShot('onboarding-name');
     await tapOnboardingNext();
 

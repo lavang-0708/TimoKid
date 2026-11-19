@@ -10,6 +10,15 @@
 /// `app_test.dart:168`). Font test DejaVu rộng hơn Nunito thật nên
 /// test này khắt khe hơn máy thật; qua được ở đây thì máy thật vừa.
 ///
+/// Vòng 2 (review PR #19 lần 2): ca bàn phím ảo mở ở bước đặt tên
+/// rồi KHÔNG đóng khi sang bước sau — bóp cả Thị trấn và màn toán,
+/// `tapCorrect(1)` chạm hụt nên không có `math-next-button`;
+/// Column mở đầu (`onboarding_screen.dart:231`) báo RenderFlex
+/// DISPOSED sau khi rời màn. Nhóm 'bàn phím mở ở bước tên' khóa ca
+/// này ở cả 608x248 và 640x320: mở bàn phím ở ô tên (showKeyboard
+/// + viewInsets như máy ảo CI), đi tiếp tới Thị trấn/màn toán/kết
+/// quả chặng, khóa không tràn và focus phải được bỏ khi rời bước tên.
+///
 /// Lưu ý: ở 608x248 vài nút nằm dưới nếp gấp cuộn (nút váy, thẻ
 /// trứng, nút Tiếp lúc xem lời giải, nút gửi bàn phím) nên test dùng
 /// `ensureVisible` trước khi bấm — đó là hành vi đúng của màn cuộn,
@@ -339,5 +348,198 @@ void main() {
       _checkNoError(tester, 'màn kết quả');
       expect(find.byKey(const Key('stage-result-screen')), findsOneWidget);
     });
+  });
+
+  group('bàn phím mở ở bước tên', () {
+    // Ca review PR #19 vòng 2 (xem đầu file): bàn phím ảo mở ở bước
+    // đặt tên rồi không đóng khi sang bước sau — bóp Thị trấn/màn
+    // toán, tapCorrect(1) chạm hụt, Column mở đầu báo DISPOSED.
+    late FakeClock clock;
+    late AppDatabase db;
+    late String childId;
+
+    setUp(() async {
+      clock = FakeClock(DateTime(2026, 11, 18, 8, 0));
+      db = AppDatabase(executor: NativeDatabase.memory(), clock: clock);
+      addTearDown(db.close);
+      childId = await db.ensureSeeded();
+      final service = DailySetService(
+        dailySetsDao: db.dailySetsDao,
+        reviewQueueDao: db.reviewQueueDao,
+        ladderService: LadderService(
+          attemptsDao: db.attemptsDao,
+          skillProgressDao: db.skillProgressDao,
+        ),
+        clock: clock,
+        random: Random(42),
+      );
+      await service.getOrCreateTodaySet(childId: childId);
+    });
+
+    Future<void> runFlow(WidgetTester tester, Size size) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+        tester.view.resetViewInsets();
+      });
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [databaseProvider.overrideWithValue(db)],
+          child: TimoKidApp(
+            router: AppRouter.create(
+              showOnboarding: true,
+              previewLoader: placeholderLayerLoader,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      _checkNoError(tester, 'bước 1 giới tính');
+
+      Future<void> tapNext() async {
+        await _tapVisible(
+          tester,
+          find.byKey(const Key('onboarding-next-button')),
+        );
+      }
+
+      await tester.tap(find.byKey(const Key('onboarding-gender-girl')));
+      await tapNext();
+      _checkNoError(tester, 'bước 2 màu tóc');
+      await tapNext();
+      _checkNoError(tester, 'bước 3 váy');
+      await _tapVisible(
+        tester,
+        find.byKey(const Key('onboarding-dress-girl_top_02')),
+      );
+      _checkNoError(tester, 'bước 3 chọn váy tím');
+      await tapNext();
+      _checkNoError(tester, 'bước 4 tên');
+
+      // Mở bàn phím ở ô tên, rồi mô phỏng bàn phím ảo đang mở
+      // (thu hẹp viewport như máy ảo CI).
+      await tester.showKeyboard(find.byKey(const Key('onboarding-name-field')));
+      await tester.enterText(
+        find.byKey(const Key('onboarding-name-field')),
+        'An',
+      );
+      tester.view.viewInsets = const FakeViewPadding(bottom: 140);
+      await tester.pumpAndSettle();
+      _checkNoError(tester, 'bước 4 tên, bàn phím mở');
+      await tapNext();
+      // Rời bước tên phải bỏ focus để bàn phím đóng: máy ảo đóng
+      // bàn phím khi focus mất, mô phỏng bằng cách trả viewInsets
+      // về 0 rồi kiểm focus đã về scope gốc (không còn ở ô tên).
+      // Lưu ý: primaryFocus không bao giờ null — sau unfocus nó là
+      // FocusScopeNode của Navigator, còn khi ô tên đang focus thì
+      // nó là FocusNode của EditableText.
+      tester.view.viewInsets = const FakeViewPadding();
+      await tester.pumpAndSettle();
+      expect(
+        FocusManager.instance.primaryFocus,
+        isA<FocusScopeNode>(),
+        reason: 'rời bước tên phải unfocus để bàn phím đóng',
+      );
+      _checkNoError(tester, 'bước 5 trứng (sau khi đóng bàn phím)');
+      expect(find.text('Bước 5/5'), findsOneWidget);
+
+      final eggSvg = find.descendant(
+        of: find.byKey(const Key('onboarding-egg-dog')),
+        matching: find.byType(SvgPicture),
+      );
+      await tester.ensureVisible(eggSvg);
+      await tester.pumpAndSettle();
+      await tester.tap(eggSvg);
+      await tester.pumpAndSettle();
+      _checkNoError(tester, 'bước 5 chọn trứng chó');
+      await _tapVisible(
+        tester,
+        find.byKey(const Key('onboarding-finish-button')),
+      );
+      _checkNoError(tester, 'vào Thị trấn');
+      expect(find.byKey(const Key('town-screen')), findsOneWidget);
+      expect(find.text('An'), findsOneWidget);
+
+      // Vào màn toán, làm hết chặng 0 tới màn kết quả (kịch bản
+      // app_test.dart:168): bàn phím đã đóng nên cột phải không bị
+      // bóp, tapCorrect phải chạm trúng và có math-next-button.
+      await tester.tap(find.byKey(const Key('town-stage-0-button')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('math-screen')), findsOneWidget);
+      _checkNoError(tester, 'mở màn toán');
+
+      final todaySet = await db.dailySetsDao.getDailySet(
+        childId,
+        clock.today(),
+      );
+      final resolved = db.dailySetsDao
+          .readQuestions(todaySet!)
+          .sublist(0, 5)
+          .map(ResolvedQuestion.resolve)
+          .toList();
+      var qi = 0;
+
+      Future<void> tapCorrect() async {
+        await _tapVisible(
+          tester,
+          find.byKey(Key('choice-${resolved[qi].correctDisplayIndex}')),
+        );
+      }
+
+      Future<void> tapWrong() async {
+        final correct = resolved[qi].correctDisplayIndex;
+        await _tapVisible(
+          tester,
+          find.byKey(Key('choice-${correct == 0 ? 1 : 0}')),
+        );
+      }
+
+      Future<void> tapNextHere() async {
+        await _tapVisible(tester, find.byKey(const Key('math-next-button')));
+        qi++;
+      }
+
+      await tapCorrect();
+      _checkNoError(tester, 'câu 1 đúng (băng xanh)');
+      await tapNextHere();
+      _checkNoError(tester, 'sau câu 1');
+      await tapWrong();
+      _checkNoError(tester, 'câu 2 sai lần 1 (băng gợi ý)');
+      await tapCorrect();
+      _checkNoError(tester, 'câu 2 đúng (băng xanh)');
+      await tapNextHere();
+      _checkNoError(tester, 'sau câu 2');
+      await tapWrong();
+      await tapWrong();
+      _checkNoError(tester, 'câu 3 sai lần 2 (băng lời giải)');
+      await tapNextHere();
+      _checkNoError(tester, 'sau câu 3');
+      await tapCorrect();
+      _checkNoError(tester, 'câu 4 đúng (băng xanh)');
+      await tapNextHere();
+      _checkNoError(tester, 'sau câu 4');
+      final answer = '${resolved[4].question.answer}';
+      for (final ch in answer.split('')) {
+        await _tapVisible(tester, find.byKey(Key('keypad-$ch')));
+      }
+      _checkNoError(tester, 'câu 5 gõ số (bàn phím)');
+      await _tapVisible(tester, find.byKey(const Key('keypad-submit')));
+      _checkNoError(tester, 'câu 5 đúng (băng xanh)');
+      await tapNextHere();
+      _checkNoError(tester, 'sau câu 5 (sang kết quả)');
+
+      expect(find.byKey(const Key('stage-result-screen')), findsOneWidget);
+      expect(find.text('Đúng 4/5 câu'), findsOneWidget);
+      expect(find.text('Nhận được 12 xu'), findsOneWidget);
+    }
+
+    for (final size in [const Size(608, 248), const Size(640, 320)]) {
+      testWidgets(
+        'bàn phím mở ở bước tên → kết quả chặng ($size)',
+        (tester) async => runFlow(tester, size),
+      );
+    }
   });
 }

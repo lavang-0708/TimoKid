@@ -138,6 +138,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   void _next() {
+    // Bỏ focus TRƯỚC khi đổi bước: bàn phím ảo mở ở bước đặt tên
+    // mà không đóng thì bóp cả Thị trấn/màn toán sau đó — review
+    // PR #19 vòng 2: tapCorrect(1) chạm hụt vì cột bị bóp, Column
+    // mở đầu báo RenderFlex DISPOSED sau khi rời màn.
+    FocusScope.of(context).unfocus();
     if (!_canContinue) {
       if (_stepKey == 'name') {
         setState(() {
@@ -154,6 +159,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   void _back() {
+    // Như _next: bỏ focus để bàn phím đóng khi quay lại bước trước.
+    FocusScope.of(context).unfocus();
     if (_step > 0) setState(() => _step--);
   }
 
@@ -229,122 +236,153 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        child: _body(),
+      ),
+    );
+  }
+
+  /// Thân mở đầu.
+  ///
+  /// Bàn phím đóng: bố cục cố định như trước (xem trước + lựa chọn
+  /// cạnh nhau, nút điều hướng luôn thấy) để golden không đổi.
+  /// Bàn phím ảo mở: viewport thu hẹp, Column cố định tràn
+  /// (review PR #19 vòng 2: tràn 98 px ở 608x248, 18 px ở
+  /// 640x320) nên chuyển sang bố cục cuộn dọc, ẩn xem trước;
+  /// nút điều hướng tới được bằng cuộn.
+  Widget _body() {
+    if (MediaQuery.of(context).viewInsets.bottom > 0) {
+      return SingleChildScrollView(
         child: Column(
           children: [
-            Row(
-              children: [
-                Text(
-                  'Bước ${_step + 1}/${_stepTitles.length}',
-                  key: const Key('onboarding-step-counter'),
-                  style: const TextStyle(fontSize: 18),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    _stepTitles[_step],
-                    key: const Key('onboarding-step-title'),
-                    style: const TextStyle(fontSize: 22),
-                  ),
-                ),
-              ],
-            ),
+            _headerRow(),
             const SizedBox(height: 8),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Xem trước nhân vật (ẩn ở bước chọn trứng để đủ
-                  // chỗ cho 3 thẻ trứng).
-                  if (!_isEggStep) ...[
-                    SizedBox(
-                      width: 170,
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: CharacterView(
-                              key: const Key('onboarding-preview'),
-                              outfit: _previewOutfit(),
-                              loader: _previewLoader,
-                              // Tắt thở/chớp mắt (xem ghi chú đầu file).
-                              animationsEnabled: false,
-                            ),
-                          ),
-                          // Nhãn "Hình tạm" chỉ khi xem trước đúng là
-                          // lớp tạm: dáng nam (chưa có hình thật) hoặc
-                          // test đang bơm loader tạm. Dáng nữ khi chạy
-                          // app dùng hình thật nên không có nhãn.
-                          if (_previewLoader != null)
-                            const Text(
-                              'Hình tạm',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                  ],
-                  Expanded(child: SingleChildScrollView(child: _stepBody())),
-                ],
-              ),
-            ),
+            _stepBody(),
             const SizedBox(height: 8),
-            // Hai nút điều hướng co lại khi màn hẹp (chữ trong nút
-            // thu nhỏ theo, không tràn): nút "Xong — vào Thị trấn" ở
-            // bước trứng dài nên ở màn 608 dp (font DejaVu trong
-            // test) hai nút cộng lại vượt chiều rộng; khi chạy app
-            // (font Nunito) vẫn vừa như trước, không đổi gì.
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (_step > 0)
-                  Flexible(
-                    child: ElevatedButton.icon(
-                      key: const Key('onboarding-back-button'),
-                      icon: const Text('←', style: TextStyle(fontSize: 24)),
-                      label: const FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text('Quay lại', style: TextStyle(fontSize: 20)),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(56, 56),
-                      ),
-                      onPressed: _saving ? null : _back,
-                    ),
-                  )
-                else
-                  const SizedBox.shrink(),
-                Flexible(
-                  child: ElevatedButton.icon(
-                    key: Key(
-                      _isEggStep
-                          ? 'onboarding-finish-button'
-                          : 'onboarding-next-button',
-                    ),
-                    label: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        _isEggStep ? 'Xong — vào Thị trấn' : 'Tiếp theo',
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                    ),
-                    icon: _saving
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 3),
-                          )
-                        : const Text('→', style: TextStyle(fontSize: 24)),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(56, 56),
-                    ),
-                    onPressed: (_canContinue && !_saving) ? _next : null,
-                  ),
-                ),
-              ],
-            ),
+            _navRow(),
           ],
         ),
-      ),
+      );
+    }
+    return Column(
+      children: [
+        _headerRow(),
+        const SizedBox(height: 8),
+        Expanded(child: _middleRow()),
+        const SizedBox(height: 8),
+        _navRow(),
+      ],
+    );
+  }
+
+  /// Hàng đếm bước + tiêu đề bước.
+  Widget _headerRow() {
+    return Row(
+      children: [
+        Text(
+          'Bước ${_step + 1}/${_stepTitles.length}',
+          key: const Key('onboarding-step-counter'),
+          style: const TextStyle(fontSize: 18),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            _stepTitles[_step],
+            key: const Key('onboarding-step-title'),
+            style: const TextStyle(fontSize: 22),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Hàng giữa: xem trước nhân vật + lựa chọn của bước (cuộn được
+  /// để vừa màn 640x320).
+  Widget _middleRow() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Xem trước nhân vật (ẩn ở bước chọn trứng để đủ
+        // chỗ cho 3 thẻ trứng).
+        if (!_isEggStep) ...[
+          SizedBox(
+            width: 170,
+            child: Column(
+              children: [
+                Expanded(
+                  child: CharacterView(
+                    key: const Key('onboarding-preview'),
+                    outfit: _previewOutfit(),
+                    loader: _previewLoader,
+                    // Tắt thở/chớp mắt (xem ghi chú đầu file).
+                    animationsEnabled: false,
+                  ),
+                ),
+                // Nhãn "Hình tạm" chỉ khi xem trước đúng là
+                // lớp tạm: dáng nam (chưa có hình thật) hoặc
+                // test đang bơm loader tạm. Dáng nữ khi chạy
+                // app dùng hình thật nên không có nhãn.
+                if (_previewLoader != null)
+                  const Text('Hình tạm', style: TextStyle(fontSize: 16)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+        ],
+        Expanded(child: SingleChildScrollView(child: _stepBody())),
+      ],
+    );
+  }
+
+  /// Hai nút điều hướng co lại khi màn hẹp (chữ trong nút
+  /// thu nhỏ theo, không tràn): nút "Xong — vào Thị trấn" ở
+  /// bước trứng dài nên ở màn 608 dp (font DejaVu trong
+  /// test) hai nút cộng lại vượt chiều rộng; khi chạy app
+  /// (font Nunito) vẫn vừa như trước, không đổi gì.
+  Widget _navRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        if (_step > 0)
+          Flexible(
+            child: ElevatedButton.icon(
+              key: const Key('onboarding-back-button'),
+              icon: const Text('←', style: TextStyle(fontSize: 24)),
+              label: const FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text('Quay lại', style: TextStyle(fontSize: 20)),
+              ),
+              style: ElevatedButton.styleFrom(minimumSize: const Size(56, 56)),
+              onPressed: _saving ? null : _back,
+            ),
+          )
+        else
+          const SizedBox.shrink(),
+        Flexible(
+          child: ElevatedButton.icon(
+            key: Key(
+              _isEggStep
+                  ? 'onboarding-finish-button'
+                  : 'onboarding-next-button',
+            ),
+            label: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                _isEggStep ? 'Xong — vào Thị trấn' : 'Tiếp theo',
+                style: const TextStyle(fontSize: 20),
+              ),
+            ),
+            icon: _saving
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 3),
+                  )
+                : const Text('→', style: TextStyle(fontSize: 24)),
+            style: ElevatedButton.styleFrom(minimumSize: const Size(56, 56)),
+            onPressed: (_canContinue && !_saving) ? _next : null,
+          ),
+        ),
+      ],
     );
   }
 
@@ -465,6 +503,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               key: const Key('onboarding-name-field'),
               controller: _nameController,
               maxLength: onboardingMaxNameLength,
+              // Bấm Done trên bàn phím ảo thì đóng bàn phím ngay
+              // (cùng hiệu ứng với unfocus trong _next/_back).
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => FocusScope.of(context).unfocus(),
               style: const TextStyle(fontSize: 24),
               decoration: InputDecoration(
                 hintText: 'Tên nhân vật',
