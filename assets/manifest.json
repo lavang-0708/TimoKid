@@ -894,7 +894,7 @@
       "set": null,
       "price_xu": 0,
       "price_gem": null,
-      "status": "planned",
+      "status": "ready",
       "name_vi": "Trứng Chó Tinh Anh",
       "source": "assets/concept/pet_eggs.png"
     },
@@ -909,7 +909,7 @@
       "set": null,
       "price_xu": null,
       "price_gem": null,
-      "status": "planned",
+      "status": "ready",
       "name_vi": "Chó Tinh Anh mới nở",
       "source": "assets/concept/pet_evolution.png"
     },
@@ -924,7 +924,7 @@
       "set": null,
       "price_xu": null,
       "price_gem": null,
-      "status": "planned",
+      "status": "ready",
       "name_vi": "Chó Tinh Anh nhỡ",
       "source": "assets/concept/pet_evolution.png"
     },
@@ -939,7 +939,7 @@
       "set": null,
       "price_xu": null,
       "price_gem": null,
-      "status": "planned",
+      "status": "ready",
       "name_vi": "Chó Tinh Anh lớn",
       "source": "assets/concept/pet_evolution.png"
     },
@@ -954,7 +954,7 @@
       "set": null,
       "price_xu": 0,
       "price_gem": null,
-      "status": "planned",
+      "status": "ready",
       "name_vi": "Trứng Mèo Mũm Mĩm",
       "source": "assets/concept/pet_eggs.png"
     },
@@ -969,7 +969,7 @@
       "set": null,
       "price_xu": null,
       "price_gem": null,
-      "status": "planned",
+      "status": "ready",
       "name_vi": "Mèo Mũm Mĩm mới nở",
       "source": "assets/concept/pet_evolution.png"
     },
@@ -984,7 +984,7 @@
       "set": null,
       "price_xu": null,
       "price_gem": null,
-      "status": "planned",
+      "status": "ready",
       "name_vi": "Mèo Mũm Mĩm nhỡ",
       "source": "assets/concept/pet_evolution.png"
     },
@@ -999,7 +999,7 @@
       "set": null,
       "price_xu": null,
       "price_gem": null,
-      "status": "planned",
+      "status": "ready",
       "name_vi": "Mèo Mũm Mĩm lớn",
       "source": "assets/concept/pet_evolution.png"
     },
@@ -1014,7 +1014,7 @@
       "set": null,
       "price_xu": 0,
       "price_gem": null,
-      "status": "planned",
+      "status": "ready",
       "name_vi": "Trứng Thỏ Bánh Bao",
       "source": "assets/concept/pet_eggs.png"
     },
@@ -1029,7 +1029,7 @@
       "set": null,
       "price_xu": null,
       "price_gem": null,
-      "status": "planned",
+      "status": "ready",
       "name_vi": "Thỏ Bánh Bao mới nở",
       "source": "assets/concept/pet_evolution.png"
     },
@@ -1044,7 +1044,7 @@
       "set": null,
       "price_xu": null,
       "price_gem": null,
-      "status": "planned",
+      "status": "ready",
       "name_vi": "Thỏ Bánh Bao nhỡ",
       "source": "assets/concept/pet_evolution.png"
     },
@@ -1059,7 +1059,7 @@
       "set": null,
       "price_xu": null,
       "price_gem": null,
-      "status": "planned",
+      "status": "ready",
       "name_vi": "Thỏ Bánh Bao lớn",
       "source": "assets/concept/pet_evolution.png"
     },
