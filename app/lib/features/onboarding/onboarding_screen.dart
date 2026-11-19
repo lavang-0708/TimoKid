@@ -234,6 +234,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: const Key('onboarding-screen'),
+      // Không co thân khi bàn phím ảo mở (xem [_body]).
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Tạo nhân vật'),
         // Mở đầu là bắt buộc ở lần đầu mở app nên không có nút về
@@ -247,28 +249,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
-  /// Thân mở đầu.
+  /// Thân mở đầu: một bố cục cố định duy nhất (xem trước + lựa
+  /// chọn cạnh nhau, nút điều hướng luôn thấy).
   ///
-  /// Bàn phím đóng: bố cục cố định như trước (xem trước + lựa chọn
-  /// cạnh nhau, nút điều hướng luôn thấy) để golden không đổi.
-  /// Bàn phím ảo mở: viewport thu hẹp, Column cố định tràn
-  /// (review PR #19 vòng 2: tràn 98 px ở 608x248, 18 px ở
-  /// 640x320) nên chuyển sang bố cục cuộn dọc, ẩn xem trước;
-  /// nút điều hướng tới được bằng cuộn.
+  /// Không đổi bố cục theo bàn phím ảo (sửa lỗi bản v0.0.2): bản
+  /// trước chuyển sang bố cục cuộn khi `viewInsets.bottom > 0`, cây
+  /// widget đổi nên ô tên bị dựng lại, mất focus, bàn phím đóng ngay
+  /// khi bé vừa bấm vào ô tên — không gõ được. Giờ Scaffold không co
+  /// thân theo bàn phím (`resizeToAvoidBottomInset: false`): bàn phím
+  /// che phần dưới, ô tên ở trên vẫn thấy; bấm Xong/Tiếp thì bàn phím
+  /// đóng (unfocus trong `_next`/`onSubmitted`).
   Widget _body() {
-    if (MediaQuery.of(context).viewInsets.bottom > 0) {
-      return SingleChildScrollView(
-        child: Column(
-          children: [
-            _headerRow(),
-            const SizedBox(height: 8),
-            _stepBody(),
-            const SizedBox(height: 8),
-            _navRow(),
-          ],
-        ),
-      );
-    }
     return Column(
       children: [
         _headerRow(),

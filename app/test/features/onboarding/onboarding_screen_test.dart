@@ -250,4 +250,30 @@ void main() {
       'dog',
     );
   });
+
+  // Lỗi bản v0.0.2 trên máy thật: bấm vào ô tên thì bàn phím mở,
+  // màn đổi bố cục theo bàn phím, ô tên bị dựng lại và mất focus nên
+  // bàn phím đóng ngay, bé không gõ được. Khóa: bàn phím mở (viewInsets
+  // dưới > 0) thì ô tên vẫn giữ focus và gõ tiếp được.
+  testWidgets('bàn phím ảo mở thì ô tên vẫn giữ focus, gõ được', (
+    tester,
+  ) async {
+    await goToNameStepGirl(tester);
+    final field = find.byKey(const Key('onboarding-name-field'));
+    await tester.tap(field);
+    await tester.pump();
+    tester.view.viewInsets = const FakeViewPadding(bottom: 200);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpAndSettle();
+
+    final editable = find.descendant(
+      of: field,
+      matching: find.byType(EditableText),
+    );
+    expect(tester.widget<EditableText>(editable).focusNode.hasFocus, isTrue);
+    await tester.enterText(field, 'An');
+    await tester.pumpAndSettle();
+    expect(find.text('An'), findsOneWidget);
+    expect(tester.widget<EditableText>(editable).focusNode.hasFocus, isTrue);
+  });
 }
