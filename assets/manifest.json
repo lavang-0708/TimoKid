@@ -94,14 +94,14 @@
       "kind": "character_layer",
       "form": "girl",
       "layer": "body",
-      "recolorable": true,
+      "recolorable": false,
       "line": false,
       "set": null,
       "price_xu": null,
       "price_gem": null,
-      "status": "planned",
-      "name_vi": "Thân nữ",
-      "source": "assets/concept/girl_character_sheet.png"
+      "status": "ready",
+      "name_vi": "Cô bé (đồ gốc)",
+      "source": "assets/concept/girl_character_sheet.png (Claude cắt + ghép, 19/11)"
     },
     {
       "id": "girl_body_01_line",
@@ -309,9 +309,9 @@
       "set": "girl_hair_01",
       "price_xu": null,
       "price_gem": null,
-      "status": "planned",
-      "name_vi": "Tóc sau kiểu 1",
-      "source": "assets/concept/hairstyles_gray.png"
+      "status": "ready",
+      "name_vi": "Tóc sau kiểu 1 (để trống, tóc nằm ở lớp trước)",
+      "source": "assets/concept/girl_character_sheet.png (Claude cắt + ghép, 19/11)"
     },
     {
       "id": "girl_hair_front_01",
@@ -324,9 +324,9 @@
       "set": "girl_hair_01",
       "price_xu": null,
       "price_gem": null,
-      "status": "planned",
-      "name_vi": "Tóc trước kiểu 1",
-      "source": "assets/concept/hairstyles_gray.png"
+      "status": "ready",
+      "name_vi": "Tóc dài xoăn buộc hai bên",
+      "source": "assets/concept/girl_character_sheet.png (Claude cắt + ghép, 19/11)"
     },
     {
       "id": "girl_hair_back_02",
@@ -394,14 +394,14 @@
       "kind": "character_layer",
       "form": "girl",
       "layer": "top",
-      "recolorable": true,
+      "recolorable": false,
       "line": false,
       "set": null,
       "price_xu": null,
       "price_gem": null,
-      "status": "planned",
-      "name_vi": "Áo kiểu 1",
-      "source": "assets/concept/girl_outfits_gray.png"
+      "status": "ready",
+      "name_vi": "Váy hồng",
+      "source": "assets/concept/girl_character_sheet.png (Claude cắt + ghép, 19/11)"
     },
     {
       "id": "girl_top_02",
@@ -409,14 +409,14 @@
       "kind": "character_layer",
       "form": "girl",
       "layer": "top",
-      "recolorable": true,
+      "recolorable": false,
       "line": false,
       "set": null,
       "price_xu": null,
       "price_gem": null,
-      "status": "planned",
-      "name_vi": "Áo kiểu 2",
-      "source": "assets/concept/girl_outfits_gray.png"
+      "status": "ready",
+      "name_vi": "Váy tím",
+      "source": "assets/concept/girl_character_sheet.png (Claude cắt + ghép, 19/11)"
     },
     {
       "id": "girl_top_03",
