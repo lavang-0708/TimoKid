@@ -287,17 +287,37 @@ void main() {
     await completeOnboardingGirl();
     await pumpRoom(tester);
 
-    await tester.tap(find.byKey(const Key('room-furniture-bed')));
+    await tester.tap(find.byKey(const Key('room-furniture-day-co')));
     await tester.pump();
-    expect(find.text('Giường êm quá, ngủ ngon lắm!'), findsOneWidget);
+    expect(find.text('Dây cờ bay bay, phòng xinh quá!'), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('room-furniture-shelf')));
+    await tester.tap(find.byKey(const Key('room-furniture-den-sao')));
     await tester.pump();
-    expect(find.text('Sách toán hay nhất ở đây!'), findsOneWidget);
+    expect(find.text('Đèn sao sáng rồi, đọc sách thôi!'), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('room-furniture-lamp')));
+    await tester.tap(find.byKey(const Key('room-furniture-khung-anh')));
     await tester.pump();
-    expect(find.text('Đèn sáng rồi, đọc sách thôi!'), findsOneWidget);
+    expect(find.text('Khung ảnh này ai tặng nhỉ?'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('room-furniture-chau-cay')));
+    await tester.pump();
+    expect(find.text('Cây lớn nhanh nhé!'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('room-furniture-goi')));
+    await tester.pump();
+    expect(find.text('Gối êm quá, ngủ ngon lắm!'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('room-furniture-gau-bong')));
+    await tester.pump();
+    expect(find.text('Gấu bông ôm thích lắm!'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('room-furniture-coc-sao')));
+    await tester.pump();
+    expect(find.text('Cốc sao uống sữa ngon lắm!'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('room-furniture-binh-hoa')));
+    await tester.pump();
+    expect(find.text('Hoa thơm quá!'), findsOneWidget);
   });
 
   testWidgets('qua ngày mới khóa lại', (tester) async {
@@ -330,7 +350,8 @@ void main() {
       (provider as AssetImage).assetName,
       'assets/images/pets/dog_egg.png',
     );
-    // Ô trứng không còn SVG (nền + nội thất Phòng vẫn là SVG tạm).
+    // Ô trứng không còn SVG (từ A1, nền + nội thất Phòng cũng là
+    // PNG thật, không còn SVG tạm nào trong màn Phòng).
     expect(
       find.descendant(
         of: find.byKey(const Key('room-egg')),
@@ -338,6 +359,34 @@ void main() {
       ),
       findsNothing,
     );
+  });
+
+  testWidgets('nền + nội thất ở Phòng là PNG thật (A1), không còn SVG', (
+    tester,
+  ) async {
+    await completeOnboardingGirl();
+    await pumpRoom(tester);
+
+    final assetNames = tester
+        .widgetList<Image>(find.byType(Image))
+        .map((w) => w.image)
+        .whereType<AssetImage>()
+        .map((p) => p.assetName)
+        .toList();
+    expect(assetNames, contains('assets/images/backgrounds/room_v2.png'));
+    for (final name in [
+      'goi',
+      'coc_sao',
+      'binh_hoa',
+      'chau_cay',
+      'khung_anh',
+      'gau_bong',
+      'den_sao',
+      'day_co',
+    ]) {
+      expect(assetNames, contains('assets/images/furniture/$name.png'));
+    }
+    expect(find.byType(SvgPicture), findsNothing);
   });
 
   testWidgets('pet đã nở ở Phòng là PNG thật (PR #21)', (tester) async {
