@@ -67,3 +67,46 @@ cuối của ảnh 512x512. Xem `preview9_<tên>.png` trong `work/`.
 
 Bóng đổ sẽ do app vẽ (xem `docs/STATUS_2B.md`), không nướng trong PNG.
 Cần Claude decode lần 2 rồi mới làm giai đoạn 2b (code + manifest + mở PR).
+
+## Giai đoạn 2a vòng 3 — sửa 6 món bị cắt cụt hai bên (chỉ hình, chưa code)
+
+Claude decode THỬ commit `96ccf79` nhưng CHƯA commit: vệt bóng đã hết, nhưng
+6/8 món bị CẮT MẤT HAI BÊN thành cạnh thẳng đứng — bình hoa (mất hai hông
+bình), chậu cây (mất hai mép chậu), cốc (mất nửa quai phải), gối (mất mép
+trái), khung ảnh (còn mẩu thừa góc trái dưới), gấu bông (ổn hơn nhưng kiểm
+lại). Nguyên nhân: mặt nạ xóa bóng ở vòng 2 (`cut9.py`) cắt theo cột —
+ngoài khoảng x của đường chân thì XÓA CẢ CỘT, nên đã cắt luôn phần thân/
+quai/mép vốn nằm thấp hơn đường đó ở hai bên.
+
+Vòng 3 làm lại từ bản cắt v5 (thân nguyên vẹn, chỉ còn vệt bóng), KHÔNG sửa
+từ file vòng 2 (phần bị cắt đã mất). Cách làm (script
+`~/workspace/timokid-review/a1-phong-v2/work/cut10.py`): đường viền đáy
+theo BÓNG DÁNG THẬT của món — tức đường cong là mép dưới của món đồ, đọc
+bằng mắt trên lưới tọa độ + dải đáy phóng to 2x (`grid_<tên>.png`,
+`zoom_bottom_<tên>.png`), trải suốt bề rộng bóng dáng (hông bình, mép chậu,
+quai cốc, mép gối, góc khung, tay/chân gấu); CHỈ xóa pixel nằm DƯỚI đường
+đó, tuyệt đối không xóa theo cột; ngoài khoảng x của đường thì kéo phẳng
+theo điểm đầu/cuối (chỉ xóa vệt bóng dưới, giữ nguyên mọi thứ phía trên).
+Bias −2 px (cắt 2 px vào phần shading mềm ở đáy — không nhìn thấy) để
+không còn sót vệt bóng; viền làm mềm 1,2 px. Gấu bông hạ thêm 3 px ở
+khoảng x=320–345 (bản 548) để xóa một vệt mờ 10x3 px (alpha ≤ 110) còn sót
+dưới chân phải.
+
+Đã kiểm chứng từng PNG trên nền tối + nền caro + bản đồ alpha (trắng = mờ
+đục, đỏ = mờ nhạt) + đo số: viền ngoài liền mạch, KHÔNG còn cạnh thẳng
+đứng; hông bình / mép chậu / quai cốc (đủ cả quai phải) / mép gối / 4
+pom-pom / khung (hết mẩu thừa góc trái dưới) / gấu (đủ 2 chân) còn nguyên;
+không còn vệt bóng; 0 pixel mờ đục dưới hàng 470; điểm mờ nhạt rời rạc
+còn lại ≤ alpha 7 (nhiễu resize, không nhìn thấy). Đèn sao + dây cờ vốn đã
+sạch nên không động vào, giữ nguyên bản vòng 2.
+
+| File .b64 (đẩy lại, vòng 3) | Đường dẫn đích | Cỡ gốc mới (byte) | Ghi chú |
+| --- | --- | ---: | --- |
+| `app/assets/_incoming/app/assets/images/furniture/binh_hoa.png.b64` | `app/assets/images/furniture/binh_hoa.png` | 126329 | Hông bình còn nguyên, hết vệt bóng xanh lá |
+| `app/assets/_incoming/app/assets/images/furniture/chau_cay.png.b64` | `app/assets/images/furniture/chau_cay.png` | 135467 | Mép chậu còn nguyên, hết vệt bóng nâu vàng |
+| `app/assets/_incoming/app/assets/images/furniture/coc_sao.png.b64` | `app/assets/images/furniture/coc_sao.png` | 95003 | Quai phải còn nguyên, hết vệt bóng xanh |
+| `app/assets/_incoming/app/assets/images/furniture/goi.png.b64` | `app/assets/images/furniture/goi.png` | 124811 | Mép trái + 4 pom-pom còn nguyên, hết vệt bóng hồng (kể cả góc lõm pom-pom dưới) |
+| `app/assets/_incoming/app/assets/images/furniture/khung_anh.png.b64` | `app/assets/images/furniture/khung_anh.png` | 107950 | Hết mẩu thừa góc trái dưới, hết vệt bóng tím |
+| `app/assets/_incoming/app/assets/images/furniture/gau_bong.png.b64` | `app/assets/images/furniture/gau_bong.png` | 140609 | Đủ 2 chân/tay, hết vệt bóng hồng |
+
+Cần Claude decode vòng 3 rồi mới làm giai đoạn 2b (code + manifest + mở PR).
