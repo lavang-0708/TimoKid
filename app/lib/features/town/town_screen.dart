@@ -20,6 +20,7 @@ import '../onboarding/onboarding_model.dart';
 import '../onboarding/onboarding_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
+import '../room/room_screen.dart';
 import 'town_assets.dart';
 
 /// Màn Thị trấn — màn chính của bản 0.1 (T1-12).
@@ -121,7 +122,17 @@ class _TownScreenState extends ConsumerState<TownScreen> {
     if (statuses == null) {
       return Scaffold(
         key: const Key('town-screen'),
-        appBar: AppBar(title: const Text('Thị trấn Diệu Kỳ')),
+        appBar: AppBar(
+          title: const Text('Thị trấn Diệu Kỳ'),
+          actions: [
+            TextButton.icon(
+              key: const Key('town-room-button'),
+              onPressed: () => context.go(RoomScreen.route),
+              icon: const Icon(Icons.home_outlined),
+              label: const Text('Phòng'),
+            ),
+          ],
+        ),
         body: Center(child: Text('Không tải được Thị trấn: $_error')),
       );
     }
@@ -130,7 +141,17 @@ class _TownScreenState extends ConsumerState<TownScreen> {
     final profile = _profile;
     return Scaffold(
       key: const Key('town-screen'),
-      appBar: AppBar(title: const Text('Thị trấn Diệu Kỳ')),
+      appBar: AppBar(
+        title: const Text('Thị trấn Diệu Kỳ'),
+        actions: [
+          TextButton.icon(
+            key: const Key('town-room-button'),
+            onPressed: () => context.go(RoomScreen.route),
+            icon: const Icon(Icons.home_outlined),
+            label: const Text('Phòng'),
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
         child: Column(
@@ -150,12 +171,23 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                   style: const TextStyle(fontSize: 22),
                 ),
                 const Spacer(),
-                Text(
-                  done == total
-                      ? 'Xong đề ngày hôm nay!'
-                      : 'Đề ngày: $done/$total chặng',
-                  key: const Key('town-progress-text'),
-                  style: const TextStyle(fontSize: 22),
+                // Co lại + cắt `...` khi hẹp (vd: phông test Ahem
+                // rộng, màn 608x248, đề đã xong): cùng cách sửa
+                // header màn Phòng ở T2-04.
+                Flexible(
+                  child: Text(
+                    done == total
+                        ? 'Xong đề ngày hôm nay!'
+                        : 'Đề ngày: $done/$total chặng',
+                    key: const Key('town-progress-text'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    // Canh phải để khi đủ chỗ thì chữ vẫn nằm ở mép
+                    // phải như trước khi bọc Flexible (Flexible chia
+                    // chỗ trống với Spacer nên chữ mặc định sẽ dồn trái).
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(fontSize: 22),
+                  ),
                 ),
               ],
             ),

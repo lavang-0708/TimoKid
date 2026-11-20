@@ -79,6 +79,14 @@ flutter:
     # chứng ở T2-03 với Flutter 3.50: `ManifestAssetBundle` chỉ liệt
     # kê file trực tiếp trong thư mục, không đệ quy) — mỗi thư mục
     # con có file thật phải khai riêng ở đây.
+    # Hình tạm để riêng ở assets/temp/ để KHÔNG rơi vào phạm vi
+    # kiểm tra của tools/assets/check_assets.py (chỉ quét
+    # app/assets/images/ và bắt mọi file phải có dòng manifest):
+    # hình tạm chưa phải hình thật theo hợp đồng manifest nên không
+    # được thêm dòng manifest cho chúng.
+    # Nền + nội thất tạm cho màn Phòng (T2-04), xem
+    # app/lib/features/room/room_assets.dart.
+    - assets/temp/room/
     # Âm thanh (PLAN điểm (m)): 4 file WAV đã có trên main, xem
     # app/assets/sounds/README.md.
     - assets/sounds/

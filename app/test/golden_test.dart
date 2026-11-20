@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:timokid/core/database/app_database.dart';
 import 'package:timokid/core/database/database_provider.dart';
+import 'package:timokid/core/router/app_router.dart';
 import 'package:timokid/main.dart';
 
 import 'goldens/golden_data.dart';
@@ -85,7 +86,10 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [databaseProvider.overrideWithValue(db)],
-        child: const TimoKidApp(),
+        // Router mới mỗi test: router tĩnh của app giữ stack của
+        // test trước (test trước kết thúc ở Thị trấn thì test sau
+        // bơm vào đã ở Thị trấn, không còn ở Phòng).
+        child: TimoKidApp(router: AppRouter.create(showOnboarding: false)),
       ),
     );
     await tester.pumpAndSettle();
@@ -98,6 +102,9 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await pumpApp(tester);
+    // Từ T2-04 app mở vào Phòng; sang Thị trấn bằng nút ở Phòng.
+    await tester.tap(find.byKey(const Key('room-town-button')));
+    await tester.pumpAndSettle();
 
     await expectLater(
       find.byKey(const Key('town-screen')),
@@ -112,6 +119,9 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await pumpApp(tester);
+    // Từ T2-04 app mở vào Phòng; sang Thị trấn bằng nút ở Phòng.
+    await tester.tap(find.byKey(const Key('room-town-button')));
+    await tester.pumpAndSettle();
 
     await expectLater(
       find.byKey(const Key('town-screen')),

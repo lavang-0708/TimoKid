@@ -5,6 +5,8 @@ import '../../features/character/character_view.dart';
 import '../../features/math/math_screen.dart';
 import '../../features/onboarding/hatch_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
+import '../../features/room/coming_soon_screen.dart';
+import '../../features/room/room_screen.dart';
 import '../../features/qa/qa_config.dart';
 import '../../features/qa/qa_menu_screen.dart';
 import '../../features/stage_result/stage_result_screen.dart';
@@ -16,11 +18,12 @@ import '../database/database_provider.dart';
 /// Bản 0.1 mở thẳng vào màn Thị trấn (mục (i) PLAN). Từ bản 0.2
 /// (T2-03): lần đầu mở app thì vào màn mở đầu (tạo nhân vật + chọn
 /// trứng); nếu có lần nở trứng đang chờ (tắt app giữa chừng sau khi
-/// xong chặng đầu) thì vào màn nở trứng trước.
+/// xong chặng đầu) thì vào màn nở trứng trước. Từ T2-04, màn chính
+/// là Phòng ở `/room`; Thị trấn ở `/` chỉ là nơi làm đề ngày.
 class AppRouter {
   AppRouter._();
 
-  /// Router mặc định: mở thẳng vào màn Thị trấn. Test widget dùng
+  /// Router mặc định: mở thẳng vào màn Phòng. Test widget dùng
   /// router này để bơm thẳng màn cần kiểm mà không qua mở đầu.
   static final GoRouter router = create();
 
@@ -37,13 +40,22 @@ class AppRouter {
         ? OnboardingScreen.route
         : showHatch
         ? HatchScreen.route
-        : TownScreen.route;
+        : RoomScreen.route;
     return GoRouter(
       initialLocation: initialLocation,
       routes: [
         GoRoute(
           path: TownScreen.route,
           builder: (context, state) => const TownScreen(),
+        ),
+        GoRoute(
+          path: RoomScreen.route,
+          builder: (context, state) => const RoomScreen(),
+        ),
+        GoRoute(
+          path: ComingSoonScreen.route,
+          builder: (context, state) =>
+              ComingSoonScreen(args: state.extra as ComingSoonArgs),
         ),
         GoRoute(
           path: OnboardingScreen.route,

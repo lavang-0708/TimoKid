@@ -125,7 +125,20 @@ void main() {
     await tester.tap(find.byKey(const Key('onboarding-finish-button')));
     await tester.pumpAndSettle();
 
-    // Vào Thị trấn: nhân vật nữ đã tạo đứng ở cột trái.
+    // Vào Phòng (màn chính từ T2-04): nhân vật nữ đã tạo đứng
+    // giữa phòng, trứng chó ở bên cạnh; đề ngày chưa xong nên
+    // Tủ đồ/Cửa hàng khóa, có banner nhắc ra Thị trấn.
+    expect(find.byKey(const Key('room-screen')), findsOneWidget);
+    expect(find.text('Phòng của bé'), findsOneWidget);
+    expect(find.byKey(const Key('room-character')), findsOneWidget);
+    expect(find.byKey(const Key('room-egg')), findsOneWidget);
+    expect(find.text('An'), findsOneWidget);
+    expect(find.byKey(const Key('room-locked-banner')), findsOneWidget);
+    await takeShot('room');
+
+    // Sang Thị trấn bằng nút ở Phòng.
+    await tapVisible(const Key('room-town-button'));
+    await tester.pumpAndSettle();
     expect(find.byKey(const Key('town-screen')), findsOneWidget);
     expect(find.text('Thị trấn Diệu Kỳ'), findsOneWidget);
     expect(find.byKey(const Key('town-character')), findsOneWidget);

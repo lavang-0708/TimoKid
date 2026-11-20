@@ -1,0 +1,16 @@
+<!-- HÌNH TẠM (T2-04): nền phòng vẽ đơn giản bằng SVG cho màn Phòng.
+Hình thật (nền JPEG 16:9 theo manifest) về sẽ thay file này. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+  <rect x="0" y="0" width="800" height="300" fill="#F3E9F7"/>
+  <rect x="0" y="290" width="800" height="10" fill="#FFFFFF" opacity="0.6"/>
+  <rect x="0" y="300" width="800" height="150" fill="#EFD9BE"/>
+  <rect x="560" y="40" width="180" height="140" rx="12" fill="#BFE0F5"/>
+  <rect x="560" y="40" width="180" height="140" rx="12" fill="none" stroke="#FFFFFF" stroke-width="8"/>
+  <rect x="645" y="40" width="10" height="140" fill="#FFFFFF"/>
+  <rect x="560" y="105" width="180" height="10" fill="#FFFFFF"/>
+  <circle cx="610" cy="75" r="22" fill="#FFD166"/>
+  <rect x="80" y="60" width="100" height="80" rx="10" fill="#FFFFFF" stroke="#D9C2E8" stroke-width="6"/>
+  <circle cx="130" cy="100" r="24" fill="#F2A7C3"/>
+  <ellipse cx="400" cy="390" rx="220" ry="38" fill="#F2A7C3" opacity="0.8"/>
+  <ellipse cx="400" cy="390" rx="160" ry="26" fill="#FBD3E2"/>
+</svg>

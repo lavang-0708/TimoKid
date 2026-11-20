@@ -14,14 +14,15 @@ import 'features/qa/qa_menu_opener.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Mở database và tạo hồ sơ bé mặc định (lớp 2) nếu đây là lần đầu
-  // mở app. Làm trước khi chạy giao diện để màn Thị trấn đọc được
+  // mở app. Làm trước khi chạy giao diện để màn Phòng đọc được
   // số dư xu và tiến độ đề ngày ngay từ đầu.
   final db = AppDatabase();
   final childId = await db.ensureSeeded();
   // Màn đầu (T2-03): chưa xong mở đầu thì vào màn tạo nhân vật;
   // máy 0.1 cũ (không có cờ mở đầu) thì bỏ qua. Có lần nở trứng
   // đang chờ (tắt app giữa chừng sau khi xong chặng đầu) thì vào
-  // màn nở trứng trước để bé không mất màn ăn mừng.
+  // màn nở trứng trước để bé không mất màn ăn mừng. Xong mở đầu /
+  // nở trứng thì vào Phòng (màn chính từ T2-04).
   final showOnboarding = !await OnboardingService(db: db).isCompleted();
   final showHatch =
       !showOnboarding && await EggService(db: db).isHatchPending(childId);
@@ -51,8 +52,8 @@ Future<void> main() async {
 class TimoKidApp extends StatelessWidget {
   const TimoKidApp({super.key, this.router});
 
-  /// Router của app; null = router mặc định (mở thẳng vào Thị trấn).
-  /// Test widget bơm thẳng màn cần kiểm thì để null.
+  /// Router của app; null = router mặc định (mở thẳng vào Phòng
+  /// từ T2-04). Test widget bơm thẳng màn cần kiểm thì để null.
   final GoRouter? router;
 
   @override

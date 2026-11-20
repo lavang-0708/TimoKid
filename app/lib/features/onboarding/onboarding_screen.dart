@@ -40,7 +40,7 @@ import '../character/character_bounce.dart';
 import '../character/character_model.dart';
 import '../character/character_view.dart';
 import '../character/placeholder_layers.dart';
-import '../town/town_screen.dart';
+import '../room/room_screen.dart';
 import 'onboarding_config.dart';
 import 'onboarding_model.dart';
 import 'onboarding_service.dart';
@@ -183,13 +183,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         eggSpecies: _selectedEgg!,
       );
       if (!mounted) return;
-      // Bỏ focus ở gốc trước khi sang Thị trấn (vòng 3 review
+      // Bỏ focus ở gốc trước khi sang Phòng (vòng 3 review
       // PR #19): bàn phím ảo mở ở bước tên có thể còn mở trên máy
       // ảo CI dù `_next()` đã unfocus — yêu cầu đóng bàn phím lần
-      // nữa ở điểm rời mở đầu duy nhất, để Thị trấn/màn toán
+      // nữa ở điểm rời mở đầu duy nhất, để Phòng/Thị trấn/màn toán
       // không bị bóp viewport. Không có gì focus thì đây là no-op.
       FocusManager.instance.primaryFocus?.unfocus();
-      context.go(TownScreen.route);
+      context.go(RoomScreen.route);
     } catch (_) {
       if (!mounted) return;
       setState(() => _saving = false);
@@ -350,7 +350,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   /// Hai nút điều hướng co lại khi màn hẹp (chữ trong nút
-  /// thu nhỏ theo, không tràn): nút "Xong — vào Thị trấn" ở
+  /// thu nhỏ theo, không tràn): nút "Xong — vào Phòng" ở
   /// bước trứng dài nên ở màn 608 dp (font DejaVu trong
   /// test) hai nút cộng lại vượt chiều rộng; khi chạy app
   /// (font Nunito) vẫn vừa như trước, không đổi gì.
@@ -388,7 +388,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               label: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  _isEggStep ? 'Xong — vào Thị trấn' : 'Tiếp theo',
+                  _isEggStep ? 'Xong — vào Phòng' : 'Tiếp theo',
                   style: const TextStyle(fontSize: 20),
                 ),
               ),
