@@ -268,3 +268,20 @@ Sau bản 0.1 và 0.2, bé chơi thử khoảng một tuần để chỉnh độ
 | Nhắc học bằng thông báo | Không làm |
 | Kiểu trả lời | Ghép vào độ khó thành thang ải 6 bậc, xen kẽ trắc nghiệm và điền số |
 | Lưu hình gói nội dung | Bộ hình ban đầu đóng gói trong APK; hình thêm sau để trong repo, phát qua Cloudflare Pages |
+
+## Phong cách đồ họa phòng và thị trấn (chốt 20/11/2026)
+
+Chủ dự án gửi 4 ảnh chụp từ một game nhập vai dựng nhà cho trẻ em làm mẫu phong cách. Ảnh chỉ dùng để tham khảo, **không** đưa vào repo và không sao chép chi tiết: không chép bố cục cụ thể, logo, tên cửa hàng hay nhân vật trong ảnh. Mọi hình phải là hình mới.
+
+**Đặc điểm cần đạt:**
+
+- Vector phẳng, nét viền đậm màu nâu tối hoặc tím than, đều và sạch. Mảng màu phẳng, chỉ có một lớp bóng đơn giản. Không có texture sơn, không bóng mềm kiểu tranh.
+- Màu tươi, sáng, nhiều pastel (hồng, tím lavender, xanh trời, vàng kem). Mỗi phòng có một tông chủ đạo.
+- **Thị trấn:** nhìn từ trên xuống, nghiêng chéo như bản đồ thành phố. Đường xe có vạch kẻ, vỉa hè lát gạch, bồn cây, hàng rào. Mỗi công trình là một khối riêng, dễ nhận và bấm được: nhà của bé, cửa hàng quần áo, siêu thị, tiệm bánh, trường học, công viên, nhà pet. Hậu cảnh là các tòa nhà nhạt màu hơn.
+- **Trong phòng:** nhìn thẳng từ phía trước như sân khấu. Có tường, sàn lát ô, cửa sổ lớn. Đồ vật là các món rời đặt trên kệ, bàn và sàn (gối, cốc, bình hoa, chậu cây, khung ảnh, thú bông). Đồ trang trí treo trên tường và trần (dây cờ, đèn sao). Món nào cũng đủ lớn để bé bấm hay kéo được.
+- Nút điều hướng góc màn hình bo tròn, viền đậm, có bóng nhẹ.
+
+**Hệ quả:**
+
+- Nền và đồ vật phải là lớp rời: nền tĩnh một ảnh, đồ vật mỗi món một PNG. Như vậy bé xếp lại và mua thêm được (T2-04 phòng, T2-06 cửa hàng).
+- Nhân vật hiện tại (cắt từ tấm concept) là kiểu tranh tô bóng mềm, sẽ lệch tông khi đứng trên nền vector phẳng. Cần chốt riêng: giữ nhân vật cũ, hay làm lại nhân vật cùng phong cách vector phẳng.
