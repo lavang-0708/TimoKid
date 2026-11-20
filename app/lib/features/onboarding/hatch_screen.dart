@@ -20,7 +20,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/database/database_provider.dart';
 import '../../core/widgets/press_bounce.dart';
-import '../town/town_screen.dart';
+import '../room/room_screen.dart';
 import 'egg_service.dart';
 import 'onboarding_config.dart';
 
@@ -135,7 +135,7 @@ class _HatchScreenState extends ConsumerState<HatchScreen>
     final childId = await db.ensureSeeded();
     await EggService(db: db).consumeHatchCelebration(childId);
     if (!mounted) return;
-    context.go(TownScreen.route);
+    context.go(RoomScreen.route);
   }
 
   @override
@@ -150,7 +150,7 @@ class _HatchScreenState extends ConsumerState<HatchScreen>
         child: _loading
             ? const CircularProgressIndicator()
             : _species == null
-            ? _EmptyHatch(onBack: () => context.go(TownScreen.route))
+            ? _EmptyHatch(onBack: () => context.go(RoomScreen.route))
             : _HatchAnimation(
                 species: _species!,
                 shake: _shake,

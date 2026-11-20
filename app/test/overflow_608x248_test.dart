@@ -36,6 +36,11 @@
 /// không phải lỗi; integration test cũng dùng `ensureVisible` từ vòng
 /// 3 (bàn phím kẹt mở trên máy ảo CI bóp viewport, bấm trực tiếp
 /// chạm hụt — xem nhóm 'bàn phím kẹt mở tới màn toán' bên dưới).
+///
+/// T2-04: màn Phòng là màn chính — nhóm 'phòng 608x248 + 640x320'
+/// khóa Phòng khóa (banner + nút khóa) và Phòng mở (hết banner, nút
+/// sang màn chờ) đều vừa ở cả 2 cỡ, đi Phòng → Thị trấn → Phòng
+/// không tràn.
 library;
 
 import 'dart:math';
@@ -47,6 +52,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:timokid/core/database/app_database.dart';
 import 'package:timokid/core/database/database_provider.dart';
+import 'package:timokid/core/database/models.dart';
 import 'package:timokid/core/router/app_router.dart';
 import 'package:timokid/core/time/clock.dart';
 import 'package:timokid/features/character/placeholder_layers.dart';
@@ -95,7 +101,7 @@ void main() {
       await db.ensureSeeded();
     });
 
-    testWidgets('đi hết 5 bước nữ rồi vào Thị trấn', (tester) async {
+    testWidgets('đi hết 5 bước nữ rồi vào Phòng', (tester) async {
       _setSize(tester);
       await tester.pumpWidget(
         ProviderScope(
@@ -151,7 +157,11 @@ void main() {
       _checkNoError(tester, 'bước 5 chọn trứng chó');
       await tester.tap(find.byKey(const Key('onboarding-finish-button')));
       await tester.pumpAndSettle();
-      _checkNoError(tester, 'vào Thị trấn');
+      _checkNoError(tester, 'vào Phòng');
+      expect(find.byKey(const Key('room-screen')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('room-town-button')));
+      await tester.pumpAndSettle();
+      _checkNoError(tester, 'sang Thị trấn');
       expect(find.byKey(const Key('town-screen')), findsOneWidget);
     });
   });
@@ -471,9 +481,13 @@ void main() {
         tester,
         find.byKey(const Key('onboarding-finish-button')),
       );
-      _checkNoError(tester, 'vào Thị trấn');
-      expect(find.byKey(const Key('town-screen')), findsOneWidget);
+      _checkNoError(tester, 'vào Phòng');
+      expect(find.byKey(const Key('room-screen')), findsOneWidget);
       expect(find.text('An'), findsOneWidget);
+
+      // Từ T2-04 app mở vào Phòng; sang Thị trấn bằng nút ở Phòng.
+      await _tapVisible(tester, find.byKey(const Key('room-town-button')));
+      expect(find.byKey(const Key('town-screen')), findsOneWidget);
 
       // Vào màn toán, làm hết chặng 0 tới màn kết quả (kịch bản
       // app_test.dart:168): bàn phím đã đóng nên cột phải không bị
@@ -623,6 +637,10 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      // Từ T2-04 app mở vào Phòng; sang Thị trấn bằng nút ở Phòng.
+      expect(find.byKey(const Key('room-screen')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('room-town-button')));
+      await tester.pumpAndSettle();
       expect(find.byKey(const Key('town-screen')), findsOneWidget);
       expect(find.text('An'), findsOneWidget);
 
@@ -760,6 +778,125 @@ void main() {
       await pumpHatch(tester, const Size(640, 320));
       _checkNoError(tester, 'màn nở 640x320');
       expect(find.byKey(const Key('hatch-continue-button')), findsOneWidget);
+    });
+  });
+
+  group('phòng 608x248 + 640x320 (T2-04)', () {
+    // Màn Phòng là màn chính từ T2-04: Phòng khóa (banner + nút
+    // khóa) và Phòng mở (hết banner, nút sang màn chờ) đều phải vừa
+    // ở 608x248 và 640x320; đi Phòng → Thị trấn → Phòng cũng không
+    // tràn.
+    late FakeClock clock;
+    late AppDatabase db;
+    late String childId;
+
+    setUp(() async {
+      clock = FakeClock(DateTime(2026, 11, 18, 8, 0));
+      db = AppDatabase(executor: NativeDatabase.memory(), clock: clock);
+      addTearDown(db.close);
+      childId = await db.ensureSeeded();
+      await OnboardingService(db: db).completeOnboarding(
+        childId: childId,
+        profile: CharacterProfile.defaults().copyWith(
+          name: 'An',
+          dress: 'girl_top_02',
+        ),
+        eggSpecies: 'dog',
+      );
+    });
+
+    /// Tạo đề ngày hôm nay rồi đánh dấu xong cả 5 chặng + cho
+    /// trứng nở (mẫu `room_golden_test.dart`): Phòng mở khóa và
+    /// hiện pet đã nở thay vì trứng.
+    Future<void> createSetAndMarkDone() async {
+      final service = DailySetService(
+        dailySetsDao: db.dailySetsDao,
+        reviewQueueDao: db.reviewQueueDao,
+        ladderService: LadderService(
+          attemptsDao: db.attemptsDao,
+          skillProgressDao: db.skillProgressDao,
+        ),
+        clock: clock,
+      );
+      final set = await service.getOrCreateTodaySet(childId: childId);
+      for (var i = 0; i < 5; i++) {
+        await db.dailySetsDao.updateStageStatus(
+          id: set.id,
+          stageIndex: i,
+          status: StageStatus.done,
+        );
+      }
+      final eggs = EggService(db: db);
+      await eggs.noteStageCompleted(childId);
+      await eggs.consumeHatchCelebration(childId);
+    }
+
+    Future<void> pumpRoom(WidgetTester tester, Size size) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [databaseProvider.overrideWithValue(db)],
+          child: TimoKidApp(router: AppRouter.create(showOnboarding: false)),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('Phòng khóa ở 608x248 không tràn', (tester) async {
+      await pumpRoom(tester, const Size(608, 248));
+      _checkNoError(tester, 'Phòng khóa 608x248');
+      expect(find.byKey(const Key('room-screen')), findsOneWidget);
+      expect(find.byKey(const Key('room-locked-banner')), findsOneWidget);
+      expect(find.byKey(const Key('room-egg')), findsOneWidget);
+    });
+
+    testWidgets('Phòng mở ở 608x248 không tràn, nút Tủ đồ sang màn chờ', (
+      tester,
+    ) async {
+      await createSetAndMarkDone();
+      await pumpRoom(tester, const Size(608, 248));
+      _checkNoError(tester, 'Phòng mở 608x248');
+      expect(find.byKey(const Key('room-screen')), findsOneWidget);
+      expect(find.byKey(const Key('room-locked-banner')), findsNothing);
+      expect(find.byKey(const Key('room-pet')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('room-wardrobe-button')));
+      await tester.pumpAndSettle();
+      _checkNoError(tester, 'màn chờ Tủ đồ 608x248');
+      expect(find.byKey(const Key('coming-soon-screen')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('coming-soon-back-button')));
+      await tester.pumpAndSettle();
+      _checkNoError(tester, 'quay lại Phòng 608x248');
+      expect(find.byKey(const Key('room-screen')), findsOneWidget);
+    });
+
+    testWidgets('Phòng khóa ở 640x320 không tràn', (tester) async {
+      await pumpRoom(tester, const Size(640, 320));
+      _checkNoError(tester, 'Phòng khóa 640x320');
+      expect(find.byKey(const Key('room-screen')), findsOneWidget);
+      expect(find.byKey(const Key('room-locked-banner')), findsOneWidget);
+      expect(find.byKey(const Key('room-egg')), findsOneWidget);
+    });
+
+    testWidgets('Phòng mở ở 640x320, đi Phòng → Thị trấn → Phòng không tràn', (
+      tester,
+    ) async {
+      await createSetAndMarkDone();
+      await pumpRoom(tester, const Size(640, 320));
+      _checkNoError(tester, 'Phòng mở 640x320');
+      expect(find.byKey(const Key('room-screen')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('room-town-button')));
+      await tester.pumpAndSettle();
+      _checkNoError(tester, 'Thị trấn 640x320');
+      expect(find.byKey(const Key('town-screen')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('town-room-button')));
+      await tester.pumpAndSettle();
+      _checkNoError(tester, 'quay lại Phòng 640x320');
+      expect(find.byKey(const Key('room-screen')), findsOneWidget);
     });
   });
 }

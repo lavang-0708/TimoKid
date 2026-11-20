@@ -1,0 +1,12 @@
+<!-- HÌNH TẠM (T2-04): giường vẽ đơn giản bằng SVG cho màn Phòng.
+Hình thật về sẽ thay file này. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect x="15" y="55" width="12" height="60" rx="6" fill="#C89B6C"/>
+  <rect x="173" y="55" width="12" height="60" rx="6" fill="#C89B6C"/>
+  <rect x="15" y="110" width="170" height="55" rx="8" fill="#C89B6C"/>
+  <rect x="20" y="95" width="160" height="25" rx="10" fill="#FFFFFF"/>
+  <rect x="20" y="100" width="100" height="45" rx="8" fill="#F2A7C3"/>
+  <rect x="125" y="88" width="50" height="22" rx="10" fill="#FFF3DC"/>
+  <circle cx="60" cy="122" r="8" fill="#F28BB0"/>
+  <circle cx="85" cy="122" r="8" fill="#F28BB0"/>
+</svg>

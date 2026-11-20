@@ -39,38 +39,37 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets(
-    'có lần chờ nở: hiện pet mới nở, bấm Tiếp thì đã nở + về Thị trấn',
-    (tester) async {
-      final eggs = EggService(db: db);
-      await eggs.selectEgg(childId: childId, species: 'dog');
-      await eggs.noteStageCompleted(childId);
-      await pumpHatch(tester);
+  testWidgets('có lần chờ nở: hiện pet mới nở, bấm Tiếp thì đã nở + về Phòng', (
+    tester,
+  ) async {
+    final eggs = EggService(db: db);
+    await eggs.selectEgg(childId: childId, species: 'dog');
+    await eggs.noteStageCompleted(childId);
+    await pumpHatch(tester);
 
-      expect(find.byKey(const Key('hatch-screen')), findsOneWidget);
-      expect(find.text('Chào bé cún Tinh Anh!'), findsOneWidget);
-      // Trứng + pet mới nở là PNG thật (PR #21), không còn SVG tạm.
-      final paths = tester
-          .widgetList<Image>(find.byType(Image))
-          .map((w) => w.image)
-          .whereType<AssetImage>()
-          .map((p) => p.assetName)
-          .toList();
-      expect(paths, contains('assets/images/pets/dog_egg.png'));
-      expect(paths, contains('assets/images/pets/dog_newborn.png'));
-      expect(find.byType(SvgPicture), findsNothing);
-      expect(find.byKey(const Key('hatch-continue-button')), findsOneWidget);
+    expect(find.byKey(const Key('hatch-screen')), findsOneWidget);
+    expect(find.text('Chào bé cún Tinh Anh!'), findsOneWidget);
+    // Trứng + pet mới nở là PNG thật (PR #21), không còn SVG tạm.
+    final paths = tester
+        .widgetList<Image>(find.byType(Image))
+        .map((w) => w.image)
+        .whereType<AssetImage>()
+        .map((p) => p.assetName)
+        .toList();
+    expect(paths, contains('assets/images/pets/dog_egg.png'));
+    expect(paths, contains('assets/images/pets/dog_newborn.png'));
+    expect(find.byType(SvgPicture), findsNothing);
+    expect(find.byKey(const Key('hatch-continue-button')), findsOneWidget);
 
-      await tester.tap(find.byKey(const Key('hatch-continue-button')));
-      await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('hatch-continue-button')));
+    await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('town-screen')), findsOneWidget);
-      expect(await eggs.isHatched(childId), isTrue);
-      expect(await eggs.isHatchPending(childId), isFalse);
-    },
-  );
+    expect(find.byKey(const Key('room-screen')), findsOneWidget);
+    expect(await eggs.isHatched(childId), isTrue);
+    expect(await eggs.isHatchPending(childId), isFalse);
+  });
 
-  testWidgets('không có lần chờ: hiện thông báo + nút về Thị trấn', (
+  testWidgets('không có lần chờ: hiện thông báo + nút về Phòng', (
     tester,
   ) async {
     await pumpHatch(tester);
@@ -78,7 +77,7 @@ void main() {
     expect(find.text('Chưa có trứng nào nở.'), findsOneWidget);
     await tester.tap(find.byKey(const Key('hatch-back-button')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('town-screen')), findsOneWidget);
+    expect(find.byKey(const Key('room-screen')), findsOneWidget);
   });
 
   testWidgets('màn Kết quả chặng rẽ sang màn nở khi có lần chờ', (

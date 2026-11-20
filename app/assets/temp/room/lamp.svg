@@ -1,0 +1,9 @@
+<!-- HÌNH TẠM (T2-04): đèn đứng vẽ đơn giản bằng SVG cho màn Phòng.
+Hình thật về sẽ thay file này. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <ellipse cx="100" cy="180" rx="30" ry="8" fill="#8A7FA6"/>
+  <rect x="96" y="80" width="8" height="100" fill="#6E6390"/>
+  <path d="M 55 30 L 145 30 L 130 80 L 70 80 Z" fill="#FFD166"/>
+  <path d="M 55 30 L 145 30 L 130 80 L 70 80 Z" fill="none" stroke="#E8B64C" stroke-width="3"/>
+  <circle cx="100" cy="55" r="12" fill="#FFF3DC"/>
+</svg>

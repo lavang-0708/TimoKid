@@ -1,5 +1,5 @@
 /// Widget test màn mở đầu (T2-03): đi các bước, quay lại, kiểm tên,
-/// chọn trứng, lưu xong vào Thị trấn.
+/// chọn trứng, lưu xong vào Phòng (màn chính từ T2-04).
 ///
 /// Dáng nữ (bộ nhân vật nữ 1, PR #18) chỉ có 5 bước: giới tính, màu
 /// tóc, váy, tên, trứng — không có bước màu da/kiểu mắt/kiểu miệng.
@@ -216,7 +216,7 @@ void main() {
     expect(find.byType(SvgPicture), findsNothing);
   });
 
-  testWidgets('đi hết 5 bước nữ: lưu hồ sơ + trứng rồi vào Thị trấn', (
+  testWidgets('đi hết 5 bước nữ: lưu hồ sơ + trứng rồi vào Phòng', (
     tester,
   ) async {
     await goToNameStepGirl(tester);
@@ -227,8 +227,8 @@ void main() {
     await tester.tap(find.byKey(const Key('onboarding-finish-button')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('town-screen')), findsOneWidget);
-    expect(find.text('Thị trấn Diệu Kỳ'), findsOneWidget);
+    expect(find.byKey(const Key('room-screen')), findsOneWidget);
+    expect(find.text('Phòng của bé'), findsOneWidget);
 
     final service = OnboardingService(db: db);
     expect(await service.isCompleted(), isTrue);
@@ -248,7 +248,7 @@ void main() {
     expect(child!.name, 'An');
   });
 
-  testWidgets('đi hết 7 bước nam: lưu hồ sơ rồi vào Thị trấn', (tester) async {
+  testWidgets('đi hết 7 bước nam: lưu hồ sơ rồi vào Phòng', (tester) async {
     await goToNameStepBoy(tester);
     await enterName(tester, 'Bình');
     await tapNext(tester);
@@ -257,7 +257,7 @@ void main() {
     await tester.tap(find.byKey(const Key('onboarding-finish-button')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('town-screen')), findsOneWidget);
+    expect(find.byKey(const Key('room-screen')), findsOneWidget);
 
     final service = OnboardingService(db: db);
     final profile = await service.loadProfile(childId);
