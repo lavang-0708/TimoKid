@@ -1,12 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/database/database_provider.dart';
 import '../../core/database/models.dart';
 import '../../core/database/tables.dart';
-import '../../core/widgets/press_bounce.dart';
 import '../character/character_bounce.dart';
 import '../character/character_model.dart';
 import '../character/character_view.dart';
@@ -21,13 +19,16 @@ import '../onboarding/onboarding_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
 import '../room/room_screen.dart';
-import 'town_assets.dart';
+import 'town_map.dart';
 
 /// Màn Thị trấn — màn chính của bản 0.1 (T1-12).
 ///
-/// 5 nút lớn cho 5 khu theo DESIGN, mỗi nút hiện trạng thái chặng hôm
-/// nay (chưa làm / đang làm / xong), thanh tiến độ đề ngày, số xu và
-/// kim cương. Chưa có bản đồ hay cư dân (theo PLAN mục T1-12).
+/// Bản đồ phong cách v2 (A2): nền thị trấn + 10 lớp động + 5 công
+/// trình là vùng bấm (mỗi khu một công trình, xem [townAreas] trong
+/// `town_assets.dart`), nhà hồng về Phòng (xem [TownMap]). Mỗi nhãn
+/// dán trên công trình hiện tên khu + trạng thái chặng hôm nay (chưa
+/// làm / đang làm / xong); hàng đầu vẫn là số xu, kim cương, thanh
+/// tiến độ đề ngày như trước.
 ///
 /// Từ T2-03, nhân vật bé đã tạo hiện ở cột trái (tên bên dưới):
 /// nữ dùng bộ nhân vật nữ 1 thật (PR #18), nam tạm dùng lớp xám
@@ -36,6 +37,10 @@ import 'town_assets.dart';
 /// `CharacterView`), bấm vào thì nhảy lên + lấp lánh (xem
 /// [CharacterBounce]); cổng [AnimationGate] tắt hiệu ứng khi chạy
 /// test để `pumpAndSettle` dừng được.
+///
+/// Lớp động trên bản đồ (mây trôi, xe chạy, người đi bộ, đài phun
+/// nước nhấp nhô, cây đung đưa) cũng tắt bằng cổng [AnimationGate]
+/// khi chạy test (xem [TownMap]).
 ///
 /// Số dư đọc qua [RewardService.balances] của T1-11 (đã merge, tổng
 /// `wallet_ledger` của bé), bảng thưởng đọc từ settings như màn làm
@@ -240,20 +245,13 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                     const SizedBox(width: 12),
                   ],
                   Expanded(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        for (var i = 0; i < townAreas.length; i++) ...[
-                          if (i > 0) const SizedBox(width: 10),
-                          Expanded(
-                            child: _AreaButton(
-                              area: townAreas[i],
-                              status: statuses[i],
-                              stageIndex: i,
-                            ),
-                          ),
-                        ],
-                      ],
+                    child: TownMap(
+                      statuses: statuses,
+                      onAreaTap: (i) => context.go(
+                        MathScreen.route,
+                        extra: MathScreenArgs(stageIndex: i),
+                      ),
+                      onRoomTap: () => context.go(RoomScreen.route),
                     ),
                   ),
                 ],
@@ -297,101 +295,4 @@ class _TownScreenState extends ConsumerState<TownScreen> {
   /// xám như ở màn mở đầu.
   CharacterLayerLoader? _loaderFor(CharacterProfile profile) =>
       profile.gender == 'girl' ? null : placeholderLayerLoader;
-}
-
-/// Một nút khu: biểu tượng SVG, tên khu, nhãn trạng thái chặng hôm nay.
-class _AreaButton extends StatelessWidget {
-  const _AreaButton({
-    required this.area,
-    required this.status,
-    required this.stageIndex,
-  });
-
-  final TownArea area;
-  final String status;
-  final int stageIndex;
-
-  @override
-  Widget build(BuildContext context) {
-    final (label, chipColor) = switch (status) {
-      StageStatus.done => ('Xong ✓', Colors.green.shade600),
-      StageStatus.inProgress => ('Đang làm', Colors.amber.shade700),
-      _ => ('Chưa làm', Colors.grey.shade600),
-    };
-    return SizedBox(
-      child: PressBounce(
-        child: ElevatedButton(
-          key: Key('town-stage-$stageIndex-button'),
-          onPressed: () => context.go(
-            MathScreen.route,
-            extra: MathScreenArgs(stageIndex: stageIndex),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(area.color),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-          ),
-          // Icon chiếm phần còn lại của nút (Expanded): tên khu (tối đa
-          // 2 dòng; font DejaVu trong test rộng hơn Roboto nên tính dư)
-          // + nhãn trạng thái giữ chiều cao cố định, icon co theo chỗ
-          // còn lại nên không bao giờ tràn — ở màn 640x320 icon còn
-          // ~40 dp, ở màn lớn cũng không phình vô hạn vì nút cao hữu hạn.
-          // Màn thấp (nút cao < 120 dp, vd 608x248): tên + nhãn cố định
-          // đã 91 dp mà nút chỉ còn 85 dp nên tràn 6 px — lúc này co
-          // gọn (tên 16, khe 4) để vừa; ở cỡ thường vẫn 18/6 như cũ
-          // nên golden không đổi.
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final compact = constraints.maxHeight < 120;
-              final gap = compact ? 4.0 : 6.0;
-              final nameSize = compact ? 16.0 : 18.0;
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: SvgPicture.asset(area.asset),
-                    ),
-                  ),
-                  SizedBox(height: gap),
-                  Text(
-                    area.name,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    style: TextStyle(fontSize: nameSize),
-                  ),
-                  SizedBox(height: gap),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: chipColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    // Nhãn trạng thái không được xuống dòng: ở màn hẹp
-                    // (có cột nhân vật, nút chỉ rộng ~65 dp) "Chưa làm"
-                    // wrap thành 5 dòng cao 92 dp làm nút tràn 79 px.
-                    // `FittedBox` thu chữ lại vừa chiều rộng thay vì
-                    // wrap; khi chạy app (font Nunito) vẫn vừa như trước.
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        label,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
 }

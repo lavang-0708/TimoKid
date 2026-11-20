@@ -75,6 +75,15 @@ flutter:
     - assets/images/character/girl/
     # Trứng và pet 3 giai đoạn, cắt từ pet_eggs + pet_evolution (19/11).
     - assets/images/pets/
+    # Nền phòng v2 + 8 đồ rời phong cách v2 (A1, 20/11): nền PNG
+    # 1600x900, đồ rời PNG trong suốt 512x512, xem docs/ASSETS.md
+    # mục "Phòng v2".
+    - assets/images/backgrounds/
+    - assets/images/furniture/
+    # Lớp động thị trấn v2 (A2, 20/11): mây, xe, đài phun nước, cây,
+    # người đi bộ — PNG trong suốt 512x512, xem docs/ASSETS.md mục
+    # "Thị trấn v2".
+    - assets/images/town/
     # Thư mục con KHÔNG tự động đi kèm theo mục thư mục cha (kiểm
     # chứng ở T2-03 với Flutter 3.50: `ManifestAssetBundle` chỉ liệt
     # kê file trực tiếp trong thư mục, không đệ quy) — mỗi thư mục
@@ -84,9 +93,6 @@ flutter:
     # app/assets/images/ và bắt mọi file phải có dòng manifest):
     # hình tạm chưa phải hình thật theo hợp đồng manifest nên không
     # được thêm dòng manifest cho chúng.
-    # Nền + nội thất tạm cho màn Phòng (T2-04), xem
-    # app/lib/features/room/room_assets.dart.
-    - assets/temp/room/
     # Âm thanh (PLAN điểm (m)): 4 file WAV đã có trên main, xem
     # app/assets/sounds/README.md.
     - assets/sounds/

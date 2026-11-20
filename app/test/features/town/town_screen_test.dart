@@ -18,6 +18,7 @@ import 'package:timokid/features/ladder/ladder_service.dart';
 import 'package:timokid/features/math/math_screen.dart';
 import 'package:timokid/features/onboarding/onboarding_model.dart';
 import 'package:timokid/features/onboarding/onboarding_service.dart';
+import 'package:timokid/features/room/room_screen.dart';
 import 'package:timokid/features/stage_result/stage_result_screen.dart';
 import 'package:timokid/features/town/town_screen.dart';
 
@@ -71,6 +72,10 @@ void main() {
           path: MathScreen.route,
           builder: (context, state) =>
               MathScreen(args: state.extra as MathScreenArgs?),
+        ),
+        GoRoute(
+          path: RoomScreen.route,
+          builder: (context, state) => const RoomScreen(),
         ),
         GoRoute(
           path: StageResultScreen.route,
@@ -171,6 +176,16 @@ void main() {
 
     expect(find.byKey(const Key('math-screen')), findsOneWidget);
     expect(find.text('Chặng 3 — Con số'), findsOneWidget);
+  });
+
+  testWidgets('bấm nhà hồng thì về Phòng', (tester) async {
+    await pumpTown(tester);
+
+    await tester.tap(find.byKey(const Key('town-room-house-button')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('room-screen')), findsOneWidget);
+    expect(find.text('Phòng của bé'), findsOneWidget);
   });
 
   testWidgets('xong cả 5 chặng thì hiện đã xong đề ngày', (tester) async {

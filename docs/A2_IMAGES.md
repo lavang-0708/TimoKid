@@ -51,7 +51,7 @@ Dùng cho giai đoạn 2 đặt vùng bấm. Tọa độ (x, y, w, h), gốc tr�
 | Tiệm quần áo (tím, mái sọc) | 660, 490, 330, 240 | Mái sọc hồng-trắng |
 | Cửa hàng thú cưng (xanh lá, biển dấu chân) | 1260, 450, 290, 230 | Góc phải |
 | Nhà hồng (Phòng) | 95, 545, 300, 225 | Góc trái dưới, có hàng rào trắng |
-| Công viên (xích đu, cầu trượt) | 860, 300, 580, 280 | Khuôn viên có rào, cây anh đào + cây xanh |
+| Công viên (xích đu, cầu trượt) | 860, 300, 400, 280 | Khuôn viên có rào, cây anh đào + cây xanh. Bóng dáng đo được tới x = 1440 nhưng vùng bấm cắt ở x = 1260 (mép trái cửa hàng thú cưng) để không chồng vùng bấm thú cưng — tâm vùng thú cưng (1405, 565) nằm trong rect cũ nên tap chặng 2 rơi nhầm sang chặng 3 (bắt bằng test thị trấn, A2 giai đoạn 2). |
 
 ## Lớp động — cách chuyển động (giai đoạn 2, Flutter animation + AnimationGate)
 

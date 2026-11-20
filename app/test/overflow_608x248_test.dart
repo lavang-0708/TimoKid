@@ -207,6 +207,62 @@ void main() {
       _checkNoError(tester, 'thị trấn có nhân vật nữ');
       expect(find.byKey(const Key('town-character')), findsOneWidget);
     });
+
+    testWidgets('thị trấn v2 không tràn ở 640x320, bấm khu 0 sang màn toán', (
+      tester,
+    ) async {
+      // A2: bản đồ thị trấn v2 (nền + 10 lớp động + 6 vùng bấm) phải
+      // vừa ở 640x320 (cỡ thiết kế) kể cả khi có cột nhân vật, và
+      // bấm khu 0 phải sang màn toán không tràn.
+      tester.view.physicalSize = const Size(640, 320);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+      final service = DailySetService(
+        dailySetsDao: db.dailySetsDao,
+        reviewQueueDao: db.reviewQueueDao,
+        ladderService: LadderService(
+          attemptsDao: db.attemptsDao,
+          skillProgressDao: db.skillProgressDao,
+        ),
+        clock: clock,
+      );
+      await service.getOrCreateTodaySet(childId: childId);
+      final router = GoRouter(
+        initialLocation: TownScreen.route,
+        routes: [
+          GoRoute(
+            path: TownScreen.route,
+            builder: (context, state) => const TownScreen(),
+          ),
+          GoRoute(
+            path: MathScreen.route,
+            builder: (context, state) =>
+                MathScreen(args: state.extra as MathScreenArgs?),
+          ),
+        ],
+      );
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [databaseProvider.overrideWithValue(db)],
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
+      await tester.pumpAndSettle();
+      _checkNoError(tester, 'thị trấn 640x320');
+      expect(find.byKey(const Key('town-character')), findsOneWidget);
+      for (var i = 0; i < 5; i++) {
+        expect(find.byKey(Key('town-stage-$i-button')), findsOneWidget);
+      }
+      expect(find.byKey(const Key('town-room-house-button')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('town-stage-0-button')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('math-screen')), findsOneWidget);
+      _checkNoError(tester, 'màn toán 640x320');
+    });
   });
 
   group('màn toán 608x248', () {
