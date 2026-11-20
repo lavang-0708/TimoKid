@@ -17,7 +17,7 @@ xem `docs/DESIGN.md` mục "Hướng dẫn vẽ cho họa sĩ".
 | --- | --- |
 | `assets/manifest.json` | Liệt kê mọi hình: mã, loại, dáng, lớp, có đổi màu không, giá, trạng thái. Đây là danh sách duy nhất app và script cùng đọc. |
 | `tools/assets/check_assets.py` | Script kiểm tra (Python, chỉ dùng thư viện chuẩn): khung, PNG trong suốt, tên file, manifest khớp file thật. |
-| `tools/assets/check_assets_test.py` | Test cho script (18 test): JPEG báo lỗi, PNG nền đặc báo lỗi, file đúng qua được. |
+| `tools/assets/check_assets_test.py` | Test cho script (21 test): JPEG báo lỗi, PNG nền đặc báo lỗi (trừ nền), file đúng qua được. |
 | `tools/assets/decode_incoming.py` | Giải mã ảnh Muse đẩy dạng base64 (xem "Đường đưa ảnh lên repo"). |
 | `app/test/assets_manifest_test.dart` | Test Dart gọi script kiểm tra trong lúc chạy `flutter test` (để CI kiểm tra mà không cần sửa workflow). |
 
@@ -53,7 +53,7 @@ vai y = 716, mặt đất y = 1400, mép an toàn là hình chữ nhật
 | `pet` | 512 x 512 | PNG trong suốt | Pet và trứng; mặt đất y = 440, mép an toàn (32, 32)–(480, 480) theo `assets/templates/khung_pet_do_vat.svg`. |
 | `item` | 512 x 512 | PNG trong suốt | Đồ vật: thức ăn pet, đồ chơi, nơ, kẹp tóc, túi… |
 | `furniture` | 512 x 512 | PNG trong suốt | Nội thất đặt trong phòng. |
-| `background` | Không cố định | JPEG | Nền phòng/thị trấn; JPEG không có nền trong suốt nên không chồng lớp được. Tỉ lệ ngang 16:9, khuyến nghị 1600x900 trở lên. |
+| `background` | Không cố định | JPEG hoặc PNG | Nền phòng/thị trấn; JPEG/PNG không có nền trong suốt nên không chồng lớp được. Tỉ lệ ngang 16:9, khuyến nghị 1600x900 trở lên. Nền PNG được phép từ A1 vì đường đưa ảnh base64 chỉ nhận PNG. |
 | `icon` | Không cố định | SVG | Biểu tượng giao diện (vector). 5 icon khu Thị trấn (T1-12) nằm ngay ở `app/assets/images/area_*.svg`; icon mới cho vào `app/assets/images/icons/`. |
 
 ## Quy tắc đặt tên
@@ -68,7 +68,7 @@ Mã (`id`) của mỗi mục **trùng với tên file** (không tính đuôi):
   `app/assets/images/pets/`.
 - Đồ vật: `app/assets/images/items/<tên món>.png`.
 - Nội thất: `app/assets/images/furniture/<tên món>.png`.
-- Nền: `app/assets/images/backgrounds/<tên>.jpg`.
+- Nền: `app/assets/images/backgrounds/<tên>.jpg` hoặc `.png`.
 - Icon: `app/assets/images/icons/<tên>.svg` (icon cũ ở gốc
   `app/assets/images/` vẫn hợp lệ).
 
@@ -125,6 +125,8 @@ Mã (`id`) của mỗi mục **trùng với tên file** (không tính đuôi):
 - **Dáng nam** (24 mục, `planned`): thân, mắt, miệng, tóc ×2 kiểu,
   trang phục — vẽ dần sau dáng nữ.
 - **Nền** (2 mục, `planned`): `room_01.jpg`, `town_01.jpg`.
+- **Nền phòng v2 + nội thất (A1, 20/11, `ready`)**: `room_v2.png` +
+  8 món đồ rời (xem mục "Phòng v2" cuối tài liệu).
 - **Icon khu Thị trấn** (5 mục, `ready`): `area_logic`,
   `area_arith`, `area_number`, `area_geo`, `area_comb` (SVG, T1-12).
 
@@ -181,3 +183,52 @@ Chủ dự án đã duyệt bản xem trước ngày 19/11. Bộ này cắt nguy
 - `girl_hair_back_01`: để trống (trong suốt), chỉ để đủ bộ `girl_hair_01`.
 - `girl_top_01` (váy hồng), `girl_top_02` (váy tím): cắt từ tấm concept, kéo giãn riêng phần chân váy để phủ kín bộ đồ gốc. Tay áo trắng dài của bộ gốc vẫn lộ ra như áo sơ mi mặc trong váy, đây là chủ ý.
 - Không chọn váy nào thì cô bé mặc bộ đồ gốc.
+
+## Phòng v2 (A1, 20/11)
+
+Chủ dự án đã duyệt phong cách v2 ngày 20/11: 3D mềm (mặt sáng/tối rõ,
+ánh sáng từ trên-trái, bóng đổ mềm, gradient nhẹ), phòng phối cảnh
+1 điểm tụ. Nền + 8 đồ rời vẽ mới bằng AI theo `docs/DESIGN.md`,
+`source` trong manifest ghi "Muse vẽ AI 20/11 theo DESIGN.md".
+
+- **Nền** `app/assets/images/backgrounds/room_v2.png`: PNG 1600x900
+  (không phải JPEG — đường đưa ảnh base64 chỉ nhận PNG nên nền đẩy
+  dạng PNG; script kiểm tra đã cho phép nền PNG từ A1, xem
+  `tools/assets/check_assets.py`). Phòng trống, phối cảnh 1 điểm tụ:
+  cửa sổ lớn ở tường sau (x ~480–1120, y ~190–610 trong ảnh 1600x900),
+  sàn gỗ bắt đầu y ~620, hai tường bên hồng. App vẽ nền bằng
+  `Image.asset` với `BoxFit.cover`.
+- **Đồ rời** `app/assets/images/furniture/<tên>.png`: PNG trong suốt
+  512x512, `kind: furniture`, `status: ready`. Mép đáy của món
+  (ground line) là mốc đặt đồ xuống sàn — app neo món đồ theo mép
+  đáy rồi vẽ bóng ngay dưới mốc đó. Vị trí đáy trong ảnh 512x512
+  (hàng pixel mờ đục cuối cùng, đo từ PNG thật, ghi trong
+  `app/lib/features/room/room_assets.dart` trường `bottomRow`):
+  gối 426, cốc sao 392, bình hoa 426, chậu cây 421, khung ảnh 423,
+  gấu bông 433, đèn sao 433, dây cờ 359 (dây cờ treo, không đặt sàn).
+
+### Quy tắc bóng đổ (A1)
+
+- PNG đồ rời **không nướng bóng trong ảnh** (alpha quanh món đồ
+  sạch). App tự vẽ bóng đổ mềm dưới mỗi món **đặt sàn** khi đặt vào
+  phòng: ellipse mờ, đen 20% (`Colors.black.withValues(alpha: 0.20)`),
+  rộng 85% bề ngang món, cao 10% bề ngang, đặt ngay dưới mép đáy
+  (`bottomRow`). Món treo (dây cờ, đèn sao) không có bóng.
+- Áp dụng tương tự cho nhân vật (PR 3) và pet (PR 4): cắt với alpha
+  sạch, app vẽ bóng dưới chân.
+
+### Quy tắc cắt alpha sạch (bài học A1, áp dụng cho PR 3, 4)
+
+- Vệt bóng và phần shading dưới của món đồ cùng tông màu, nối nhau
+  bằng gradient mượt — **không có ngưỡng màu hay step nào tách được
+  sạch mà không ăn vào món đồ** (đã thử 5 biến thể flood-fill/trim).
+  Cách làm được là cắt theo **đường viền đáy thủ công** (ground line)
+  đọc bằng mắt trên lưới tọa độ + dải đáy phóng to, rồi làm mềm viền
+  1–1,2 px. Cách làm chi tiết xem `docs/A1_IMAGES.md` (mục vòng 3).
+- Đường viền đáy phải theo **bóng dáng thật** của món (mép dưới, một
+  đường cong theo món đồ, trải suốt bề rộng bóng dáng), CHỈ xóa pixel
+  nằm DƯỚI đường đó, KHÔNG bao giờ xóa theo cột — tay, tai, đuôi,
+  quai đều nằm ngoài bề ngang đáy (vòng 2 đã cắt cụt hông bình, mép
+  chậu, quai cốc, mép gối vì xóa theo cột).
+- Kiểm từng tấm trên nền tối + nền caro + bản đồ alpha: viền ngoài
+  liền mạch, không cạnh thẳng đứng, không vệt bóng, không mẩu thừa.

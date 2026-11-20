@@ -30,6 +30,7 @@ import 'package:timokid/features/onboarding/onboarding_config.dart';
 import 'package:timokid/features/onboarding/onboarding_model.dart';
 import 'package:timokid/features/onboarding/onboarding_service.dart';
 import 'package:timokid/features/room/coming_soon_screen.dart';
+import 'package:timokid/features/room/room_assets.dart';
 import 'package:timokid/features/room/room_screen.dart';
 import 'package:timokid/features/town/town_screen.dart';
 
@@ -160,6 +161,14 @@ void main() {
       for (final path in [
         ...eggSpeciesAssets.values,
         ...newbornSpeciesAssets.values,
+      ]) {
+        await precacheImage(AssetImage(path), context);
+      }
+      // Nền + nội thất PNG v2 (A1): nạp trước để ảnh chụp golden
+      // không trắng trơn (cùng lý do như trứng/pet).
+      for (final path in [
+        roomBackgroundAsset,
+        ...roomFurniture.map((f) => f.asset),
       ]) {
         await precacheImage(AssetImage(path), context);
       }

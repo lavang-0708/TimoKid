@@ -2,7 +2,7 @@
 """Kiểm tra hình đầu vào theo hợp đồng trong ``assets/manifest.json``.
 
 Hợp đồng (xem ``docs/ASSETS.md``): khung nhân vật 1024x1536, pet/đồ vật/
-nội thất 512x512, nền JPEG, tên file ``<dáng>_<lớp>_<tên món>.png``,
+nội thất 512x512, nền JPEG hoặc PNG, tên file ``<dáng>_<lớp>_<tên món>.png``,
 lớp đổi màu tô xám để app nhân màu, chi tiết không đổi màu đi file
 riêng đuôi ``_line``, thứ tự chồng 8 lớp từ tóc sau lên phụ kiện.
 
@@ -10,7 +10,8 @@ Script kiểm tra:
   - manifest đúng lược đồ (lớp, trường bắt buộc, tên file khớp mã);
   - file trạng thái ``ready`` phải tồn tại và đúng nội dung: PNG đúng
     kích thước khung, có kênh alpha, có ít nhất một pixel trong suốt
-    (kể cả ở viền), lớp đổi màu phải tô xám;
+    (kể cả ở viền), lớp đổi màu phải tô xám; riêng nền PNG thì không
+    yêu cầu alpha (nền đặc, không chồng lớp);
   - file trạng thái ``planned`` chưa được có mặt (có rồi thì đổi
     status thành ``ready``);
   - mọi file hình trong ``app/assets/images/`` đều phải có dòng
@@ -50,7 +51,7 @@ KINDS = {"character_layer", "pet", "item", "furniture", "background", "icon"}
 FORMS = {"girl", "boy", "any"}
 STATUSES = {"ready", "planned"}
 
-# Khung (rộng, cao) cho từng loại; nền JPEG và icon SVG không kiểm tra
+# Khung (rộng, cao) cho từng loại; nền và icon SVG không kiểm tra
 # kích thước (xem docs/ASSETS.md).
 FRAMES = {
     "character_layer": (1024, 1536),
@@ -71,7 +72,7 @@ NAME_PATTERNS = {
     "pet": re.compile(r"^(dog|cat|rabbit)_(egg|newborn|teen|adult)\.png$"),
     "item": re.compile(r"^[a-z0-9_]+\.png$"),
     "furniture": re.compile(r"^[a-z0-9_]+\.png$"),
-    "background": re.compile(r"^[a-z0-9_]+\.(jpg|jpeg)$"),
+    "background": re.compile(r"^[a-z0-9_]+\.(jpg|jpeg|png)$"),
     "icon": re.compile(r"^[a-z0-9_]+\.svg$"),
 }
 
@@ -262,6 +263,31 @@ class Checker:
                         f"({i % width}, {i // width}) có màu ({r}, {g}, {b})",
                     )
                     return
+
+    def _check_png_background(self, entry: dict, path: pathlib.Path) -> None:
+        """Nền PNG: chỉ cần là PNG 8-bit thật, không yêu cầu alpha.
+
+        Nền là ảnh đặc (không chồng lớp) nên không cần pixel trong
+        suốt ở viền như lớp nhân vật/pet/nội thất, và được phép là
+        RGB không kênh alpha (loại màu 2). Nền PNG được phép từ A1
+        vì đường đưa ảnh base64 chỉ nhận PNG (xem docs/ASSETS.md).
+        """
+        where = entry["file"]
+        data = path.read_bytes()
+        if not data.startswith(PNG_SIG) or len(data) < 26:
+            self.fail(where, "không phải file PNG")
+            return
+        width, height, bit_depth, color_type, _, _, interlace = (
+            struct.unpack(">IIBBBBB", data[16:29])
+        )
+        if bit_depth != 8:
+            self.fail(where, f"chỉ hỗ trợ PNG 8-bit (đang là {bit_depth}-bit)")
+        if interlace != 0:
+            self.fail(where, "không dùng PNG interlaced")
+        if color_type not in (0, 2, 3, 4, 6):
+            self.fail(where, f"loại màu PNG lạ ({color_type})")
+        if width <= 0 or height <= 0:
+            self.fail(where, "kích thước PNG không hợp lệ")
 
     # -- Manifest -----------------------------------------------------------
 
@@ -476,7 +502,10 @@ class Checker:
                 self.fail(entry["file"], "manifest ghi ready nhưng thiếu file")
                 continue
             if entry["file"].endswith(".png"):
-                self._check_png(entry, path)
+                if entry["kind"] == "background":
+                    self._check_png_background(entry, path)
+                else:
+                    self._check_png(entry, path)
             elif entry["file"].endswith((".jpg", ".jpeg")):
                 if not path.read_bytes().startswith(JPEG_SOI):
                     self.fail(entry["file"], "không phải file JPEG thật")

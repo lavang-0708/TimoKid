@@ -369,6 +369,48 @@ class CheckAssetsTest(unittest.TestCase):
         code, errors = self.run_checker()
         self.assertEqual(code, 0, errors)
 
+    def _add_background_png(self, eid="room_v2", color_type=2):
+        """Nền PNG đặc 1600x900 (không pixel trong suốt): đúng hợp
+        đồng A1 (đường đưa ảnh base64 chỉ nhận PNG)."""
+        path = self.root / f"app/assets/images/backgrounds/{eid}.png"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if color_type == 2:
+            write_png(path, 1600, 900, 2, lambda x, y: (250, 220, 230))
+        else:
+            write_png(path, 1600, 900, 6,
+                      lambda x, y: (250, 220, 230, 255))
+        self.manifest["entries"].append(
+            entry(eid, f"app/assets/images/backgrounds/{eid}.png",
+                  kind="background", form="any", layer=None,
+                  recolorable=False)
+        )
+        return path
+
+    def test_png_background_rgb_passes(self):
+        # Nền PNG RGB đặc (không kênh alpha) vẫn qua được.
+        self._add_background_png(color_type=2)
+        self.write_manifest()
+        code, errors = self.run_checker()
+        self.assertEqual(code, 0, errors)
+
+    def test_png_background_rgba_passes(self):
+        # Nền PNG RGBA đặc (alpha toàn 255) vẫn qua được.
+        self._add_background_png(color_type=6)
+        self.write_manifest()
+        code, errors = self.run_checker()
+        self.assertEqual(code, 0, errors)
+
+    def test_background_gif_name_fails(self):
+        self._add_background_png()
+        self.manifest["entries"][0]["file"] = (
+            "app/assets/images/backgrounds/room_v2.gif"
+        )
+        self.write_manifest()
+        code, errors = self.run_checker()
+        self.assertEqual(code, 1)
+        self.assertTrue(any("sai quy tắc đặt tên" in e for e in errors),
+                        errors)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
