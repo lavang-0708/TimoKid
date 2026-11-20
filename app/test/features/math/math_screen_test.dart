@@ -24,6 +24,7 @@ import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/core/database/models.dart';
 import 'package:timokid/core/database/tables.dart' hide AnswerType;
 import 'package:timokid/core/time/clock.dart';
+import 'package:timokid/features/building/building_screen.dart';
 import 'package:timokid/features/daily_set/daily_set_service.dart';
 import 'package:timokid/features/ladder/ladder_service.dart';
 import 'package:timokid/features/math/math_decor.dart';
@@ -613,6 +614,11 @@ void main() {
           builder: (context, state) => const TownScreen(),
         ),
         GoRoute(
+          path: BuildingScreen.route,
+          builder: (context, state) =>
+              BuildingScreen(args: state.extra as BuildingScreenArgs?),
+        ),
+        GoRoute(
           path: MathScreen.route,
           builder: (context, state) =>
               MathScreen(args: state.extra as MathScreenArgs?),
@@ -634,7 +640,12 @@ void main() {
 
     // Đi từ Thị trấn bằng nút khu 0 (Lâu đài Lôgic) của T1-12;
     // key cũ `town-math-button` đã bỏ khi viết lại màn Thị trấn.
+    // Từ PR (B): nút khu vào màn Tòa nhà, bấm Thử thách mới vào
+    // màn toán.
     await tester.tap(find.byKey(const Key('town-stage-0-button')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('building-screen')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('building-challenge-button')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('math-screen')), findsOneWidget);
 

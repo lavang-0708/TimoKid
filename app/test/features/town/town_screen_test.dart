@@ -12,6 +12,7 @@ import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/core/database/models.dart';
 import 'package:timokid/core/database/tables.dart';
 import 'package:timokid/core/time/clock.dart';
+import 'package:timokid/features/building/building_screen.dart';
 import 'package:timokid/features/character/character_view.dart';
 import 'package:timokid/features/daily_set/daily_set_service.dart';
 import 'package:timokid/features/ladder/ladder_service.dart';
@@ -60,13 +61,18 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     // Router mới mỗi test (không dùng router tĩnh của app để trạng
-    // thái điều hướng không rò sang test khác), cùng 3 route như app.
+    // thái điều hướng không rò sang test khác), cùng 5 route như app.
     final router = GoRouter(
       initialLocation: TownScreen.route,
       routes: [
         GoRoute(
           path: TownScreen.route,
           builder: (context, state) => const TownScreen(),
+        ),
+        GoRoute(
+          path: BuildingScreen.route,
+          builder: (context, state) =>
+              BuildingScreen(args: state.extra as BuildingScreenArgs?),
         ),
         GoRoute(
           path: MathScreen.route,
@@ -168,10 +174,17 @@ void main() {
     expect(find.text('◆ 1'), findsOneWidget);
   });
 
-  testWidgets('bấm nút khu thì sang màn làm toán đúng chặng', (tester) async {
+  testWidgets('bấm nút khu thì sang màn tòa nhà rồi làm toán đúng chặng', (
+    tester,
+  ) async {
     await pumpTown(tester);
 
     await tester.tap(find.byKey(const Key('town-stage-2-button')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('building-screen')), findsOneWidget);
+    expect(find.text('Tháp Con số'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('building-challenge-button')));
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('math-screen')), findsOneWidget);
@@ -203,6 +216,10 @@ void main() {
     await pumpTown(tester);
 
     await tester.tap(find.byKey(const Key('town-stage-0-button')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('building-screen')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('building-challenge-button')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('math-screen')), findsOneWidget);
 

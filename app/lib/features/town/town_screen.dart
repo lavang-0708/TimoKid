@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/models.dart';
 import '../../core/database/tables.dart';
+import '../building/building_screen.dart';
 import '../character/character_bounce.dart';
 import '../character/character_model.dart';
 import '../character/character_view.dart';
@@ -12,7 +13,6 @@ import '../character/placeholder_layers.dart';
 import '../daily_set/daily_set_config.dart';
 import '../daily_set/daily_set_service.dart';
 import '../ladder/ladder_service.dart';
-import '../math/math_screen.dart';
 import '../onboarding/onboarding_config.dart';
 import '../onboarding/onboarding_model.dart';
 import '../onboarding/onboarding_service.dart';
@@ -25,7 +25,9 @@ import 'town_map.dart';
 ///
 /// Bản đồ phong cách v2 (A2): nền thị trấn + 10 lớp động + 5 công
 /// trình là vùng bấm (mỗi khu một công trình, xem [townAreas] trong
-/// `town_assets.dart`), nhà hồng về Phòng (xem [TownMap]). Mỗi nhãn
+/// `town_assets.dart`), nhà hồng về Phòng (xem [TownMap]). Bấm công
+/// trình thì vào màn Tòa nhà của khu đó (PR (B)) — chưa vào làm bài
+/// ngay; nút "Thử thách" ở màn Tòa nhà mới vào màn toán. Mỗi nhãn
 /// dán trên công trình hiện tên khu + trạng thái chặng hôm nay (chưa
 /// làm / đang làm / xong); hàng đầu vẫn là số xu, kim cương, thanh
 /// tiến độ đề ngày như trước.
@@ -248,8 +250,8 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                     child: TownMap(
                       statuses: statuses,
                       onAreaTap: (i) => context.go(
-                        MathScreen.route,
-                        extra: MathScreenArgs(stageIndex: i),
+                        BuildingScreen.route,
+                        extra: BuildingScreenArgs(stageIndex: i),
                       ),
                       onRoomTap: () => context.go(RoomScreen.route),
                     ),

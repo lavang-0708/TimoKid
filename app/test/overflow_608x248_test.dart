@@ -41,6 +41,11 @@
 /// khóa Phòng khóa (banner + nút khóa) và Phòng mở (hết banner, nút
 /// sang màn chờ) đều vừa ở cả 2 cỡ, đi Phòng → Thị trấn → Phòng
 /// không tràn.
+///
+/// PR (B): bấm khu ở Thị trấn vào màn Tòa nhà rồi mới vào màn toán
+/// (nút Thử thách) — các nhóm dưới đi qua màn Tòa nhà, và nhóm
+/// 'màn tòa nhà 608x248 + 640x320' khóa riêng màn Tòa nhà vừa ở
+/// cả 2 cỡ.
 library;
 
 import 'dart:math';
@@ -55,6 +60,7 @@ import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/core/database/models.dart';
 import 'package:timokid/core/router/app_router.dart';
 import 'package:timokid/core/time/clock.dart';
+import 'package:timokid/features/building/building_screen.dart';
 import 'package:timokid/features/character/placeholder_layers.dart';
 import 'package:timokid/features/daily_set/daily_set_service.dart';
 import 'package:timokid/features/ladder/ladder_service.dart';
@@ -238,6 +244,11 @@ void main() {
             builder: (context, state) => const TownScreen(),
           ),
           GoRoute(
+            path: BuildingScreen.route,
+            builder: (context, state) =>
+                BuildingScreen(args: state.extra as BuildingScreenArgs?),
+          ),
+          GoRoute(
             path: MathScreen.route,
             builder: (context, state) =>
                 MathScreen(args: state.extra as MathScreenArgs?),
@@ -258,7 +269,14 @@ void main() {
       }
       expect(find.byKey(const Key('town-room-house-button')), findsOneWidget);
 
+      // PR (B): nút khu vào màn Tòa nhà, bấm Thử thách mới vào màn
+      // toán — cả hai màn đều phải vừa ở 640x320.
       await tester.tap(find.byKey(const Key('town-stage-0-button')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('building-screen')), findsOneWidget);
+      _checkNoError(tester, 'màn tòa nhà 640x320');
+
+      await tester.tap(find.byKey(const Key('building-challenge-button')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('math-screen')), findsOneWidget);
       _checkNoError(tester, 'màn toán 640x320');
@@ -301,6 +319,11 @@ void main() {
             builder: (context, state) => const TownScreen(),
           ),
           GoRoute(
+            path: BuildingScreen.route,
+            builder: (context, state) =>
+                BuildingScreen(args: state.extra as BuildingScreenArgs?),
+          ),
+          GoRoute(
             path: MathScreen.route,
             builder: (context, state) =>
                 MathScreen(args: state.extra as MathScreenArgs?),
@@ -321,7 +344,13 @@ void main() {
       await tester.pumpAndSettle();
       _checkNoError(tester, 'thị trấn');
 
+      // PR (B): nút khu vào màn Tòa nhà, bấm Thử thách mới vào màn
+      // toán.
       await tester.tap(find.byKey(const Key('town-stage-0-button')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('building-screen')), findsOneWidget);
+      _checkNoError(tester, 'mở màn tòa nhà');
+      await tester.tap(find.byKey(const Key('building-challenge-button')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('math-screen')), findsOneWidget);
       _checkNoError(tester, 'mở màn toán');
@@ -426,6 +455,102 @@ void main() {
       await tester.pumpAndSettle();
       _checkNoError(tester, 'màn kết quả');
       expect(find.byKey(const Key('stage-result-screen')), findsOneWidget);
+    });
+  });
+
+  group('màn tòa nhà 608x248 + 640x320 (PR (B))', () {
+    late FakeClock clock;
+    late AppDatabase db;
+    late String childId;
+
+    setUp(() async {
+      clock = FakeClock(DateTime(2026, 11, 18, 8, 0));
+      db = AppDatabase(executor: NativeDatabase.memory(), clock: clock);
+      addTearDown(db.close);
+      childId = await db.ensureSeeded();
+      final service = DailySetService(
+        dailySetsDao: db.dailySetsDao,
+        reviewQueueDao: db.reviewQueueDao,
+        ladderService: LadderService(
+          attemptsDao: db.attemptsDao,
+          skillProgressDao: db.skillProgressDao,
+        ),
+        clock: clock,
+        random: Random(42),
+      );
+      await service.getOrCreateTodaySet(childId: childId);
+    });
+
+    Future<void> pumpTown(WidgetTester tester, Size size) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final router = GoRouter(
+        initialLocation: TownScreen.route,
+        routes: [
+          GoRoute(
+            path: TownScreen.route,
+            builder: (context, state) => const TownScreen(),
+          ),
+          GoRoute(
+            path: BuildingScreen.route,
+            builder: (context, state) =>
+                BuildingScreen(args: state.extra as BuildingScreenArgs?),
+          ),
+          GoRoute(
+            path: MathScreen.route,
+            builder: (context, state) =>
+                MathScreen(args: state.extra as MathScreenArgs?),
+          ),
+        ],
+      );
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [databaseProvider.overrideWithValue(db)],
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
+      await tester.pumpAndSettle();
+      _checkNoError(tester, 'thị trấn $size');
+    }
+
+    for (final size in [const Size(608, 248), const Size(640, 320)]) {
+      testWidgets('màn tòa nhà không tràn ($size)', (tester) async {
+        await pumpTown(tester, size);
+
+        await tester.tap(find.byKey(const Key('town-stage-0-button')));
+        await tester.pumpAndSettle();
+        expect(find.byKey(const Key('building-screen')), findsOneWidget);
+        _checkNoError(tester, 'màn tòa nhà $size');
+        expect(
+          find.byKey(const Key('building-challenge-button')),
+          findsOneWidget,
+        );
+      });
+    }
+
+    testWidgets('màn tòa nhà chặng đã xong không tràn (608x248)', (
+      tester,
+    ) async {
+      // Nhãn phụ nút Thử thách dài hơn khi chặng đã xong ("Chặng ngày
+      // xong, làm chặng tự chọn") nên khóa riêng ở cỡ nhỏ nhất.
+      final set = await db.dailySetsDao.getDailySet(childId, clock.today());
+      await db.dailySetsDao.updateStageStatus(
+        id: set!.id,
+        stageIndex: 0,
+        status: StageStatus.done,
+      );
+      await pumpTown(tester, const Size(608, 248));
+
+      await tester.tap(find.byKey(const Key('town-stage-0-button')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('building-screen')), findsOneWidget);
+      _checkNoError(tester, 'màn tòa nhà chặng xong 608x248');
+      expect(
+        find.byKey(const Key('building-challenge-button')),
+        findsOneWidget,
+      );
     });
   });
 
@@ -548,7 +673,16 @@ void main() {
       // Vào màn toán, làm hết chặng 0 tới màn kết quả (kịch bản
       // app_test.dart:168): bàn phím đã đóng nên cột phải không bị
       // bóp, tapCorrect phải chạm trúng và có math-next-button.
+      // PR (B): nút khu vào màn Tòa nhà, bấm Thử thách mới vào màn
+      // toán.
       await _tapVisible(tester, find.byKey(const Key('town-stage-0-button')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('building-screen')), findsOneWidget);
+      _checkNoError(tester, 'mở màn tòa nhà');
+      await _tapVisible(
+        tester,
+        find.byKey(const Key('building-challenge-button')),
+      );
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('math-screen')), findsOneWidget);
       _checkNoError(tester, 'mở màn toán');
@@ -713,7 +847,16 @@ void main() {
       await tester.pumpAndSettle();
       drain();
 
+      // PR (B): nút khu vào màn Tòa nhà, bấm Thử thách mới vào màn
+      // toán. Bàn phím kẹt mở bóp viewport nên nút Thử thách cũng
+      // phải bấm bằng ensureVisible.
       await _tapVisible(tester, find.byKey(const Key('town-stage-0-button')));
+      drain();
+      expect(find.byKey(const Key('building-screen')), findsOneWidget);
+      await _tapVisible(
+        tester,
+        find.byKey(const Key('building-challenge-button')),
+      );
       drain();
       expect(find.byKey(const Key('math-screen')), findsOneWidget);
 

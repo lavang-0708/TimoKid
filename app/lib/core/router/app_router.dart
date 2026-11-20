@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/character/character_view.dart';
+import '../../features/building/building_screen.dart';
 import '../../features/math/math_screen.dart';
 import '../../features/onboarding/hatch_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
@@ -65,6 +66,11 @@ class AppRouter {
         GoRoute(
           path: HatchScreen.route,
           builder: (context, state) => const HatchScreen(),
+        ),
+        GoRoute(
+          path: BuildingScreen.route,
+          builder: (context, state) =>
+              BuildingScreen(args: state.extra as BuildingScreenArgs?),
         ),
         GoRoute(
           path: MathScreen.route,
