@@ -6,6 +6,8 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/models.dart';
 import '../../core/database/tables.dart';
+import '../../core/widgets/press_bounce.dart';
+import '../character/character_bounce.dart';
 import '../character/character_model.dart';
 import '../character/character_view.dart';
 import '../character/placeholder_layers.dart';
@@ -29,7 +31,10 @@ import 'town_assets.dart';
 /// Từ T2-03, nhân vật bé đã tạo hiện ở cột trái (tên bên dưới):
 /// nữ dùng bộ nhân vật nữ 1 thật (PR #18), nam tạm dùng lớp xám
 /// như ở màn mở đầu. Chưa tạo nhân vật (máy 0.1 cũ) thì không có
-/// cột nhân vật.
+/// cột nhân vật. Nhân vật thở nhẹ kiểu squash/stretch (xem
+/// `CharacterView`), bấm vào thì nhảy lên + lấp lánh (xem
+/// [CharacterBounce]); cổng [AnimationGate] tắt hiệu ứng khi chạy
+/// test để `pumpAndSettle` dừng được.
 ///
 /// Số dư đọc qua [RewardService.balances] của T1-11 (đã merge, tổng
 /// `wallet_ledger` của bé), bảng thưởng đọc từ settings như màn làm
@@ -175,15 +180,17 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                       child: Column(
                         children: [
                           Expanded(
-                            child: CharacterView(
-                              key: const Key('town-character'),
-                              outfit: _outfitFor(profile),
-                              loader: _loaderFor(profile),
-                              // Tĩnh ở Thị trấn (không thở/chớp mắt):
-                              // hiệu ứng lặp vô hạn làm `pumpAndSettle`
-                              // trong test và integration test không bao
-                              // giờ dừng; phòng (T2-04) sẽ bật lại.
-                              animationsEnabled: false,
+                            child: CharacterBounce(
+                              child: CharacterView(
+                                key: const Key('town-character'),
+                                outfit: _outfitFor(profile),
+                                loader: _loaderFor(profile),
+                                // Thở/chớp mắt bật (kiểu game); cổng
+                                // AnimationGate tắt khi chạy test để
+                                // pumpAndSettle dừng được (xem ghi chú
+                                // ở đầu file).
+                                animationsEnabled: true,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -280,72 +287,77 @@ class _AreaButton extends StatelessWidget {
       _ => ('Chưa làm', Colors.grey.shade600),
     };
     return SizedBox(
-      child: ElevatedButton(
-        key: Key('town-stage-$stageIndex-button'),
-        onPressed: () => context.go(
-          MathScreen.route,
-          extra: MathScreenArgs(stageIndex: stageIndex),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Color(area.color),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-        ),
-        // Icon chiếm phần còn lại của nút (Expanded): tên khu (tối đa
-        // 2 dòng; font DejaVu trong test rộng hơn Roboto nên tính dư)
-        // + nhãn trạng thái giữ chiều cao cố định, icon co theo chỗ
-        // còn lại nên không bao giờ tràn — ở màn 640x320 icon còn
-        // ~40 dp, ở màn lớn cũng không phình vô hạn vì nút cao hữu hạn.
-        // Màn thấp (nút cao < 120 dp, vd 608x248): tên + nhãn cố định
-        // đã 91 dp mà nút chỉ còn 85 dp nên tràn 6 px — lúc này co
-        // gọn (tên 16, khe 4) để vừa; ở cỡ thường vẫn 18/6 như cũ
-        // nên golden không đổi.
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final compact = constraints.maxHeight < 120;
-            final gap = compact ? 4.0 : 6.0;
-            final nameSize = compact ? 16.0 : 18.0;
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: SvgPicture.asset(area.asset),
-                  ),
-                ),
-                SizedBox(height: gap),
-                Text(
-                  area.name,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  style: TextStyle(fontSize: nameSize),
-                ),
-                SizedBox(height: gap),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: chipColor,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  // Nhãn trạng thái không được xuống dòng: ở màn hẹp
-                  // (có cột nhân vật, nút chỉ rộng ~65 dp) "Chưa làm"
-                  // wrap thành 5 dòng cao 92 dp làm nút tràn 79 px.
-                  // `FittedBox` thu chữ lại vừa chiều rộng thay vì
-                  // wrap; khi chạy app (font Nunito) vẫn vừa như trước.
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      label,
-                      style: const TextStyle(fontSize: 16, color: Colors.white),
+      child: PressBounce(
+        child: ElevatedButton(
+          key: Key('town-stage-$stageIndex-button'),
+          onPressed: () => context.go(
+            MathScreen.route,
+            extra: MathScreenArgs(stageIndex: stageIndex),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(area.color),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          ),
+          // Icon chiếm phần còn lại của nút (Expanded): tên khu (tối đa
+          // 2 dòng; font DejaVu trong test rộng hơn Roboto nên tính dư)
+          // + nhãn trạng thái giữ chiều cao cố định, icon co theo chỗ
+          // còn lại nên không bao giờ tràn — ở màn 640x320 icon còn
+          // ~40 dp, ở màn lớn cũng không phình vô hạn vì nút cao hữu hạn.
+          // Màn thấp (nút cao < 120 dp, vd 608x248): tên + nhãn cố định
+          // đã 91 dp mà nút chỉ còn 85 dp nên tràn 6 px — lúc này co
+          // gọn (tên 16, khe 4) để vừa; ở cỡ thường vẫn 18/6 như cũ
+          // nên golden không đổi.
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxHeight < 120;
+              final gap = compact ? 4.0 : 6.0;
+              final nameSize = compact ? 16.0 : 18.0;
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: SvgPicture.asset(area.asset),
                     ),
                   ),
-                ),
-              ],
-            );
-          },
+                  SizedBox(height: gap),
+                  Text(
+                    area.name,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    style: TextStyle(fontSize: nameSize),
+                  ),
+                  SizedBox(height: gap),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: chipColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    // Nhãn trạng thái không được xuống dòng: ở màn hẹp
+                    // (có cột nhân vật, nút chỉ rộng ~65 dp) "Chưa làm"
+                    // wrap thành 5 dòng cao 92 dp làm nút tràn 79 px.
+                    // `FittedBox` thu chữ lại vừa chiều rộng thay vì
+                    // wrap; khi chạy app (font Nunito) vẫn vừa như trước.
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        label,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

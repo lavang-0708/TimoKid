@@ -120,18 +120,22 @@ const Map<String, String> eggSpeciesNames = <String, String>{
   'rabbit': 'Thỏ Bánh Bao',
 };
 
-/// Đường dẫn SVG trứng tạm của từng loài (xem `egg_assets.dart`).
+/// Đường dẫn PNG trứng thật của từng loài (PR #21: 12 PNG ở
+/// `app/assets/images/pets/`, 512x512, đất y=440; trứng có tai/đuôi
+/// theo loài). Trước đây là SVG tạm ở `assets/temp/eggs/`.
 const Map<String, String> eggSpeciesAssets = <String, String>{
-  'dog': 'assets/temp/eggs/egg_dog.svg',
-  'cat': 'assets/temp/eggs/egg_cat.svg',
-  'rabbit': 'assets/temp/eggs/egg_rabbit.svg',
+  'dog': 'assets/images/pets/dog_egg.png',
+  'cat': 'assets/images/pets/cat_egg.png',
+  'rabbit': 'assets/images/pets/rabbit_egg.png',
 };
 
-/// Đường dẫn SVG pet mới nở tạm của từng loài.
+/// Đường dẫn PNG pet mới nở thật của từng loài (PR #21). Trước đây
+/// là SVG tạm ở `assets/temp/pets/`. Giai đoạn teen/adult để T2-07
+/// dùng sau, chưa xài ở đây.
 const Map<String, String> newbornSpeciesAssets = <String, String>{
-  'dog': 'assets/temp/pets/dog_newborn.svg',
-  'cat': 'assets/temp/pets/cat_newborn.svg',
-  'rabbit': 'assets/temp/pets/rabbit_newborn.svg',
+  'dog': 'assets/images/pets/dog_newborn.png',
+  'cat': 'assets/images/pets/cat_newborn.png',
+  'rabbit': 'assets/images/pets/rabbit_newborn.png',
 };
 
 /// Cách gọi pet mới nở trong câu chào ở màn nở trứng.

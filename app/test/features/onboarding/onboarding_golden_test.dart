@@ -7,9 +7,9 @@
 /// 640x320 nhất trong các cỡ chuẩn).
 ///
 /// Màn mở đầu bơm trực tiếp (không qua router) để xác định: xem
-/// trước nhân vật dùng lớp tạm xám, trứng dùng SVG tạm. Màn nở bơm
-/// sau khi đặt cờ chờ nở, `pumpAndSettle` chạy hết hoạt cảnh 2,4 giây
-/// nên ảnh chụp thấy pet mới nở + nút Tiếp tục.
+/// trước nhân vật dùng lớp tạm xám, trứng dùng PNG thật (PR #21).
+/// Màn nở bơm sau khi đặt cờ chờ nở, `pumpAndSettle` chạy hết hoạt
+/// cảnh 2,4 giây nên ảnh chụp thấy pet mới nở + nút Tiếp tục.
 library;
 
 import 'dart:convert';
@@ -26,6 +26,7 @@ import 'package:timokid/core/theme/app_theme.dart';
 import 'package:timokid/features/character/placeholder_layers.dart';
 import 'package:timokid/features/onboarding/egg_service.dart';
 import 'package:timokid/features/onboarding/hatch_screen.dart';
+import 'package:timokid/features/onboarding/onboarding_config.dart';
 import 'package:timokid/features/onboarding/onboarding_screen.dart';
 
 import '../../goldens/onboarding_golden_data.dart';
@@ -109,16 +110,21 @@ void main() {
   /// Nạp trước ảnh vào ImageCache (mẫu `character_golden_test.dart`):
   /// codec giải mã chỉ chạy trong async thật (`runAsync`), fake async
   /// của `pump` không lái được nó — không có bước này thì ảnh chụp
-  /// golden trắng trơn (cả lớp xám MemoryImage lẫn SVG trứng/pet).
+  /// golden trắng trơn (cả lớp xám MemoryImage lẫn PNG trứng/pet).
   Future<void> precacheImages(WidgetTester tester, Finder scope) async {
     final context = tester.element(scope);
     await tester.runAsync(() async {
       for (final path in placeholderLayerBase64.keys) {
         await precacheImage(placeholderLayerLoader(path), context);
       }
-      // SVG trứng/pet không có hàm precache trong flutter_svg 2.4.0;
-      // chúng nạp qua `pumpAndSettle` sau khi đã khai đúng thư mục
-      // con trong pubspec (xem ghi chú ở mục assets của pubspec).
+      // PNG trứng/pet thật (PR #21): nạp trước để ảnh chụp golden
+      // không trắng trơn (cùng lý do như lớp tạm xám).
+      for (final path in [
+        ...eggSpeciesAssets.values,
+        ...newbornSpeciesAssets.values,
+      ]) {
+        await precacheImage(AssetImage(path), context);
+      }
     });
     await tester.pump();
   }

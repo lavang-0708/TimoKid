@@ -6,6 +6,7 @@ library;
 
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -48,6 +49,16 @@ void main() {
 
       expect(find.byKey(const Key('hatch-screen')), findsOneWidget);
       expect(find.text('Chào bé cún Tinh Anh!'), findsOneWidget);
+      // Trứng + pet mới nở là PNG thật (PR #21), không còn SVG tạm.
+      final paths = tester
+          .widgetList<Image>(find.byType(Image))
+          .map((w) => w.image)
+          .whereType<AssetImage>()
+          .map((p) => p.assetName)
+          .toList();
+      expect(paths, contains('assets/images/pets/dog_egg.png'));
+      expect(paths, contains('assets/images/pets/dog_newborn.png'));
+      expect(find.byType(SvgPicture), findsNothing);
       expect(find.byKey(const Key('hatch-continue-button')), findsOneWidget);
 
       await tester.tap(find.byKey(const Key('hatch-continue-button')));

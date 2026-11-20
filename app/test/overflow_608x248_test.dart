@@ -42,7 +42,6 @@ import 'dart:math';
 
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -55,6 +54,8 @@ import 'package:timokid/features/daily_set/daily_set_service.dart';
 import 'package:timokid/features/ladder/ladder_service.dart';
 import 'package:timokid/features/math/math_screen.dart';
 import 'package:timokid/features/math/math_session.dart';
+import 'package:timokid/features/onboarding/egg_service.dart';
+import 'package:timokid/features/onboarding/hatch_screen.dart';
 import 'package:timokid/features/onboarding/onboarding_model.dart';
 import 'package:timokid/features/onboarding/onboarding_service.dart';
 import 'package:timokid/features/stage_result/stage_result_screen.dart';
@@ -137,15 +138,15 @@ void main() {
       await tapNext();
       _checkNoError(tester, 'bước 5 trứng');
       // Thẻ trứng cao hơn vùng nhìn ở màn thấp (243 dp > 73 dp)
-      // nên tâm thẻ nằm dưới nếp gấp — bấm vào hình trứng SVG ở
+      // nên tâm thẻ nằm dưới nếp gấp — bấm vào hình trứng PNG ở
       // đỉnh thẻ (luôn thấy sau khi cuộn) thay vì tâm thẻ.
-      final eggSvg = find.descendant(
+      final eggImage = find.descendant(
         of: find.byKey(const Key('onboarding-egg-dog')),
-        matching: find.byType(SvgPicture),
+        matching: find.byType(Image),
       );
-      await tester.ensureVisible(eggSvg);
+      await tester.ensureVisible(eggImage);
       await tester.pumpAndSettle();
-      await tester.tap(eggSvg);
+      await tester.tap(eggImage);
       await tester.pumpAndSettle();
       _checkNoError(tester, 'bước 5 chọn trứng chó');
       await tester.tap(find.byKey(const Key('onboarding-finish-button')));
@@ -457,13 +458,13 @@ void main() {
       _checkNoError(tester, 'bước 5 trứng (sau khi đóng bàn phím)');
       expect(find.text('Bước 5/5'), findsOneWidget);
 
-      final eggSvg = find.descendant(
+      final eggImage = find.descendant(
         of: find.byKey(const Key('onboarding-egg-dog')),
-        matching: find.byType(SvgPicture),
+        matching: find.byType(Image),
       );
-      await tester.ensureVisible(eggSvg);
+      await tester.ensureVisible(eggImage);
       await tester.pumpAndSettle();
-      await tester.tap(eggSvg);
+      await tester.tap(eggImage);
       await tester.pumpAndSettle();
       _checkNoError(tester, 'bước 5 chọn trứng chó');
       await _tapVisible(
@@ -711,6 +712,54 @@ void main() {
       expect(find.byKey(const Key('stage-result-screen')), findsOneWidget);
       expect(find.text('Đúng 4/5 câu'), findsOneWidget);
       expect(find.text('Nhận được 12 xu'), findsOneWidget);
+    });
+  });
+
+  group('màn nở 608x248', () {
+    late AppDatabase db;
+    late String childId;
+
+    setUp(() async {
+      db = AppDatabase(executor: NativeDatabase.memory());
+      addTearDown(db.close);
+      childId = await db.ensureSeeded();
+      final eggs = EggService(db: db);
+      await eggs.selectEgg(childId: childId, species: 'dog');
+      await eggs.noteStageCompleted(childId);
+    });
+
+    Future<void> pumpHatch(WidgetTester tester, Size size) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [databaseProvider.overrideWithValue(db)],
+          child: const MaterialApp(home: HatchScreen()),
+        ),
+      );
+      // Hoạt cảnh nở một lần 2,4 giây rồi dừng nên pumpAndSettle
+      // qua được; xong mới hiện nút Tiếp tục.
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('màn nở xong không tràn, nút Tiếp tục bấm được', (
+      tester,
+    ) async {
+      await pumpHatch(tester, const Size(608, 248));
+      _checkNoError(tester, 'màn nở 608x248');
+      expect(find.byKey(const Key('hatch-screen')), findsOneWidget);
+      expect(find.text('Chào bé cún Tinh Anh!'), findsOneWidget);
+      expect(find.byKey(const Key('hatch-continue-button')), findsOneWidget);
+    });
+
+    testWidgets('màn nở ở 640x320 không tràn', (tester) async {
+      await pumpHatch(tester, const Size(640, 320));
+      _checkNoError(tester, 'màn nở 640x320');
+      expect(find.byKey(const Key('hatch-continue-button')), findsOneWidget);
     });
   });
 }

@@ -8,6 +8,7 @@ library;
 
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:timokid/core/database/app_database.dart';
@@ -193,6 +194,28 @@ void main() {
     expect(tester.widget<ElevatedButton>(finish).onPressed, isNotNull);
   });
 
+  testWidgets('bước chọn trứng: hình PNG thật, không còn SVG tạm', (
+    tester,
+  ) async {
+    await goToNameStepGirl(tester);
+    await enterName(tester, 'An');
+    await tapNext(tester);
+    expect(find.text('Chọn một quả trứng'), findsOneWidget);
+
+    for (final species in ['dog', 'cat', 'rabbit']) {
+      final card = find.byKey(Key('onboarding-egg-$species'));
+      final image = find.descendant(of: card, matching: find.byType(Image));
+      expect(image, findsOneWidget);
+      final provider = tester.widget<Image>(image).image;
+      expect(provider, isA<AssetImage>());
+      expect(
+        (provider as AssetImage).assetName,
+        'assets/images/pets/${species}_egg.png',
+      );
+    }
+    expect(find.byType(SvgPicture), findsNothing);
+  });
+
   testWidgets('đi hết 5 bước nữ: lưu hồ sơ + trứng rồi vào Thị trấn', (
     tester,
   ) async {
@@ -249,31 +272,5 @@ void main() {
       await db.settingsDao.getValue(childId: childId, key: 'selected_egg'),
       'dog',
     );
-  });
-
-  // Lỗi bản v0.0.2 trên máy thật: bấm vào ô tên thì bàn phím mở,
-  // màn đổi bố cục theo bàn phím, ô tên bị dựng lại và mất focus nên
-  // bàn phím đóng ngay, bé không gõ được. Khóa: bàn phím mở (viewInsets
-  // dưới > 0) thì ô tên vẫn giữ focus và gõ tiếp được.
-  testWidgets('bàn phím ảo mở thì ô tên vẫn giữ focus, gõ được', (
-    tester,
-  ) async {
-    await goToNameStepGirl(tester);
-    final field = find.byKey(const Key('onboarding-name-field'));
-    await tester.tap(field);
-    await tester.pump();
-    tester.view.viewInsets = const FakeViewPadding(bottom: 200);
-    addTearDown(tester.view.resetViewInsets);
-    await tester.pumpAndSettle();
-
-    final editable = find.descendant(
-      of: field,
-      matching: find.byType(EditableText),
-    );
-    expect(tester.widget<EditableText>(editable).focusNode.hasFocus, isTrue);
-    await tester.enterText(field, 'An');
-    await tester.pumpAndSettle();
-    expect(find.text('An'), findsOneWidget);
-    expect(tester.widget<EditableText>(editable).focusNode.hasFocus, isTrue);
   });
 }

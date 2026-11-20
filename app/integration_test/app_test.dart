@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:timokid/core/animation/animation_gate.dart';
 import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/features/math/math_session.dart';
 import 'package:timokid/main.dart' as app;
@@ -17,6 +18,12 @@ import 'package:timokid/main.dart' as app;
 /// DB qua [databaseProvider], sinh lại từng câu từ seed bằng
 /// [ResolvedQuestion.resolve] — cùng code màn hình dùng.
 void main() {
+  // Tắt hiệu ứng lặp vô hạn khi chạy integration test (cùng mẫu
+  // sound_enabled = false bên dưới): thở/chớp mắt/lắc trứng dùng
+  // AnimationController.repeat() nên pumpAndSettle không bao giờ
+  // dừng khi Thị trấn/mở đầu đang hiện. Máy thật vẫn bật hiệu ứng.
+  AnimationGate.enabled = false;
+
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('mở đầu nữ, vào Thị trấn, làm hết chặng 1', (tester) async {
