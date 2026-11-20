@@ -30,6 +30,7 @@ import 'package:timokid/features/daily_set/daily_set_service.dart';
 import 'package:timokid/features/ladder/ladder_service.dart';
 import 'package:timokid/features/math/math_screen.dart';
 import 'package:timokid/features/stage_result/stage_result_screen.dart';
+import 'package:timokid/features/town/town_assets.dart';
 import 'package:timokid/features/town/town_screen.dart';
 
 import '../../goldens/town_golden_data.dart';
@@ -145,8 +146,26 @@ void main() {
     }
   }
 
+  /// Nạp trước nền + 10 lớp động vào ImageCache (mẫu
+  /// `room_golden_test.dart` / A1): codec giải mã chỉ chạy trong
+  /// async thật (`runAsync`), fake async của `pump` không lái được
+  /// nó — không có bước này thì ảnh chụp golden thiếu nền/lớp động
+  /// (test đầu chạy khi ảnh chưa kịp về, test sau mới có vì đã
+  /// cache — bắt bằng mắt ở golden `town_before` A2).
+  Future<void> precacheImages(WidgetTester tester) async {
+    final context = tester.element(find.byKey(const Key('town-screen')));
+    await tester.runAsync(() async {
+      await precacheImage(const AssetImage(townBackgroundAsset), context);
+      for (final path in townLayerAssets) {
+        await precacheImage(AssetImage(path), context);
+      }
+    });
+    await tester.pump();
+  }
+
   testWidgets('Thị trấn trước khi làm đề ngày (0/5 chặng)', (tester) async {
     await pumpTown(tester);
+    await precacheImages(tester);
     await expectLater(
       find.byKey(const Key('town-screen')),
       matchesGoldenFile('../../goldens/town_before.png'),
@@ -168,6 +187,7 @@ void main() {
       reason: 'test',
     );
     await pumpTown(tester);
+    await precacheImages(tester);
     await expectLater(
       find.byKey(const Key('town-screen')),
       matchesGoldenFile('../../goldens/town_during.png'),
@@ -191,6 +211,7 @@ void main() {
       reason: 'test',
     );
     await pumpTown(tester);
+    await precacheImages(tester);
     await expectLater(
       find.byKey(const Key('town-screen')),
       matchesGoldenFile('../../goldens/town_after.png'),

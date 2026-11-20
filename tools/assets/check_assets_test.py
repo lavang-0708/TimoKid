@@ -411,6 +411,51 @@ class CheckAssetsTest(unittest.TestCase):
         self.assertTrue(any("sai quy tắc đặt tên" in e for e in errors),
                         errors)
 
+    def _add_town_layer(self, eid="cloud_01", w=512, h=512):
+        """Lớp động thị trấn: PNG trong suốt 512x512 ở thư mục town/."""
+        path = self.root / f"app/assets/images/town/{eid}.png"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        top_row = bytes([255, 255, 255, 0]) * w
+        mid_row = (
+            bytes([255, 255, 255, 0])
+            + bytes([255, 255, 255, 255]) * (w - 2)
+            + bytes([255, 255, 255, 0])
+        )
+        write_png_rows(path, w, h, 6, top_row, mid_row)
+        self.manifest["entries"].append(
+            entry(eid, f"app/assets/images/town/{eid}.png",
+                  kind="town_layer", form="any", layer=None,
+                  recolorable=False)
+        )
+        return path
+
+    def test_town_layer_valid_passes(self):
+        self._add_town_layer()
+        self.write_manifest()
+        code, errors = self.run_checker()
+        self.assertEqual(code, 0, errors)
+
+    def test_town_layer_wrong_dir_fails(self):
+        # Lớp động thị trấn phải nằm trong thư mục town/, không phải
+        # furniture/ (cùng khung 512x512 nhưng khác loại).
+        self._add_town_layer()
+        self.manifest["entries"][0]["file"] = (
+            "app/assets/images/furniture/cloud_01.png"
+        )
+        self.write_manifest()
+        code, errors = self.run_checker()
+        self.assertEqual(code, 1)
+        self.assertTrue(any("phải nằm trong thư mục" in e for e in errors),
+                        errors)
+
+    def test_town_layer_wrong_size_fails(self):
+        self._add_town_layer(w=256, h=256)
+        self.write_manifest()
+        code, errors = self.run_checker()
+        self.assertEqual(code, 1)
+        self.assertTrue(any("sai kích thước khung" in e for e in errors),
+                        errors)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

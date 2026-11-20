@@ -9,6 +9,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:timokid/core/database/app_database.dart';
 import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/core/router/app_router.dart';
+import 'package:timokid/features/town/town_assets.dart';
 import 'package:timokid/main.dart';
 
 import 'goldens/golden_data.dart';
@@ -95,6 +96,21 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// Nạp trước nền + 10 lớp động thị trấn v2 vào ImageCache (mẫu
+  /// `room_golden_test.dart` / A1): không có bước này thì ảnh chụp
+  /// golden thiếu nền (test đầu chạy khi ảnh chưa kịp về — bắt bằng
+  /// mắt ở golden `town_800x360` A2).
+  Future<void> precacheTownImages(WidgetTester tester) async {
+    final context = tester.element(find.byKey(const Key('town-screen')));
+    await tester.runAsync(() async {
+      await precacheImage(const AssetImage(townBackgroundAsset), context);
+      for (final path in townLayerAssets) {
+        await precacheImage(AssetImage(path), context);
+      }
+    });
+    await tester.pump();
+  }
+
   testWidgets('màn Thị trấn 800x360 dp', (tester) async {
     tester.view.physicalSize = const Size(800, 360);
     tester.view.devicePixelRatio = 1.0;
@@ -105,6 +121,7 @@ void main() {
     // Từ T2-04 app mở vào Phòng; sang Thị trấn bằng nút ở Phòng.
     await tester.tap(find.byKey(const Key('room-town-button')));
     await tester.pumpAndSettle();
+    await precacheTownImages(tester);
 
     await expectLater(
       find.byKey(const Key('town-screen')),
@@ -122,6 +139,7 @@ void main() {
     // Từ T2-04 app mở vào Phòng; sang Thị trấn bằng nút ở Phòng.
     await tester.tap(find.byKey(const Key('room-town-button')));
     await tester.pumpAndSettle();
+    await precacheTownImages(tester);
 
     await expectLater(
       find.byKey(const Key('town-screen')),

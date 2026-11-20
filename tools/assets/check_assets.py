@@ -2,7 +2,8 @@
 """Kiểm tra hình đầu vào theo hợp đồng trong ``assets/manifest.json``.
 
 Hợp đồng (xem ``docs/ASSETS.md``): khung nhân vật 1024x1536, pet/đồ vật/
-nội thất 512x512, nền JPEG hoặc PNG, tên file ``<dáng>_<lớp>_<tên món>.png``,
+nội thất/lớp động thị trấn 512x512, nền JPEG hoặc PNG, tên file
+``<dáng>_<lớp>_<tên món>.png``,
 lớp đổi màu tô xám để app nhân màu, chi tiết không đổi màu đi file
 riêng đuôi ``_line``, thứ tự chồng 8 lớp từ tóc sau lên phụ kiện.
 
@@ -47,7 +48,15 @@ LAYERS = {
     "accessory_hand": 8,
 }
 
-KINDS = {"character_layer", "pet", "item", "furniture", "background", "icon"}
+KINDS = {
+    "character_layer",
+    "pet",
+    "item",
+    "furniture",
+    "background",
+    "icon",
+    "town_layer",
+}
 FORMS = {"girl", "boy", "any"}
 STATUSES = {"ready", "planned"}
 
@@ -58,6 +67,7 @@ FRAMES = {
     "pet": (512, 512),
     "item": (512, 512),
     "furniture": (512, 512),
+    "town_layer": (512, 512),
 }
 
 # Tên file cho từng loại (chỉ tên file, không tính thư mục — thư mục
@@ -74,6 +84,7 @@ NAME_PATTERNS = {
     "furniture": re.compile(r"^[a-z0-9_]+\.png$"),
     "background": re.compile(r"^[a-z0-9_]+\.(jpg|jpeg|png)$"),
     "icon": re.compile(r"^[a-z0-9_]+\.svg$"),
+    "town_layer": re.compile(r"^[a-z0-9_]+\.png$"),
 }
 
 # Thư mục con cho từng loại (tính từ app/assets/images/); icon không
@@ -85,6 +96,7 @@ KIND_DIRS = {
     "furniture": "furniture",
     "background": "backgrounds",
     "icon": None,
+    "town_layer": "town",
 }
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".svg"}

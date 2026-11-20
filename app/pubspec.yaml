@@ -80,6 +80,10 @@ flutter:
     # mục "Phòng v2".
     - assets/images/backgrounds/
     - assets/images/furniture/
+    # Lớp động thị trấn v2 (A2, 20/11): mây, xe, đài phun nước, cây,
+    # người đi bộ — PNG trong suốt 512x512, xem docs/ASSETS.md mục
+    # "Thị trấn v2".
+    - assets/images/town/
     # Thư mục con KHÔNG tự động đi kèm theo mục thư mục cha (kiểm
     # chứng ở T2-03 với Flutter 3.50: `ManifestAssetBundle` chỉ liệt
     # kê file trực tiếp trong thư mục, không đệ quy) — mỗi thư mục
