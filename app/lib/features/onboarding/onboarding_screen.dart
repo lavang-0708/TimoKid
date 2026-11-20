@@ -15,9 +15,14 @@
 /// lớp tạm xám ([placeholderLayerLoader]) và có nhãn "Hình tạm".
 /// Test bơm loader tạm qua [OnboardingScreen.previewLoader] để
 /// golden cũ vẫn dùng lớp tạm xám (không cần file hình thật ở local).
-/// Tắt animation của [CharacterView] ở đây (thở/chớp mắt lặp vô hạn
-/// làm `pumpAndSettle` trong test không bao giờ dừng); phòng (T2-04)
-/// sẽ bật lại.
+/// Nhân vật xem trước thở/chớp mắt + bấm vào nhảy lên lấp lánh, đổi
+/// màu tóc/váy thì nảy 'pop' (xem [CharacterBounce]); trứng là PNG
+/// thật (PR #21) lắc lư nhẹ chờ nở. Cổng [AnimationGate] tắt mọi
+/// hiệu ứng lặp khi chạy test để `pumpAndSettle` dừng được.
+///
+/// Bố cục ngang: cột trái là xem trước, cột phải là lựa chọn của
+/// bước (cuộn được để vừa màn 640x320); bước chọn trứng ẩn cột xem
+/// trước để đủ chỗ cho 3 thẻ trứng.
 ///
 /// Bố cục ngang: cột trái là xem trước, cột phải là lựa chọn của
 /// bước (cuộn được để vừa màn 640x320); bước chọn trứng ẩn cột xem
@@ -25,11 +30,13 @@
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../core/animation/animation_gate.dart';
 import '../../core/database/database_provider.dart';
+import '../../core/widgets/press_bounce.dart';
+import '../character/character_bounce.dart';
 import '../character/character_model.dart';
 import '../character/character_view.dart';
 import '../character/placeholder_layers.dart';
@@ -192,6 +199,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
   }
 
+  /// Khóa pop cho xem trước: đổi lựa chọn nào của nhân vật thì
+  /// nhân vật nảy 'pop' một cái (xem [CharacterBounce.popKey]).
+  String get _previewPopKey =>
+      '${_draft.gender}|${_draft.skinColor}|${_draft.hairStyle}|'
+      '${_draft.hairColor}|${_draft.eyeStyle}|${_draft.eyeColor}|'
+      '${_draft.mouthStyle}|${_draft.dress}';
+
   /// Bộ nạp lớp cho xem trước: nữ dùng `AssetImage` mặc định (hình
   /// thật bộ girlSet1 đã có từ PR #18) trừ khi test bơm loader tạm
   /// qua [OnboardingScreen.previewLoader]; nam chưa có hình thật
@@ -306,12 +320,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             child: Column(
               children: [
                 Expanded(
-                  child: CharacterView(
-                    key: const Key('onboarding-preview'),
-                    outfit: _previewOutfit(),
-                    loader: _previewLoader,
-                    // Tắt thở/chớp mắt (xem ghi chú đầu file).
-                    animationsEnabled: false,
+                  child: CharacterBounce(
+                    popKey: _previewPopKey,
+                    child: CharacterView(
+                      key: const Key('onboarding-preview'),
+                      outfit: _previewOutfit(),
+                      loader: _previewLoader,
+                      // Thở/chớp mắt bật (kiểu game); cổng
+                      // AnimationGate tắt khi chạy test để
+                      // pumpAndSettle dừng được (xem ghi chú đầu file).
+                      animationsEnabled: true,
+                    ),
                   ),
                 ),
                 // Nhãn "Hình tạm" chỉ khi xem trước đúng là
@@ -341,42 +360,48 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       children: [
         if (_step > 0)
           Flexible(
-            child: ElevatedButton.icon(
-              key: const Key('onboarding-back-button'),
-              icon: const Text('←', style: TextStyle(fontSize: 24)),
-              label: const FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text('Quay lại', style: TextStyle(fontSize: 20)),
+            child: PressBounce(
+              child: ElevatedButton.icon(
+                key: const Key('onboarding-back-button'),
+                icon: const Text('←', style: TextStyle(fontSize: 24)),
+                label: const FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text('Quay lại', style: TextStyle(fontSize: 20)),
+                ),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(56, 56),
+                ),
+                onPressed: _saving ? null : _back,
               ),
-              style: ElevatedButton.styleFrom(minimumSize: const Size(56, 56)),
-              onPressed: _saving ? null : _back,
             ),
           )
         else
           const SizedBox.shrink(),
         Flexible(
-          child: ElevatedButton.icon(
-            key: Key(
-              _isEggStep
-                  ? 'onboarding-finish-button'
-                  : 'onboarding-next-button',
-            ),
-            label: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                _isEggStep ? 'Xong — vào Thị trấn' : 'Tiếp theo',
-                style: const TextStyle(fontSize: 20),
+          child: PressBounce(
+            child: ElevatedButton.icon(
+              key: Key(
+                _isEggStep
+                    ? 'onboarding-finish-button'
+                    : 'onboarding-next-button',
               ),
+              label: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  _isEggStep ? 'Xong — vào Thị trấn' : 'Tiếp theo',
+                  style: const TextStyle(fontSize: 20),
+                ),
+              ),
+              icon: _saving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 3),
+                    )
+                  : const Text('→', style: TextStyle(fontSize: 24)),
+              style: ElevatedButton.styleFrom(minimumSize: const Size(56, 56)),
+              onPressed: (_canContinue && !_saving) ? _next : null,
             ),
-            icon: _saving
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 3),
-                  )
-                : const Text('→', style: TextStyle(fontSize: 24)),
-            style: ElevatedButton.styleFrom(minimumSize: const Size(56, 56)),
-            onPressed: (_canContinue && !_saving) ? _next : null,
           ),
         ),
       ],
@@ -618,18 +643,21 @@ class _OptionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        minimumSize: const Size(56, 56),
-        backgroundColor: selected ? const Color(0xFFBFE8CF) : null,
+    return PressBounce(
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(56, 56),
+          backgroundColor: selected ? const Color(0xFFBFE8CF) : null,
+        ),
+        child: Text(label, style: const TextStyle(fontSize: 20)),
       ),
-      child: Text(label, style: const TextStyle(fontSize: 20)),
     );
   }
 }
 
-/// Thẻ trứng ở bước cuối: hình trứng tạm + tên loài.
+/// Thẻ trứng ở bước cuối: hình trứng PNG thật (PR #21) + tên loài.
+/// Trứng lắc lư nhẹ chờ nở ([_EggWiggle]).
 class _EggCard extends StatelessWidget {
   const _EggCard({
     required this.species,
@@ -662,7 +690,12 @@ class _EggCard extends StatelessWidget {
           children: [
             SizedBox(
               height: 120,
-              child: SvgPicture.asset(eggSpeciesAssets[species]!),
+              child: _EggWiggle(
+                child: Image.asset(
+                  eggSpeciesAssets[species]!,
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -673,6 +706,61 @@ class _EggCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Trứng lắc lư nhẹ chờ nở: xoay qua lại ±0.05 rad, chu kỳ 1,6 giây.
+///
+/// Hiệu ứng lặp nên chỉ chạy khi cổng [AnimationGate] bật (máy thật);
+/// khi chạy test thì trả trứng nguyên vẹn để `pumpAndSettle` dừng
+/// được (cùng mẫu `CharacterView`).
+class _EggWiggle extends StatefulWidget {
+  const _EggWiggle({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_EggWiggle> createState() => _EggWiggleState();
+}
+
+class _EggWiggleState extends State<_EggWiggle>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _controller;
+  late final Animation<double> _angle;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!AnimationGate.enabled) return;
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1600),
+    )..repeat(reverse: true);
+    _angle = Tween<double>(
+      begin: -0.05,
+      end: 0.05,
+    ).animate(CurvedAnimation(parent: _controller!, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = _controller;
+    if (controller == null) return widget.child;
+    return AnimatedBuilder(
+      animation: _angle,
+      builder: (context, child) => Transform.rotate(
+        key: const Key('egg-wiggle'),
+        angle: _angle.value,
+        child: child,
+      ),
+      child: widget.child,
     );
   }
 }

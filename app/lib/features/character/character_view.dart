@@ -5,13 +5,18 @@
 /// lên trên lớp gốc. Dùng chung cho màn tạo nhân vật (T2-03), phòng
 /// (T2-04) và tủ đồ (T2-05).
 ///
-/// Hiệu ứng: thở nhẹ (toàn nhân vật phồng lên ~1,5% rồi xẹp, quanh
-/// chân để chân không rời mặt đất) và chớp mắt (chỉ lớp mắt + viền
-/// mắt co dọc trong ~0,3 giây, mỗi chu kỳ ~3,4 giây). Cả hai đều là
-/// `Transform` rẻ trên GPU; ảnh mỗi lớp chỉ giải mã một lần rồi nằm
-/// trong `ImageCache`, nên mỗi khung hình không làm lại việc nặng —
+/// Hiệu ứng: thở nhẹ kiểu squash/stretch (hít vào thì cao lên +
+/// hẹp lại, thở ra thì thấp xuống + bè ra, quanh chân để chân không
+/// rời mặt đất) và chớp mắt (chỉ lớp mắt + viền mắt co dọc trong
+/// ~0,3 giây, mỗi chu kỳ ~3,4 giây). Cả hai đều là `Transform` rẻ
+/// trên GPU; ảnh mỗi lớp chỉ giải mã một lần rồi nằm trong
+/// `ImageCache`, nên mỗi khung hình không làm lại việc nặng —
 /// thiết kế để vẽ đủ lớp dưới 16 ms trên máy ảo tầm trung (chưa đo
 /// trực tiếp ở local vì không có máy ảo; kiểm lại ở T2-09).
+///
+/// Cổng [AnimationGate] tắt thở/chớp mắt khi chạy test (cùng lý do
+/// như `animationsEnabled`): hiệu ứng lặp làm `pumpAndSettle`
+/// không bao giờ dừng.
 ///
 /// Bộ nạp lớp [loader] chèn được: mặc định `AssetImage` theo đường
 /// dẫn trong manifest; trong test chèn `MemoryImage` từ fixture
@@ -23,6 +28,7 @@ library;
 
 import 'package:material_ui/material_ui.dart';
 
+import '../../core/animation/animation_gate.dart';
 import 'character_model.dart';
 
 /// Nạp một lớp thành [ImageProvider] từ đường dẫn asset.
@@ -97,18 +103,24 @@ class _CharacterViewState extends State<CharacterView>
     with TickerProviderStateMixin {
   AnimationController? _breathController;
   AnimationController? _blinkController;
-  late final Animation<double> _breathScale;
+  late final Animation<double> _breathScaleX;
+  late final Animation<double> _breathScaleY;
   late final Animation<double> _blinkScaleY;
 
   @override
   void initState() {
     super.initState();
-    if (!widget.animationsEnabled) return;
+    if (!widget.animationsEnabled || !AnimationGate.enabled) return;
     _breathController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2400),
     )..repeat(reverse: true);
-    _breathScale = Tween<double>(begin: 1.0, end: 1.015).animate(
+    // Squash/stretch: hít vào cao lên (Y 0.99 → 1.03) + hẹp lại
+    // (X 1.01 → 0.985), thở ra thì ngược lại.
+    _breathScaleY = Tween<double>(begin: 0.99, end: 1.03).animate(
+      CurvedAnimation(parent: _breathController!, curve: Curves.easeInOut),
+    );
+    _breathScaleX = Tween<double>(begin: 1.01, end: 0.985).animate(
       CurvedAnimation(parent: _breathController!, curve: Curves.easeInOut),
     );
     _blinkController = AnimationController(
@@ -156,7 +168,7 @@ class _CharacterViewState extends State<CharacterView>
 
   /// Bọc chớp mắt quanh một widget (chỉ dùng cho nhóm mắt).
   Widget _blinkWrap(Widget child) {
-    if (!widget.animationsEnabled) return child;
+    if (!widget.animationsEnabled || !AnimationGate.enabled) return child;
     return AnimatedBuilder(
       animation: _blinkScaleY,
       builder: (context, child) => Transform.scale(
@@ -194,12 +206,16 @@ class _CharacterViewState extends State<CharacterView>
     }
 
     Widget stack = Stack(children: children);
-    if (widget.animationsEnabled) {
+    if (widget.animationsEnabled && AnimationGate.enabled) {
       stack = AnimatedBuilder(
-        animation: _breathScale,
-        builder: (context, child) => Transform.scale(
+        animation: Listenable.merge([_breathScaleX, _breathScaleY]),
+        builder: (context, child) => Transform(
           key: const Key('character-breath'),
-          scale: _breathScale.value,
+          transform: Matrix4.diagonal3Values(
+            _breathScaleX.value,
+            _breathScaleY.value,
+            1.0,
+          ),
           alignment: Alignment.bottomCenter,
           child: child,
         ),

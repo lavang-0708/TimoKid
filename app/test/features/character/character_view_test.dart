@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:timokid/core/animation/animation_gate.dart';
 import 'package:timokid/features/character/character_model.dart';
 import 'package:timokid/features/character/character_view.dart';
 
@@ -70,6 +71,13 @@ Future<void> pumpCharacter(
 }
 
 void main() {
+  // Bật cổng hiệu ứng cho file này (testExecutable đã tắt cho mọi
+  // file test): test thở/chớp mắt bơm bằng pump(Duration) chứ không
+  // dùng pumpAndSettle với animation lặp. Các test còn lại bơm với
+  // animationsEnabled: false nên cổng bật cũng không ảnh hưởng.
+  setUpAll(() => AnimationGate.enabled = true);
+  tearDownAll(() => AnimationGate.enabled = false);
+
   group('CharacterOutfit.girl', () {
     test('xếp lớp theo z, _line ngay sau lớp gốc', () {
       final outfit = outfitA();
@@ -209,27 +217,37 @@ void main() {
       );
     });
 
-    testWidgets('thở: tỉ lệ toàn nhân vật tăng dần rồi về 1', (tester) async {
+    testWidgets('thở squash/stretch: cao lên + hẹp lại rồi về', (tester) async {
       await pumpCharacter(tester, outfitA(), animationsEnabled: true);
       final breath = find.byKey(const Key('character-breath'));
       expect(breath, findsOneWidget);
 
-      double scale() {
+      double scaleX() {
         final t = tester.widget<Transform>(breath);
         return t.transform.storage[0];
       }
 
-      // Sau 2 lần pump khởi động (t = 100 ms): gần 1.0.
-      expect(scale(), closeTo(1.0, 0.002));
+      double scaleY() {
+        final t = tester.widget<Transform>(breath);
+        return t.transform.storage[5];
+      }
+
+      // Sau 2 lần pump khởi động (t = 100 ms): gần đầu chu kỳ thở
+      // (X ≈ 1.01 bè ra, Y ≈ 0.99 thấp xuống).
+      expect(scaleX(), closeTo(1.01, 0.002));
+      expect(scaleY(), closeTo(0.99, 0.002));
       // t = 1200 ms: giữa chu kỳ thở (easeInOut(0.5) = 0.5).
       await tester.pump(const Duration(milliseconds: 1100));
-      expect(scale(), closeTo(1.0075, 0.001));
-      // t = 2400 ms: cuối chu kỳ thuận, phồng tối đa.
+      expect(scaleX(), closeTo(0.9975, 0.002));
+      expect(scaleY(), closeTo(1.01, 0.002));
+      // t = 2400 ms: cuối chu kỳ thuận, cao nhất + hẹp nhất.
       await tester.pump(const Duration(milliseconds: 1200));
-      expect(scale(), closeTo(1.015, 0.001));
-      // t = 3600 ms: đang xẹp lại, giữa chu kỳ ngược.
+      expect(scaleX(), closeTo(0.985, 0.001));
+      expect(scaleY(), closeTo(1.03, 0.001));
+      // t = 3600 ms: đang thở ra, giữa chu kỳ ngược.
       await tester.pump(const Duration(milliseconds: 1200));
-      expect(scale(), closeTo(1.0075, 0.002));
+      expect(scaleX(), closeTo(0.9975, 0.002));
+      expect(scaleY(), closeTo(1.01, 0.002));
     });
 
     testWidgets('chớp mắt: mắt co dọc ở cuối chu kỳ rồi mở lại', (

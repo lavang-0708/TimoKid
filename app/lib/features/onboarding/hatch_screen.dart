@@ -3,22 +3,23 @@
 ///
 /// Hiệu ứng đơn giản, chạy một lần rồi dừng (không lặp vô hạn để
 /// `pumpAndSettle` trong test dừng được): trứng rung → vết nứt hiện
-/// → trứng vỡ (phóng to + mờ dần) và pet mới nở hiện ra nảy lên.
-/// Xong mới hiện nút "Tiếp tục": bấm thì đánh dấu đã nở
-/// ([EggService.consumeHatchCelebration]) rồi về Thị trấn.
+/// → trứng vỡ (phóng to + mờ dần), pet mới nở hiện ra nảy lên + sao
+/// bung ra xung quanh. Xong mới hiện nút "Tiếp tục": bấm thì đánh dấu
+/// đã nở ([EggService.consumeHatchCelebration]) rồi về Thị trấn.
 ///
 /// Màn chỉ vào được khi có lần nở đang chờ (`hatch_pending`); nếu
 /// mở trực tiếp mà không có trứng hay không có lần chờ thì hiện thông
-/// báo và nút về Thị trấn. Pet và trứng là hình tạm (SVG vẽ đơn giản,
-/// xem `app/assets/temp/eggs/` và `app/assets/temp/pets/`).
+/// báo và nút về Thị trấn. Pet và trứng là PNG thật (PR #21,
+/// `app/assets/images/pets/`); vết nứt vẽ bằng CustomPaint (thay
+/// file SVG tạm `egg_crack.svg` đã bỏ).
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/database/database_provider.dart';
+import '../../core/widgets/press_bounce.dart';
 import '../town/town_screen.dart';
 import 'egg_service.dart';
 import 'onboarding_config.dart';
@@ -40,6 +41,7 @@ class _HatchScreenState extends ConsumerState<HatchScreen>
   late final Animation<double> _eggScale;
   late final Animation<double> _eggFade;
   late final Animation<double> _petScale;
+  late final Animation<double> _stars;
 
   String? _species;
   bool _loading = true;
@@ -90,6 +92,14 @@ class _HatchScreenState extends ConsumerState<HatchScreen>
       CurvedAnimation(
         parent: _controller,
         curve: const Interval(0.66, 1.0, curve: Curves.elasticOut),
+      ),
+    );
+    // Sao bung: 0–66% chưa có sao, lúc trứng vỡ (66–100%) sao bay
+    // ra từ giữa rồi mờ dần (opacity 1 → 0 theo cùng nhịp).
+    _stars = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.66, 1.0, curve: Curves.easeOut),
       ),
     );
     _controller.addStatusListener((status) {
@@ -148,6 +158,7 @@ class _HatchScreenState extends ConsumerState<HatchScreen>
                 eggScale: _eggScale,
                 eggFade: _eggFade,
                 petScale: _petScale,
+                stars: _stars,
                 showContinue: _showContinue,
                 onContinue: _continue,
               ),
@@ -169,12 +180,14 @@ class _EmptyHatch extends StatelessWidget {
       children: [
         const Text('Chưa có trứng nào nở.', style: TextStyle(fontSize: 24)),
         const SizedBox(height: 16),
-        ElevatedButton.icon(
-          key: const Key('hatch-back-button'),
-          icon: const Text('←', style: TextStyle(fontSize: 24)),
-          label: const Text('Về Thị trấn', style: TextStyle(fontSize: 20)),
-          style: ElevatedButton.styleFrom(minimumSize: const Size(56, 56)),
-          onPressed: onBack,
+        PressBounce(
+          child: ElevatedButton.icon(
+            key: const Key('hatch-back-button'),
+            icon: const Text('←', style: TextStyle(fontSize: 24)),
+            label: const Text('Về Thị trấn', style: TextStyle(fontSize: 20)),
+            style: ElevatedButton.styleFrom(minimumSize: const Size(56, 56)),
+            onPressed: onBack,
+          ),
         ),
       ],
     );
@@ -190,6 +203,7 @@ class _HatchAnimation extends StatelessWidget {
     required this.eggScale,
     required this.eggFade,
     required this.petScale,
+    required this.stars,
     required this.showContinue,
     required this.onContinue,
   });
@@ -200,6 +214,7 @@ class _HatchAnimation extends StatelessWidget {
   final Animation<double> eggScale;
   final Animation<double> eggFade;
   final Animation<double> petScale;
+  final Animation<double> stars;
   final bool showContinue;
   final VoidCallback onContinue;
 
@@ -230,13 +245,20 @@ class _HatchAnimation extends StatelessWidget {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      SvgPicture.asset(eggSpeciesAssets[species]!),
+                      Image.asset(
+                        eggSpeciesAssets[species]!,
+                        width: 200,
+                        height: 220,
+                        fit: BoxFit.contain,
+                      ),
                       AnimatedBuilder(
                         animation: crack,
                         builder: (context, child) =>
                             Opacity(opacity: crack.value, child: child),
-                        child: SvgPicture.asset(
-                          'assets/temp/eggs/egg_crack.svg',
+                        child: const SizedBox(
+                          width: 200,
+                          height: 220,
+                          child: CustomPaint(painter: _CrackPainter()),
                         ),
                       ),
                     ],
@@ -247,7 +269,41 @@ class _HatchAnimation extends StatelessWidget {
                 animation: petScale,
                 builder: (context, child) =>
                     Transform.scale(scale: petScale.value, child: child),
-                child: SvgPicture.asset(newbornSpeciesAssets[species]!),
+                child: Image.asset(
+                  newbornSpeciesAssets[species]!,
+                  width: 200,
+                  height: 220,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              // Sao bung lúc trứng vỡ: 5 sao bay ra từ giữa khung
+              // rồi mờ dần (theo [stars], 0.66–1.0 của hoạt cảnh).
+              // Dùng Icons.star (MaterialIcons) thay vì ký tự `✦`:
+              // Nunito không có ký tự dingbat nên chữ sẽ thành ô
+              // vuông trên máy thật.
+              AnimatedBuilder(
+                animation: stars,
+                builder: (context, child) {
+                  final t = stars.value;
+                  if (t <= 0.01) return const SizedBox.shrink();
+                  return Opacity(
+                    opacity: 1 - t,
+                    child: Stack(
+                      children: [
+                        for (final offset in _starOffsets)
+                          Positioned(
+                            left: 100 + offset.dx * t - 11,
+                            top: 110 + offset.dy * t - 11,
+                            child: const Icon(
+                              Icons.star,
+                              size: 22,
+                              color: Color(0xFFFFC93C),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -268,14 +324,19 @@ class _HatchAnimation extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               if (showContinue)
-                ElevatedButton.icon(
-                  key: const Key('hatch-continue-button'),
-                  label: const Text('Tiếp tục', style: TextStyle(fontSize: 22)),
-                  icon: const Text('→', style: TextStyle(fontSize: 24)),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(56, 56),
+                PressBounce(
+                  child: ElevatedButton.icon(
+                    key: const Key('hatch-continue-button'),
+                    label: const Text(
+                      'Tiếp tục',
+                      style: TextStyle(fontSize: 22),
+                    ),
+                    icon: const Text('→', style: TextStyle(fontSize: 24)),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(56, 56),
+                    ),
+                    onPressed: onContinue,
                   ),
-                  onPressed: onContinue,
                 ),
             ],
           ),
@@ -283,4 +344,39 @@ class _HatchAnimation extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Vị trí sao bung lúc trứng vỡ (tương đối so với tâm khung 200x220):
+/// 5 sao bay ra theo 5 hướng rồi mờ dần.
+const List<Offset> _starOffsets = <Offset>[
+  Offset(-70, -80),
+  Offset(70, -70),
+  Offset(-85, 20),
+  Offset(85, 30),
+  Offset(0, -95),
+];
+
+/// Vết nứt trên trứng lúc nở: đường gãy khúc vẽ bằng CustomPaint
+/// (thay file SVG tạm `egg_crack.svg` đã bỏ cùng `assets/temp/`).
+class _CrackPainter extends CustomPainter {
+  const _CrackPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFF5D4037)
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    final path = Path()
+      ..moveTo(size.width * 0.5, size.height * 0.08)
+      ..lineTo(size.width * 0.42, size.height * 0.3)
+      ..lineTo(size.width * 0.58, size.height * 0.48)
+      ..lineTo(size.width * 0.45, size.height * 0.68)
+      ..lineTo(size.width * 0.55, size.height * 0.9);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
