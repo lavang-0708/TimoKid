@@ -1,0 +1,54 @@
+# Web admin cho phụ huynh (admin/): lint, test, build; deploy lên GitHub Pages
+# khi push vào main. PR chỉ chạy kiểm tra, không deploy.
+name: Web admin
+
+on:
+  push:
+    branches: [main]
+    paths: ['admin/**', '.github/workflows/admin.yml']
+  pull_request:
+    paths: ['admin/**', '.github/workflows/admin.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: admin-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Lint, test và build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: admin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: admin/dist
+
+  deploy:
+    name: Deploy lên GitHub Pages
+    needs: build
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
