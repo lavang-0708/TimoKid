@@ -306,20 +306,13 @@ void main() {
       }
     });
 
-    test('không lặp dạng trong cùng chặng khi còn dạng khác '
-        '(chặng comb bậc 1 lặp đúng 1 dạng vì chỉ có 4 dạng mức 1)', () async {
+    test('không lặp dạng trong cùng chặng khi còn dạng khác', () async {
       final set = await service.getOrCreateTodaySet(childId: childId);
 
       for (var stage = 0; stage < 5; stage++) {
         final qs = stageQuestions(set, stage);
-        final formIds = qs.map((q) => q.formId).toList();
-        final distinct = formIds.toSet();
-        if (Strand.all[stage] == Strand.comb) {
-          // Bậc 1: cả 5 ô đều mức 1, comb chỉ có 4 dạng mức 1.
-          expect(distinct, hasLength(4));
-        } else {
-          expect(distinct, hasLength(5), reason: Strand.all[stage]);
-        }
+        final distinct = qs.map((q) => q.formId).toSet();
+        expect(distinct, hasLength(5), reason: Strand.all[stage]);
       }
     });
 
@@ -453,77 +446,78 @@ void main() {
       },
     );
 
-    test('lặp dạng thì ưu tiên dạng ít gặp trong 7 ngày qua', () async {
-      // Đề hôm qua: chặng comb dùng outfit x3, handshake x2, routes
-      // x1, choose2 x0 — hôm nay chặng comb bậc 1 bắt buộc lặp 1 dạng
-      // (5 ô mức 1 mà chỉ có 4 dạng), dạng lặp phải là choose2.
-      final yesterdayQuestions = <DailySetQuestion>[
-        for (final strand in Strand.all)
-          for (var i = 0; i < 5; i++)
-            makeQuestion(
-              strand == Strand.comb
-                  ? [
-                      'comb.outfit',
-                      'comb.handshake',
-                      'comb.routes',
-                      'comb.outfit',
-                      'comb.handshake',
-                    ][i]
-                  : strand == Strand.logic
-                  ? 'logic.age'
-                  : strand == Strand.arith
-                  ? 'arith.quick'
-                  : strand == Strand.number
-                  ? 'number.parity'
-                  : 'geo.countsq',
-              strand,
-              seed: i + 1,
-            ),
-      ];
-      await db.dailySetsDao.createDailySet(
-        childId: childId,
-        date: '2026-11-17',
-        questions: yesterdayQuestions,
-      );
-
-      final set = await service.getOrCreateTodaySet(childId: childId);
-      final combQs = stageQuestions(set, 4);
-      final counts = <String, int>{};
-      for (final q in combQs) {
-        counts[q.formId] = (counts[q.formId] ?? 0) + 1;
-      }
-      final repeated = counts.entries
-          .where((e) => e.value == 2)
-          .map((e) => e.key)
-          .toList();
-      expect(repeated, ['comb.choose2']);
-    });
-
-    test('đề quá 7 ngày không tính vào lịch sử ít gặp', () async {
-      // Đề 8 ngày trước dùng outfit rất nhiều, nhưng ngoài cửa sổ
-      // 7 ngày nên hôm nay dạng lặp không bị ảnh hưởng bởi nó:
-      // chặng comb vẫn lặp một dạng bất kỳ trong 4 dạng mức 1.
-      const strandForm = {
+    /// Đề [date] gồm chặng comb dùng [combForms]; các mảng khác dùng
+    /// một dạng cố định.
+    Future<void> addPastSet(String date, List<String> combForms) async {
+      const other = {
         'logic': 'logic.age',
         'arith': 'arith.quick',
         'number': 'number.parity',
         'geo': 'geo.countsq',
-        'comb': 'comb.outfit',
       };
-      final oldQuestions = <DailySetQuestion>[
-        for (final strand in Strand.all)
-          for (var i = 0; i < 5; i++)
-            makeQuestion(strandForm[strand]!, strand, seed: i + 1),
-      ];
       await db.dailySetsDao.createDailySet(
         childId: childId,
-        date: '2026-11-10',
-        questions: oldQuestions,
+        date: date,
+        questions: [
+          for (final strand in Strand.all)
+            for (var i = 0; i < combForms.length; i++)
+              makeQuestion(
+                strand == Strand.comb ? combForms[i] : other[strand]!,
+                strand,
+                seed: i + 1,
+              ),
+        ],
       );
+    }
+
+    test('chọn dạng mới thì ưu tiên dạng ít gặp trong 7 ngày qua', () async {
+      // Hôm qua chặng comb đã gặp 5 dạng; 4 dạng mức 1 còn lại chưa gặp
+      // nên hôm nay phải có mặt cả 4.
+      await addPastSet('2026-11-17', [
+        'comb.outfit',
+        'comb.handshake',
+        'comb.routes',
+        'comb.choose2',
+        'comb.makenumparity',
+      ]);
 
       final set = await service.getOrCreateTodaySet(childId: childId);
-      final combQs = stageQuestions(set, 4);
-      expect(combQs.map((q) => q.formId).toSet(), hasLength(4));
+      final combForms = stageQuestions(set, 4).map((q) => q.formId).toSet();
+      expect(combForms, hasLength(5));
+      expect(
+        combForms.containsAll([
+          'comb.minsum2',
+          'comb.freebie',
+          'comb.vases',
+          'comb.pick2',
+        ]),
+        isTrue,
+        reason: '$combForms',
+      );
+    });
+
+    test('đề quá 7 ngày không tính vào lịch sử ít gặp', () async {
+      // Đề 8 ngày trước dùng 5 dạng; đề 2 ngày trước dùng 4 dạng còn
+      // lại. Nếu đề cũ bị tính thì mọi dạng hòa nhau; không tính thì
+      // hôm nay chặng comb phải là đúng 5 dạng của đề cũ.
+      const oldForms = [
+        'comb.outfit',
+        'comb.handshake',
+        'comb.routes',
+        'comb.choose2',
+        'comb.makenumparity',
+      ];
+      await addPastSet('2026-11-10', oldForms);
+      await addPastSet('2026-11-16', [
+        'comb.minsum2',
+        'comb.freebie',
+        'comb.vases',
+        'comb.pick2',
+      ]);
+
+      final set = await service.getOrCreateTodaySet(childId: childId);
+      final combForms = stageQuestions(set, 4).map((q) => q.formId).toSet();
+      expect(combForms, oldForms.toSet());
     });
   });
 
@@ -603,7 +597,7 @@ void main() {
     });
   });
 
-  group('DailySetService: phủ dạng bài của 48 dạng', () {
+  group('DailySetService: phủ dạng bài của 72 dạng', () {
     test('mọi mảng đều có ít nhất 4 dạng ở mỗi mức', () {
       for (final strand in Strand.all) {
         for (var level = 1; level <= 3; level++) {

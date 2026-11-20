@@ -38,7 +38,8 @@ import 'daily_set_config.dart';
 /// Thứ tự ưu tiên (xem `docs/DECISIONS.md` mục T1-08 — điểm chờ
 /// Claude chốt):
 /// 1. Đúng mức trước: chỉ xét các dạng hỗ trợ đúng mức của ô.
-/// 2. Chưa dùng trong chặng trước: không lặp dạng nếu mảng còn dạng khác.
+/// 2. Chưa dùng trong chặng trước: không lặp dạng nếu mảng còn dạng khác;
+///    trong các dạng chưa dùng, ưu tiên dạng ít gặp nhất trong 7 ngày qua.
 /// 3. Đúng kiểu sau: trong các dạng còn lại, ưu tiên dạng điền số được
 ///    khi ô cần điền số; dạng `choiceOnly` chỉ dùng khi không còn dạng
 ///    điền số nào (ô trắc nghiệm thì mọi dạng như nhau).
@@ -75,7 +76,15 @@ class StageFormPicker {
       candidates.where((g) => !usedFormIds.contains(g.formId)).toList(),
     );
     if (fresh.isNotEmpty) {
-      return fresh[random.nextInt(fresh.length)].formId;
+      // Trong các dạng mới, ưu tiên dạng bé ít gặp nhất 7 ngày qua để
+      // các dạng được xoay vòng đều, bé không gặp lại mãi vài dạng quen.
+      final freshMin = fresh
+          .map((g) => usageLast7Days[g.formId] ?? 0)
+          .reduce(min);
+      final freshLeast = fresh
+          .where((g) => (usageLast7Days[g.formId] ?? 0) == freshMin)
+          .toList();
+      return freshLeast[random.nextInt(freshLeast.length)].formId;
     }
 
     // Hết dạng mới: lặp dạng ít gặp nhất trong 7 ngày qua, ưu tiên

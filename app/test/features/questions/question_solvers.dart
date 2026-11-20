@@ -21,6 +21,54 @@ List<String> _pStrings(Question q, String key) =>
 /// - câu trắc nghiệm: chỉ số của lựa chọn đúng trong [Question.choices].
 int solveQuestion(Question q) {
   switch (q.formId) {
+    case 'logic.classsize':
+      return _pInt(q, 'taller') + _pInt(q, 'shorter') + _pInt(q, 'same') + 1;
+    case 'logic.seqgrow':
+      return _solveSeqGrow(q);
+    case 'logic.interleave':
+      return _solveInterleave(q);
+    case 'logic.cyclepattern':
+      return _solveCycle(q);
+    case 'logic.laps':
+      return _solveLaps(q);
+    case 'arith.altsum':
+      return _solveAltsum(q);
+    case 'arith.runsum':
+      return _pInts(q, 'terms').fold(0, (a, b) => a + b);
+    case 'arith.cryptarith':
+      return _solveCryptarith(q);
+    case 'arith.arrowchain':
+      return _solveArrow(q);
+    case 'arith.flowerx':
+      return _solveFlower(q);
+    case 'arith.factorout':
+      return _pInts(q, 'xs').fold(0, (a, x) => a + _pInt(q, 'm') * x);
+    case 'number.digitcond':
+      return _solveDigitCond(q);
+    case 'number.parityops':
+      return _solveParityOps(q);
+    case 'number.kth':
+      return _solveKth(q);
+    case 'number.giveequal':
+      return _solveGiveEqual(q);
+    case 'number.pages':
+      return _solvePages(q);
+    case 'number.countsteps':
+      return _solveCountSteps(q);
+    case 'geo.pointsegs':
+      return _solvePointSegs(q);
+    case 'geo.shapeparts':
+      return _solveShapeParts(q);
+    case 'comb.makenumparity':
+      return _solveMakeNumParity(q);
+    case 'comb.minsum2':
+      return _solveMinSum2(q);
+    case 'comb.freebie':
+      return _solveFreebie(q);
+    case 'comb.vases':
+      return _solveVases(q);
+    case 'comb.pick2':
+      return _solvePick2(q);
     case 'logic.age':
       return _solveAge(q);
     case 'logic.queue':
@@ -543,4 +591,257 @@ int _solveCoins() {
     }
   }
   return ways;
+}
+
+// ------------------------------------------------ dạng bổ sung (gen_timo2.py)
+
+int _solveSeqGrow(Question q) {
+  // Đáp án là số tiếp theo sau 6 số đầu: lấy khoảng cách cuối cộng thêm
+  // đúng độ tăng của khoảng cách.
+  final s = _pInts(q, 'seq');
+  final g4 = s[5] - s[4];
+  final g3 = s[4] - s[3];
+  return s[5] + g4 + (g4 - g3);
+}
+
+int _solveInterleave(Question q) {
+  final s = _pInts(q, 'seq');
+  final n = _pInt(q, 'n');
+  // Số ở vị trí n (đếm từ 0) theo cùng dãy với số ở vị trí n - 2.
+  return s[n - 2] + (s[n - 2] - s[n - 4]);
+}
+
+int _solveCycle(Question q) {
+  final pat = _pStrings(q, 'pattern');
+  final sym = q.params['sym'] as String;
+  var c = 0;
+  for (var i = 0; i < _pInt(q, 'n'); i++) {
+    if (pat[i % pat.length] == sym) c++;
+  }
+  return c;
+}
+
+int _solveLaps(Question q) {
+  var t = 0;
+  final n = _pInt(q, 'n');
+  for (var i = 1; i <= n; i++) {
+    t += _pInt(q, 't');
+    if (i < n) t += _pInt(q, 'r');
+  }
+  return t;
+}
+
+int _solveAltsum(Question q) {
+  final terms = _pInts(q, 'terms');
+  var v = 0;
+  for (var i = 0; i < terms.length; i++) {
+    v += i.isEven ? terms[i] : -terms[i];
+  }
+  return v;
+}
+
+int _solveCryptarith(Question q) {
+  final plus = _pBool(q, 'plus');
+  final res = _pInt(q, 'res');
+  final found = <int>[];
+  for (var a = 1; a <= 9; a++) {
+    for (var b = 0; b <= 9; b++) {
+      if (a == b) continue;
+      final v = plus ? (10 * a + b) + a : (10 * a + b) - a;
+      if (v == res) found.add(b);
+    }
+  }
+  if (found.length != 1) throw StateError('Nghiệm không duy nhất: $found');
+  return found.single;
+}
+
+int _solveArrow(Question q) {
+  final plus = (q.params['plus'] as List).cast<bool>();
+  final xs = _pInts(q, 'xs');
+  for (var start = 0; start <= 200; start++) {
+    var v = start;
+    for (var i = 0; i < xs.length; i++) {
+      v = plus[i] ? v + xs[i] : v - xs[i];
+    }
+    if (v == _pInt(q, 'end')) return start;
+  }
+  throw StateError('Không tìm được số ban đầu');
+}
+
+int _solveFlower(Question q) {
+  for (var x = 0; x <= 200; x++) {
+    if (_pInt(q, 'k') * x - _pInt(q, 'a') == x + _pInt(q, 'b')) return x;
+  }
+  throw StateError('Không có nghiệm');
+}
+
+int _solveDigitCond(Question q) {
+  final k = _pInt(q, 'k');
+  final kind = q.params['kind'] as String;
+  var c = 0;
+  for (var t = 1; t <= 9; t++) {
+    for (var u = 0; u <= 9; u++) {
+      final ok = switch (kind) {
+        'both_gt' => t > k && u > k,
+        'both_lt' => t < k && u < k,
+        'unit_lt' => u < k,
+        'tens_gt_unit' => t > u,
+        'sum_eq' => t + u == k,
+        _ => throw StateError(kind),
+      };
+      if (ok) c++;
+    }
+  }
+  return c;
+}
+
+int _solveParityOps(Question q) {
+  final a = _pInts(q, 'a');
+  final b = _pInts(q, 'b');
+  final plus = (q.params['plus'] as List).cast<bool>();
+  final even = _pBool(q, 'even');
+  var c = 0;
+  for (var i = 0; i < a.length; i++) {
+    final v = plus[i] ? a[i] + b[i] : a[i] - b[i];
+    if ((v % 2 == 0) == even) c++;
+  }
+  return c;
+}
+
+int _solveKth(Question q) {
+  final xs = _pInts(q, 'xs');
+  final k = _pInt(q, 'k');
+  final largest = _pBool(q, 'largest');
+  // Số thứ k: có đúng k - 1 số đứng trước nó theo thứ tự đã chọn.
+  for (final x in xs) {
+    final before = xs.where((y) => largest ? y > x : y < x).length;
+    if (before == k - 1) return x;
+  }
+  throw StateError('Không tìm được');
+}
+
+int _solveGiveEqual(Question q) {
+  final a = _pInt(q, 'a');
+  final b = _pInt(q, 'b');
+  for (var g = 0; g <= a; g++) {
+    if ((a - g) - (b + g) == _pInt(q, 'c')) return g;
+  }
+  throw StateError('Không tìm được');
+}
+
+int _solvePages(Question q) {
+  var pages = 0;
+  while (pages * _pInt(q, 'k') < _pInt(q, 'n')) {
+    pages++;
+  }
+  return pages;
+}
+
+int _solveCountSteps(Question q) {
+  var c = 0;
+  for (var v = _pInt(q, 'a'); v <= _pInt(q, 'b'); v += _pInt(q, 'step')) {
+    c++;
+  }
+  return c;
+}
+
+int _solvePointSegs(Question q) {
+  final n = _pInt(q, 'n');
+  var c = 0;
+  for (var i = 0; i < n; i++) {
+    for (var j = i + 1; j < n; j++) {
+      c++;
+    }
+  }
+  return c;
+}
+
+int _solveShapeParts(Question q) {
+  // Cạnh, đỉnh, mặt của: tam giác, hình vuông, hình chữ nhật, lập phương.
+  const table = [
+    [3, 3, 0],
+    [4, 4, 0],
+    [4, 4, 0],
+    [12, 8, 6],
+  ];
+  final col = switch (q.params['what'] as String) {
+    'cạnh' => 0,
+    'đỉnh' => 1,
+    _ => 2,
+  };
+  final items = _pInts(q, 'items');
+  final cnts = _pInts(q, 'cnts');
+  var total = 0;
+  for (var i = 0; i < items.length; i++) {
+    total += cnts[i] * table[items[i]][col];
+  }
+  return total;
+}
+
+int _solveMakeNumParity(Question q) {
+  final ds = _pInts(q, 'digits');
+  final even = _pBool(q, 'even');
+  final made = <int>{};
+  for (final a in ds) {
+    for (final b in ds) {
+      if (a != b && a != 0 && (b % 2 == 0) == even) made.add(10 * a + b);
+    }
+  }
+  return made.length;
+}
+
+int _solveMinSum2(Question q) {
+  final ds = _pInts(q, 'digits');
+  final isMin = _pBool(q, 'min');
+  int? best;
+  for (var i = 0; i < 4; i++) {
+    for (var j = 0; j < 4; j++) {
+      for (var k = 0; k < 4; k++) {
+        for (var l = 0; l < 4; l++) {
+          if ({i, j, k, l}.length != 4) continue;
+          final v = 10 * ds[i] + ds[j] + 10 * ds[k] + ds[l];
+          if (best == null || (isMin ? v < best : v > best)) best = v;
+        }
+      }
+    }
+  }
+  return best!;
+}
+
+int _solveFreebie(Question q) {
+  var money = _pInt(q, 'money');
+  var bought = 0;
+  var got = 0;
+  while (money >= _pInt(q, 'p')) {
+    money -= _pInt(q, 'p');
+    bought++;
+    got++;
+    if (bought % _pInt(q, 'k') == 0) got++;
+  }
+  return got;
+}
+
+int _solveVases(Question q) {
+  final n = _pInt(q, 'n');
+  var c = 0;
+  for (var a = 1; a <= n; a++) {
+    for (var b = 1; b <= n; b++) {
+      for (var d = 1; d <= n; d++) {
+        if (a + b + d == n) c++;
+      }
+    }
+  }
+  return c;
+}
+
+int _solvePick2(Question q) {
+  final n = _pInt(q, 'n');
+  var c = 0;
+  for (var i = 0; i < n; i++) {
+    for (var j = 0; j < n; j++) {
+      if (i == j) continue;
+      if (_pBool(q, 'ordered') || i < j) c++;
+    }
+  }
+  return c;
 }

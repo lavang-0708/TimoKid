@@ -429,7 +429,10 @@ void main() {
     // Xóa một chữ số rồi gõ lại.
     await tester.tap(find.byKey(const Key('keypad-delete')));
     await tester.pumpAndSettle();
-    expect(typedText(answer.substring(0, answer.length - 1)), findsOneWidget);
+    if (answer.length > 1) {
+      // Đáp án một chữ số thì xóa xong ô trống, không còn chữ để tìm.
+      expect(typedText(answer.substring(0, answer.length - 1)), findsOneWidget);
+    }
     await tester.tap(find.byKey(Key('keypad-${answer[answer.length - 1]}')));
     await tester.pumpAndSettle();
     expect(typedText(answer), findsOneWidget);
