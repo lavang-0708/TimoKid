@@ -50,10 +50,17 @@ Mỗi câu đều có:
 | comb | vases | n hoa giống nhau vào 3 lọ, không lọ trống | n 4 → 7 |
 | comb | kth_choose | chọn 2 bạn (không thứ tự) / trưởng + phó (có thứ tự) | n ≤ 6 |
 
-## Việc giao cho Muse
+## Đã đưa vào app
 
-Port mỗi dạng thành một generator Dart trong `app/lib/features/questions/generators/` và đăng ký trong `question_registry.dart`. Yêu cầu:
-- Giữ đúng giới hạn số theo mức như bảng trên.
-- Đáp án phải do code tính.
-- Lời giải nên theo mẫu câu trong `questions_timo2.json`.
-- Mỗi generator có unit test: sinh 200 câu cho mỗi mức, giải lại bằng vét cạn như `check_timo2.py`, và kiểm tra không có số > 200.
+24 dạng điền số đã được chuyển sang Dart trong `app/lib/features/questions/generators/timo2_generators.dart` và đăng ký trong `question_registry.dart`. App hiện có 72 dạng: logic 16, arith 13, number 16, geo 11, comb 16.
+
+Ba dạng chỉ có trắc nghiệm vẫn chỉ nằm trong `questions_timo2.json`: weekday_rel, order3 và signs. Trong app, phần `cyclepattern` chỉ dùng biến thể "đếm hình". Tên dạng trong Dart:
+- `seq_grow` → `logic.seqgrow`
+- `factor_out` → `arith.factorout`
+- `parity_ops` → `number.parityops`
+- `makenum_parity` → `comb.makenumparity`
+- `kth_choose` → `comb.pick2`
+
+Test `question_generators_test.dart` sinh 500 câu cho mỗi mức của mỗi dạng. Đáp án được giải lại độc lập trong `question_solvers.dart`.
+
+Đề ngày cũng đổi cách chọn dạng: trong các dạng chưa dùng ở chặng, app ưu tiên dạng bé ít gặp nhất trong 7 ngày qua, để các dạng được xoay vòng đều.
