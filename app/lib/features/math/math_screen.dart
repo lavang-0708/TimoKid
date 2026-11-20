@@ -52,6 +52,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/database/database_provider.dart';
 import '../../core/database/models.dart';
+import '../../core/widgets/round_back_button.dart';
 import '../daily_set/daily_set_config.dart';
 import '../daily_set/daily_set_service.dart';
 import '../ladder/ladder_service.dart';
@@ -66,10 +67,16 @@ import 'math_session.dart';
 
 /// Tham số vào màn làm toán qua GoRouter `extra`.
 class MathScreenArgs {
-  const MathScreenArgs({this.stageIndex});
+  const MathScreenArgs({this.stageIndex, this.extraQuestions});
 
   /// Chỉ số chặng cần làm (0–4). Bỏ trống: chặng đầu tiên chưa xong.
   final int? stageIndex;
+
+  /// Câu của chặng tự chọn đã sinh sẵn (PR (B): màn Tòa nhà sinh
+  /// chặng tự chọn qua [DailySetService.buildExtraStage] rồi đưa
+  /// sang đây). Có thì làm chặng tự chọn (`stageIndex` -1, không
+  /// lưu vào đề ngày); bỏ trống thì làm chặng trong đề ngày.
+  final List<DailySetQuestion>? extraQuestions;
 }
 
 /// Màn làm toán — route `/math`.
@@ -215,11 +222,38 @@ class _MathScreenState extends ConsumerState<MathScreen>
     );
   }
 
-  /// Tải đề ngày hôm nay và dựng phiên cho chặng cần làm.
+  /// Tải đề ngày hôm nay và dựng phiên cho chặng cần làm. Có
+  /// [MathScreenArgs.extraQuestions] thì làm chặng tự chọn đã sinh
+  /// sẵn (không cần đề ngày).
   Future<void> _load() async {
     try {
       final db = ref.read(databaseProvider);
       final childId = await db.ensureSeeded();
+      final extraQuestions = widget.args?.extraQuestions;
+      if (extraQuestions != null) {
+        final session = StageSession(
+          db: db,
+          childId: childId,
+          dailySetId: null,
+          stageIndex: -1,
+          questions: extraQuestions,
+          rewardService: RewardService(
+            db: db,
+            config: await RewardConfig.load(db),
+          ),
+        );
+        session.addListener(_onSessionChanged);
+        if (!mounted) return;
+        setState(() {
+          _session = session;
+          if (_soundService == null) {
+            _soundService = SoundService(db: db);
+            _ownsSoundService = true;
+          }
+          _loading = false;
+        });
+        return;
+      }
       final service = DailySetService(
         dailySetsDao: db.dailySetsDao,
         reviewQueueDao: db.reviewQueueDao,
@@ -296,31 +330,21 @@ class _MathScreenState extends ConsumerState<MathScreen>
     if (_error != null) {
       return Scaffold(
         key: const Key('math-screen'),
-        appBar: AppBar(title: const Text('Làm toán')),
+        appBar: AppBar(
+          title: const Text('Làm toán'),
+          leading: const RoundBackButton(key: Key('math-back-button')),
+        ),
         body: Center(child: Text('Không tải được đề: $_error')),
       );
     }
     if (_allDone || session == null) {
       return Scaffold(
         key: const Key('math-screen'),
-        appBar: AppBar(title: const Text('Làm toán')),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('Bé đã xong đề ngày hôm nay rồi!'),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 56,
-                child: ElevatedButton(
-                  key: const Key('math-back-button'),
-                  onPressed: () => context.go('/'),
-                  child: const Text('Về Thị trấn'),
-                ),
-              ),
-            ],
-          ),
+        appBar: AppBar(
+          title: const Text('Làm toán'),
+          leading: const RoundBackButton(key: Key('math-back-button')),
         ),
+        body: const Center(child: Text('Bé đã xong đề ngày hôm nay rồi!')),
       );
     }
     final question = session.current;
@@ -346,10 +370,10 @@ class _MathScreenState extends ConsumerState<MathScreen>
     // luồng cột trái nên không cần chừa chỗ toàn màn.
     const greenBannerReserve = 112.0;
     // Các nút trên thanh tiêu đề là nút biểu tượng, tối thiểu 56x56 dp.
-    // Biểu tượng là ký tự chữ (←, Aa) thay vì `Icon` vì font
-    // MaterialIcons không có trong môi trường test nên golden test sẽ
-    // bị ô vuông; các ký tự này có trong font DejaVu dùng ở test và
-    // trong Roboto trên máy thật.
+    // Nút Trở về là [RoundBackButton] tròn (PR (B)): icon là ký tự
+    // chữ '←' thay vì `Icon` vì font MaterialIcons không có trong môi
+    // trường test nên golden test sẽ bị ô vuông; ký tự này có trong
+    // font DejaVu dùng ở test và trong Roboto trên máy thật.
     // Nút đổi EN đã bỏ (PLAN điểm (l)): đề luôn hiện song ngữ cùng lúc.
     return Scaffold(
       key: const Key('math-screen'),
@@ -360,16 +384,7 @@ class _MathScreenState extends ConsumerState<MathScreen>
         title: Text(title),
         // Bé được rời chặng giữa chừng: chặng đang làm giữ trạng thái
         // `in_progress` nên vào lại vẫn làm tiếp từ đầu chặng.
-        leading: IconButton(
-          key: const Key('math-back-button'),
-          icon: const Text('←', style: TextStyle(fontSize: 30)),
-          tooltip: 'Về',
-          onPressed: () => context.go('/'),
-          style: IconButton.styleFrom(
-            minimumSize: const Size(56, 56),
-            iconSize: 30,
-          ),
-        ),
+        leading: const RoundBackButton(key: Key('math-back-button')),
         actions: [
           // Ví xu của chặng (đích đến của hiệu ứng xu bay).
           Padding(
@@ -872,7 +887,7 @@ class _SlideUpBanner extends StatelessWidget {
   }
 }
 
-/// Băng phản hồi đúng (mẫu đã chốt với chủ dự án, PLAN điểm (m)): bo
+/// Băng phản hồi đúng (mẫu đã chốt với anh Điệp, PLAN điểm (m)): bo
 /// tròn, nền xanh nhạt, viền xanh dày 3, bóng dưới, dấu tích tròn bên
 /// trái, số xu trong ô vàng có hình đồng xu, kèm nút Tiếp. Đúng liền
 /// 3 câu thì thêm dòng "N câu liền!".

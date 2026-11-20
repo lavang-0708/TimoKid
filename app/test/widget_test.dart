@@ -51,21 +51,27 @@ void main() {
     expect(find.text('Đề ngày: 0/5 chặng'), findsOneWidget);
   });
 
-  testWidgets('bấm nút khu thì sang màn Làm toán, bấm về thì quay lại', (
-    tester,
-  ) async {
-    await pumpApp(tester);
+  testWidgets(
+    'bấm nút khu thì sang màn Tòa nhà, Thử thách sang Làm toán, bấm về thì quay lại',
+    (tester) async {
+      await pumpApp(tester);
 
-    await tester.tap(find.byKey(const Key('room-town-button')));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('town-screen')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('room-town-button')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('town-screen')), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('town-stage-0-button')));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('math-screen')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('town-stage-0-button')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('building-screen')), findsOneWidget);
+      expect(find.text('Lâu đài Lôgic'), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('math-back-button')));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('town-screen')), findsOneWidget);
-  });
+      await tester.tap(find.byKey(const Key('building-challenge-button')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('math-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('math-back-button')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('town-screen')), findsOneWidget);
+    },
+  );
 }

@@ -1,8 +1,10 @@
 /// Màn Phòng — màn chính từ bản 0.2 (T2-04).
 ///
-/// Nền phòng, nhân vật, pet, nội thất ở các ô cố định; 3 nút: Thị trấn
-/// (luôn mở), Tủ đồ, Cửa hàng. Tủ đồ và Cửa hàng là T2-05/T2-06 nên
-/// nút chỉ dẫn tới màn chờ "sắp mở" khi đã mở khóa.
+/// Nền phòng, nhân vật, pet, nội thất ở các ô cố định; 2 nút ở cột
+/// phải: Tủ đồ, Cửa hàng. Nút Trở về tròn ở góc trên trái về Thị trấn
+/// (PR (B), xem [RoundBackButton]) thay cho nút chữ "Thị trấn" trước
+/// đây. Tủ đồ và Cửa hàng là T2-05/T2-06 nên nút chỉ dẫn tới màn chờ
+/// "sắp mở" khi đã mở khóa.
 ///
 /// Cổng mỗi ngày: chưa xong đề ngày thì Tủ đồ, Cửa hàng và chơi với
 /// pet bị khóa ([RoomService.isPlayUnlocked] đọc trạng thái 5 chặng
@@ -40,6 +42,7 @@ import '../../core/animation/animation_gate.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/tables.dart';
 import '../../core/widgets/press_bounce.dart';
+import '../../core/widgets/round_back_button.dart';
 import '../character/character_bounce.dart';
 import '../character/character_model.dart';
 import '../character/character_view.dart';
@@ -198,6 +201,8 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
           children: [
             Row(
               children: [
+                const RoundBackButton(key: Key('room-town-button')),
+                const SizedBox(width: 8),
                 const Text('Phòng của bé', style: TextStyle(fontSize: 20)),
                 if (profile != null) ...[
                   const SizedBox(width: 8),
@@ -286,14 +291,6 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _RoomButton(
-                          key: const Key('room-town-button'),
-                          label: 'Thị trấn',
-                          icon: Icons.map_outlined,
-                          locked: false,
-                          onPressed: () => context.go(TownScreen.route),
-                        ),
-                        const SizedBox(height: 8),
                         _RoomButton(
                           key: const Key('room-wardrobe-button'),
                           label: 'Tủ đồ',
@@ -709,7 +706,7 @@ class _RoomEggWiggleState extends State<_RoomEggWiggle>
   }
 }
 
-/// Nút ở cột phải màn Phòng (Thị trấn / Tủ đồ / Cửa hàng).
+/// Nút ở cột phải màn Phòng (Tủ đồ / Cửa hàng).
 class _RoomButton extends StatelessWidget {
   const _RoomButton({
     super.key,

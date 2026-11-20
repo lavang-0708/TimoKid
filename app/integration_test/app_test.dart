@@ -147,8 +147,11 @@ void main() {
 
     // --- T1-09: đi hết chặng 1 (mảng logic, bậc 1) ---
     // Nút khu 0 của màn Thị trấn T1-12 (tên key cũ `town-math-button`
-    // đã bỏ khi viết lại màn Thị trấn).
+    // đã bỏ khi viết lại màn Thị trấn). Từ PR (B): nút khu vào màn
+    // Tòa nhà, bấm Thử thách mới vào màn toán.
     await tapVisible(const Key('town-stage-0-button'));
+    expect(find.byKey(const Key('building-screen')), findsOneWidget);
+    await tapVisible(const Key('building-challenge-button'));
     expect(find.byKey(const Key('math-screen')), findsOneWidget);
 
     // Đọc đề ngày đã lưu từ DB của app để tính đáp án đúng.
