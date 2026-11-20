@@ -54,11 +54,18 @@ class TownRoadSegment {
 
 /// 6 đoạn đường v3b (đo từ nền thật; gần đúng ±40 px — xem
 /// `docs/C_IMAGES.md`).
+///
+/// Vòng sửa PR #31 (21/11): D2 đo lại từ nền thật (đoạn khai báo cũ
+/// (880, 70) → (1120, 220) cắt qua khối lều Hội chợ — xe hồng ở
+/// t = 0 nằm trên cỏ (990, 90)); ngã giao D1×D2 dời về đúng tâm làn
+/// (865, 125) (điểm cũ (880, 70) nằm trên cỏ, trên vạch sang
+/// đường). D2 mới uốn theo đường nhựa thật: qua phải tháp Con số,
+/// giữa lều và vòng quay Hội chợ, ra mép phải ở y ≈ 430.
 const List<TownRoadSegment> townRoads = [
   TownRoadSegment(
     name: 'D1',
     points: [
-      Offset(880, 70),
+      Offset(865, 125),
       Offset(600, 210),
       Offset(300, 360),
       Offset(0, 480),
@@ -67,10 +74,16 @@ const List<TownRoadSegment> townRoads = [
   TownRoadSegment(
     name: 'D2',
     points: [
-      Offset(880, 70),
-      Offset(1120, 220),
-      Offset(1420, 380),
-      Offset(1600, 470),
+      Offset(865, 125),
+      Offset(994, 180),
+      Offset(1077, 210),
+      Offset(1221, 270),
+      Offset(1320, 320),
+      Offset(1385, 340),
+      Offset(1420, 360),
+      Offset(1434, 380),
+      Offset(1532, 400),
+      Offset(1600, 430),
     ],
   ),
   TownRoadSegment(
@@ -398,16 +411,93 @@ bool pingPongForward(double progress) {
 }
 
 /// Tuyến xe 1 (xe hồng): D1 ngược + D2 xuôi — đường trên, qua ngã
-/// giao (880, 70). Tới-lui giữa 2 mép khung.
+/// giao (865, 125). Tới-lui giữa 2 mép khung.
 final TownRoute car1Route = TownRoute(const [
   Offset(0, 480),
   Offset(300, 360),
   Offset(600, 210),
-  Offset(880, 70),
-  Offset(1120, 220),
-  Offset(1420, 380),
-  Offset(1600, 470),
+  Offset(865, 125),
+  Offset(994, 180),
+  Offset(1077, 210),
+  Offset(1221, 270),
+  Offset(1320, 320),
+  Offset(1385, 340),
+  Offset(1420, 360),
+  Offset(1434, 380),
+  Offset(1532, 400),
+  Offset(1600, 430),
 ]);
+
+/// Vùng chân công trình (footprint KHÍT, chỉ thân/khối chính — KHÔNG
+/// phải vùng bấm trong `town_assets.dart`): dùng để test độc lập
+/// "tuyến đường không cắt qua công trình" (vòng sửa PR #31).
+///
+/// Vùng bấm cố tình rộng (bao cả sân/vườn để bé bấm dễ) nên KHÔNG
+/// dùng được cho test này — đường chạy dọc mép sân/vườn của Tháp,
+/// Hội chợ, Vườn, Nhà hồng, Công viên, Hồ nên rect bấm rộng sẽ báo
+/// sai. Các rect dưới đây chỉ lấy phần khối chính, và có CHỪA CHỖ
+/// ở những chỗ đường chạy sát (kiểm bằng code, không đoán — test
+/// `town_roads_test.dart` khóa lại: tuyến mới phải xanh, D2 cũ phải
+/// đỏ ở lều):
+/// - Lâu đài, Tháp: nhà cao nên rect toàn thân sẽ phủ cả mặt đường
+///   chạy sau lưng nó — chỉ lấy phần trên (mái/tháp) + chân đế
+///   (chỗ thân chạm đất). Tường trước lâu đài không lấy vì đường D1
+///   chạy dọc chân tường (D1 còn lệch ~40 px, chưa đo lại — việc
+///   còn lại).
+/// - Hội chợ: TÁCH THÀNH 2 rect — lều và bệ vòng quay — vì đường D2
+///   chạy GIỮA hai khối (rect gộp cũ bao cả đường nên test không bắt
+///   được lỗi xe cắt qua lều). Quầy hàng ven đường không lấy.
+/// - Tiệm bánh: mép trái + dải mái không lấy vì đường D1 chạy dọc
+///   tường trái (D1 còn lệch, chưa đo lại — việc còn lại).
+/// - Vườn Hình học: góc trên-trái không lấy vì đường D3 + vỉa hè
+///   chạy dọc hàng rào trên (D3 còn lệch, chưa đo lại — việc còn
+///   lại); chỉ lấy phần trong có đồ chơi khối.
+/// - Nhà hồng: chỉ mái + tường trên (y 545–675); tường dưới không lấy
+///   vì đường D3 chạy dọc mặt trước nhà.
+/// - Công viên: dải dưới không lấy vì đường D4 chạy dọc hàng rào dưới.
+/// - Hồ: chỉ lòng nước giữa; bờ trái không lấy vì đường D5 + vỉa hè
+///   chạy dọc bờ.
+const List<Rect> townBuildingFootprints = [
+  // Lâu đài Lôgic: tháp + thân trên (x 230–620, y 0–150).
+  Rect.fromLTWH(230, 0, 390, 150),
+  // Tháp Con số: thân trên (x 670–785, y 5–105).
+  Rect.fromLTWH(670, 5, 115, 100),
+  // Tháp Con số: chân đế (x 670–785, y 295–335).
+  Rect.fromLTWH(670, 295, 115, 40),
+  // Hội chợ Tổ hợp — lều (x 1050–1350, y 0–195).
+  Rect.fromLTWH(1050, 0, 300, 195),
+  // Hội chợ Tổ hợp — bệ vòng quay (x 1340–1520, y 150–280).
+  Rect.fromLTWH(1340, 150, 180, 130),
+  // Tiệm bánh Số học: mặt trước chính (x 350–570, y 340–540).
+  Rect.fromLTWH(350, 340, 220, 200),
+  // Vườn Hình học: phần trong có đồ chơi khối (x 570–900, y 620–745).
+  Rect.fromLTWH(570, 620, 330, 125),
+  // Nhà của bé: mái + tường trên (x 75–310, y 545–675).
+  Rect.fromLTWH(75, 545, 235, 130),
+  // Công viên (trang trí): sân chơi (x 850–1300, y 340–520).
+  Rect.fromLTWH(850, 340, 450, 180),
+  // Hồ: lòng nước giữa (x 1320–1540, y 590–760).
+  Rect.fromLTWH(1320, 590, 220, 170),
+];
+
+/// Có điểm nào của [route] (đã lệch vỉa hè nếu [sidewalk]) nằm trong
+/// vùng chân công trình nào không — kiểm tra độc lập với vùng đường
+/// đã khai báo (vùng khai báo sai thì test đường vẫn xanh).
+bool routeHitsBuilding(TownRoute route, {required bool sidewalk}) {
+  for (var d = 0.0; d <= route.totalLength; d += 5) {
+    for (final forward in [true, false]) {
+      final sample = route.sample(d, forward);
+      var point = sample.point;
+      if (sidewalk) {
+        point = sidewalkPoint(point, sample.legUnit);
+      }
+      for (final building in townBuildingFootprints) {
+        if (building.contains(point)) return true;
+      }
+    }
+  }
+  return false;
+}
 
 /// Tuyến xe 2 (xe xanh nhạt): D3 ngược + D4 xuôi — đường dưới, qua
 /// ngã giao (720, 450). Tới-lui giữa mép trái và (1500, 850).

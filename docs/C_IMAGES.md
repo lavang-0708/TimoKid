@@ -172,3 +172,27 @@ vẫn giữ lại sau khi thu nhỏ — vẫn dưới 5%.
 
 `tree_02.png` ghi đè cùng tên nên không cần xóa. Các file còn lại của giai
 đoạn 1 (`town_v3.png`, `cloud_01/02/03.png`, `tree_01.png`) giữ nguyên.
+
+## Vòng sửa PR #31 (21/11) — D2 đo lại từ nền thật
+
+D2 cũ (880, 70) → (1120, 220) → (1420, 380) → (1600, 470) là đoạn
+thẳng cắt qua khối lều Hội chợ; xe hồng ở t = 0 nằm trên cỏ (990, 90).
+Đo lại tâm làn thật từ `town_v3.png` (quét điểm ảnh nhựa: R 125–180,
+G 130–180, B 155–205, max-min ≤ 40; xem ảnh phóng to có lưới 50 px):
+
+- Ngã giao D1×D2 thật ở (865, 125) (điểm cũ (880, 70) nằm trên cỏ,
+  trên vạch sang đường). Tâm làn D2: (915, 150), (994, 180),
+  (1077, 210), (1154, 240), (1221, 270), (1268, 300), (1320, 320),
+  (1385, 340), (1420, 360), (1434, 380), (1532, 400), ra mép phải
+  ở (1600, 430). D2 mới trong `town_roads.dart` lấy các điểm mốc này
+  (gọn lại còn 10 điểm, lệch tâm thật ≤ ~20 px).
+- D1 và D3 cũng lệch so với đường nhựa thật (D1 chỉ 14% điểm mẫu nằm
+  trên nhựa, D3 26%; D4/D5/D6 77–87%) — chưa đo lại trong vòng này.
+- Rect Hội chợ TÁCH THÀNH 2 cho test đường (xem `docs/ASSETS.md`):
+  lều (1050, 0, 300, 195) + bệ vòng quay (1340, 150, 180, 130) — đường
+  D2 chạy giữa hai khối nên rect gộp cũ bao cả đường. Vùng bấm Hội chợ
+  trong `town_assets.dart` KHÔNG đổi (vẫn một rect 1080, 5, 480, 375).
+- Mây dời lên dải trời y < 120 (nhỏ hơn + mờ hơn, opacity 0,75); cây
+  xanh dời chân từ (72, 200) về (130, 230) (đúng gốc cây vẽ sẵn, trên
+  cỏ) + bóng đổ neo đúng chân. Chi tiết xem `docs/ASSETS.md` mục
+  "Thị trấn v3b".

@@ -413,8 +413,23 @@ nếu lệch). Nửa rộng vùng đường 50 px (mặt đường + vỉa hè);
 GIỮA làn, người đi trên vỉa hè (lệch tâm 25 px sang phía nam
 đường, tức phía dưới màn hình).
 
-- D1 ↙: (880, 70) → (600, 210) → (300, 360) → (0, 480).
-- D2 ↘: (880, 70) → (1120, 220) → (1420, 380) → (1600, 470).
+- D1 ↙: (865, 125) → (600, 210) → (300, 360) → (0, 480).
+- D2 ↘: (865, 125) → (994, 180) → (1077, 210) → (1221, 270) →
+  (1320, 320) → (1385, 340) → (1420, 360) → (1434, 380) →
+  (1532, 400) → (1600, 430).
+
+Vòng sửa PR #31 (21/11): D2 cũ (880, 70) → (1120, 220) →
+(1420, 380) → (1600, 470) là đoạn thẳng cắt qua khối lều Hội chợ
+— xe hồng ở t = 0 nằm trên cỏ (990, 90). D2 mới đo lại tâm làn thật
+từ nền (quét điểm ảnh nhựa + xem ảnh phóng to có lưới 50 px): ngã
+giao D1×D2 dời về đúng tâm làn (865, 125) (điểm cũ (880, 70) nằm
+trên cỏ, trên vạch sang đường); D2 uốn theo đường nhựa thật — qua
+phải tháp Con số, giữa lều và vòng quay Hội chợ, ra mép phải ở
+y ≈ 430. D1 và D3 còn lệch ~40–100 px so với đường nhựa thật
+(đo bằng code: D1 chỉ 14% điểm mẫu nằm trên nhựa, D3 26%; D4/D5/D6
+77–87%) — chưa đo lại trong vòng này, để việc còn lại; xe chạy
+trên D1/D3 có thể hơi lệch tâm làn nhưng không cắt qua công trình
+(khóa bằng test rect chân công trình dưới đây).
 - D3 ↙: (720, 450) → (550, 560) → (250, 710) → (0, 830).
 - D4 ↘: (720, 450) → (880, 550) → (1090, 650) → (1400, 800) →
   (1500, 850).
@@ -422,18 +437,47 @@ GIỮA làn, người đi trên vỉa hè (lệch tâm 25 px sang phía nam
   (700, 850).
 - D6 ↘: (1150, 680) → (1300, 760) → (1500, 850) → (1600, 900).
 
-Ngã giao: D1×D2 (880, 70); D3×D4 (720, 450); D4×D5 (1100, 650);
+Ngã giao: D1×D2 (865, 125); D3×D4 (720, 450); D4×D5 (1100, 650);
 D5×D6 (1300, 760).
 
 Tuyến xe/người (tới-lui ping-pong trên các đoạn):
 
-- Xe 1 (hồng): (0, 480) → (300, 360) → (600, 210) → (880, 70) →
-  (1120, 220) → (1420, 380) → (1600, 470) — D1 ngược + D2 xuôi.
+- Xe 1 (hồng): (0, 480) → (300, 360) → (600, 210) → (865, 125) →
+  (994, 180) → (1077, 210) → (1221, 270) → (1320, 320) →
+  (1385, 340) → (1420, 360) → (1434, 380) → (1532, 400) →
+  (1600, 430) — D1 ngược + D2 xuôi.
 - Xe 2 (xanh nhạt): (0, 830) → (250, 710) → (550, 560) →
   (720, 450) → (880, 550) → (1090, 650) → (1400, 800) →
   (1500, 850) — D3 ngược + D4 xuôi.
 - Người 1 (bé gái): dọc vỉa hè D3, (0, 830) → (720, 450).
 - Người 2 (bé trai): dọc vỉa hè D5, (1400, 480) → (700, 850).
+
+### Rect chân công trình — test độc lập (vòng sửa PR #31)
+
+Test "mọi điểm trên tuyến nằm trong vùng đường đã khai báo" không
+bắt được lỗi khai báo sai (vùng sai thì test vẫn xanh — đúng lỗi D2
+cũ cắt qua lều). Thêm test độc lập trong `town_roads_test.dart`:
+không điểm nào của bất kỳ tuyến nào (kể cả lệch vỉa hè) được nằm
+trong rect chân công trình nào — `townBuildingFootprints` trong
+`town_roads.dart` + hàm `routeHitsBuilding` (lấy mẫu mỗi 5 px, cả
+2 chiều) + test hồi quy: tuyến xe 1 với D2 cũ PHẢI chạm lều.
+
+Rect chân công trình KHÁC vùng bấm (vùng bấm rộng, bao cả sân/vườn
+để bé bấm dễ — đường chạy dọc mép sân/vườn nên rect bấm sẽ báo
+sai). Rect chân chỉ lấy khối chính, có chừa chỗ ở chỗ đường chạy
+sát; **Hội chợ TÁCH THÀNH 2 rect (lều + bệ vòng quay)** vì đường D2
+chạy giữa hai khối — rect gộp cũ (1080, 5, 480, 375) bao cả đường
+nên test không bắt được lỗi. Vùng bấm Hội chợ KHÔNG đổi (vẫn một
+rect 1080, 5, 480, 375 — bấm vào đường giữa hai khối vẫn mở Hội
+chợ, chấp nhận được). Danh sách rect (khung 1600x900): lâu đài
+(230, 0, 390, 150); tháp trên (670, 5, 115, 100) + tháp đế
+(670, 295, 115, 40); lều (1050, 0, 300, 195); bệ vòng quay
+(1340, 150, 180, 130); tiệm bánh (350, 340, 220, 200); vườn
+(570, 620, 330, 125); nhà hồng (75, 545, 235, 130); công viên
+(850, 340, 450, 180); hồ (1320, 590, 220, 170). Nhà cao (lâu đài,
+tháp) chỉ lấy phần trên + chân đế — rect toàn thân phủ cả mặt
+đường chạy sau lưng nó. Chi tiết chừa chỗ từng rect xem chú thích
+trong `town_roads.dart`.
 
 ### Hướng và lật (quan trọng — có test khóa lại)
 
@@ -467,12 +511,16 @@ bảng hướng mặt — ai "sửa" map theo tên file thì test đỏ.
   trên đường — xe 3/4 bị rút ngắn theo phối cảnh, bề ngang ảnh
   302–371 px so với xe cũ nhìn ngang 430–432 px); hộp người rộng
   0,04 bề rộng bản đồ (~55–60 px cao). Cây: cây xanh chân
-  (72, 200), hộp rộng 0,08; cây anh đào chân (1000, 865), hộp
+  (130, 230), hộp rộng 0,08; cây anh đào chân (1000, 865), hộp
   rộng 0,09 (dải cỏ đáy, không chồng công trình, không chặn đường).
+  Chân cây xanh dời từ (72, 200) về (130, 230) ở vòng sửa PR #31:
+  chân cũ đặt trên mép lối đi sáng màu nên nhìn như nổi trên vỉa
+  hè — chân mới đúng gốc cây vẽ sẵn, trên cỏ.
 - Bóng đổ: PNG lớp động KHÔNG có bóng sẵn — app vẽ ellipse mềm
   (đen 20%, blur 4, mẫu `_SoftShadow` ở màn Phòng) dưới chân
-  xe/người, rộng 0,85 hộp, cao 0,10 hộp, neo theo hàng đáy.
-  Cây không có bóng app (nền đã có bóng vẽ sẵn).
+  xe/người/cây, rộng 0,85 hộp, cao 0,10 hộp, neo theo hàng đáy.
+  (Vòng sửa PR #31: cây trước đây không có bóng app — nay có, như
+  xe/người.)
 - Thứ tự vẽ: lớp mặt đất (2 cây + 2 xe + 2 người) sắp theo y chân
   — càng ở dưới màn hình (y chân lớn) càng vẽ sau, che lớp ở trên
   (công trình trước che xe sau); rồi mây trên trời; vùng bấm trên
@@ -486,7 +534,14 @@ bảng hướng mặt — ai "sửa" map theo tên file thì test đỏ.
 
 - Chuyển động bằng Flutter animation
   (`app/lib/features/town/town_map.dart` + `town_roads.dart`):
-  mây trôi ngang chậm (mỗi mây tốc độ/hướng khác nhau, lặp 90 s);
+  mây trôi ngang chậm (mỗi mây tốc độ/hướng khác nhau, lặp 90 s)
+  — vòng sửa PR #31: mây CHỈ ở dải trời y < 120 (khung nền),
+  nhỏ hơn (rộng 0,09/0,085/0,07 bề rộng bản đồ) và mờ hơn
+  (opacity 0,75); mây cũ to + thấp (mép dưới tới y ≈ 150–210) đè
+  lều Hội chợ và cỏ. Mép dưới phần mây nhìn thấy tính từ alpha
+  PNG thật (xem chú thích trong `town_map.dart`): mây 1 ≈ 111,
+  mây 2 ≈ 112, mây 3 ≈ 90 — đều < 120, không chạm nhãn (nhãn ở
+  y ≥ 250);
   xe chạy tới-lui 30 s một lượt ping-pong; người đi bộ tới-lui
   24 s một lượt; cây đung đưa nhẹ (±2° quanh gốc, chu kỳ 4 s).
 - Tất cả tắt được qua cổng [AnimationGate] trong test (mẫu PR #22):
@@ -494,10 +549,11 @@ bảng hướng mặt — ai "sửa" map theo tên file thì test đỏ.
   bật thì vẽ lại mỗi khung qua `AnimatedBuilder` (vị trí tính
   trong builder từ giá trị controller hiện tại).
 - Vị trí ở t = 0 (khóa bằng test + golden; vị trí chân đã lệch
-  vỉa hè đối với người đi bộ): xe 1 giữa D2 (~(1000, 145), hướng
+  vỉa hè đối với người đi bộ): xe 1 giữa D2 (~(995, 180), hướng
   ↘), xe 2 giữa D4 (~(804, 502), hướng ↘), người 1 giữa D3
   (~(407, 659), hướng ↗, khung a), người 2 giữa D5 (~(1192, 629),
-  hướng ↙, khung a).
+  hướng ↙, khung a). Xe 1 dời từ (~(1000, 145)) ở vòng sửa PR #31
+  (D2 mới).
 - Test golden phải nạp trước nền + 17 lớp động bằng `runAsync` +
   `precacheImage` (mẫu `room_golden_test.dart` / A1) — không có
   bước này thì ảnh chụp thiếu nền/lớp động.

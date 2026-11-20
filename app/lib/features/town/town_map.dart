@@ -71,6 +71,7 @@ class _CloudSpec {
     required this.rightward,
     required this.speed,
     required this.phase,
+    required this.opacity,
   });
 
   /// Đường dẫn asset PNG của mây.
@@ -90,32 +91,47 @@ class _CloudSpec {
 
   /// Vị trí ban đầu 0..1 (cũng là vị trí khi cổng tắt).
   final double phase;
+
+  /// Độ mờ của mây (1.0 = đặc; vòng sửa PR #31: mây nhỏ + mờ hơn,
+  /// chỉ ở dải trời).
+  final double opacity;
 }
 
 const List<_CloudSpec> _clouds = [
+  // Vòng sửa PR #31 (21/11): mây cũ to + thấp (mép dưới tới y ≈ 150–
+  // 210 khung nền) đè lều Hội chợ và cỏ. Mây mới CHỈ ở dải trời
+  // y < 120: mép dưới phần mây nhìn thấy = top*900 +
+  // (đáy alpha/512)*width*1600 — đo từ PNG thật (cloud_01 alpha
+  // y 117–394, cloud_02 y 156–356, cloud_03 y 100–411):
+  // mây 1: 0 + 0,770*0,09*1600 ≈ 111; mây 2: 18 + 0,695*0,085*1600
+  // ≈ 112; mây 3: 0 + 0,803*0,07*1600 ≈ 90 — đều < 120. Nhãn dán ở
+  // cuối vùng bấm (y ≥ 250) nên mây không bao giờ chạm nhãn.
   _CloudSpec(
     asset: 'assets/images/town/cloud_01.png',
     top: 0.00,
-    width: 0.12,
+    width: 0.09,
     rightward: true,
     speed: 1.0,
     phase: 0.0,
+    opacity: 0.75,
   ),
   _CloudSpec(
     asset: 'assets/images/town/cloud_02.png',
-    top: 0.04,
-    width: 0.13,
+    top: 0.02,
+    width: 0.085,
     rightward: false,
     speed: 0.7,
     phase: 0.3,
+    opacity: 0.75,
   ),
   _CloudSpec(
     asset: 'assets/images/town/cloud_03.png',
-    top: 0.08,
-    width: 0.11,
+    top: 0.00,
+    width: 0.07,
     rightward: true,
     speed: 1.3,
     phase: 0.6,
+    opacity: 0.75,
   ),
 ];
 
@@ -238,8 +254,12 @@ class _TreeSpec {
 const List<_TreeSpec> _trees = [
   _TreeSpec(
     asset: 'assets/images/town/tree_01.png',
-    // Cây xanh ở góc cỏ trên-trái (che cây vẽ sẵn ở (70, 130)).
-    feet: Offset(72, 200),
+    // Cây xanh ở góc cỏ trên-trái, đè khít cây vẽ sẵn (gốc thân ở
+    // (130, 230)) — vòng sửa PR #31: chân cũ (72, 200) đặt trên
+    // mép lối đi sáng màu, không bóng đổ nên nhìn như nổi trên vỉa
+    // hè; chân mới đúng gốc cây vẽ sẵn, trên cỏ, có bóng đổ neo
+    // đúng chân (xem _treeLayer).
+    feet: Offset(130, 230),
     width: 0.08,
     anchorRow: 484,
     phase: 0.0,
@@ -367,7 +387,11 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
           top: h * cloud.top,
           width: w * cloud.width,
           height: w * cloud.width,
-          child: Image.asset(cloud.asset, fit: BoxFit.contain),
+          child: Image.asset(
+            cloud.asset,
+            fit: BoxFit.contain,
+            opacity: AlwaysStoppedAnimation(cloud.opacity),
+          ),
         ),
     ];
   }
@@ -448,21 +472,38 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
   }
 
   /// Một cây ở vị trí chân cây: hộp vuông neo gốc thân tại [tree.feet],
-  /// đung đưa ±2° quanh gốc.
+  /// đung đưa ±2° quanh gốc, bóng đổ mềm neo đúng chân (mẫu xe/người
+  /// — cây cũ không có bóng nên nhìn như nổi).
   Widget _treeLayer(_TreeSpec tree, double w, double h) {
     final size = w * tree.width;
     final feetX = tree.feet.dx / townFrameWidth * w;
     final feetY = tree.feet.dy / townFrameHeight * h;
+    // Mép đáy (gốc thân) nằm ở anchorRow/512 chiều cao hộp.
+    final bottom = size * tree.anchorRow / 512;
+    final shadowHeight = size * 0.10;
     return Positioned(
       key: Key('town-layer-${_keyOf(tree.asset)}'),
       left: feetX - size / 2,
-      top: feetY - size * tree.anchorRow / 512,
+      top: feetY - bottom,
       width: size,
       height: size,
-      child: Transform.rotate(
-        alignment: Alignment.bottomCenter,
-        angle: 0.035 * math.sin(2 * math.pi * (_treeT + tree.phase)),
-        child: Image.asset(tree.asset, fit: BoxFit.contain),
+      child: Stack(
+        children: [
+          Positioned(
+            left: size * 0.075,
+            top: bottom - shadowHeight * 0.3,
+            width: size * 0.85,
+            height: shadowHeight,
+            child: const _SoftShadow(),
+          ),
+          Positioned.fill(
+            child: Transform.rotate(
+              alignment: Alignment.bottomCenter,
+              angle: 0.035 * math.sin(2 * math.pi * (_treeT + tree.phase)),
+              child: Image.asset(tree.asset, fit: BoxFit.contain),
+            ),
+          ),
+        ],
       ),
     );
   }

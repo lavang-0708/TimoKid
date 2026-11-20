@@ -83,7 +83,7 @@ void main() {
       expectPoint(car1Route.sample(0, true).point, const Offset(0, 480));
       expectPoint(
         car1Route.sample(car1Route.totalLength, true).point,
-        const Offset(1600, 470),
+        const Offset(1600, 430),
       );
       expectPoint(car2Route.sample(0, true).point, const Offset(0, 830));
       expectPoint(
@@ -114,7 +114,7 @@ void main() {
         car1Route.sample(0, false).direction,
         TownTravelDirection.downLeft,
       );
-      // Giữa D2 (cách đầu tuyến ~1050 px: ~972 px hết D1 + 78 px
+      // Giữa D2 (cách đầu tuyến ~1050 px: ~937 px hết D1 + 113 px
       // vào D2) thì hướng ↘.
       expect(
         car1Route.sample(1050, true).direction,
@@ -211,6 +211,49 @@ void main() {
       expect(pingPongProgress(1.0), 0);
       expect(pingPongForward(0.25), isTrue);
       expect(pingPongForward(0.75), isFalse);
+    });
+  });
+
+  group('tuyến đường không cắt qua công trình (vòng sửa PR #31)', () {
+    // Kiểm tra ĐỘC LẬP với vùng đường đã khai báo: test "điểm trên
+    // tuyến nằm trong vùng đường" không bắt được lỗi khai báo sai —
+    // D2 cũ (880, 70) → (1120, 220) nằm gọn trong vùng đường khai
+    // báo cũ nhưng cắt qua khối lều Hội chợ, xe hồng ở t = 0 nằm
+    // trên cỏ (990, 90). Test này bắt lỗi đó bằng rect chân công
+    // trình đo từ nền thật (`townBuildingFootprints`).
+    final routes = <(TownRoute route, bool sidewalk)>[
+      (car1Route, false),
+      (car2Route, false),
+      (walker1Route, true),
+      (walker2Route, true),
+    ];
+
+    for (final (route, sidewalk) in routes) {
+      test('tuyến ${route.waypoints.first} → ${route.waypoints.last}', () {
+        expect(
+          routeHitsBuilding(route, sidewalk: sidewalk),
+          isFalse,
+          reason:
+              'tuyến cắt qua chân một công trình (xem '
+              'townBuildingFootprints)',
+        );
+      });
+    }
+
+    test('hồi quy: D2 cũ cắt qua lều Hội chợ (lỗi PR #31)', () {
+      // Tuyến xe 1 với đoạn D2 cũ (880, 70) → (1120, 220) →
+      // (1420, 380) → (1600, 470): phải CHẠM lều thì test mới có
+      // giá trị — nếu ai đó "sửa" D2 về đoạn thẳng cũ, test này đỏ.
+      final oldCar1 = TownRoute(const [
+        Offset(0, 480),
+        Offset(300, 360),
+        Offset(600, 210),
+        Offset(880, 70),
+        Offset(1120, 220),
+        Offset(1420, 380),
+        Offset(1600, 470),
+      ]);
+      expect(routeHitsBuilding(oldCar1, sidewalk: false), isTrue);
     });
   });
 
