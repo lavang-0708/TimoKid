@@ -3,9 +3,11 @@ import 'generators/comb_generators.dart';
 import 'generators/geo_generators.dart';
 import 'generators/logic_generators.dart';
 import 'generators/number_generators.dart';
+import 'generators/timo2_generators.dart';
 import 'question.dart';
 
-/// Toàn bộ 48 dạng bài của TimoKid, chuyển từ `gen.py`.
+/// Toàn bộ 72 dạng bài của TimoKid: 48 dạng chuyển từ `gen.py` và 24 dạng
+/// bổ sung theo đề vòng loại TIMO lớp 2 (`gen_timo2.py`).
 ///
 /// Mỗi dạng là một [QuestionGenerator] với mã dạng (`formId`) dạng
 /// `mảng.tên`, vd `logic.balance`. Danh sách này là nguồn duy nhất để
@@ -16,15 +18,20 @@ const List<QuestionGenerator> allQuestionGenerators = [
   ...numberGenerators,
   ...geoGenerators,
   ...combGenerators,
+  ...timo2LogicGenerators,
+  ...timo2ArithGenerators,
+  ...timo2NumberGenerators,
+  ...timo2GeoGenerators,
+  ...timo2CombGenerators,
 ];
 
-/// Số dạng bài theo từng mảng, khớp với `gen.py`.
+/// Số dạng bài theo từng mảng (`gen.py` + `gen_timo2.py`).
 const Map<String, int> generatorCountByTopic = {
-  'logic': 11,
-  'arith': 7,
-  'number': 10,
-  'geo': 9,
-  'comb': 11,
+  'logic': 16,
+  'arith': 13,
+  'number': 16,
+  'geo': 11,
+  'comb': 16,
 };
 
 /// Tìm generator theo mã dạng, vd `questionGeneratorFor('logic.balance')`.
