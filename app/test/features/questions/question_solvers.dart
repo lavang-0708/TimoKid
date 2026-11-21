@@ -174,6 +174,32 @@ int solveQuestion(Question q) {
       return _solveSplit(q);
     case 'comb.coins':
       return _solveCoins();
+    // Đợt 3 (timo3_generators.dart).
+    case 'geo.fence':
+      return _solveFence(q);
+    case 'geo.segline':
+      return _solveSegline(q);
+    case 'geo.units':
+      return _solveUnits(q);
+    case 'geo.cutsquares':
+      return (_pInt(q, 'a') ~/ _pInt(q, 's')) *
+          (_pInt(q, 'b') ~/ _pInt(q, 's'));
+    case 'geo.cubefaces':
+      return _solveCubeFaces(q);
+    case 'geo.perimchange':
+      return _solvePerimChange(q);
+    case 'logic.clock':
+      return _solveClock(q);
+    case 'logic.calendar':
+      return _solveCalendar(q);
+    case 'arith.sametotal':
+      return _solveSameTotal(q);
+    case 'arith.missingdigits':
+      return _solveMissingDigits(q);
+    case 'number.between':
+      return _solveBetween(q);
+    case 'comb.dice':
+      return _solveDice(q);
     default:
       throw StateError('Chưa có hàm giải độc lập cho ${q.formId}');
   }
@@ -844,4 +870,152 @@ int _solvePick2(Question q) {
     }
   }
   return c;
+}
+
+// ===================================================== Đợt 3: hàm giải
+
+int _solveFence(Question q) {
+  final gap = _pInt(q, 'gap');
+  switch (q.params['shape']) {
+    case 'square':
+      // Vòng khép kín: số cọc = chu vi : khoảng cách.
+      return (_pInt(q, 'side') * 4) ~/ gap;
+    case 'rect':
+      return ((_pInt(q, 'length') + _pInt(q, 'width')) * 2) ~/ gap;
+    default:
+      return (_pInt(q, 'posts') * gap) ~/ 4;
+  }
+}
+
+int _solveSegline(Question q) {
+  if (q.params.containsKey('ac')) {
+    return _pInt(q, 'ac') + _pInt(q, 'bd') - _pInt(q, 'ad');
+  }
+  if (q.params.containsKey('ad')) {
+    return _pInt(q, 'ad') - _pInt(q, 'ab') - _pInt(q, 'cd');
+  }
+  return _pInt(q, 'ab') + _pInt(q, 'bc');
+}
+
+int _solveUnits(Question q) {
+  final cm = _pInt(q, 'dm') * 10 + _pInt(q, 'cm');
+  return q.params['mode'] == 'rest_of_1m' ? 100 - cm : cm;
+}
+
+int _solveCubeFaces(Question q) {
+  final n = _pInt(q, 'n');
+  // Đếm trực tiếp từng khối thay vì dùng công thức.
+  var total = 0;
+  for (var i = 0; i < n; i++) {
+    final isEnd = (i == 0 ? 1 : 0) + (i == n - 1 ? 1 : 0);
+    switch (q.params['mode']) {
+      case 'all':
+        total += 6;
+      case 'on_table':
+        total += 3 + isEnd; // trên, trước, sau + mặt đầu
+      default:
+        total += 4 + isEnd; // 4 mặt quanh thân + mặt đầu
+    }
+  }
+  return total;
+}
+
+int _solvePerimChange(Question q) {
+  if (q.params['mode'] == 'square') {
+    final a = _pInt(q, 'side');
+    final b = _pInt(q, 'grow');
+    return 4 * (a + b) - 4 * a;
+  }
+  final l = _pInt(q, 'length');
+  final w = _pInt(q, 'width');
+  final before = 2 * (l + w);
+  final after = 2 * ((l + _pInt(q, 'grow')) + (w - _pInt(q, 'shrink')));
+  return after - before;
+}
+
+int _solveClock(Question q) {
+  var h = _pInt(q, 'hour');
+  final back = _pBool(q, 'back');
+  for (var i = 0; i < _pInt(q, 'shift'); i++) {
+    h = back ? (h == 1 ? 12 : h - 1) : (h == 12 ? 1 : h + 1);
+  }
+  return h;
+}
+
+int _solveCalendar(Question q) {
+  const thirty = {4, 6, 9, 11};
+  final m = _pInt(q, 'month');
+  final len = thirty.contains(m) ? 30 : 31;
+  final d = _pInt(q, 'day');
+  switch (q.params['mode']) {
+    case 'until':
+      return (len - d) + _pInt(q, 'day2');
+    default:
+      // Đếm từng ngày một.
+      var day = d;
+      for (var i = 0; i < _pInt(q, 'after'); i++) {
+        day = day == len ? 1 : day + 1;
+      }
+      return day;
+  }
+}
+
+int _solveSameTotal(Question q) {
+  final v = _pInt(q, 'value');
+  if (q.params['mode'] == 'sum') {
+    // Chọn hai số cụ thể có tổng v rồi thay đổi chúng.
+    final x = v ~/ 2;
+    final y = v - x;
+    return (x + _pInt(q, 'up')) + (y - _pInt(q, 'down'));
+  }
+  final big = v + 50;
+  const small = 50;
+  return (big + _pInt(q, 'up')) - (small - _pInt(q, 'down'));
+}
+
+int _solveMissingDigits(Question q) {
+  final u = _pInt(q, 'u');
+  final t = _pInt(q, 'total');
+  if (q.params['mode'] == 'one') {
+    for (var a = 1; a <= 9; a++) {
+      if (10 * a + u + _pInt(q, 'second') == t) return a;
+    }
+    throw StateError('không có nghiệm');
+  }
+  final v = _pInt(q, 'v');
+  final sols = <int>[];
+  for (var a = 1; a <= 9; a++) {
+    for (var b = 0; b <= 9; b++) {
+      if (10 * a + u + 10 * v + b == t) sols.add(a + b);
+    }
+  }
+  if (sols.length != 1) throw StateError('nghiệm không duy nhất: $sols');
+  return sols.single;
+}
+
+int _solveBetween(Question q) {
+  var count = 0;
+  for (var x = _pInt(q, 'lo') + 1; x < _pInt(q, 'hi'); x++) {
+    switch (q.params['kind']) {
+      case 'all':
+        count++;
+      case 'even':
+        if (x % 2 == 0) count++;
+      default:
+        if (x % 10 == 0) count++;
+    }
+  }
+  return count;
+}
+
+int _solveDice(Question q) {
+  final s = _pInt(q, 's');
+  final atLeast = _pBool(q, 'atLeast');
+  var count = 0;
+  for (var blue = 1; blue <= 6; blue++) {
+    for (var red = 1; red <= 6; red++) {
+      if (atLeast ? blue + red >= s : blue + red == s) count++;
+    }
+  }
+  return count;
 }

@@ -103,7 +103,7 @@ void main() {
         skillProgressDao: db.skillProgressDao,
       ),
       clock: clock,
-      random: Random(42),
+      random: Random(4),
     );
     final set = await service.getOrCreateTodaySet(childId: childId);
     final questions = db.dailySetsDao.readQuestions(set).sublist(0, 5);

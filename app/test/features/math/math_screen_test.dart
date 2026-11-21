@@ -70,7 +70,7 @@ void main() {
         skillProgressDao: db.skillProgressDao,
       ),
       clock: clock,
-      random: Random(42),
+      random: Random(4),
     );
     return service.getOrCreateTodaySet(childId: childId);
   }
