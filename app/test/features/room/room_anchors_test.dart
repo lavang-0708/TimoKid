@@ -83,50 +83,34 @@ void main() {
     expect(roomPointInFloor(roomPetFeet), isTrue);
   });
 
-  test('rect hiển thị phủ khít rect món vẽ sẵn trong nền', () {
-    // Content bbox của PNG riêng (khung 512, đo bằng code) +
-    // rect món vẽ sẵn trong nền (docs/D_IMAGES.md mục 2). Lớp rời
-    // phải phủ khít món trong nền để không lộ ra gây hình đôi;
-    // dung sai 2 px vì rect trong nền đo có sai số, và đèn/cốc
-    // thiếu ~1 px ở một mép (đèn mép phải, cốc mép đáy).
-    const contentBbox512 = <String, Rect>{
-      'room-furniture-gau-bong': Rect.fromLTRB(125, 95, 388, 444),
-      'room-furniture-den-sao': Rect.fromLTRB(96, 91, 418, 449),
-      'room-furniture-chau-cay': Rect.fromLTRB(99, 119, 373, 440),
-      'room-furniture-binh-hoa': Rect.fromLTRB(156, 106, 360, 429),
-      'room-furniture-coc-sao': Rect.fromLTRB(100, 83, 354, 433),
+  test('vùng chạm = hộp món vẽ sẵn trong nền (đo bằng PIL 22/11)', () {
+    // Nền room_v3.png đã VẼ SẴN 5 món nên app không vẽ PNG rời đè
+    // lên (đè → hình đôi) mà đặt vùng chạm vô hình đúng hộp món đo
+    // trên ảnh thật. Rect đo bằng PIL (khung 1600x900).
+    const measured = <String, Rect>{
+      'room-furniture-gau-bong': Rect.fromLTRB(340, 440, 456, 548),
+      'room-furniture-den-sao': Rect.fromLTRB(92, 486, 210, 604),
+      'room-furniture-chau-cay': Rect.fromLTRB(783, 538, 902, 684),
+      'room-furniture-binh-hoa': Rect.fromLTRB(1230, 396, 1357, 545),
+      'room-furniture-coc-sao': Rect.fromLTRB(1076, 441, 1144, 523),
     };
-    const bakedInBackground = <String, Rect>{
-      'room-furniture-gau-bong': Rect.fromLTRB(355, 425, 475, 550),
-      'room-furniture-den-sao': Rect.fromLTRB(90, 455, 210, 580),
-      'room-furniture-chau-cay': Rect.fromLTRB(785, 530, 900, 670),
-      'room-furniture-binh-hoa': Rect.fromLTRB(1250, 365, 1360, 510),
-      'room-furniture-coc-sao': Rect.fromLTRB(1071, 432, 1127, 515),
-    };
+    const frame = Rect.fromLTWH(0, 0, roomFrameWidth, roomFrameHeight);
     for (final item in roomFurniture) {
-      final content = contentBbox512[item.key]!;
-      final display = Rect.fromLTRB(
-        item.placeX + content.left / 512 * item.placeSize,
-        item.placeY + content.top / 512 * item.placeSize,
-        item.placeX + content.right / 512 * item.placeSize,
-        item.placeY + content.bottom / 512 * item.placeSize,
-      );
-      final baked = bakedInBackground[item.key]!;
-      expect(
-        display.left <= baked.left + 2 &&
-            display.top <= baked.top + 2 &&
-            display.right >= baked.right - 2 &&
-            display.bottom >= baked.bottom - 2,
-        isTrue,
-        reason:
-            '${item.key}: rect hiển thị $display phải phủ khít '
-            'món trong nền $baked (không hở, không hình đôi)',
-      );
-      // Điểm neo đáy là đáy món (giữa rect hiển thị theo x,
-      // dung sai 3 px vì đế món hẹp hơn thân).
-      expect(item.anchor.dx, closeTo(display.center.dx, 3));
-      expect(item.anchor.dy, closeTo(display.bottom, 2));
+      expect(item.bakedRect, measured[item.key], reason: item.key);
+      // Nằm trọn trong khung, đủ lớn để bé chạm (>= 60 px khung).
+      expect(frame.contains(item.bakedRect.topLeft), isTrue);
+      expect(frame.contains(item.bakedRect.bottomRight), isTrue);
+      expect(item.bakedRect.width, greaterThanOrEqualTo(60));
+      expect(item.bakedRect.height, greaterThanOrEqualTo(80));
+      // Điểm neo bóng đổ (dùng khi có nền sạch) nằm giữa món theo x.
+      expect(item.bakedRect.left <= item.anchor.dx, isTrue);
+      expect(item.anchor.dx <= item.bakedRect.right, isTrue);
     }
+    expect(roomCleanBackgroundReady, isFalse);
+    expect(
+      roomCleanBackgroundAsset,
+      'assets/images/backgrounds/room_v3_clean.png',
+    );
   });
 
   test('dấu chân đồ chạm sàn (cho PR (G))', () {
