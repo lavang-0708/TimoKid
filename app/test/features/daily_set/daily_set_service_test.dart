@@ -497,7 +497,7 @@ void main() {
     });
 
     test('đề quá 7 ngày không tính vào lịch sử ít gặp', () async {
-      // Đề 8 ngày trước dùng 5 dạng; đề 2 ngày trước dùng 4 dạng còn
+      // Đề 8 ngày trước dùng 5 dạng; đề 2 ngày trước dùng 5 dạng còn
       // lại. Nếu đề cũ bị tính thì mọi dạng hòa nhau; không tính thì
       // hôm nay chặng comb phải là đúng 5 dạng của đề cũ.
       const oldForms = [
@@ -513,6 +513,7 @@ void main() {
         'comb.freebie',
         'comb.vases',
         'comb.pick2',
+        'comb.dice',
       ]);
 
       final set = await service.getOrCreateTodaySet(childId: childId);
@@ -597,7 +598,7 @@ void main() {
     });
   });
 
-  group('DailySetService: phủ dạng bài của 72 dạng', () {
+  group('DailySetService: phủ dạng bài của 84 dạng', () {
     test('mọi mảng đều có ít nhất 4 dạng ở mỗi mức', () {
       for (final strand in Strand.all) {
         for (var level = 1; level <= 3; level++) {
