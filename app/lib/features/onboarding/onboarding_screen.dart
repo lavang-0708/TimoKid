@@ -37,9 +37,9 @@ import '../../core/animation/animation_gate.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/widgets/press_bounce.dart';
 import '../character/character_bounce.dart';
-import '../character/character_model.dart';
-import '../character/character_view.dart';
-import '../character/placeholder_layers.dart';
+import '../character/character_view.dart' show CharacterLayerLoader;
+import '../character/kid_assets.dart';
+import '../character/kid_sprite.dart';
 import '../room/room_screen.dart';
 import 'onboarding_config.dart';
 import 'onboarding_model.dart';
@@ -51,53 +51,28 @@ import 'onboarding_service.dart';
 /// bước cuối.
 const List<String> _girlStepTitles = <String>[
   'Bé là bé gái hay bé trai?',
-  'Chọn màu tóc',
-  'Chọn váy',
+  'Chọn bộ đồ',
   'Đặt tên cho nhân vật',
   'Chọn một quả trứng',
 ];
 
 /// Mã bước dáng nữ, cùng thứ tự với [_girlStepTitles].
-const List<String> _girlStepKeys = <String>[
-  'gender',
-  'hairColor',
-  'dress',
-  'name',
-  'egg',
-];
+const List<String> _girlStepKeys = <String>['gender', 'dress', 'name', 'egg'];
 
-const List<String> _boyStepTitles = <String>[
-  'Bé là bé gái hay bé trai?',
-  'Chọn màu da',
-  'Chọn kiểu tóc và màu tóc',
-  'Chọn kiểu mắt và màu mắt',
-  'Chọn kiểu miệng',
-  'Đặt tên cho nhân vật',
-  'Chọn một quả trứng',
-];
+/// Dáng nam: cùng 4 bước như dáng nữ (E: ảnh toàn thân, bé chỉ chọn
+/// bộ đồ; màu da/tóc/mắt cố định theo hình đã duyệt).
+const List<String> _boyStepTitles = _girlStepTitles;
 
 /// Mã bước dáng nam, cùng thứ tự với [_boyStepTitles].
-const List<String> _boyStepKeys = <String>[
-  'gender',
-  'skin',
-  'hair',
-  'eyes',
-  'mouth',
-  'name',
-  'egg',
-];
+const List<String> _boyStepKeys = _girlStepKeys;
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key, this.previewLoader});
 
   static const String route = '/onboarding';
 
-  /// Bộ nạp lớp cho xem trước nhân vật, chỉ dùng trong test: bơm
-  /// [placeholderLayerLoader] để golden/test cũ vẫn dùng lớp tạm
-  /// xám (không cần file hình thật `girl_body_01.png` ở local).
-  /// Khi chạy app thì để null để [CharacterView] dùng `AssetImage`
-  /// mặc định và tải hình thật bộ girlSet1 từ bundle. Chỉ áp dụng
-  /// cho dáng nữ; dáng nam chưa có hình thật nên luôn dùng lớp tạm.
+  /// Không còn dùng từ (E): xem trước là ảnh toàn thân [KidSprite].
+  /// Giữ tham số để router/test cũ không phải đổi chữ ký.
   final CharacterLayerLoader? previewLoader;
 
   @override
@@ -206,44 +181,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       '${_draft.hairColor}|${_draft.eyeStyle}|${_draft.eyeColor}|'
       '${_draft.mouthStyle}|${_draft.dress}';
 
-  /// Bộ nạp lớp cho xem trước: nữ dùng `AssetImage` mặc định (hình
-  /// thật bộ girlSet1 đã có từ PR #18) trừ khi test bơm loader tạm
-  /// qua [OnboardingScreen.previewLoader]; nam chưa có hình thật
-  /// nên vẫn dùng lớp tạm xám.
-  CharacterLayerLoader? get _previewLoader =>
-      _draft.gender == 'girl' ? widget.previewLoader : placeholderLayerLoader;
-
-  /// Bộ đồ xem trước từ nháp hiện tại.
-  ///
-  /// Nữ: bộ nhân vật nữ 1 ([CharacterOutfit.girlSet1]) — thân + tóc
-  /// + váy, đúng cờ `recolorable` của PR #18 (thân/váy màu thật,
-  /// chỉ tóc nhân màu). Nam: bộ đủ lớp manifest v1 (tủ đồ là T2-05),
-  /// chỉ tóc/mắt/miệng theo lựa chọn của bé — dáng nam chưa có hình
-  /// thật nên tạm dùng bộ nữ làm xem trước (hình tạm xám).
-  CharacterOutfit _previewOutfit() {
-    if (_draft.gender == 'girl') {
-      return CharacterOutfit.girlSet1(
-        hairColor: Color(_draft.hairColor),
-        top: _draft.dress,
-      );
-    }
-    return CharacterOutfit.girl(
-      palette: CharacterPalette(
-        skin: Color(_draft.skinColor),
-        hair: Color(_draft.hairColor),
-        eyes: Color(_draft.eyeColor),
-        mouth: const Color(onboardingMouthColor),
-        top: const Color(0xFFF2A7C3),
-        bottom: const Color(0xFFB5A8E8),
-        shoes: const Color(0xFF8FCB9B),
-        accessoryHead: const Color(0xFFF28BB0),
-      ),
-      hairSet: _draft.hairStyle,
-      eyes: _draft.eyeStyle,
-      mouth: _draft.mouthStyle,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -322,23 +259,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 Expanded(
                   child: CharacterBounce(
                     popKey: _previewPopKey,
-                    child: CharacterView(
+                    // Thở/chớp mắt bật (kiểu game); cổng AnimationGate
+                    // tắt khi chạy test để pumpAndSettle dừng được.
+                    child: KidSprite(
                       key: const Key('onboarding-preview'),
-                      outfit: _previewOutfit(),
-                      loader: _previewLoader,
-                      // Thở/chớp mắt bật (kiểu game); cổng
-                      // AnimationGate tắt khi chạy test để
-                      // pumpAndSettle dừng được (xem ghi chú đầu file).
-                      animationsEnabled: true,
+                      gender: _draft.gender,
+                      outfit: kidOutfitNumber(_draft.dress),
                     ),
                   ),
                 ),
-                // Nhãn "Hình tạm" chỉ khi xem trước đúng là
-                // lớp tạm: dáng nam (chưa có hình thật) hoặc
-                // test đang bơm loader tạm. Dáng nữ khi chạy
-                // app dùng hình thật nên không có nhãn.
-                if (_previewLoader != null)
-                  const Text('Hình tạm', style: TextStyle(fontSize: 16)),
               ],
             ),
           ),
@@ -416,8 +345,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           labels: onboardingGenderNames,
           selected: _draft.gender,
           keyPrefix: 'onboarding-gender',
-          onSelected: (value) =>
-              setState(() => _draft = _draft.copyWith(gender: value)),
+          // Đổi dáng thì về bộ 1 của dáng đó (mã bộ đồ theo dáng).
+          onSelected: (value) => setState(
+            () => _draft = value == _draft.gender
+                ? _draft
+                : _draft.copyWith(gender: value, dressToNull: true),
+          ),
         );
       case 'skin':
         return _colorRow(
@@ -471,18 +404,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           ],
         );
       case 'dress':
-        // Nữ bộ 1: chọn váy phủ lên bộ đồ gốc; không chọn thì mặc
-        // bộ đồ gốc trên thân.
-        return _optionList<String?>(
-          options: onboardingGirlDresses,
-          labels: onboardingGirlDressNames,
-          selected: _draft.dress,
+        // E: 3 bộ đồ toàn thân của dáng đã chọn; chưa chọn (null) =
+        // bộ 1.
+        final ids = kidOutfitIds[kidGender(_draft.gender)]!;
+        return _optionList<String>(
+          options: ids,
+          labels: kidOutfitNames,
+          selected: _draft.dress ?? ids.first,
           keyPrefix: 'onboarding-dress',
-          onSelected: (value) => setState(
-            () => _draft = value == null
-                ? _draft.copyWith(dressToNull: true)
-                : _draft.copyWith(dress: value),
-          ),
+          onSelected: (value) =>
+              setState(() => _draft = _draft.copyWith(dress: value)),
         );
       case 'eyes':
         return Column(

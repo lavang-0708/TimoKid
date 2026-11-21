@@ -35,6 +35,7 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -46,9 +47,9 @@ import '../../core/database/tables.dart';
 import '../../core/widgets/press_bounce.dart';
 import '../../core/widgets/round_back_button.dart';
 import '../character/character_bounce.dart';
-import '../character/character_model.dart';
-import '../character/character_view.dart';
-import '../character/placeholder_layers.dart';
+import '../character/kid_assets.dart';
+import '../character/kid_look_service.dart';
+import '../character/kid_sprite.dart';
 import '../daily_set/daily_set_config.dart';
 import '../onboarding/egg_service.dart';
 import '../onboarding/onboarding_config.dart';
@@ -58,8 +59,10 @@ import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
 import '../town/town_screen.dart';
 import 'coming_soon_screen.dart';
+import 'pet_growth.dart';
 import 'room_assets.dart';
 import 'room_service.dart';
+import 'room_walk.dart';
 
 class RoomScreen extends ConsumerStatefulWidget {
   const RoomScreen({super.key});
@@ -70,7 +73,8 @@ class RoomScreen extends ConsumerStatefulWidget {
   ConsumerState<RoomScreen> createState() => _RoomScreenState();
 }
 
-class _RoomScreenState extends ConsumerState<RoomScreen> {
+class _RoomScreenState extends ConsumerState<RoomScreen>
+    with TickerProviderStateMixin {
   bool _loading = true;
   String? _error;
   CharacterProfile? _profile;
@@ -84,6 +88,24 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
   String? _bubbleText;
   int _petBounce = 0;
   Timer? _bubbleTimer;
+  String? _childId;
+  String? _headAccessory;
+  PetStage _petStage = PetStage.newborn;
+  int _petDays = 0;
+
+  // (G) Đi lại trong phòng: chân nhân vật/pet theo khung 1600x900.
+  Offset _kidFeet = roomCharacterFeet;
+  Offset _petFeet = roomPetFeet;
+  bool _kidFacingLeft = false;
+  bool _petFacingLeft = false;
+  bool _kidWalking = false;
+  bool _petWalking = false;
+  bool _kidWaving = false;
+  Timer? _waveTimer;
+  late final AnimationController _kidMove = AnimationController(vsync: this);
+  late final AnimationController _petMove = AnimationController(vsync: this);
+  int _kidWalkId = 0;
+  int _petWalkId = 0;
 
   @override
   void initState() {
@@ -94,6 +116,9 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
   @override
   void dispose() {
     _bubbleTimer?.cancel();
+    _waveTimer?.cancel();
+    _kidMove.dispose();
+    _petMove.dispose();
     super.dispose();
   }
 
@@ -114,8 +139,22 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
       final roomService = RoomService(db: db);
       final unlocked = await roomService.isPlayUnlocked(childId);
       final done = await roomService.doneStageCount(childId);
+      final accessory = await KidLookService(db: db).headAccessory(childId);
+      final growth = PetGrowthService(db: db);
+      final petDays = await growth.doneDays(childId);
+      final petStage = hatched ? petStageForDays(petDays) : PetStage.egg;
+      final seen = await growth.seenStage(childId);
+      if (hatched && seen != petStage) {
+        await growth.markSeen(childId, petStage);
+      }
+      final grewUp =
+          hatched && seen != null && seen != PetStage.egg && seen != petStage;
       if (!mounted) return;
       setState(() {
+        _childId = childId;
+        _headAccessory = accessory;
+        _petDays = petDays;
+        _petStage = petStage;
         _profile = profile;
         _eggSpecies = eggSpecies;
         _hatched = hatched;
@@ -127,6 +166,12 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
         _loading = false;
         _error = null;
       });
+      if (grewUp && eggSpecies != null) {
+        _showBubble(
+          'Pet đã lớn thành ${petStageNames[petStage]}! Giỏi quá!',
+          seconds: 3,
+        );
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -137,10 +182,11 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
   }
 
   /// Hiện bong bóng phản ứng 1,5 giây rồi tự ẩn.
-  void _showBubble(String text) {
+  void _showBubble(String text, {int seconds = 0}) {
     _bubbleTimer?.cancel();
     setState(() => _bubbleText = text);
-    _bubbleTimer = Timer(const Duration(milliseconds: 1500), () {
+    final ms = seconds > 0 ? seconds * 1000 : 1500;
+    _bubbleTimer = Timer(Duration(milliseconds: ms), () {
       if (!mounted) return;
       if (_bubbleText == text) setState(() => _bubbleText = null);
     });
@@ -175,7 +221,251 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
       return;
     }
     setState(() => _petBounce++);
-    _showBubble(petHappyLines[species] ?? 'Vui quá!');
+    final next = petDaysToNextStage(_petDays);
+    _showBubble(
+      next == null
+          ? (petHappyLines[species] ?? 'Vui quá!')
+          : '${petHappyLines[species] ?? 'Vui quá!'} '
+                'Còn $next ngày học nữa tớ sẽ lớn!',
+      seconds: 2,
+    );
+  }
+
+  /// Tủ đồ (E): chọn 1 trong 3 bộ đồ và phụ kiện đầu, xem trước ngay
+  /// trên nhân vật trong phòng, lưu ngay khi chọn.
+  Future<void> _openWardrobe() async {
+    final profile = _profile;
+    final childId = _childId;
+    if (profile == null || childId == null) return;
+    final db = ref.read(databaseProvider);
+    final looks = KidLookService(db: db);
+    final gender = kidGender(profile.gender);
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (sheetContext, setSheet) {
+          final current = _profile ?? profile;
+          final outfit = kidOutfitNumber(current.dress);
+          Widget choice({
+            required Key key,
+            required bool selected,
+            required Widget child,
+            required String label,
+            required VoidCallback onTap,
+          }) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: InkWell(
+              key: key,
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                width: 104,
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: selected ? const Color(0xFFEDE4FB) : Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: selected
+                        ? const Color(0xFF8E6FD8)
+                        : const Color(0xFFD9C2E8),
+                    width: selected ? 3 : 1,
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: 92, child: child),
+                    const SizedBox(height: 4),
+                    Text(
+                      label,
+                      maxLines: 2,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+          final accessories = kidHeadAccessories[gender]!;
+          return SafeArea(
+            child: SingleChildScrollView(
+              key: const Key('room-wardrobe-sheet'),
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Bộ đồ', style: TextStyle(fontSize: 18)),
+                  const SizedBox(height: 6),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        for (var n = 1; n <= 3; n++)
+                          choice(
+                            key: Key('room-wardrobe-outfit-$n'),
+                            selected: n == outfit,
+                            label:
+                                kidOutfitNames[kidOutfitIds[gender]![n - 1]]!,
+                            onTap: () async {
+                              final updated = await looks.setOutfit(
+                                childId,
+                                current,
+                                n,
+                              );
+                              if (!mounted) return;
+                              setState(() => _profile = updated);
+                              setSheet(() {});
+                            },
+                            child: Image.asset(
+                              kidFullAsset(gender, n),
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text('Phụ kiện', style: TextStyle(fontSize: 18)),
+                  const SizedBox(height: 6),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        for (final id in <String?>[null, ...accessories.keys])
+                          choice(
+                            key: Key('room-wardrobe-accessory-${id ?? 'none'}'),
+                            selected: id == _headAccessory,
+                            label: id == null
+                                ? 'Không đeo'
+                                : accessories[id]!.$1,
+                            onTap: () async {
+                              await looks.setHeadAccessory(childId, id);
+                              if (!mounted) return;
+                              setState(() => _headAccessory = id);
+                              setSheet(() {});
+                            },
+                            child: KidSprite(
+                              gender: gender,
+                              outfit: outfit,
+                              headAccessory: id,
+                              animationsEnabled: false,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Bấm vào nhân vật: vẫy tay chào 1,4 giây.
+  void _onKidTap() {
+    _waveTimer?.cancel();
+    setState(() => _kidWaving = true);
+    final name = _profile?.name ?? '';
+    _showBubble(name.isEmpty ? 'Xin chào!' : 'Xin chào, tớ là $name!');
+    _waveTimer = Timer(const Duration(milliseconds: 1400), () {
+      if (mounted) setState(() => _kidWaving = false);
+    });
+  }
+
+  /// (G) Bé chạm vào sàn: nhân vật đi tới đó, pet đi theo sau lưng.
+  void _onFloorTap(Offset frame) {
+    final target = roomWalkTarget(frame);
+    final path = roomWalkPath(_kidFeet, target);
+    _walk(isKid: true, path: path);
+    if (_eggSpecies != null && _hatched) {
+      final facingLeft = target.dx < _kidFeet.dx;
+      final spot = roomPetFollowSpot(target, kidFacingLeft: facingLeft);
+      Timer(const Duration(milliseconds: 350), () {
+        if (!mounted) return;
+        _walk(isKid: false, path: roomWalkPath(_petFeet, spot));
+      });
+    }
+  }
+
+  /// Đi lần lượt qua các điểm [path]; lần đi mới hủy lần cũ.
+  Future<void> _walk({required bool isKid, required List<Offset> path}) async {
+    final controller = isKid ? _kidMove : _petMove;
+    final id = isKid ? ++_kidWalkId : ++_petWalkId;
+    bool current() => (isKid ? _kidWalkId : _petWalkId) == id;
+    controller.stop();
+    if (!AnimationGate.enabled) {
+      // Test: tới nơi ngay, không chạy hiệu ứng.
+      setState(() {
+        if (isKid) {
+          _kidFeet = path.last;
+        } else {
+          _petFeet = path.last;
+        }
+      });
+      return;
+    }
+    setState(() {
+      if (isKid) {
+        _kidWalking = true;
+        _kidWaving = false;
+      } else {
+        _petWalking = true;
+      }
+    });
+    for (final point in path) {
+      if (!mounted || !current()) return;
+      final from = isKid ? _kidFeet : _petFeet;
+      final dist = (point - from).distance;
+      if (dist < 1) continue;
+      final speed = isKid ? roomWalkSpeed : roomWalkSpeed * 1.15;
+      controller.duration = Duration(
+        milliseconds: (dist / speed * 1000).round(),
+      );
+      void tick() {
+        if (!current()) return;
+        final p = Offset.lerp(from, point, controller.value)!;
+        setState(() {
+          if (isKid) {
+            _kidFeet = p;
+          } else {
+            _petFeet = p;
+          }
+        });
+      }
+
+      setState(() {
+        if ((point.dx - from.dx).abs() > 2) {
+          if (isKid) {
+            _kidFacingLeft = point.dx < from.dx;
+          } else {
+            _petFacingLeft = point.dx < from.dx;
+          }
+        }
+      });
+      controller.addListener(tick);
+      try {
+        await controller.forward(from: 0).orCancel;
+      } on TickerCanceled {
+        return;
+      } finally {
+        controller.removeListener(tick);
+      }
+    }
+    if (!mounted || !current()) return;
+    setState(() {
+      if (isKid) {
+        _kidWalking = false;
+      } else {
+        _petWalking = false;
+        // Tới nơi thì pet quay về phía bé.
+        _petFacingLeft = _kidFeet.dx < _petFeet.dx;
+      }
+    });
   }
 
   @override
@@ -301,13 +591,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
                               : Icons.lock_outlined,
                           locked: !_unlocked,
                           onPressed: () => _unlocked
-                              ? context.push(
-                                  ComingSoonScreen.route,
-                                  extra: const ComingSoonArgs(
-                                    title: 'Tủ đồ',
-                                    message: 'Tủ đồ sắp mở ở bản sau nhé! Xong đề ngày là được thay đồ.',
-                                  ),
-                                )
+                              ? _openWardrobe()
                               : _showLockedReminder('Tủ đồ'),
                         ),
                         const SizedBox(height: 8),
@@ -383,20 +667,88 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
               roomFurniture[1], // đèn sao (neo y = 580)
               roomFurniture[2], // chậu cây (neo y = 686)
             ];
+            // (G) Nhân vật và pet: cỡ theo chiều sâu (chân y), vẽ theo
+            // chân y (xa trước, gần sau) để ai đứng trước thì che đúng.
+            final kidScale = roomDepthScale(_kidFeet.dy);
+            final kidBoxH = kidFrameHeight * 360 / kidBodyHeight * kidScale;
+            final kidBoxW = kidBoxH * kidFrameWidth / kidFrameHeight;
+            final petScale = roomDepthScale(_petFeet.dy);
+            final petBox = petBoxSize(_petStage) * petScale;
+            final actors = <(double, List<Widget>)>[
+              if (profile != null)
+                (
+                  _kidFeet.dy,
+                  [
+                    frameShadow(_kidFeet, 240 * kidScale),
+                    Positioned(
+                      left: fx(_kidFeet.dx - kidBoxW / 2),
+                      top: fy(_kidFeet.dy - kidFeetFraction * kidBoxH),
+                      width: fx(kidBoxW),
+                      height: fy(kidBoxH),
+                      child: CharacterBounce(
+                        onTap: _onKidTap,
+                        child: KidSprite(
+                          key: const Key('room-character'),
+                          gender: profile.gender,
+                          outfit: kidOutfitNumber(profile.dress),
+                          headAccessory: _headAccessory,
+                          waving: _kidWaving,
+                          walking: _kidWalking,
+                          facingLeft: _kidFacingLeft,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if (_eggSpecies != null)
+                (
+                  _petFeet.dy,
+                  [
+                    frameShadow(_petFeet, petBox * 0.7),
+                    Positioned(
+                      left: fx(_petFeet.dx - petBox / 2),
+                      top: fy(_petFeet.dy - petBox * 440 / 512),
+                      width: fx(petBox),
+                      height: fy(petBox),
+                      child: _PetSlot(
+                        species: _eggSpecies!,
+                        hatched: _hatched,
+                        stage: _petStage,
+                        bounce: _petBounce,
+                        walking: _petWalking,
+                        facingLeft: _petFacingLeft,
+                        onTap: _onPetTap,
+                      ),
+                    ),
+                  ],
+                ),
+            ]..sort((a, b) => a.$1.compareTo(b.$1));
             return Stack(
               children: [
-                Image.asset(
-                  roomBackgroundAsset,
-                  fit: BoxFit.fill,
-                  width: w,
-                  height: h,
+                // Chạm vào nền (sàn, tường, giường) thì nhân vật đi tới
+                // chỗ sàn tương ứng; món đồ/nhân vật/pet nằm trên nên
+                // chạm vào chúng vẫn ra phản ứng riêng.
+                Positioned.fill(
+                  child: GestureDetector(
+                    key: const Key('room-floor'),
+                    behavior: HitTestBehavior.opaque,
+                    onTapUp: (d) => _onFloorTap(
+                      Offset(
+                        d.localPosition.dx / w * roomFrameWidth,
+                        d.localPosition.dy / h * roomFrameHeight,
+                      ),
+                    ),
+                    child: Image.asset(
+                      roomBackgroundAsset,
+                      fit: BoxFit.fill,
+                      width: w,
+                      height: h,
+                    ),
+                  ),
                 ),
                 // Bóng đổ (theo chân y).
                 for (final item in itemsByFeet)
                   frameShadow(item.anchor, item.placeSize),
-                // Bóng nhân vật + pet (chân y = 810, gần nhất).
-                frameShadow(roomCharacterFeet, 240),
-                frameShadow(roomPetFeet, roomPetBox.width),
                 // 5 món nội thất (theo chân y).
                 for (final item in itemsByFeet)
                   Positioned(
@@ -409,36 +761,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
                       onTap: () => _showBubble(item.reaction),
                     ),
                   ),
-                if (profile != null)
-                  Positioned(
-                    left: fx(roomCharacterBox.left),
-                    top: fy(roomCharacterBox.top),
-                    width: fx(roomCharacterBox.width),
-                    child: CharacterBounce(
-                      child: CharacterView(
-                        key: const Key('room-character'),
-                        outfit: _outfitFor(profile),
-                        loader: _loaderFor(profile),
-                        // Thở/chớp mắt bật (kiểu game, như ở Thị trấn);
-                        // cổng AnimationGate tắt khi chạy test để
-                        // pumpAndSettle dừng được (xem chú thích đầu file).
-                        animationsEnabled: true,
-                      ),
-                    ),
-                  ),
-                if (_eggSpecies != null)
-                  Positioned(
-                    left: fx(roomPetBox.left),
-                    top: fy(roomPetBox.top),
-                    width: fx(roomPetBox.width),
-                    height: fy(roomPetBox.height),
-                    child: _PetSlot(
-                      species: _eggSpecies!,
-                      hatched: _hatched,
-                      bounce: _petBounce,
-                      onTap: _onPetTap,
-                    ),
-                  ),
+                for (final actor in actors) ...actor.$2,
                 if (_bubbleText != null)
                   Positioned(
                     top: 4,
@@ -471,39 +794,6 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
       ),
     );
   }
-
-  /// Bộ đồ xem trước cho hồ sơ đã lưu (giữ đồng bộ với `_outfitFor`
-  /// ở màn Thị trấn): nữ dùng bộ nhân vật nữ 1 (thân + tóc + váy),
-  /// nam dùng bộ đủ lớp manifest v1.
-  CharacterOutfit _outfitFor(CharacterProfile profile) {
-    if (profile.gender == 'girl') {
-      return CharacterOutfit.girlSet1(
-        hairColor: Color(profile.hairColor),
-        top: profile.dress,
-      );
-    }
-    return CharacterOutfit.girl(
-      palette: CharacterPalette(
-        skin: Color(profile.skinColor),
-        hair: Color(profile.hairColor),
-        eyes: Color(profile.eyeColor),
-        mouth: const Color(onboardingMouthColor),
-        top: const Color(0xFFF2A7C3),
-        bottom: const Color(0xFFB5A8E8),
-        shoes: const Color(0xFF8FCB9B),
-        accessoryHead: const Color(0xFFF28BB0),
-      ),
-      hairSet: profile.hairStyle,
-      eyes: profile.eyeStyle,
-      mouth: profile.mouthStyle,
-    );
-  }
-
-  /// Bộ nạp lớp: nữ dùng `AssetImage` mặc định (hình thật đã có
-  /// trên main từ PR #18); nam chưa có hình thật nên dùng lớp tạm
-  /// xám như ở màn mở đầu.
-  CharacterLayerLoader? _loaderFor(CharacterProfile profile) =>
-      profile.gender == 'girl' ? null : placeholderLayerLoader;
 }
 
 /// Một món nội thất v3b: chạm vào thì hiện bong bóng phản ứng.
@@ -553,31 +843,42 @@ class _SoftShadowPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// Ô pet/trứng: trứng chưa nở thì hiện trứng, đã nở thì hiện pet mới nở.
-/// Chạm vào thì nảy nhẹ (khi đã mở khóa) + bong bóng lời.
+/// Ô pet/trứng: trứng chưa nở thì hiện trứng, đã nở thì hiện pet theo
+/// giai đoạn lớn (F). Chạm vào thì nảy nhẹ + bong bóng lời. Đang đi thì
+/// nhún bước; [facingLeft] lật ngang.
 class _PetSlot extends StatelessWidget {
   const _PetSlot({
     required this.species,
     required this.hatched,
+    required this.stage,
     required this.bounce,
+    required this.walking,
+    required this.facingLeft,
     required this.onTap,
   });
 
   final String species;
   final bool hatched;
+  final PetStage stage;
   final int bounce;
+  final bool walking;
+  final bool facingLeft;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final asset = hatched
-        ? newbornSpeciesAssets[species]!
+        ? petAsset(species, stage == PetStage.egg ? PetStage.newborn : stage)
         : eggSpeciesAssets[species]!;
-    // Trứng/pet là PNG thật (PR #21); trứng chưa nở lắc lư nhẹ
-    // chờ nở như ở bước chọn trứng (bản sao nhỏ của `_EggWiggle`
-    // ở mở đầu — để ở đây để không sửa file mở đầu của PR ưu tiên).
-    final picture = Image.asset(asset, fit: BoxFit.contain);
-    final shown = hatched ? picture : _RoomEggWiggle(child: picture);
+    Widget picture = Image.asset(
+      asset,
+      fit: BoxFit.contain,
+      gaplessPlayback: true,
+    );
+    if (facingLeft) picture = Transform.flip(flipX: true, child: picture);
+    final shown = hatched
+        ? _PetHop(walking: walking, child: picture)
+        : _RoomEggWiggle(child: picture);
     return GestureDetector(
       key: Key(hatched ? 'room-pet' : 'room-egg'),
       onTap: onTap,
@@ -589,6 +890,65 @@ class _PetSlot extends StatelessWidget {
             Transform.scale(scale: scale, child: child),
         child: shown,
       ),
+    );
+  }
+}
+
+/// Pet nhún nhảy khi đi (nảy 2 lần mỗi chu kỳ 360 ms); đứng yên thì
+/// thở nhẹ. Tắt khi chạy test ([AnimationGate]).
+class _PetHop extends StatefulWidget {
+  const _PetHop({required this.walking, required this.child});
+
+  final bool walking;
+  final Widget child;
+
+  @override
+  State<_PetHop> createState() => _PetHopState();
+}
+
+class _PetHopState extends State<_PetHop> with SingleTickerProviderStateMixin {
+  AnimationController? _c;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!AnimationGate.enabled) return;
+    _c = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _c?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = _c;
+    if (c == null) return widget.child;
+    return AnimatedBuilder(
+      animation: c,
+      builder: (context, child) {
+        final t = c.value * 2 * math.pi;
+        if (widget.walking) {
+          // 5 nhịp nảy mỗi chu kỳ 1,8 giây (~360 ms một nhịp).
+          final hop = math.sin(t * 5).abs();
+          return FractionalTranslation(
+            translation: Offset(0, -0.08 * hop),
+            child: child,
+          );
+        }
+        final breath = 1 + 0.025 * math.sin(t);
+        return Transform(
+          alignment: const Alignment(0, 0.72),
+          transform: Matrix4.diagonal3Values(2 - breath, breath, 1),
+          child: child,
+        );
+      },
+      child: widget.child,
     );
   }
 }

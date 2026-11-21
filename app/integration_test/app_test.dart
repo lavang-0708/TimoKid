@@ -79,24 +79,20 @@ void main() {
 
     // --- T2-03: màn mở đầu nữ (DB mới: chưa xong mở đầu) ---
     expect(find.byKey(const Key('onboarding-screen')), findsOneWidget);
-    expect(find.text('Bước 1/5'), findsOneWidget);
+    expect(find.text('Bước 1/4'), findsOneWidget);
     await takeShot('onboarding-gender');
 
     await tester.tap(find.byKey(const Key('onboarding-gender-girl')));
     await tapOnboardingNext();
-    expect(find.text('Bước 2/5'), findsOneWidget);
-    await takeShot('onboarding-hair');
-
-    // Màu tóc giữ mặc định (hồng); sang bước chọn váy.
-    await tapOnboardingNext();
-    expect(find.text('Bước 3/5'), findsOneWidget);
+    // Bước chọn bộ đồ (E: ảnh toàn thân, chọn váy tím).
+    expect(find.text('Bước 2/4'), findsOneWidget);
     await tester.tap(find.byKey(const Key('onboarding-dress-girl_top_02')));
     await tester.pumpAndSettle();
     await takeShot('onboarding-dress');
     await tapOnboardingNext();
 
     // Bước đặt tên.
-    expect(find.text('Bước 4/5'), findsOneWidget);
+    expect(find.text('Bước 3/4'), findsOneWidget);
     await tester.enterText(
       find.byKey(const Key('onboarding-name-field')),
       'An',
@@ -114,7 +110,7 @@ void main() {
     await closeKeyboard();
 
     // Bước chọn trứng.
-    expect(find.text('Bước 5/5'), findsOneWidget);
+    expect(find.text('Bước 4/4'), findsOneWidget);
     await tapVisible(const Key('onboarding-egg-dog'));
     // Thẻ trứng đã chọn thì nút Xong phải bấm được.
     final finish = tester.widget<ButtonStyleButton>(

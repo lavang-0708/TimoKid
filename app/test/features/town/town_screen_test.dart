@@ -13,7 +13,7 @@ import 'package:timokid/core/database/models.dart';
 import 'package:timokid/core/database/tables.dart';
 import 'package:timokid/core/time/clock.dart';
 import 'package:timokid/features/building/building_screen.dart';
-import 'package:timokid/features/character/character_view.dart';
+import 'package:timokid/features/character/kid_sprite.dart';
 import 'package:timokid/features/daily_set/daily_set_service.dart';
 import 'package:timokid/features/ladder/ladder_service.dart';
 import 'package:timokid/features/math/math_screen.dart';
@@ -277,21 +277,16 @@ void main() {
 
     expect(find.byKey(const Key('town-character')), findsOneWidget);
     expect(find.text('An'), findsOneWidget);
-    // Đúng bộ nữ 1: tóc sau + thân + váy tím + tóc trước, không
-    // mắt/miệng/giày; dùng hình thật (AssetImage mặc định).
-    final view = tester.widget<CharacterView>(
+    // Ảnh toàn thân thật (E): bé gái bộ 2 (váy tím).
+    final view = tester.widget<KidSprite>(
       find.byKey(const Key('town-character')),
     );
-    expect(view.outfit.layers.map((layer) => layer.id).toList(), <String>[
-      'girl_hair_back_01',
-      'girl_body_01',
-      'girl_top_02',
-      'girl_hair_front_01',
-    ]);
-    expect(view.loader, isNull);
+    expect(view.gender, 'girl');
+    expect(view.outfit, 2);
+    expect(find.byKey(const Key('kid-full-girl-2')), findsOneWidget);
   });
 
-  testWidgets('đã tạo nhân vật nam thì hiện nhân vật tạm', (tester) async {
+  testWidgets('đã tạo nhân vật nam thì hiện ảnh bé trai thật', (tester) async {
     await OnboardingService(db: db).completeOnboarding(
       childId: childId,
       profile: CharacterProfile.defaults().copyWith(
@@ -304,10 +299,7 @@ void main() {
 
     expect(find.byKey(const Key('town-character')), findsOneWidget);
     expect(find.text('Bình'), findsOneWidget);
-    // Nam chưa có hình thật nên dùng lớp tạm xám.
-    final view = tester.widget<CharacterView>(
-      find.byKey(const Key('town-character')),
-    );
-    expect(view.loader, isNotNull);
+    // Ảnh toàn thân bé trai (E), bộ 1 mặc định.
+    expect(find.byKey(const Key('kid-full-boy-1')), findsOneWidget);
   });
 }

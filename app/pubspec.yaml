@@ -73,6 +73,8 @@ flutter:
     - assets/images/
     # Lớp nhân vật nữ (Claude ghép 19/11, xem docs/ASSETS.md mục "Bộ nhân vật nữ 1").
     - assets/images/character/girl/
+    # Ảnh toàn thân bé trai + phụ kiện (E, Muse vẽ 21/11, docs/E_IMAGES.md).
+    - assets/images/character/boy/
     # Trứng và pet 3 giai đoạn, cắt từ pet_eggs + pet_evolution (19/11).
     - assets/images/pets/
     # Nền phòng v2 + 8 đồ rời phong cách v2 (A1, 20/11): nền PNG
