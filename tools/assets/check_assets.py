@@ -95,7 +95,14 @@ NAME_PATTERNS = {
     "character_patch": re.compile(
         r"^(girl|boy)_eyes_closed_patch(_0[1-3]_wave)?\.png$"
     ),
-    "pet": re.compile(r"^(dog|cat|rabbit)_(egg|newborn|teen|adult)\.png$"),
+    # Ảnh giai đoạn + trứng nứt/vỏ (lô 8A) + khung đi/vui/ngồi (lô 8B).
+    "pet": re.compile(
+        r"^(dog|cat|rabbit)_("
+        r"egg|newborn|teen|adult"
+        r"|egg_crack_[1-3]|shell_(top|bottom)"
+        r"|(newborn|teen|adult)_(walk_[a-d]|happy|sit)"
+        r")\.png$"
+    ),
     "item": re.compile(r"^[a-z0-9_]+\.png$"),
     "furniture": re.compile(r"^[a-z0-9_]+\.png$"),
     "background": re.compile(r"^[a-z0-9_]+\.(jpg|jpeg|png)$"),
