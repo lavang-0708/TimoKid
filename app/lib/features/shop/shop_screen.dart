@@ -186,7 +186,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
             child: DecoratedBox(
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('$uiArt/ui_onboarding_bg.png'),
+                  image: AssetImage('assets/images/backgrounds/shop_bg.png'),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -275,7 +275,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
   Widget _grid(List<ShopItem> items) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xCCFFFFFF),
+        color: const Color(0x99FFFFFF),
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: Colors.white, width: 2),
       ),
@@ -326,7 +326,7 @@ class _TabPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final icon = category == ShopCategory.outfits
-        ? Image.asset('$uiArt/ui_icon_wardrobe.png', width: 30, height: 30)
+        ? Image.asset('$uiArt/ui_icon_clothes.png', width: 30, height: 30)
         : Icon(
             Icons.auto_awesome_rounded,
             size: 24,

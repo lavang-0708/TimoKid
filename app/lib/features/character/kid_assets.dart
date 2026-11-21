@@ -13,7 +13,6 @@ library;
 
 import 'package:material_ui/material_ui.dart';
 
-
 /// Khung ảnh nhân vật.
 const double kidFrameWidth = 1024;
 const double kidFrameHeight = 1536;
