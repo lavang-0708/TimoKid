@@ -33,7 +33,7 @@ import zlib
 
 # --- Hợp đồng cố định (khớp docs/ASSETS.md) -------------------------------
 
-# 11 mã lớp, mỗi mã gắn một bậc chồng z (mắt, miệng và tay cùng z 6,
+# 10 mã lớp, mỗi mã gắn một bậc chồng z (mắt và miệng cùng z 6,
 # phụ kiện đầu và tay cùng z 8 — xem DESIGN mục "Thứ tự lớp").
 LAYERS = {
     "hair_back": 1,
@@ -43,7 +43,6 @@ LAYERS = {
     "top": 5,
     "eyes": 6,
     "mouth": 6,
-    "arm": 6,
     "hair_front": 7,
     "accessory_head": 8,
     "accessory_hand": 8,
@@ -76,7 +75,7 @@ FRAMES = {
 NAME_PATTERNS = {
     "character_layer": re.compile(
         r"^(girl|boy)_"
-        r"(hair_back|body|shoes|bottom|top|eyes|mouth|arm|hair_front"
+        r"(hair_back|body|shoes|bottom|top|eyes|mouth|hair_front"
         r"|accessory_head|accessory_hand)"
         r"_[a-z0-9]+(_line)?\.png$"
     ),
