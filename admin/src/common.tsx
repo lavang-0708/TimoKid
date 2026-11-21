@@ -71,10 +71,10 @@ export function Card({ title, children, tone }: { title?: string; children: Reac
   );
 }
 
-export function RangePicker({ value, onChange }: { value: number; onChange: (n: number) => void }) {
+export function RangePicker({ value, onChange, options = [7, 30] }: { value: number; onChange: (n: number) => void; options?: number[] }) {
   return (
     <div className="row">
-      {[7, 30].map((n) => (
+      {options.map((n) => (
         <button key={n} className={`chip ${value === n ? 'on' : ''}`} onClick={() => onChange(n)}>
           {n} ngày
         </button>

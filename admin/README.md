@@ -34,7 +34,11 @@ Chạy ở máy cần origin `localhost` được Neon Auth cho phép; bản dep
 
 ## Các màn hình
 
-Đăng nhập/Đăng ký, Chọn bé, Thống kê (7 hoặc 30 ngày), Dạng bài, Thư và quà, Cài đặt. Trang không tạo được hồ sơ bé: hồ sơ xuất hiện sau khi app trên máy bé đăng nhập cùng tài khoản và đồng bộ.
+Đăng nhập/Đăng ký, Chọn bé, Thống kê (7 hoặc 30 ngày, kèm thẻ Nhân vật và pet), Dạng bài (7, 30 hoặc 90 ngày), Thư và quà, Cài đặt. Trang không tạo được hồ sơ bé: hồ sơ xuất hiện sau khi app trên máy bé đăng nhập cùng tài khoản và đồng bộ.
+
+**Dạng bài** có mục "Thống kê từng dạng": với bé đang chọn và khoảng ngày đã chọn, mỗi mảng liệt kê đủ các dạng của app (84 dạng: logic 18, số học 15, lý thuyết số 17, hình học 17, tổ hợp 17) kèm số lượt và tỉ lệ đúng ngay lần đầu. Dạng yếu (từ 5 lượt trở lên, đúng dưới 60%) xếp trước, rồi theo tỉ lệ đúng tăng dần; dạng chưa làm lượt nào hiện "Chưa làm" ở cuối mỗi mảng. Dữ liệu lấy từ bảng `attempts`; phần tính nằm ở `formStatsByStrand` trong `src/lib/logic.ts`. Bảng tên tiếng Việt `FORM_LABELS` (`src/lib/labels.ts`) được `src/lib/labels.test.ts` đối chiếu với mã Dart trong `app/lib/features/questions/generators/`: thêm hoặc đổi mã dạng trong app mà quên cập nhật nhãn thì `npm test` báo lỗi.
+
+**Nhân vật và pet** (thẻ trong màn Thống kê, chỉ đọc) hiển thị tên, dáng, bộ đồ, phụ kiện đang đeo, loài pet, giai đoạn và số ngày xong đề nữa để lên giai đoạn sau. Đọc từ các khóa `settings` của bé: `character_profile`, `kid_head_accessory`, `kid_glasses`, `kid_white_shoes`, `kid_backpack`, `selected_egg`, `egg_hatched`; giai đoạn pet tính từ số dòng `daily_sets` có đủ 5 chặng `done` (mới nở 0-2 ngày, tuổi nhỡ 3-7, trưởng thành từ 8, như `app/lib/features/room/pet_growth.dart`). Tên bộ đồ, loài, giai đoạn được chép từ mã Dart sang `labels.ts`. Khi app chưa đồng bộ các dòng này, thẻ hiện "Chưa có dữ liệu — app chưa đồng bộ" thay vì báo lỗi.
 
 Cài đặt ghi vào bảng `settings` của bé bằng cách đọc theo `child_id` + `key` rồi PATCH theo `id` (chưa có thì POST), vì chỉ mục duy nhất là chỉ mục biểu thức nên `on_conflict` không dùng được. Các khóa: `answer_type_lock` (map mảng -> `choice` | `number` | null) và `rewards` (cùng tên khóa với app: `easy`, `medium`, `hard`, `stage_complete`, `daily_complete_xu`, `daily_complete_gem`, `mastery_gem`).
 
