@@ -175,7 +175,8 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                     GameRoundButton(
                       key: const Key('town-room-button'),
                       icon: Icons.home_rounded,
-                      color: const Color(0xFFFF9EB5),
+                      image: '$uiArt/ui_icon_room.png',
+                      color: const Color(0xFFFFA65C),
                       label: 'Phòng',
                       tooltip: 'Về Phòng',
                       onPressed: () => context.go(RoomScreen.route),
@@ -204,18 +205,21 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                               ),
                             GameStat(
                               icon: Icons.monetization_on_rounded,
+                              image: '$uiArt/ui_coin.png',
                               color: const Color(0xFFF5B83D),
                               text: '$_xu',
                               textKey: const Key('town-xu-balance'),
                             ),
                             GameStat(
                               icon: Icons.diamond_rounded,
+                              image: '$uiArt/ui_gem.png',
                               color: const Color(0xFFA07BE0),
                               text: '$_gems',
                               textKey: const Key('town-gem-balance'),
                             ),
                             GameStat(
                               icon: Icons.star_rounded,
+                              image: '$uiArt/ui_star.png',
                               color: const Color(0xFFFFC94D),
                               text: '$done/$total',
                               textKey: const Key('town-progress-text'),

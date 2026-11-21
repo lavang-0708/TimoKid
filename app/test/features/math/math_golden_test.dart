@@ -26,6 +26,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../helpers/ui_images.dart';
+
 import 'package:timokid/core/database/app_database.dart';
 import 'package:timokid/core/database/models.dart';
 import 'package:timokid/core/database/tables.dart';
@@ -162,6 +165,7 @@ void main() {
 
   testWidgets('màn câu trắc nghiệm', (tester) async {
     await pumpMath(tester);
+    await precacheUiImages(tester);
     await expectLater(
       find.byKey(const Key('math-screen')),
       matchesGoldenFile('../../goldens/math_choice.png'),
@@ -189,6 +193,7 @@ void main() {
       ],
     );
     await pumpMath(tester);
+    await precacheUiImages(tester);
     await expectLater(
       find.byKey(const Key('math-screen')),
       matchesGoldenFile('../../goldens/math_choice_bilingual.png'),
@@ -198,6 +203,7 @@ void main() {
   testWidgets('màn gợi ý sau sai lần đầu', (tester) async {
     await pumpMath(tester);
     await tapWrongChoice(tester);
+    await precacheUiImages(tester);
     await expectLater(
       find.byKey(const Key('math-screen')),
       matchesGoldenFile('../../goldens/math_hint.png'),
@@ -208,6 +214,7 @@ void main() {
     await pumpMath(tester);
     await tapWrongChoice(tester);
     await tapWrongChoice(tester);
+    await precacheUiImages(tester);
     await expectLater(
       find.byKey(const Key('math-screen')),
       matchesGoldenFile('../../goldens/math_solution.png'),
@@ -217,6 +224,7 @@ void main() {
   testWidgets('màn đúng, hiện xu', (tester) async {
     await pumpMath(tester);
     await tapCorrectChoice(tester);
+    await precacheUiImages(tester);
     await expectLater(
       find.byKey(const Key('math-screen')),
       matchesGoldenFile('../../goldens/math_correct.png'),
@@ -229,6 +237,7 @@ void main() {
       await tapCorrectChoice(tester);
       await tapNext(tester);
     }
+    await precacheUiImages(tester);
     await expectLater(
       find.byKey(const Key('math-screen')),
       matchesGoldenFile('../../goldens/math_number.png'),
@@ -237,6 +246,7 @@ void main() {
 
   testWidgets('màn trắc nghiệm ở 1280x800', (tester) async {
     await pumpMath(tester, size: const Size(1280, 800));
+    await precacheUiImages(tester);
     await expectLater(
       find.byKey(const Key('math-screen')),
       matchesGoldenFile('../../goldens/math_choice_1280x800.png'),
@@ -249,6 +259,7 @@ void main() {
       await tapCorrectChoice(tester);
       await tapNext(tester);
     }
+    await precacheUiImages(tester);
     await expectLater(
       find.byKey(const Key('math-screen')),
       matchesGoldenFile('../../goldens/math_number_1280x800.png'),
@@ -279,6 +290,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    await precacheUiImages(tester);
     await expectLater(
       find.byKey(const Key('stage-result-screen')),
       matchesGoldenFile('../../goldens/math_result.png'),

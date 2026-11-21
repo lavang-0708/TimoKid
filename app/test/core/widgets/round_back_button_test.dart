@@ -45,7 +45,16 @@ void main() {
     final size = tester.getSize(find.byType(RoundBackButton));
     expect(size.width, greaterThanOrEqualTo(56));
     expect(size.height, greaterThanOrEqualTo(56));
-    expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
+    final image = tester.widget<Image>(
+      find.descendant(
+        of: find.byType(RoundBackButton),
+        matching: find.byType(Image),
+      ),
+    );
+    expect(
+      (image.image as AssetImage).assetName,
+      'assets/images/ui/ui_btn_back.png',
+    );
   });
 
   testWidgets('onPressed riêng thì gọi hàm đó, không về Thị trấn', (

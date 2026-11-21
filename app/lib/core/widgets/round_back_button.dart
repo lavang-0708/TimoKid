@@ -28,7 +28,8 @@ class RoundBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GameRoundButton(
       icon: Icons.arrow_back_rounded,
-      color: const Color(0xFFFFA65C),
+      color: const Color(0xFFFF8FB1),
+      image: '$uiArt/ui_btn_back.png',
       size: size,
       tooltip: 'Về Thị trấn',
       onPressed: onPressed ?? () => context.go(TownScreen.route),

@@ -120,11 +120,15 @@ class GameStat extends StatelessWidget {
     required this.color,
     required this.text,
     this.textKey,
+    this.image,
   });
 
   final IconData icon;
   final Color color;
   final String text;
+
+  /// Ảnh icon vẽ sẵn (xu, kim cương, sao — lô 6) thay vòng tròn màu.
+  final String? image;
 
   /// Khoá của widget chữ (để test đọc số dư).
   final Key? textKey;
@@ -136,19 +140,22 @@ class GameStat extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 26,
-            height: 26,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                center: const Alignment(-0.3, -0.4),
-                colors: [Color.lerp(color, Colors.white, 0.45)!, color],
+          if (image != null)
+            Image.asset(image!, width: 28, height: 28)
+          else
+            Container(
+              width: 26,
+              height: 26,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  center: const Alignment(-0.3, -0.4),
+                  colors: [Color.lerp(color, Colors.white, 0.45)!, color],
+                ),
+                border: Border.all(color: Colors.white, width: 1.5),
               ),
-              border: Border.all(color: Colors.white, width: 1.5),
+              child: Icon(icon, size: 16, color: Colors.white),
             ),
-            child: Icon(icon, size: 16, color: Colors.white),
-          ),
           const SizedBox(width: 4),
           Text(text, key: textKey, style: gameOutlinedText(16)),
         ],
@@ -168,9 +175,14 @@ class GameRoundButton extends StatelessWidget {
     this.label,
     this.locked = false,
     this.tooltip,
+    this.image,
   });
 
   final IconData icon;
+
+  /// Ảnh nút vẽ sẵn (lô 6, `assets/images/ui/`); có thì thay cho
+  /// vòng tròn vẽ bằng code. Khoá thì ảnh xám mờ.
+  final String? image;
   final VoidCallback onPressed;
   final Color color;
   final double size;
@@ -187,76 +199,94 @@ class GameRoundButton extends StatelessWidget {
     final base = locked ? const Color(0xFFB9B3C6) : color;
     final top = Color.lerp(base, Colors.white, 0.35)!;
     final edge = Color.lerp(base, Colors.black, 0.25)!;
-    Widget circle = SizedBox(
-      width: size,
-      height: size + 4,
-      child: Stack(
-        children: [
-          // Gờ dưới tạo khối 3D.
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 4,
-            height: size,
-            child: DecoratedBox(
-              decoration: BoxDecoration(shape: BoxShape.circle, color: edge),
-            ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            height: size,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [top, base],
-                ),
-                border: Border.all(color: Colors.white, width: 2.5),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x40000000),
-                    blurRadius: 6,
-                    offset: Offset(0, 3),
+    final art = image;
+    Widget circle = art != null
+        ? SizedBox(
+            width: size,
+            height: size + 4,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: locked ? 0.75 : 1,
+                    child: ColorFiltered(
+                      colorFilter: locked
+                          ? const ColorFilter.matrix(_greyMatrix)
+                          : const ColorFilter.mode(
+                              Colors.transparent,
+                              BlendMode.dst,
+                            ),
+                      child: Image.asset(
+                        art,
+                        fit: BoxFit.contain,
+                        semanticLabel: tooltip ?? label,
+                      ),
+                    ),
                   ),
-                ],
-              ),
-              child: Center(
-                child: Icon(
-                  icon,
-                  size: size * 0.52,
-                  color: Colors.white,
-                  shadows: const [
-                    Shadow(color: Color(0x66000000), offset: Offset(0, 1.5)),
-                  ],
                 ),
-              ),
+                if (locked) _lockBadge(),
+              ],
             ),
-          ),
-          if (locked)
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: Container(
-                width: size * 0.38,
-                height: size * 0.38,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFF6E6680),
+          )
+        : SizedBox(
+            width: size,
+            height: size + 4,
+            child: Stack(
+              children: [
+                // Gờ dưới tạo khối 3D.
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 4,
+                  height: size,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: edge,
+                    ),
+                  ),
                 ),
-                child: Icon(
-                  Icons.lock_rounded,
-                  size: size * 0.24,
-                  color: Colors.white,
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  height: size,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [top, base],
+                      ),
+                      border: Border.all(color: Colors.white, width: 2.5),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x40000000),
+                          blurRadius: 6,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Icon(
+                        icon,
+                        size: size * 0.52,
+                        color: Colors.white,
+                        shadows: const [
+                          Shadow(
+                            color: Color(0x66000000),
+                            offset: Offset(0, 1.5),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                if (locked) _lockBadge(),
+              ],
             ),
-        ],
-      ),
-    );
+          );
     Widget content = circle;
     if (label != null) {
       content = Column(
@@ -275,10 +305,37 @@ class GameRoundButton extends StatelessWidget {
     if (tooltip != null) content = Tooltip(message: tooltip!, child: content);
     return PressBounce(child: Semantics(button: true, child: content));
   }
+
+  Widget _lockBadge() => Positioned(
+    right: 0,
+    bottom: 0,
+    child: Container(
+      width: size * 0.38,
+      height: size * 0.38,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: const Color(0xFF6E6680),
+        border: Border.all(color: Colors.white, width: 1.5),
+      ),
+      child: Icon(Icons.lock_rounded, size: size * 0.24, color: Colors.white),
+    ),
+  );
 }
 
-/// Biển gỗ tên nhà: tấm gỗ bo tròn + 2 sợi dây treo, chữ trắng viền.
-/// [badge] (tuỳ chọn) là nhãn trạng thái nhỏ đính góc dưới biển.
+/// Ma trận đổi ảnh sang xám (nút đang khoá).
+const List<double> _greyMatrix = <double>[
+  0.2126, 0.7152, 0.0722, 0, 0, //
+  0.2126, 0.7152, 0.0722, 0, 0, //
+  0.2126, 0.7152, 0.0722, 0, 0, //
+  0, 0, 0, 1, 0,
+];
+
+/// Đường dẫn ảnh giao diện lô 6.
+const String uiArt = 'assets/images/ui';
+
+/// Biển gỗ tên nhà (ảnh `ui_sign_board` lô 6: tấm gỗ + 2 dây treo),
+/// chữ trắng viền đặt giữa mặt gỗ. [badge] (tuỳ chọn) là nhãn trạng
+/// thái nhỏ đính góc dưới biển.
 class GameSign extends StatelessWidget {
   const GameSign({
     super.key,
@@ -294,78 +351,68 @@ class GameSign extends StatelessWidget {
   final Color badgeColor;
   final double scale;
 
-  /// Màu gỗ (có thể nhuộm theo màu khu).
+  /// Màu nhuộm nhẹ lên gỗ (theo màu khu).
   final Color color;
+
+  /// Cỡ biển ở scale 1 (ảnh gốc 768x320).
+  static const double baseWidth = 150;
+  static const double baseHeight = baseWidth * 320 / 768;
 
   @override
   Widget build(BuildContext context) {
-    final light = Color.lerp(color, Colors.white, 0.30)!;
-    final dark = Color.lerp(color, Colors.black, 0.30)!;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Hai sợi dây treo.
-        SizedBox(
-          height: 8 * scale,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(width: 2 * scale, color: dark),
-              SizedBox(width: 48 * scale),
-              Container(width: 2 * scale, color: dark),
-            ],
+    final w = baseWidth * scale;
+    final h = baseHeight * scale;
+    return SizedBox(
+      width: w,
+      height: h,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned.fill(
+            child: ColorFiltered(
+              colorFilter: ColorFilter.mode(
+                color.withValues(alpha: 0.25),
+                BlendMode.srcATop,
+              ),
+              child: Image.asset('$uiArt/ui_sign_board.png', fit: BoxFit.fill),
+            ),
           ),
-        ),
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 10 * scale,
-                vertical: 4 * scale,
-              ),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [light, color],
+          // Mặt gỗ chiếm khoảng 6–94% ngang, 38–88% dọc của ảnh.
+          Positioned(
+            left: w * 0.08,
+            right: w * 0.08,
+            top: h * 0.38,
+            bottom: h * 0.14,
+            child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  text,
+                  maxLines: 1,
+                  style: gameOutlinedText(13 * scale),
                 ),
-                borderRadius: BorderRadius.circular(10 * scale),
-                border: Border.all(color: dark, width: 2 * scale),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x55000000),
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Text(
-                text,
-                maxLines: 1,
-                style: gameOutlinedText(13 * scale),
               ),
             ),
-            if (badge != null)
-              Positioned(
-                right: -6 * scale,
-                bottom: -8 * scale,
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 5 * scale,
-                    vertical: 1 * scale,
-                  ),
-                  decoration: BoxDecoration(
-                    color: badgeColor,
-                    borderRadius: BorderRadius.circular(8 * scale),
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                  child: Text(badge!, style: gameOutlinedText(9 * scale)),
+          ),
+          if (badge != null)
+            Positioned(
+              right: -4 * scale,
+              bottom: -6 * scale,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 5 * scale,
+                  vertical: 1 * scale,
                 ),
+                decoration: BoxDecoration(
+                  color: badgeColor,
+                  borderRadius: BorderRadius.circular(8 * scale),
+                  border: Border.all(color: Colors.white, width: 1.5),
+                ),
+                child: Text(badge!, style: gameOutlinedText(9 * scale)),
               ),
-          ],
-        ),
-      ],
+            ),
+        ],
+      ),
     );
   }
 }

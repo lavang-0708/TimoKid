@@ -59,6 +59,7 @@ KINDS = {
     "background",
     "icon",
     "town_layer",
+    "ui",
 }
 FORMS = {"girl", "boy", "any"}
 STATUSES = {"ready", "planned"}
@@ -100,6 +101,9 @@ NAME_PATTERNS = {
     "background": re.compile(r"^[a-z0-9_]+\.(jpg|jpeg|png)$"),
     "icon": re.compile(r"^[a-z0-9_]+\.svg$"),
     "town_layer": re.compile(r"^[a-z0-9_]+\.png$"),
+    # Hình giao diện kiểu game (lô 6, 21/11): nút, icon, biển, logo,
+    # nền màn chờ/mở đầu; mỗi hình một cỡ riêng nên không kiểm khung.
+    "ui": re.compile(r"^ui_[a-z0-9_]+\.png$"),
 }
 
 # Thư mục con cho từng loại (tính từ app/assets/images/); icon không
@@ -114,6 +118,7 @@ KIND_DIRS = {
     "background": "backgrounds",
     "icon": None,
     "town_layer": "town",
+    "ui": "ui",
 }
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".svg"}
@@ -605,7 +610,11 @@ class Checker:
                 self.fail(entry["file"], "manifest ghi ready nhưng thiếu file")
                 continue
             if entry["file"].endswith(".png"):
-                if entry["kind"] == "background":
+                # Nền màn chờ/mở đầu của lô 6 (ui_*_bg) là ảnh nền kín
+                # như nền phòng: kiểm như background (không cần alpha).
+                if entry["kind"] == "background" or (
+                    entry["kind"] == "ui" and entry["id"].endswith("_bg")
+                ):
                     self._check_png_background(entry, path)
                 else:
                     self._check_png(entry, path)

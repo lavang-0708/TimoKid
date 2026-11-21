@@ -181,22 +181,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Nền sân khấu kiểu game: trời hồng tím + hai đốm sáng.
+          // Nền phòng thay đồ pastel (ảnh lô 6).
           const DecoratedBox(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFFFD9EC),
-                  Color(0xFFE4D7FF),
-                  Color(0xFFC9F0E4),
-                ],
+              color: Color(0xFFE4D7FF),
+              image: DecorationImage(
+                image: AssetImage('$uiArt/ui_onboarding_bg.png'),
+                fit: BoxFit.cover,
               ),
             ),
           ),
-          const Positioned(left: -60, top: -60, child: _Glow(size: 220)),
-          const Positioned(right: -40, bottom: -70, child: _Glow(size: 260)),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -298,11 +292,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   bottom: 0,
                   left: 10,
                   right: 10,
-                  height: 26,
+                  height: 50,
                   child: _Pedestal(),
                 ),
                 Positioned.fill(
-                  bottom: 10,
+                  bottom: 24,
                   child: CharacterBounce(
                     popKey: _previewPopKey,
                     // Thở/chớp mắt/vẫy tay (kiểu game); cổng
@@ -753,11 +747,11 @@ class _EggCard extends StatelessWidget {
                   bottom: 0,
                   left: 14,
                   right: 14,
-                  height: 18,
+                  height: 36,
                   child: _Pedestal(),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.only(bottom: 18),
                   child: _EggWiggle(
                     child: Image.asset(
                       eggSpeciesAssets[species]!,
@@ -918,48 +912,19 @@ class _PickCard extends StatelessWidget {
   }
 }
 
-/// Bục đứng hình elip dưới nhân vật/trứng.
+/// Bục đứng (ảnh lô 6) dưới nhân vật/trứng.
 class _Pedestal extends StatelessWidget {
   const _Pedestal();
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
+    // Vẽ bằng DecorationImage (không phải widget Image) để mỗi thẻ
+    // trứng chỉ có đúng một Image là hình trứng.
+    return const DecoratedBox(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFFFFFFF), Color(0xFFC7B8F0)],
-        ),
-        borderRadius: const BorderRadius.all(Radius.elliptical(200, 30)),
-        border: Border.all(color: const Color(0xFFA996E0), width: 2),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x33000000),
-            offset: Offset(0, 4),
-            blurRadius: 6,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Đốm sáng mờ trang trí nền.
-class _Glow extends StatelessWidget {
-  const _Glow({required this.size});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [Color(0x99FFFFFF), Color(0x00FFFFFF)],
+        image: DecorationImage(
+          image: AssetImage('$uiArt/ui_pedestal.png'),
+          fit: BoxFit.fill,
         ),
       ),
     );
