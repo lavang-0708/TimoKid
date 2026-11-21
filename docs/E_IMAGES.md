@@ -353,3 +353,138 @@ bên, chỉ đổi đúng các điểm đó (alpha không đổi):
 - **Claude quyết:** có làm lại patch mắt nhắm bé gái không (lỗi
   `_hsv` kể trên — patch gái có thể lọt đồng tử/tròng trắng khi
   soi 3×).
+
+---
+
+# Phụ kiện rời — (E) lô 3 (lớp chồng lên ảnh toàn thân)
+
+Lô 3 làm **10 phụ kiện rời** (5 bé gái + 5 bé trai), khung 1024×1536
+PNG trong suốt, lớp chồng lên ảnh toàn thân lô 1/2. Cùng tư thế/khung/
+điểm chân với ảnh toàn thân nên khít; **không nướng bóng đổ** (bóng do
+app vẽ như nhân vật); màu thật, không nhuộm; cùng phong cách 3D mềm,
+cùng hướng sáng trên-trái.
+
+## Cách làm (balo ghép từ 2 nguồn)
+
+- Mũ, nơ/kẹp, kính, giày: vẽ AI trên nền đặc, tách nền bằng keying
+  theo khoảng cách RGB tới màu nền (như lô 1/2), resize
+  premultiplied-alpha (bài học lô 2: tránh viền đen), đặt vào khung
+  1024×1536 theo mốc đo từ ảnh toàn thân thật.
+- Kính v1 bị loại: tròng kính phủ màu hồng/lavender nhạt, che mắt.
+  Vẽ lại v2 với "no lenses, empty rings" — vòng rỗng, chỉ gọng +
+  cầu + càng.
+- Balo: generator chỉ ra ảnh sản phẩm đứng một mình (túi + quai
+  vòng cao), không ra bố cục đeo dù đã nhắc rõ + có ảnh tham chiếu.
+  Cách làm: **cắt thân túi** từ ảnh sản phẩm, **quai đeo tạo riêng**
+  (2 dải dọc phồng), ghép lại bằng code. Quai bé trai = quai bé gái
+  hue-shift −140° (hồng ~340° → xanh ~210°).
+- Dọn artifact: xóa pixel magenta (bóng đổ từ ảnh gốc lọt qua
+  keying), pixel đen/đỏ thuần do ringing LANCZOS ở mép (tô màu từ
+  pixel hợp lệ gần nhất), zero RGB nơi alpha=0; đế giày tô trắng
+  vùng bão hòa cao ở y>1405 (vệt tím từ shading đế).
+
+## File (10 PNG, khung 1024×1536, PNG trong suốt)
+
+Đường đích `app/assets/images/character/girl/` và `.../boy/`. Tỉ lệ
+bán trong suốt = phần pixel có nội dung (alpha>0) mà alpha bán trong
+suốt (0<alpha<255) — chủ yếu là viền chống răng cưa sau resize;
+giày = 0,0000 (mép cứng sau dilate, như ảnh toàn thân lô 1/2).
+
+| File | Vai trò | Cỡ (byte) | Bán trong suốt |
+| --- | --- | --- | --- |
+| `girl_hat_01.png` | Beret hồng có nơ, đội đỉnh tóc | 144.138 | 0,0422 |
+| `girl_bow_01.png` | Nơ kẹp tóc hồng, cài thái dương trái | 29.549 | 0,1596 |
+| `girl_glasses_01.png` | Kính tròn gọng hồng, vòng rỗng | 73.012 | 0,2268 |
+| `girl_backpack_01.png` | Balo hồng: túi sau vai + quai đeo trước ngực/vai | 113.978 | 0,1208 |
+| `girl_shoes_02.png` | Mary Jane trắng thay giày hồng/tím gốc | 45.708 | 0,0000 |
+| `boy_hat_01.png` | Mũ lưỡi trai xanh, lưỡi sang trái | 130.170 | 0,0492 |
+| `boy_clip_01.png` | Kẹp tóc xanh hình sao 5 cánh | 22.117 | 0,1730 |
+| `boy_glasses_01.png` | Kính tròn gọng xanh, vòng rỗng | 74.043 | 0,3045 |
+| `boy_backpack_01.png` | Balo xanh: túi sau vai + quai đeo | 119.389 | 0,1240 |
+| `boy_shoes_02.png` | Sneaker trắng thay sneaker màu gốc | 62.117 | 0,0000 |
+
+## Vị trí / điểm neo (khung 1024×1536, bbox đo bằng code từ PNG cuối)
+
+Mốc ảnh toàn thân để căn: gái tâm mắt (388,562)/(619,559), miệng
+(517,835), chân y=1429; trai tâm mắt (398,626)/(611,626), miệng
+≈(508,720), chân y=1429.
+
+- Mũ: gái bbox x[287,721] y[53,364] (đỉnh tóc y≈142, đội đúng đỉnh
+  đầu); trai x[287,722] y[48,312].
+- Nơ/kẹp: gái x[259,399] y[428,529] (thái dương trái, trên tóc);
+  trai x[259,358] y[468,570].
+- Kính: gái x[205,725] y[453,666], scale 0,554 theo tâm lỗ tròng
+  (372,897)/(789,891) về tâm mắt; trai x[226,708] y[526,722],
+  scale 0,497 (lỗ phải thật ≈(802,773)). Càng xa trong tròng phải
+  đã xóa (bbox lỗ tròng) để không che mắt; đầu càng trái gái trôi
+  ngoài tóc đã cắt (x<238, y>500).
+- Balo: gái bbox x[110,625] y[700,1120] — túi x[160,349]
+  y[820,1096] sát vai phải nhân vật, quai x[374,410]/[590,626]
+  y 700–1000 qua vai; trai x[387,913] y[700,1129] — túi
+  x[690,884] y[815,1105] sát vai trái nhân vật, quai
+  x[387,423]/[592,628]. Túi nằm cạnh vai (chủ yếu ngoài silhouette
+  thân), quai chồng trước ngực/vai. Kiểm trên biến thể wave: tay
+  giơ không chạm balo.
+- Giày thay thế: gái x[391,642] y[1299,1428]; trai x[328,681]
+  y[1291,1428]. Đáy neo y=1428 (chân ảnh toàn thân 1429, sai 1 px
+  do làm tròn).
+
+## Giày thay thế che kín giày gốc (kiểm bằng code, cả 3 bộ mỗi dáng)
+
+- Giày gốc gái: trái x≈402–503, phải x≈529–631, y≈1340–1428
+  (hồng bộ 1/3, tím bộ 2). Giày gốc trai: trái x≈331–480, phải
+  x≈530–679, y≈1330–1428 (sneaker xanh nhạt / xanh lá / đỏ).
+- Cách che: giày thay thế đặt đè lên, giãn mask (gái 12 px ngang/
+  4 px dọc, trai 10/4, tô màu giày gần nhất) + lấp đúng vùng rò
+  (hợp của cả 3 bộ) + trai lấp thêm khe giữa 2 giày y 1300–1360.
+  **Rò = 0 px trên cả 3 bộ mỗi dáng** (trước sửa: gái ~17.100
+  px/bộ, trai ~24.500 px/bộ trong bbox giày). Đế trắng sạch,
+  không bệ trắng dưới đế (cách lấp cột xuống 1428 đã bỏ vì tạo
+  bệ), không bóng magenta, không pixel đen/đỏ.
+- Lưu ý: giày thay thế là một ảnh duy nhất dùng chung cho cả 3 bộ
+  (không theo màu từng bộ) — đúng thiết kế "giày thay thế" trong
+  Tủ đồ/Cửa hàng.
+
+## Kiểm chứng (thành thật)
+
+- Ghép từng phụ kiện lên ảnh toàn thân + nền tối (60,60,80) + nền
+  phòng: mũ đội đúng đỉnh tóc, nơ/kẹp đúng thái dương trái, kính
+  căn đúng 2 mắt (mắt nhìn xuyên vòng rỗng), balo túi sát vai +
+  quai đúng vai, giày che kín giày gốc cả 3 bộ. Xem bằng mắt đã
+  duyệt.
+- Đen/magenta/đỏ thuần: 0 ở mọi món (chỉ còn 4 px magenta ở kính
+  gái và 12 px ở balo gái — viền không đáng kể).
+- Lỗ alpha kín ≥3 px: chỉ lỗ tròng kính (đúng thiết kế — mắt nhìn
+  xuyên qua) + lỗ 1886 px gái / 1497 px trai ở balo (khe giữa thân
+  túi và quai vòng — đặc điểm thật của túi) + lỗ nhỏ ≤35 px ở
+  mũ/nơ/kẹp (khe nếp vải, không nhìn thấy ở cỡ hiển thị).
+- Quan sát nhỏ, không chặn: sau khi xóa càng, soi kĩ tròng phải
+  kính thấy một "hình chữ nhật" mờ — đo bằng code cho thấy
+  **không có hình chữ nhật trong dữ liệu pixel** (trong rect
+  alpha=0 hoàn toàn, RGB=0, màu nền tối tại tâm rect đúng
+  (60,60,80) như nền và như tròng trái; vòng còn nguyên). Đây là
+  hiệu ứng tương phản/kết xuất; ở cỡ điện thoại (nhân vật 360 px)
+  không nhìn thấy.
+- Mặt dưới beret gái có vùng hồng mauve đậm — bóng mặt trong của
+  beret nghiêng, chấp nhận được.
+- Caveat thừa hưởng từ lô 1/2: phụ kiện vẽ từ ảnh gốc (không phải
+  ảnh toàn thân đã lượng tử) nên khi app đổi nghỉ → vẫy, shading
+  nhân vật nhấp nhẹ như đã ghi ở lô 1/2; phụ kiện đứng yên theo
+  khung nên không nhấp theo.
+
+## Việc còn lại cho giai đoạn code (E) — bổ sung lô 3
+
+- Entry manifest cho 10 file trên (loại file mới `*_hat_01`,
+  `*_bow_01`/`*_clip_01`, `*_glasses_01`, `*_backpack_01`,
+  `*_shoes_02`; **không** chạm `assets/manifest.json` ở lô này —
+  manifest cập nhật ở giai đoạn code) + cập nhật `source` thành
+  "Muse vẽ AI 21/11 theo DESIGN.md".
+- `CharacterView` vẽ phụ kiện chồng lên ảnh toàn thân theo đúng
+  bbox trên (khung 1024×1536); kính đặt theo tâm mắt từng nhân
+  vật (nữ y≈561, nam y≈626); giày thay thế vẽ đè giày gốc; balo
+  vẽ chồng (túi cạnh vai, quai trước ngực) — kiểm z-order với tay
+  ở biến thể wave.
+- Tủ đồ (T2-05) / Cửa hàng (T2-06) bán chính các phụ kiện này;
+  giày thay thế là món đổi giày gốc.
+- Thang cỡ pet + test neo + tràn 608×248 + 640×320 + full suite
+  xanh (như mục việc còn lại của lô 1/2).
