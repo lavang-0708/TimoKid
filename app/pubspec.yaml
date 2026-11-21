@@ -89,6 +89,8 @@ flutter:
     # Hình giao diện kiểu game (lô 6, 21/11): nút, icon, biển gỗ, logo,
     # nền màn chờ/mở đầu, bục — xem docs/E_IMAGES.md mục lô 6.
     - assets/images/ui/
+    # Đồ cho pet (lô 7, 22/11): thức ăn + đồ chơi, PNG 512x512.
+    - assets/images/items/
     # Thư mục con KHÔNG tự động đi kèm theo mục thư mục cha (kiểm
     # chứng ở T2-03 với Flutter 3.50: `ManifestAssetBundle` chỉ liệt
     # kê file trực tiếp trong thư mục, không đệ quy) — mỗi thư mục
