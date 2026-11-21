@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { http } from '../client';
 import { Card, ErrorBox, RangePicker, Spinner, useLoad } from '../common';
 import { loadForms } from '../lib/data';
-import { STRAND_NAMES, formLabel, strandOfForm } from '../lib/labels';
+import { STRAND_COLORS, STRAND_NAMES, formLabel, strandOfForm } from '../lib/labels';
 import { formatPercent, vnDay } from '../lib/logic';
 
 function FormName({ id }: { id: string }) {
@@ -26,7 +26,7 @@ export function FormsScreen({ childId }: { childId: string }) {
     <>
       <div className="row" style={{ justifyContent: 'space-between', marginTop: 12 }}>
         <h2 style={{ margin: 0 }}>Dạng bài</h2>
-        <RangePicker value={range} onChange={setRange} />
+        <RangePicker value={range} onChange={setRange} options={[7, 30, 90]} />
       </div>
       {q.error != null && <ErrorBox error={q.error} onRetry={q.reload} />}
       {q.loading && !d && <Spinner />}
@@ -42,6 +42,35 @@ export function FormsScreen({ childId }: { childId: string }) {
                 ))}
               </ul>
             )}
+          </Card>
+          <Card title="Thống kê từng dạng">
+            <p className="muted" style={{ marginTop: 0 }}>
+              Trong {range} ngày qua, theo từng mảng. Dạng yếu xếp trước, dạng chưa làm xếp cuối.
+            </p>
+            {d.byStrand.map((s) => (
+              <details key={s.strand} className="strand-forms" open={s.forms.some((f) => f.weak)}>
+                <summary>
+                  <b style={{ color: STRAND_COLORS[s.strand] }}>{STRAND_NAMES[s.strand]}</b>
+                  <span className="muted">
+                    {' '}· đã làm {s.attempted}/{s.total} dạng · {s.attempts} lượt · {formatPercent(s.accuracy)}
+                  </span>
+                </summary>
+                <ul className="list">
+                  {s.forms.map((f) => (
+                    <li key={f.formId}>
+                      <FormName id={f.formId} />
+                      {f.attempts === 0 ? (
+                        <span className="pill">Chưa làm</span>
+                      ) : (
+                        <span className={`pill ${f.weak ? 'pink' : f.accuracy! >= 0.8 ? 'mint' : ''}`}>
+                          {formatPercent(f.accuracy)} · {f.correctFirstTry}/{f.attempts}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ))}
           </Card>
           <Card title={`Đang yếu (${d.weak.length})`}>
             <p className="muted" style={{ marginTop: 0 }}>

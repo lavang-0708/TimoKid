@@ -47,7 +47,8 @@ def write_png_rows(path: pathlib.Path, width: int, height: int,
 
 
 def _write_png_bytes(path: pathlib.Path, width: int, height: int,
-                     color_type: int, raw: bytes) -> None:
+                     color_type: int, raw: bytes, extra=None,
+                     trns: bytes | None = None) -> None:
 
     def chunk(ctype: bytes, data: bytes) -> bytes:
         out = struct.pack(">I", len(data)) + ctype + data
@@ -57,11 +58,53 @@ def _write_png_bytes(path: pathlib.Path, width: int, height: int,
     data = (
         b"\x89PNG\r\n\x1a\n"
         + chunk(b"IHDR", ihdr)
+        + (chunk(*extra) if extra else b"")
+        + (chunk(b"tRNS", trns) if trns else b"")
         + chunk(b"IDAT", zlib.compress(raw))
         + chunk(b"IEND", b"")
     )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(data)
+
+
+def write_png_filtered(path: pathlib.Path, width: int, height: int,
+                       color_type: int, pixel, filters) -> None:
+    """Ghi PNG 8-bit với bộ lọc thật: dòng y dùng loại lọc
+    filters[y % len(filters)] (0 None, 1 Sub, 2 Up, 3 Average, 4 Paeth).
+    Dùng để kiểm đường giải lọc nhanh. Chỉ cho ảnh nhỏ."""
+    bpp = {4: 2, 6: 4}[color_type]
+    stride = width * bpp
+    rows = [
+        bytes(v for x in range(width) for v in pixel(x, y))
+        for y in range(height)
+    ]
+    raw = bytearray()
+    prev = bytes(stride)
+    for y, row in enumerate(rows):
+        ftype = filters[y % len(filters)]
+        out = bytearray()
+        for i in range(stride):
+            a = row[i - bpp] if i >= bpp else 0
+            b = prev[i]
+            c = prev[i - bpp] if i >= bpp else 0
+            if ftype == 0:
+                pred = 0
+            elif ftype == 1:
+                pred = a
+            elif ftype == 2:
+                pred = b
+            elif ftype == 3:
+                pred = (a + b) // 2
+            else:
+                p = a + b - c
+                pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
+                pred = a if (pa <= pb and pa <= pc) else (
+                    b if pb <= pc else c)
+            out.append((row[i] - pred) & 0xFF)
+        raw.append(ftype)
+        raw += out
+        prev = row
+    _write_png_bytes(path, width, height, color_type, bytes(raw))
 
 
 LAYERS = [
@@ -227,6 +270,119 @@ class CheckAssetsTest(unittest.TestCase):
         self.write_manifest()
         code, errors = self.run_checker()
         self.assertEqual(code, 0, errors)
+
+    # -- Đường giải lọc nhanh / không giải đủ ---------------------------
+
+    def _add_small(self, pixel, color_type=6, filters=(0,), w=48, h=40,
+                   recolorable=False, eid="girl_top_01"):
+        """PNG nhỏ có lọc thật; kích thước khung sai nên lọc bỏ lỗi
+        khung khi so sánh thông báo."""
+        path = self.root / f"app/assets/images/character/girl/{eid}.png"
+        write_png_filtered(path, w, h, color_type, pixel, filters)
+        self.manifest["entries"].append(
+            entry(eid, f"app/assets/images/character/girl/{eid}.png",
+                  recolorable=recolorable)
+        )
+        self.write_manifest()
+        code, errors = self.run_checker()
+        return code, [e for e in errors if "sai kích thước khung" not in e]
+
+    def test_every_filter_type_with_transparent_corner_passes(self):
+        # Mỗi loại lọc (và xen kẽ) vẫn phải thấy góc trong suốt.
+        def pixel(x, y):
+            alpha = 0 if (x == 0 or y == 0 or x == 47 or y == 39) else 255
+            return (90 + x, 100 + y, 110 + (x ^ y) % 7, alpha)
+        for filters in ((0,), (1,), (2,), (3,), (4,), (4, 3, 2, 1, 0)):
+            with self.subTest(filters=filters):
+                self.setUp()
+                code, errors = self._add_small(pixel, filters=filters)
+                self.assertEqual(errors, [])
+                self.assertEqual(code, 1)  # chỉ còn lỗi khung sai (đã lọc)
+
+    def test_border_touching_fails_with_every_filter(self):
+        # Trong suốt chỉ ở giữa: đường nhanh không kết luận được, phải
+        # giải đủ và báo chạm mép.
+        def pixel(x, y):
+            inner = 5 <= x < 40 and 5 <= y < 30
+            return (90, 100 + x, 110 + y, 0 if inner else 255)
+        for filters in ((0,), (1,), (2,), (3,), (4,), (4, 3, 2, 1, 0)):
+            with self.subTest(filters=filters):
+                self.setUp()
+                _, errors = self._add_small(pixel, filters=filters)
+                self.assertEqual(len(errors), 1, errors)
+                self.assertIn("không có pixel trong suốt ở viền", errors[0])
+
+    def test_opaque_png_with_paeth_fails(self):
+        def pixel(x, y):
+            return (x * 5 % 256, y * 3 % 256, (x + y) % 256, 255)
+        _, errors = self._add_small(pixel, filters=(4, 1, 3, 2))
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("không có pixel trong suốt nào", errors[0])
+
+    def test_transparent_only_at_left_column_passes_fast_path(self):
+        # Chỉ cột đầu có alpha < 255 ở các dòng giữa (lọc Up/Paeth/Sub
+        # phải giữ đúng giá trị cột đầu qua nhiều dòng).
+        def pixel(x, y):
+            alpha = 128 if (x == 0 and y == 20) else 255
+            return (50, 60, 70, alpha)
+        for filters in ((2,), (4,), (1,), (3,), (4, 2, 3)):
+            with self.subTest(filters=filters):
+                self.setUp()
+                _, errors = self._add_small(pixel, filters=filters)
+                self.assertEqual(errors, [])
+
+    def test_gray_alpha_with_filters_passes(self):
+        def pixel(x, y):
+            return (x * 4 % 256, 0 if (x == 0 or y == 0) else 255)
+        _, errors = self._add_small(pixel, color_type=4, filters=(4, 3, 1, 2))
+        self.assertEqual(errors, [])
+
+    def test_recolorable_colored_pixel_with_paeth_reports_position(self):
+        def pixel(x, y):
+            alpha = 0 if (x == 0 or y == 0) else 255
+            if (x, y) == (7, 9):
+                return (255, 0, 0, 255)
+            return (120, 120, 120, alpha)
+        _, errors = self._add_small(pixel, filters=(4,), recolorable=True)
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("pixel (7, 9) có màu (255, 0, 0)", errors[0])
+
+    def test_palette_png_with_trns_fails(self):
+        path = self.root / "app/assets/images/character/girl/girl_top_01.png"
+        raw = b"".join(b"\x00" + bytes([0, 1] * 8) for _ in range(16))
+        _write_png_bytes(path, 16, 16, 3, raw,
+                         extra=(b"PLTE", bytes([9, 9, 9, 200, 200, 200])),
+                         trns=bytes([0, 255]))
+        self.manifest["entries"].append(
+            entry("girl_top_01",
+                  "app/assets/images/character/girl/girl_top_01.png")
+        )
+        self.write_manifest()
+        _, errors = self.run_checker()
+        self.assertTrue(any("kênh alpha" in e for e in errors), errors)
+
+    def test_truncated_image_data_fails(self):
+        path = self.root / "app/assets/images/character/girl/girl_top_01.png"
+        _write_png_bytes(path, 16, 16, 6, b"\x00" + bytes(16 * 4) * 3)
+        self.manifest["entries"].append(
+            entry("girl_top_01",
+                  "app/assets/images/character/girl/girl_top_01.png")
+        )
+        self.write_manifest()
+        _, errors = self.run_checker()
+        self.assertTrue(any("ngắn hơn khai báo" in e for e in errors), errors)
+
+    def test_unknown_filter_type_fails(self):
+        path = self.root / "app/assets/images/character/girl/girl_top_01.png"
+        _write_png_bytes(path, 4, 2, 6, (b"\x07" + bytes(16)) * 2)
+        self.manifest["entries"].append(
+            entry("girl_top_01",
+                  "app/assets/images/character/girl/girl_top_01.png")
+        )
+        self.write_manifest()
+        _, errors = self.run_checker()
+        self.assertTrue(any("loại lọc PNG lạ (7)" in e for e in errors),
+                        errors)
 
     def test_missing_ready_file_fails(self):
         self.manifest["entries"].append(

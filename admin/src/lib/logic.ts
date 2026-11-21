@@ -1,6 +1,6 @@
 // Logic thuần (không gọi mạng): bucket ngày theo giờ Việt Nam, thống kê,
 // dạng yếu, kiểm tra thư, định dạng thời gian.
-import { STRANDS, type Strand } from './labels';
+import { STRANDS, strandOfForm, type Strand } from './labels';
 
 const VN_OFFSET_MS = 7 * 3600 * 1000; // Asia/Ho_Chi_Minh = UTC+7, không có giờ mùa hè.
 
@@ -128,6 +128,183 @@ export function weakForms(attempts: AttemptLite[]): WeakForm[] {
     }
   }
   return out.sort((a, b) => a.accuracy - b.accuracy || b.attempts - a.attempts || a.formId.localeCompare(b.formId));
+}
+
+export interface FormStat {
+  formId: string;
+  attempts: number;
+  correctFirstTry: number;
+  /** Tỉ lệ 0..1, null nếu chưa làm lượt nào. */
+  accuracy: number | null;
+  /** Đủ lượt và đúng ngay dưới ngưỡng (cùng tiêu chí với weakForms). */
+  weak: boolean;
+}
+
+export interface StrandFormStats {
+  strand: Strand;
+  forms: FormStat[];
+  attempted: number;
+  total: number;
+  attempts: number;
+  accuracy: number | null;
+}
+
+/**
+ * Thống kê từng dạng theo mảng. `allFormIds` là danh sách dạng của app: dạng
+ * chưa làm lượt nào vẫn có mặt (attempts = 0). Trong mỗi mảng: dạng yếu trước,
+ * rồi theo tỉ lệ đúng tăng dần (ít lượt hơn xếp trước khi bằng nhau để dạng
+ * còn ít dữ liệu không lấn át), dạng chưa làm xuống cuối. Mã dạng lạ (không
+ * thuộc mảng nào) bị bỏ qua.
+ */
+export function formStatsByStrand(attempts: AttemptLite[], allFormIds: readonly string[]): StrandFormStats[] {
+  const m = new Map<string, { n: number; ok: number }>();
+  for (const a of attempts) {
+    const e = m.get(a.form_id) ?? { n: 0, ok: 0 };
+    e.n++;
+    if (a.correct_first_try) e.ok++;
+    m.set(a.form_id, e);
+  }
+  const ids = new Set([...allFormIds, ...m.keys()]);
+  const byStrand = new Map<Strand, FormStat[]>(STRANDS.map((s) => [s, []]));
+  for (const formId of ids) {
+    const s = strandOfForm(formId);
+    if (!s) continue;
+    const e = m.get(formId) ?? { n: 0, ok: 0 };
+    const accuracy = e.n > 0 ? e.ok / e.n : null;
+    byStrand.get(s)!.push({
+      formId,
+      attempts: e.n,
+      correctFirstTry: e.ok,
+      accuracy,
+      weak: accuracy !== null && e.n >= WEAK_MIN_ATTEMPTS && accuracy < WEAK_MAX_ACCURACY,
+    });
+  }
+  return STRANDS.map((strand) => {
+    const forms = byStrand.get(strand)!.sort((a, b) => {
+      if ((a.attempts === 0) !== (b.attempts === 0)) return a.attempts === 0 ? 1 : -1;
+      if (a.weak !== b.weak) return a.weak ? -1 : 1;
+      return (
+        (a.accuracy ?? 0) - (b.accuracy ?? 0) ||
+        a.attempts - b.attempts ||
+        a.formId.localeCompare(b.formId)
+      );
+    });
+    const attemptsSum = forms.reduce((x, f) => x + f.attempts, 0);
+    const ok = forms.reduce((x, f) => x + f.correctFirstTry, 0);
+    return {
+      strand,
+      forms,
+      attempted: forms.filter((f) => f.attempts > 0).length,
+      total: forms.length,
+      attempts: attemptsSum,
+      accuracy: attemptsSum > 0 ? ok / attemptsSum : null,
+    };
+  });
+}
+
+// ------------------------------------------------- nhân vật và pet
+
+export type PetStage = 'egg' | 'newborn' | 'teen' | 'adult';
+/** Khớp petTeenDays / petAdultDays trong app/lib/features/room/pet_growth.dart. */
+export const PET_TEEN_DAYS = 3;
+export const PET_ADULT_DAYS = 8;
+
+/** Số ngày xong trọn đề ngày: đủ 5 chặng đều 'done'. */
+export function countFullyDoneSets(rows: { stage_status: unknown }[]): number {
+  return rows.filter((r) => {
+    const st = parseJson(r.stage_status);
+    return Array.isArray(st) && st.length === 5 && st.every((x) => x === 'done');
+  }).length;
+}
+
+export function petStageForDays(doneDays: number): Exclude<PetStage, 'egg'> {
+  if (doneDays >= PET_ADULT_DAYS) return 'adult';
+  if (doneDays >= PET_TEEN_DAYS) return 'teen';
+  return 'newborn';
+}
+
+/** Số ngày xong đề nữa để lên giai đoạn sau; null nếu đã trưởng thành. */
+export function petDaysToNextStage(doneDays: number): number | null {
+  if (doneDays >= PET_ADULT_DAYS) return null;
+  if (doneDays >= PET_TEEN_DAYS) return PET_ADULT_DAYS - doneDays;
+  return PET_TEEN_DAYS - doneDays;
+}
+
+/** Giá trị settings.value có thể là chuỗi JSON (app lưu chuỗi) hoặc đã là JSON. */
+export function parseJson(v: unknown): unknown {
+  if (typeof v !== 'string') return v;
+  try {
+    return JSON.parse(v);
+  } catch {
+    return v;
+  }
+}
+
+/** 'true' (chuỗi) hoặc true (boolean) -> true. */
+export function parseFlag(v: unknown): boolean {
+  const p = parseJson(v);
+  return p === true || p === 'true';
+}
+
+export interface CharacterSettings {
+  character_profile?: unknown;
+  kid_head_accessory?: unknown;
+  kid_glasses?: unknown;
+  kid_white_shoes?: unknown;
+  kid_backpack?: unknown;
+  selected_egg?: unknown;
+  egg_hatched?: unknown;
+}
+
+export interface CharacterView {
+  name: string;
+  gender: 'girl' | 'boy';
+  /** Mã bộ đồ 1-3 (app: null/mã lạ -> bộ 1). */
+  outfitNumber: 1 | 2 | 3;
+  head: 'hat' | 'bow' | null;
+  glasses: boolean;
+  whiteShoes: boolean;
+  backpack: boolean;
+  /** Loài đã chọn ('dog' | 'cat' | 'rabbit'), null nếu chưa chọn hoặc mã lạ. */
+  species: 'dog' | 'cat' | 'rabbit' | null;
+  hatched: boolean;
+  /** 'egg' nếu chưa nở, ngược lại theo số ngày xong đề. */
+  stage: PetStage | null;
+  doneDays: number;
+  daysToNext: number | null;
+}
+
+/**
+ * Gom các dòng settings của bé + số ngày xong đề thành dữ liệu hiển thị.
+ * Trả null nếu chưa có dòng nào liên quan (app chưa đồng bộ).
+ */
+export function buildCharacterView(settings: CharacterSettings, doneDays: number): CharacterView | null {
+  const has = Object.values(settings).some((v) => v !== undefined && v !== null);
+  if (!has) return null;
+  const rawProfile = parseJson(settings.character_profile);
+  const profile = typeof rawProfile === 'object' && rawProfile !== null && !Array.isArray(rawProfile)
+    ? (rawProfile as Record<string, unknown>)
+    : {};
+  const gender = profile.gender === 'boy' ? 'boy' : 'girl';
+  const n = Number(/(\d+)$/.exec(typeof profile.dress === 'string' ? profile.dress : '')?.[1] ?? 1);
+  const head = parseJson(settings.kid_head_accessory);
+  const sp = parseJson(settings.selected_egg);
+  const species = sp === 'dog' || sp === 'cat' || sp === 'rabbit' ? sp : null;
+  const hatched = parseFlag(settings.egg_hatched);
+  return {
+    name: typeof profile.name === 'string' ? profile.name.trim() : '',
+    gender,
+    outfitNumber: n >= 1 && n <= 3 ? (n as 1 | 2 | 3) : 1,
+    head: head === 'hat' || head === 'bow' ? head : null,
+    glasses: parseFlag(settings.kid_glasses),
+    whiteShoes: parseFlag(settings.kid_white_shoes),
+    backpack: parseFlag(settings.kid_backpack),
+    species,
+    hatched,
+    stage: species === null ? null : hatched ? petStageForDays(doneDays) : 'egg',
+    doneDays,
+    daysToNext: hatched ? petDaysToNextStage(doneDays) : null,
+  };
 }
 
 // ------------------------------------------------------------------ thư
