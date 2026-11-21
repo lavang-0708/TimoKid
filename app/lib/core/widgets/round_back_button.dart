@@ -18,11 +18,19 @@ import '../../features/town/town_screen.dart';
 import 'game_ui.dart';
 
 class RoundBackButton extends StatelessWidget {
-  const RoundBackButton({super.key, this.onPressed, this.size = 56});
+  const RoundBackButton({
+    super.key,
+    this.onPressed,
+    this.size = 56,
+    this.tooltip = 'Về Thị trấn',
+  });
 
   /// Bấm thì làm gì; mặc định về Thị trấn.
   final VoidCallback? onPressed;
   final double size;
+
+  /// Chú thích khi giữ nút (đổi khi nút về chỗ khác Thị trấn).
+  final String tooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +39,7 @@ class RoundBackButton extends StatelessWidget {
       color: const Color(0xFFFF8FB1),
       image: '$uiArt/ui_btn_back.png',
       size: size,
-      tooltip: 'Về Thị trấn',
+      tooltip: tooltip,
       onPressed: onPressed ?? () => context.go(TownScreen.route),
     );
   }

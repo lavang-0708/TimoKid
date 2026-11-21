@@ -46,6 +46,10 @@
 /// (nút Thử thách) — các nhóm dưới đi qua màn Tòa nhà, và nhóm
 /// 'màn tòa nhà 608x248 + 640x320' khóa riêng màn Tòa nhà vừa ở
 /// cả 2 cỡ.
+///
+/// T2-06: nhóm 'Cửa hàng' khóa màn Cửa hàng (HUD + nhóm hàng + lưới thẻ
+/// + hộp xác nhận + băng Mua xong!) không tràn ở 608x248, 640x320,
+/// 800x360 và 1280x800, cả bé gái lẫn bé trai, đủ xu lẫn thiếu xu.
 library;
 
 import 'dart:math';
@@ -70,6 +74,7 @@ import 'package:timokid/features/onboarding/egg_service.dart';
 import 'package:timokid/features/onboarding/hatch_screen.dart';
 import 'package:timokid/features/onboarding/onboarding_model.dart';
 import 'package:timokid/features/onboarding/onboarding_service.dart';
+import 'package:timokid/features/shop/shop_screen.dart';
 import 'package:timokid/features/stage_result/stage_result_screen.dart';
 import 'package:timokid/features/town/town_screen.dart';
 import 'package:timokid/main.dart';
@@ -1120,5 +1125,74 @@ void main() {
       _checkNoError(tester, 'quay lại Phòng 640x320');
       expect(find.byKey(const Key('room-screen')), findsOneWidget);
     });
+  });
+
+  group('Cửa hàng không tràn', () {
+    for (final size in const [
+      Size(608, 248),
+      Size(640, 320),
+      Size(800, 360),
+      Size(1280, 800),
+    ]) {
+      for (final gender in const ['girl', 'boy']) {
+        testWidgets('${size.width.toInt()}x${size.height.toInt()} $gender: '
+            'hai nhóm hàng, hộp xác nhận, băng Mua xong!', (tester) async {
+          tester.view.physicalSize = size;
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(() {
+            tester.view.resetPhysicalSize();
+            tester.view.resetDevicePixelRatio();
+          });
+          final db = AppDatabase(executor: NativeDatabase.memory());
+          addTearDown(db.close);
+          final childId = await db.ensureSeeded();
+          await OnboardingService(db: db).completeOnboarding(
+            childId: childId,
+            profile: CharacterProfile.defaults().copyWith(
+              gender: gender,
+              dress: gender == 'boy' ? 'boy_outfit_01' : 'girl_top_01',
+              name: 'An',
+            ),
+            eggSpecies: 'dog',
+          );
+          // 100 xu: mua được vài món, các món còn lại báo thiếu xu.
+          await db.walletDao.addEntry(
+            childId: childId,
+            currency: 'xu',
+            amount: 100,
+            reason: 'test',
+          );
+          final router = AppRouter.create();
+          await tester.pumpWidget(
+            ProviderScope(
+              overrides: [databaseProvider.overrideWithValue(db)],
+              child: TimoKidApp(router: router),
+            ),
+          );
+          await tester.pumpAndSettle();
+          router.go(ShopScreen.route);
+          await tester.pumpAndSettle();
+          _checkNoError(tester, 'Cửa hàng Quần áo');
+          expect(find.byKey(const Key('shop-screen')), findsOneWidget);
+
+          await tester.tap(find.byKey(const Key('shop-tab-accessories')));
+          await tester.pumpAndSettle();
+          _checkNoError(tester, 'Cửa hàng Phụ kiện');
+          await tester.tap(find.byKey(const Key('shop-tab-outfits')));
+          await tester.pumpAndSettle();
+
+          final outfit2 = gender == 'boy' ? 'boy_outfit_02' : 'girl_top_02';
+          await _tapVisible(tester, find.byKey(Key('shop-buy-$outfit2')));
+          _checkNoError(tester, 'hộp xác nhận mua');
+          expect(find.byKey(const Key('shop-confirm-dialog')), findsOneWidget);
+          await tester.tap(find.byKey(const Key('shop-confirm-buy')));
+          await tester.pumpAndSettle();
+          _checkNoError(tester, 'sau khi mua xong');
+          expect(find.byKey(const Key('shop-bought-banner')), findsOneWidget);
+          await tester.pump(const Duration(seconds: 2));
+          _checkNoError(tester, 'băng Mua xong! tắt');
+        });
+      }
+    }
   });
 }

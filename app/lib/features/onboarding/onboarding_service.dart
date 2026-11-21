@@ -24,6 +24,7 @@ import 'dart:convert';
 
 import '../../core/database/app_database.dart';
 import '../../core/database/daos.dart';
+import '../character/kid_assets.dart';
 import 'egg_service.dart';
 import 'onboarding_model.dart';
 
@@ -82,6 +83,15 @@ class OnboardingService {
       await _children.updateChild(childId, name: trimmed.name);
       await _eggs.selectEgg(childId: childId, species: eggSpecies);
       await _settings.setValue(key: onboardingCompletedKey, value: 'true');
+      // Bộ đồ chọn ở mở đầu là của bé từ đầu (Cửa hàng, T2-06).
+      await _db.inventoryDao.grant(
+        childId: childId,
+        itemId:
+            kidOutfitIds[kidGender(
+              trimmed.gender,
+            )]![kidOutfitNumber(trimmed.dress) - 1],
+        source: 'starter',
+      );
     });
   }
 }

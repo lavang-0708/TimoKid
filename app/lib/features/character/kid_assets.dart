@@ -150,12 +150,12 @@ String kidWhiteShoesAsset(String gender) {
   return 'assets/images/character/$g/${g}_shoes_02.png';
 }
 
-/// Ảnh khung nhân vật 1024x1536 giải mã ở bề ngang [kidDecodeWidth]
-/// (đủ nét cho nhân vật cao tới ~770 px vật lý) — nhỏ hơn 4 lần bộ nhớ
-/// so với ảnh gốc. Dùng chung cho hiển thị và nạp trước để trùng khóa
-/// bộ đệm ảnh.
-ImageProvider<Object> kidImage(String asset) =>
-    ResizeImage(AssetImage(asset), width: kidDecodeWidth);
+/// Ảnh khung nhân vật 1024x1536 giải mã ở bề ngang [width] (mặc định
+/// [kidDecodeWidth], đủ nét cho nhân vật cao tới ~770 px vật lý) — nhỏ
+/// hơn 4 lần bộ nhớ so với ảnh gốc. Dùng chung cho hiển thị (nhân vật,
+/// thẻ Cửa hàng) và nạp trước để trùng khóa bộ đệm ảnh.
+ImageProvider<Object> kidImage(String asset, {int width = kidDecodeWidth}) =>
+    ResizeImage(AssetImage(asset), width: width);
 
 /// Bề ngang giải mã ảnh khung nhân vật.
 const int kidDecodeWidth = 512;
