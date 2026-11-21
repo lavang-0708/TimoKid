@@ -106,8 +106,9 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
     )..repeat();
     _step = AnimationController(
       vsync: this,
-      // 4 khung đi bộ mỗi 720 ms (180 ms/khung): đi chậm, mềm hơn.
-      duration: const Duration(milliseconds: 720),
+      // 4 khung đi bộ mỗi 960 ms (240 ms/khung), khớp tốc độ đi chậm
+      // [roomWalkSpeed] để chân không trượt.
+      duration: const Duration(milliseconds: 960),
     );
     if (widget.walking) _step!.repeat();
     // Đứng yên: lắc lư người/đầu rất nhẹ quanh chân (chu kỳ 3,2 giây).
@@ -160,8 +161,12 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Widget _frameImage(String asset, Key key) => Image.asset(
-    asset,
+  /// Ảnh khung 1024x1536 giải mã ở nửa cỡ ([kidImage]) để bộ nhớ đệm
+  /// ảnh giữ đủ mọi khung đi bộ — tràn bộ đệm thì mỗi lần đổi khung
+  /// phải giải mã lại, nhân vật đi bị giật (góp ý v0.0.13). Miếng vá
+  /// mắt nhỏ nên giữ nguyên cỡ.
+  Widget _frameImage(String asset, Key key, {bool fullFrame = true}) => Image(
+    image: fullFrame ? kidImage(asset) : AssetImage(asset),
     key: key,
     fit: BoxFit.fill,
     gaplessPlayback: true,
@@ -197,7 +202,11 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
           top: patch.rect.top * k,
           width: patch.rect.width * k,
           height: patch.rect.height * k,
-          child: _frameImage(patch.asset, const Key('kid-eyes-closed')),
+          child: _frameImage(
+            patch.asset,
+            const Key('kid-eyes-closed'),
+            fullFrame: false,
+          ),
         );
         return SizedBox(
           width: w,

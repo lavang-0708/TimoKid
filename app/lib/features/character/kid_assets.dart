@@ -11,7 +11,7 @@
 /// Bộ đồ lưu ở `CharacterProfile.dress` (mã kết thúc bằng số bộ 1–3).
 library;
 
-import 'dart:ui' show Rect;
+import 'package:material_ui/material_ui.dart';
 
 /// Khung ảnh nhân vật.
 const double kidFrameWidth = 1024;
@@ -149,3 +149,13 @@ String kidWhiteShoesAsset(String gender) {
   final g = kidGender(gender);
   return 'assets/images/character/$g/${g}_shoes_02.png';
 }
+
+/// Ảnh khung nhân vật 1024x1536 giải mã ở bề ngang [kidDecodeWidth]
+/// (đủ nét cho nhân vật cao tới ~770 px vật lý) — nhỏ hơn 4 lần bộ nhớ
+/// so với ảnh gốc. Dùng chung cho hiển thị và nạp trước để trùng khóa
+/// bộ đệm ảnh.
+ImageProvider<Object> kidImage(String asset) =>
+    ResizeImage(AssetImage(asset), width: kidDecodeWidth);
+
+/// Bề ngang giải mã ảnh khung nhân vật.
+const int kidDecodeWidth = 512;
