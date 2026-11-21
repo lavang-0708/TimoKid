@@ -7,13 +7,12 @@ import '../../core/database/models.dart';
 import '../../core/database/tables.dart';
 import '../building/building_screen.dart';
 import '../character/character_bounce.dart';
-import '../character/character_model.dart';
-import '../character/character_view.dart';
-import '../character/placeholder_layers.dart';
+import '../character/kid_assets.dart';
+import '../character/kid_look_service.dart';
+import '../character/kid_sprite.dart';
 import '../daily_set/daily_set_config.dart';
 import '../daily_set/daily_set_service.dart';
 import '../ladder/ladder_service.dart';
-import '../onboarding/onboarding_config.dart';
 import '../onboarding/onboarding_model.dart';
 import '../onboarding/onboarding_service.dart';
 import '../rewards/reward_config.dart';
@@ -63,6 +62,10 @@ class _TownScreenState extends ConsumerState<TownScreen> {
   bool _loading = true;
   String? _error;
   CharacterProfile? _profile;
+  String? _headAccessory;
+  bool _glasses = false;
+  bool _whiteShoes = false;
+  bool _backpack = false;
 
   @override
   void initState() {
@@ -99,12 +102,21 @@ class _TownScreenState extends ConsumerState<TownScreen> {
       );
       final balances = await rewardService.balances(childId);
       final profile = await OnboardingService(db: db).loadProfile(childId);
+      final looks = KidLookService(db: db);
+      final accessory = await looks.headAccessory(childId);
+      final glasses = await looks.glasses(childId);
+      final whiteShoes = await looks.whiteShoes(childId);
+      final backpack = await looks.backpack(childId);
       if (!mounted) return;
       setState(() {
         _statuses = statuses;
         _xu = balances[Currency.xu] ?? 0;
         _gems = balances[Currency.gem] ?? 0;
         _profile = profile;
+        _headAccessory = accessory;
+        _glasses = glasses;
+        _whiteShoes = whiteShoes;
+        _backpack = backpack;
         _loading = false;
         _error = null;
       });
@@ -220,15 +232,16 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                         children: [
                           Expanded(
                             child: CharacterBounce(
-                              child: CharacterView(
+                              // Thở/chớp mắt bật (kiểu game); cổng
+                              // AnimationGate tắt khi chạy test.
+                              child: KidSprite(
                                 key: const Key('town-character'),
-                                outfit: _outfitFor(profile),
-                                loader: _loaderFor(profile),
-                                // Thở/chớp mắt bật (kiểu game); cổng
-                                // AnimationGate tắt khi chạy test để
-                                // pumpAndSettle dừng được (xem ghi chú
-                                // ở đầu file).
-                                animationsEnabled: true,
+                                gender: profile.gender,
+                                outfit: kidOutfitNumber(profile.dress),
+                                headAccessory: _headAccessory,
+                                glasses: _glasses,
+                                whiteShoes: _whiteShoes,
+                                backpack: _backpack,
                               ),
                             ),
                           ),
@@ -264,37 +277,4 @@ class _TownScreenState extends ConsumerState<TownScreen> {
       ),
     );
   }
-
-  /// Bộ đồ xem trước cho hồ sơ đã lưu (giữ đồng bộ với
-  /// `_previewOutfit` ở màn mở đầu): nữ dùng bộ nhân vật nữ 1
-  /// (thân + tóc + váy), nam dùng bộ đủ lớp manifest v1.
-  CharacterOutfit _outfitFor(CharacterProfile profile) {
-    if (profile.gender == 'girl') {
-      return CharacterOutfit.girlSet1(
-        hairColor: Color(profile.hairColor),
-        top: profile.dress,
-      );
-    }
-    return CharacterOutfit.girl(
-      palette: CharacterPalette(
-        skin: Color(profile.skinColor),
-        hair: Color(profile.hairColor),
-        eyes: Color(profile.eyeColor),
-        mouth: const Color(onboardingMouthColor),
-        top: const Color(0xFFF2A7C3),
-        bottom: const Color(0xFFB5A8E8),
-        shoes: const Color(0xFF8FCB9B),
-        accessoryHead: const Color(0xFFF28BB0),
-      ),
-      hairSet: profile.hairStyle,
-      eyes: profile.eyeStyle,
-      mouth: profile.mouthStyle,
-    );
-  }
-
-  /// Bộ nạp lớp: nữ dùng `AssetImage` mặc định (hình thật đã có
-  /// trên main từ PR #18); nam chưa có hình thật nên dùng lớp tạm
-  /// xám như ở màn mở đầu.
-  CharacterLayerLoader? _loaderFor(CharacterProfile profile) =>
-      profile.gender == 'girl' ? null : placeholderLayerLoader;
 }

@@ -30,6 +30,7 @@ import 'package:timokid/features/onboarding/onboarding_config.dart';
 import 'package:timokid/features/onboarding/onboarding_screen.dart';
 
 import '../../goldens/onboarding_golden_data.dart';
+import '../../helpers/kid_images.dart';
 
 void _restoreGoldens() {
   const goldens = {
@@ -122,6 +123,7 @@ void main() {
       for (final path in [
         ...eggSpeciesAssets.values,
         ...newbornSpeciesAssets.values,
+        ...kidImagePaths(),
       ]) {
         await precacheImage(AssetImage(path), context);
       }
@@ -138,9 +140,9 @@ void main() {
     );
   });
 
-  testWidgets('màn chọn màu tóc (nữ bộ 1)', (tester) async {
+  testWidgets('màn chọn bộ đồ (bé trai)', (tester) async {
     await pumpOnboarding(tester);
-    await tester.tap(find.byKey(const Key('onboarding-gender-girl')));
+    await tester.tap(find.byKey(const Key('onboarding-gender-boy')));
     await tapNext(tester);
     await precacheImages(tester, find.byKey(const Key('onboarding-screen')));
     await expectLater(
@@ -149,11 +151,12 @@ void main() {
     );
   });
 
-  testWidgets('màn chọn váy (nữ bộ 1)', (tester) async {
+  testWidgets('màn chọn bộ đồ (bé gái, bộ 3)', (tester) async {
     await pumpOnboarding(tester);
     await tester.tap(find.byKey(const Key('onboarding-gender-girl')));
     await tapNext(tester);
-    await tapNext(tester);
+    await tester.tap(find.byKey(const Key('onboarding-dress-girl_top_03')));
+    await tester.pumpAndSettle();
     await precacheImages(tester, find.byKey(const Key('onboarding-screen')));
     await expectLater(
       find.byKey(const Key('onboarding-screen')),
@@ -166,7 +169,6 @@ void main() {
     await tester.tap(find.byKey(const Key('onboarding-gender-girl')));
     await tapNext(tester);
     await tapNext(tester);
-    await tapNext(tester);
     await precacheImages(tester, find.byKey(const Key('onboarding-screen')));
     await expectLater(
       find.byKey(const Key('onboarding-screen')),
@@ -177,7 +179,6 @@ void main() {
   testWidgets('màn chọn trứng', (tester) async {
     await pumpOnboarding(tester);
     await tester.tap(find.byKey(const Key('onboarding-gender-girl')));
-    await tapNext(tester);
     await tapNext(tester);
     await tapNext(tester);
     await tester.enterText(

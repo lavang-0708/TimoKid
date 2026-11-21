@@ -8,6 +8,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:timokid/features/character/kid_sprite.dart';
+import 'package:timokid/core/animation/animation_gate.dart';
 import 'package:timokid/core/database/app_database.dart';
 import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/core/database/models.dart';
@@ -55,6 +57,7 @@ void main() {
   Future<void> pumpRoom(
     WidgetTester tester, {
     Size size = const Size(800, 360),
+    bool settle = true,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
@@ -86,6 +89,13 @@ void main() {
         child: MaterialApp.router(theme: AppTheme.light, routerConfig: router),
       ),
     );
+    if (!settle) {
+      // Hiệu ứng lặp bật thì pumpAndSettle không dừng: bơm từng khung.
+      for (var i = 0; i < 20; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+      return;
+    }
     await tester.pumpAndSettle();
   }
 
@@ -203,7 +213,7 @@ void main() {
     expect(find.byKey(const Key('room-screen')), findsOneWidget);
   });
 
-  testWidgets('xong đề ngày thì mở: hết banner, Tủ đồ sang màn chờ', (
+  testWidgets('xong đề ngày thì mở: hết banner, Tủ đồ đổi được đồ', (
     tester,
   ) async {
     await completeOnboardingGirl();
@@ -213,19 +223,83 @@ void main() {
     expect(find.byKey(const Key('room-locked-banner')), findsNothing);
     expect(find.text('Xong đề ngày hôm nay!'), findsOneWidget);
     expect(find.byIcon(Icons.lock_outlined), findsNothing);
+    // Hồ sơ lưu váy tím (bộ 2).
+    expect(find.byKey(const Key('kid-full-girl-2')), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('room-wardrobe-button')));
     await tester.pumpAndSettle();
+    expect(find.byKey(const Key('room-wardrobe-sheet')), findsOneWidget);
 
-    expect(find.byKey(const Key('coming-soon-screen')), findsOneWidget);
+    // Chọn bộ 3 + mũ: nhân vật trong phòng đổi ngay và được lưu lại.
+    await tester.tap(find.byKey(const Key('room-wardrobe-outfit-3')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(
+      find.byKey(const Key('room-wardrobe-accessory-hat')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('room-wardrobe-accessory-hat')));
+    await tester.pumpAndSettle();
+    final profile = await OnboardingService(db: db).loadProfile(childId);
+    expect(profile!.dress, 'girl_top_03');
     expect(
-      find.text('Tủ đồ sắp mở ở bản sau nhé! Xong đề ngày là được thay đồ.'),
+      await db.settingsDao.getValue(
+        childId: childId,
+        key: 'kid_head_accessory',
+      ),
+      'hat',
+    );
+    await tester.ensureVisible(find.byKey(const Key('room-wardrobe-glasses')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('room-wardrobe-glasses')));
+    await tester.pumpAndSettle();
+    expect(
+      await db.settingsDao.getValue(childId: childId, key: 'kid_glasses'),
+      'true',
+    );
+    await tester.tap(find.byKey(const Key('room-wardrobe-backpack')));
+    await tester.pumpAndSettle();
+    expect(
+      await db.settingsDao.getValue(childId: childId, key: 'kid_backpack'),
+      'true',
+    );
+    await tester.tapAt(const Offset(400, 20));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('kid-full-girl-3-backpack')), findsOneWidget);
+    expect(
+      find.byKey(const Key('kid-overlay-girl_glasses_01.png')),
       findsOneWidget,
     );
+    expect(
+      find.descendant(
+        of: find.byKey(const Key('room-character')),
+        matching: find.byKey(const Key('kid-accessory')),
+      ),
+      findsOneWidget,
+    );
+  });
 
-    await tester.tap(find.byKey(const Key('coming-soon-back-button')));
+  testWidgets('chạm sàn thì nhân vật đi tới, pet đi theo', (tester) async {
+    await completeOnboardingGirl();
+    await hatchEgg();
+    await pumpRoom(tester);
+
+    final scene = find.byKey(const Key('room-floor'));
+    final box = tester.getRect(scene);
+    Offset frameToScreen(Offset f) => Offset(
+      box.left + f.dx / 1600 * box.width,
+      box.top + f.dy / 900 * box.height,
+    );
+    final before = tester.getRect(find.byKey(const Key('room-character')));
+    // Chạm sàn phía phải thảm (khung 1600x900).
+    await tester.tapAt(frameToScreen(const Offset(1000, 840)));
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('room-screen')), findsOneWidget);
+    final after = tester.getRect(find.byKey(const Key('room-character')));
+    expect(after.center.dx, greaterThan(before.center.dx + 50));
+    // Đứng gần hơn (chân y 840 > 810) thì to hơn.
+    expect(after.height, greaterThan(before.height));
+    final pet = tester.getRect(find.byKey(const Key('room-pet')));
+    expect((pet.center.dx - after.center.dx).abs(), lessThan(box.width * 0.2));
   });
 
   testWidgets('xong đề ngày thì Cửa hàng sang màn chờ', (tester) async {
@@ -259,6 +333,111 @@ void main() {
     expect(find.byKey(const Key('room-reaction-bubble')), findsNothing);
   });
 
+  testWidgets('hiệu ứng thật: đi từng bước rồi dừng, đổi hướng, vẫy tay', (
+    tester,
+  ) async {
+    await completeOnboardingGirl();
+    await hatchEgg();
+    AnimationGate.enabled = true;
+    addTearDown(() => AnimationGate.enabled = false);
+    // Phòng với hiệu ứng bật (thở, chớp mắt, nhún bước).
+    await pumpRoom(tester, settle: false);
+
+    final scene = find.byKey(const Key('room-floor'));
+    final box = tester.getRect(scene);
+    Offset frameToScreen(Offset f) => Offset(
+      box.left + f.dx / 1600 * box.width,
+      box.top + f.dy / 900 * box.height,
+    );
+    final start = tester.getRect(find.byKey(const Key('room-character')));
+    // Đi sang trái (chạm trước tủ đầu giường → vòng trước tủ).
+    await tester.tapAt(frameToScreen(const Offset(120, 860)));
+    for (var i = 0; i < 4; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    final mid = tester.getRect(find.byKey(const Key('room-character')));
+    expect(mid.center.dx, lessThan(start.center.dx));
+    // Bé gái có khung đi bộ thật (lô 4): bộ 2, đi xuống/ngang → `dr`.
+    expect(
+      (tester.widget<Image>(find.byKey(const Key('kid-walk-frame'))).image
+              as AssetImage)
+          .assetName,
+      startsWith('assets/images/character/girl/girl_full_02_walk_dr_'),
+    );
+    expect(
+      tester.widget<KidSprite>(find.byKey(const Key('room-character'))),
+      isA<KidSprite>()
+          .having((k) => k.walking, 'walking', isTrue)
+          .having((k) => k.facingLeft, 'facingLeft', isTrue),
+    );
+    // Đi hết đường (~2 giây) rồi đứng lại.
+    for (var i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    final kid = tester.widget<KidSprite>(
+      find.byKey(const Key('room-character')),
+    );
+    expect(kid.walking, isFalse);
+    final end = tester.getRect(find.byKey(const Key('room-character')));
+    expect(end.center.dx, lessThan(mid.center.dx));
+
+    // Bấm vào nhân vật thì vẫy tay, 1,4 giây sau thôi vẫy.
+    await tester.tap(find.byKey(const Key('room-character')));
+    await tester.pump(const Duration(milliseconds: 50));
+    expect(
+      tester.widget<KidSprite>(find.byKey(const Key('room-character'))).waving,
+      isTrue,
+    );
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(
+      tester.widget<KidSprite>(find.byKey(const Key('room-character'))).waving,
+      isFalse,
+    );
+    // Gỡ cây widget (dừng hiệu ứng lặp) trước khi test kết thúc.
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('bé trai đi bằng khung đi bộ thật, đứng lại thì về ảnh đứng', (
+    tester,
+  ) async {
+    await OnboardingService(db: db).completeOnboarding(
+      childId: childId,
+      profile: CharacterProfile.defaults().copyWith(
+        gender: 'boy',
+        dress: 'boy_outfit_02',
+        name: 'Bình',
+      ),
+      eggSpecies: 'cat',
+    );
+    AnimationGate.enabled = true;
+    addTearDown(() => AnimationGate.enabled = false);
+    await pumpRoom(tester, settle: false);
+    final box = tester.getRect(find.byKey(const Key('room-floor')));
+    // Chạm xa về phía trước bên phải: đi xuống-phải (khung `dr`).
+    await tester.tapAt(
+      Offset(
+        box.left + 1300 / 1600 * box.width,
+        box.top + 860 / 900 * box.height,
+      ),
+    );
+    for (var i = 0; i < 4; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    final frame = tester.widget<Image>(find.byKey(const Key('kid-walk-frame')));
+    expect(
+      (frame.image as AssetImage).assetName,
+      startsWith('assets/images/character/boy/boy_full_02_walk_dr_'),
+    );
+    for (var i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(find.byKey(const Key('kid-walk-frame')), findsNothing);
+    expect(find.byKey(const Key('kid-full-boy-2')), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
+
   testWidgets('chạm pet khi khóa thì nhắc xong đề ngày', (tester) async {
     await completeOnboardingGirl();
     await hatchEgg();
@@ -280,7 +459,9 @@ void main() {
     await tester.tap(find.byKey(const Key('room-pet')));
     await tester.pump();
 
-    expect(find.text('Gâu gâu! Chơi với tớ nhé!'), findsOneWidget);
+    expect(find.textContaining('Gâu gâu! Chơi với tớ nhé!'), findsOneWidget);
+    // 1 ngày xong đề: còn 2 ngày nữa pet lớn.
+    expect(find.textContaining('Còn 2 ngày học nữa'), findsOneWidget);
   });
 
   testWidgets('chạm nội thất thì hiện bong bóng', (tester) async {

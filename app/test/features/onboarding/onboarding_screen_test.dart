@@ -1,9 +1,9 @@
 /// Widget test màn mở đầu (T2-03): đi các bước, quay lại, kiểm tên,
 /// chọn trứng, lưu xong vào Phòng (màn chính từ T2-04).
 ///
-/// Dáng nữ (bộ nhân vật nữ 1, PR #18) chỉ có 5 bước: giới tính, màu
-/// tóc, váy, tên, trứng — không có bước màu da/kiểu mắt/kiểu miệng.
-/// Dáng nam (chưa có hình thật) giữ 7 bước cũ với xem trước tạm.
+/// Từ (E) cả hai dáng có cùng 4 bước: giới tính, bộ đồ (3 bộ ảnh toàn
+/// thân của dáng đã chọn), tên, trứng. Màu da/tóc/mắt cố định theo
+/// hình đã duyệt nên không còn bước chọn màu.
 library;
 
 import 'package:drift/native.dart';
@@ -50,113 +50,83 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  /// Đi từ bước giới tính nữ tới bước đặt tên (3 lần Tiếp): chọn màu
-  /// tóc nâu, chọn váy tím.
-  Future<void> goToNameStepGirl(WidgetTester tester) async {
+  /// Đi từ bước giới tính tới bước đặt tên (2 lần Tiếp), chọn bộ
+  /// [outfitKey].
+  Future<void> goToNameStep(
+    WidgetTester tester, {
+    required String gender,
+    required String outfitKey,
+  }) async {
     await pumpOnboarding(tester);
-    await tester.tap(find.byKey(const Key('onboarding-gender-girl')));
+    await tester.tap(find.byKey(Key('onboarding-gender-$gender')));
     await tapNext(tester);
-    await tester.tap(find.byKey(const Key('onboarding-hair-color-1')));
-    await tapNext(tester);
-    await tester.tap(find.byKey(const Key('onboarding-dress-girl_top_02')));
+    await tester.tap(find.byKey(Key('onboarding-dress-$outfitKey')));
     await tapNext(tester);
     expect(find.text('Đặt tên cho nhân vật'), findsOneWidget);
   }
 
-  /// Đi từ bước giới tính nam tới bước đặt tên (5 lần Tiếp).
-  Future<void> goToNameStepBoy(WidgetTester tester) async {
-    await pumpOnboarding(tester);
-    await tester.tap(find.byKey(const Key('onboarding-gender-boy')));
-    await tapNext(tester);
-    await tester.tap(find.byKey(const Key('onboarding-skin-0')));
-    await tapNext(tester);
-    await tester.tap(
-      find.byKey(const Key('onboarding-hair-style-girl_hair_02')),
-    );
-    await tapNext(tester);
-    await tester.tap(
-      find.byKey(const Key('onboarding-eye-style-girl_eyes_03')),
-    );
-    await tapNext(tester);
-    await tester.tap(find.byKey(const Key('onboarding-mouth-girl_mouth_02')));
-    await tapNext(tester);
-    expect(find.text('Đặt tên cho nhân vật'), findsOneWidget);
-  }
+  Future<void> goToNameStepGirl(WidgetTester tester) =>
+      goToNameStep(tester, gender: 'girl', outfitKey: 'girl_top_02');
 
-  testWidgets('mở đầu hiện bước giới tính nữ (5 bước) + xem trước', (
+  Future<void> goToNameStepBoy(WidgetTester tester) =>
+      goToNameStep(tester, gender: 'boy', outfitKey: 'boy_outfit_03');
+
+  testWidgets('mở đầu hiện bước giới tính (4 bước) + xem trước ảnh thật', (
     tester,
   ) async {
     await pumpOnboarding(tester);
 
     expect(find.byKey(const Key('onboarding-screen')), findsOneWidget);
-    expect(find.text('Bước 1/5'), findsOneWidget);
+    expect(find.text('Bước 1/4'), findsOneWidget);
     expect(find.text('Bé là bé gái hay bé trai?'), findsOneWidget);
     expect(find.byKey(const Key('onboarding-preview')), findsOneWidget);
-    expect(find.text('Hình tạm'), findsOneWidget);
+    expect(find.byKey(const Key('kid-full-girl-1')), findsOneWidget);
+    expect(find.text('Hình tạm'), findsNothing);
     expect(find.byKey(const Key('onboarding-back-button')), findsNothing);
   });
 
-  testWidgets('nữ không có bước màu da/kiểu mắt/kiểu miệng, có bước váy', (
+  testWidgets('bước bộ đồ: 3 bộ theo dáng, xem trước đổi theo bộ chọn', (
     tester,
   ) async {
     await pumpOnboarding(tester);
     await tester.tap(find.byKey(const Key('onboarding-gender-girl')));
     await tapNext(tester);
-    // Bước 2/5: chỉ chọn màu tóc.
-    expect(find.text('Bước 2/5'), findsOneWidget);
-    expect(find.text('Chọn màu tóc'), findsOneWidget);
-    expect(find.byKey(const Key('onboarding-skin-0')), findsNothing);
-    expect(
-      find.byKey(const Key('onboarding-hair-style-girl_hair_01')),
-      findsNothing,
-    );
-    await tapNext(tester);
-    // Bước 3/5: chọn váy (đồ gốc / váy hồng / váy tím).
-    expect(find.text('Bước 3/5'), findsOneWidget);
-    expect(find.text('Chọn váy'), findsOneWidget);
-    expect(find.text('Bộ đồ gốc'), findsOneWidget);
+    expect(find.text('Bước 2/4'), findsOneWidget);
+    expect(find.text('Chọn bộ đồ'), findsOneWidget);
     expect(find.text('Váy hồng'), findsOneWidget);
     expect(find.text('Váy tím'), findsOneWidget);
-    expect(
-      find.byKey(const Key('onboarding-eye-style-girl_eyes_01')),
-      findsNothing,
-    );
-    expect(
-      find.byKey(const Key('onboarding-mouth-girl_mouth_01')),
-      findsNothing,
-    );
-  });
+    expect(find.text('Váy hồng tạp dề'), findsOneWidget);
+    expect(find.byKey(const Key('onboarding-skin-0')), findsNothing);
+    await tester.tap(find.byKey(const Key('onboarding-dress-girl_top_03')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('kid-full-girl-3')), findsOneWidget);
 
-  testWidgets('nam vẫn đủ 7 bước (màu da/kiểu mắt/kiểu miệng)', (tester) async {
-    await pumpOnboarding(tester);
+    // Đổi sang bé trai: về bộ 1 của bé trai, đủ 3 bộ của bé trai.
+    await tester.tap(find.byKey(const Key('onboarding-back-button')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('onboarding-gender-boy')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('kid-full-boy-1')), findsOneWidget);
     await tapNext(tester);
-    expect(find.text('Bước 2/7'), findsOneWidget);
-    expect(find.text('Chọn màu da'), findsOneWidget);
-    await tapNext(tester);
-    expect(find.text('Bước 3/7'), findsOneWidget);
-    expect(find.text('Chọn kiểu tóc và màu tóc'), findsOneWidget);
-    await tapNext(tester);
-    expect(find.text('Bước 4/7'), findsOneWidget);
-    expect(find.text('Chọn kiểu mắt và màu mắt'), findsOneWidget);
-    await tapNext(tester);
-    expect(find.text('Bước 5/7'), findsOneWidget);
-    expect(find.text('Chọn kiểu miệng'), findsOneWidget);
+    expect(find.text('Bước 2/4'), findsOneWidget);
+    expect(find.text('Áo xanh, quần short'), findsOneWidget);
+    expect(find.text('Áo hoodie xanh lá'), findsOneWidget);
+    expect(find.text('Áo đỏ, quần jean'), findsOneWidget);
   });
 
-  testWidgets('quay lại được ở mọi bước (nữ)', (tester) async {
+  testWidgets('quay lại được ở mọi bước', (tester) async {
     await pumpOnboarding(tester);
     await tester.tap(find.byKey(const Key('onboarding-gender-girl')));
     await tapNext(tester);
     await tapNext(tester);
-    expect(find.text('Bước 3/5'), findsOneWidget);
+    expect(find.text('Bước 3/4'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('onboarding-back-button')));
     await tester.pumpAndSettle();
-    expect(find.text('Bước 2/5'), findsOneWidget);
+    expect(find.text('Bước 2/4'), findsOneWidget);
     await tester.tap(find.byKey(const Key('onboarding-back-button')));
     await tester.pumpAndSettle();
-    expect(find.text('Bước 1/5'), findsOneWidget);
+    expect(find.text('Bước 1/4'), findsOneWidget);
     expect(find.byKey(const Key('onboarding-back-button')), findsNothing);
   });
 
@@ -216,7 +186,7 @@ void main() {
     expect(find.byType(SvgPicture), findsNothing);
   });
 
-  testWidgets('đi hết 5 bước nữ: lưu hồ sơ + trứng rồi vào Phòng', (
+  testWidgets('đi hết 4 bước nữ: lưu hồ sơ + trứng rồi vào Phòng', (
     tester,
   ) async {
     await goToNameStepGirl(tester);
@@ -236,9 +206,6 @@ void main() {
     expect(profile, isNotNull);
     expect(profile!.name, 'An');
     expect(profile.gender, 'girl');
-    // Nữ bộ 1: kiểu tóc cố định, màu tóc nâu đã chọn, váy tím.
-    expect(profile.hairStyle, 'girl_hair_01');
-    expect(profile.hairColor, 0xFFA9715C);
     expect(profile.dress, 'girl_top_02');
     expect(
       await db.settingsDao.getValue(childId: childId, key: 'selected_egg'),
@@ -248,7 +215,7 @@ void main() {
     expect(child!.name, 'An');
   });
 
-  testWidgets('đi hết 7 bước nam: lưu hồ sơ rồi vào Phòng', (tester) async {
+  testWidgets('đi hết 4 bước nam: lưu hồ sơ rồi vào Phòng', (tester) async {
     await goToNameStepBoy(tester);
     await enterName(tester, 'Bình');
     await tapNext(tester);
@@ -264,10 +231,7 @@ void main() {
     expect(profile, isNotNull);
     expect(profile!.gender, 'boy');
     expect(profile.name, 'Bình');
-    expect(profile.hairStyle, 'girl_hair_02');
-    expect(profile.eyeStyle, 'girl_eyes_03');
-    expect(profile.mouthStyle, 'girl_mouth_02');
-    expect(profile.dress, isNull);
+    expect(profile.dress, 'boy_outfit_03');
     expect(
       await db.settingsDao.getValue(childId: childId, key: 'selected_egg'),
       'dog',

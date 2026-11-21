@@ -83,7 +83,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-api30-x86_64-v1
+          key: avd-api30-x86_64-v2
 
       - name: Tạo AVD và snapshot để cache
         if: steps.avd-cache.outputs.cache-hit != 'true'

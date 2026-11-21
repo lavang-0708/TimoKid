@@ -50,6 +50,8 @@ LAYERS = {
 
 KINDS = {
     "character_layer",
+    "character_full",
+    "character_patch",
     "pet",
     "item",
     "furniture",
@@ -64,6 +66,9 @@ STATUSES = {"ready", "planned"}
 # kích thước (xem docs/ASSETS.md).
 FRAMES = {
     "character_layer": (1024, 1536),
+    # Ảnh toàn thân + phụ kiện phủ cùng khung (E, 21/11). Miếng vá mắt
+    # nhắm (character_patch) có kích thước riêng nên không kiểm khung.
+    "character_full": (1024, 1536),
     "pet": (512, 512),
     "item": (512, 512),
     "furniture": (512, 512),
@@ -79,6 +84,15 @@ NAME_PATTERNS = {
         r"|accessory_head|accessory_hand)"
         r"_[a-z0-9]+(_line)?\.png$"
     ),
+    # Ảnh toàn thân 3 bộ × (nghỉ/vẫy) và phụ kiện phủ cùng khung (E).
+    "character_full": re.compile(
+        r"^(girl|boy)_(full_0[1-3](_wave|_walk_(dr|ur)_[a-d])?(_backpack)?"
+        r"|hat_01|bow_01|clip_01"
+        r"|glasses_01|backpack_01|shoes_02)\.png$"
+    ),
+    "character_patch": re.compile(
+        r"^(girl|boy)_eyes_closed_patch(_0[1-3]_wave)?\.png$"
+    ),
     "pet": re.compile(r"^(dog|cat|rabbit)_(egg|newborn|teen|adult)\.png$"),
     "item": re.compile(r"^[a-z0-9_]+\.png$"),
     "furniture": re.compile(r"^[a-z0-9_]+\.png$"),
@@ -91,6 +105,8 @@ NAME_PATTERNS = {
 # bắt buộc thư mục (5 icon khu T1-12 nằm ngay ở gốc).
 KIND_DIRS = {
     "character_layer": "character/{form}",
+    "character_full": "character/{form}",
+    "character_patch": "character/{form}",
     "pet": "pets",
     "item": "items",
     "furniture": "furniture",

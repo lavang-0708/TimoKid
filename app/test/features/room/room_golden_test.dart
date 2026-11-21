@@ -35,6 +35,7 @@ import 'package:timokid/features/room/room_screen.dart';
 import 'package:timokid/features/town/town_screen.dart';
 
 import '../../goldens/room_golden_data.dart';
+import '../../helpers/kid_images.dart';
 
 AppDatabase openMemoryDb({Clock? clock}) => AppDatabase(
   executor: NativeDatabase.memory(),
@@ -161,6 +162,7 @@ void main() {
       for (final path in [
         ...eggSpeciesAssets.values,
         ...newbornSpeciesAssets.values,
+        ...kidImagePaths(),
       ]) {
         await precacheImage(AssetImage(path), context);
       }

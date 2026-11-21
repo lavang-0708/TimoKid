@@ -131,24 +131,22 @@ void main() {
 
       await tester.tap(find.byKey(const Key('onboarding-gender-girl')));
       await tapNext();
-      _checkNoError(tester, 'bước 2 màu tóc');
-      await tapNext();
-      _checkNoError(tester, 'bước 3 váy');
+      _checkNoError(tester, 'bước 2 bộ đồ');
       // Nút váy ở dưới nếp gấp cuộn ở màn thấp: cuộn tới rồi bấm.
       await _tapVisible(
         tester,
         find.byKey(const Key('onboarding-dress-girl_top_02')),
       );
-      _checkNoError(tester, 'bước 3 chọn váy tím');
+      _checkNoError(tester, 'bước 2 chọn váy tím');
       await tapNext();
-      _checkNoError(tester, 'bước 4 tên');
+      _checkNoError(tester, 'bước 3 tên');
       await tester.enterText(
         find.byKey(const Key('onboarding-name-field')),
         'An',
       );
       await tester.pumpAndSettle();
       await tapNext();
-      _checkNoError(tester, 'bước 5 trứng');
+      _checkNoError(tester, 'bước 4 trứng');
       // Thẻ trứng cao hơn vùng nhìn ở màn thấp (243 dp > 73 dp)
       // nên tâm thẻ nằm dưới nếp gấp — bấm vào hình trứng PNG ở
       // đỉnh thẻ (luôn thấy sau khi cuộn) thay vì tâm thẻ.
@@ -160,7 +158,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(eggImage);
       await tester.pumpAndSettle();
-      _checkNoError(tester, 'bước 5 chọn trứng chó');
+      _checkNoError(tester, 'bước 4 chọn trứng chó');
       await tester.tap(find.byKey(const Key('onboarding-finish-button')));
       await tester.pumpAndSettle();
       _checkNoError(tester, 'vào Phòng');
@@ -638,16 +636,14 @@ void main() {
 
       await tester.tap(find.byKey(const Key('onboarding-gender-girl')));
       await tapNext();
-      _checkNoError(tester, 'bước 2 màu tóc');
-      await tapNext();
-      _checkNoError(tester, 'bước 3 váy');
+      _checkNoError(tester, 'bước 2 bộ đồ');
       await _tapVisible(
         tester,
         find.byKey(const Key('onboarding-dress-girl_top_02')),
       );
-      _checkNoError(tester, 'bước 3 chọn váy tím');
+      _checkNoError(tester, 'bước 2 chọn váy tím');
       await tapNext();
-      _checkNoError(tester, 'bước 4 tên');
+      _checkNoError(tester, 'bước 3 tên');
 
       // Mở bàn phím ở ô tên, rồi mô phỏng bàn phím ảo đang mở
       // (thu hẹp viewport như máy ảo CI).
@@ -658,7 +654,7 @@ void main() {
       );
       tester.view.viewInsets = const FakeViewPadding(bottom: 140);
       await tester.pumpAndSettle();
-      _checkNoError(tester, 'bước 4 tên, bàn phím mở');
+      _checkNoError(tester, 'bước 3 tên, bàn phím mở');
       await tapNext();
       // Rời bước tên phải bỏ focus để bàn phím đóng: máy ảo đóng
       // bàn phím khi focus mất, mô phỏng bằng cách trả viewInsets
@@ -673,8 +669,8 @@ void main() {
         isA<FocusScopeNode>(),
         reason: 'rời bước tên phải unfocus để bàn phím đóng',
       );
-      _checkNoError(tester, 'bước 5 trứng (sau khi đóng bàn phím)');
-      expect(find.text('Bước 5/5'), findsOneWidget);
+      _checkNoError(tester, 'bước 4 trứng (sau khi đóng bàn phím)');
+      expect(find.text('Bước 4/4'), findsOneWidget);
 
       final eggImage = find.descendant(
         of: find.byKey(const Key('onboarding-egg-dog')),
@@ -684,7 +680,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(eggImage);
       await tester.pumpAndSettle();
-      _checkNoError(tester, 'bước 5 chọn trứng chó');
+      _checkNoError(tester, 'bước 4 chọn trứng chó');
       await _tapVisible(
         tester,
         find.byKey(const Key('onboarding-finish-button')),
@@ -1081,7 +1077,7 @@ void main() {
       expect(find.byKey(const Key('room-egg')), findsOneWidget);
     });
 
-    testWidgets('Phòng mở ở 608x248 không tràn, nút Tủ đồ sang màn chờ', (
+    testWidgets('Phòng mở ở 608x248 không tràn, Tủ đồ mở bảng đổi đồ', (
       tester,
     ) async {
       await createSetAndMarkDone();
@@ -1092,9 +1088,9 @@ void main() {
       expect(find.byKey(const Key('room-pet')), findsOneWidget);
       await tester.tap(find.byKey(const Key('room-wardrobe-button')));
       await tester.pumpAndSettle();
-      _checkNoError(tester, 'màn chờ Tủ đồ 608x248');
-      expect(find.byKey(const Key('coming-soon-screen')), findsOneWidget);
-      await tester.tap(find.byKey(const Key('coming-soon-back-button')));
+      _checkNoError(tester, 'bảng Tủ đồ 608x248');
+      expect(find.byKey(const Key('room-wardrobe-sheet')), findsOneWidget);
+      await tester.tapAt(const Offset(300, 10));
       await tester.pumpAndSettle();
       _checkNoError(tester, 'quay lại Phòng 608x248');
       expect(find.byKey(const Key('room-screen')), findsOneWidget);

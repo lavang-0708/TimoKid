@@ -25,7 +25,11 @@ class CharacterBounce extends StatefulWidget {
     required this.child,
     this.animationsEnabled = true,
     this.popKey,
+    this.onTap,
   });
+
+  /// Gọi thêm khi bé bấm vào nhân vật (ngoài cú nhảy), vd vẫy tay chào.
+  final VoidCallback? onTap;
 
   /// Nhân vật bên trong (thường là `CharacterView`).
   final Widget child;
@@ -98,9 +102,15 @@ class _CharacterBounceState extends State<CharacterBounce>
   Widget build(BuildContext context) {
     // Cổng tắt (test) hoặc cờ riêng tắt: trả con nguyên vẹn, không
     // bọc GestureDetector để test bấm xuyên qua như bình thường.
-    if (!_on) return widget.child;
+    if (!_on) {
+      if (widget.onTap == null) return widget.child;
+      return GestureDetector(onTap: widget.onTap, child: widget.child);
+    }
     return GestureDetector(
-      onTap: () => _jumpController.forward(from: 0),
+      onTap: () {
+        _jumpController.forward(from: 0);
+        widget.onTap?.call();
+      },
       behavior: HitTestBehavior.translucent,
       child: AnimatedBuilder(
         animation: Listenable.merge([_jumpY, _sparkle, _popScale]),
