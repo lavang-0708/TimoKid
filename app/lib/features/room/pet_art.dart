@@ -18,7 +18,7 @@ library;
 import 'pet_growth.dart';
 
 /// Đã có hình trứng nứt + vỏ trứng của Muse chưa.
-const bool eggCrackArtReady = false;
+const bool eggCrackArtReady = true;
 
 /// Đã có hình đi/vui/ngồi của pet (Muse) chưa.
 const bool petMotionArtReady = false;
