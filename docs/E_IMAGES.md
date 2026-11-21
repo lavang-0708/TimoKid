@@ -702,3 +702,45 @@ bước; 02_ur_b 2.548 px là khe nách thật; 02_ur_a 50 px là khe nhỏ th�
 - 02_ur_c sau quantize x_max lệch 1 px so với bản gốc (882→881).
 - Dải + ghép phòng dựng từ bản chưa quantize; khác biệt chỉ ở màu dither,
   dưới ngưỡng thấy ở cỡ hiển thị.
+
+## (E) fix3 giai đoạn 2 — balo (12 ảnh toàn thân có balo, biến thể)
+
+Chủ dự án xem ảnh và nhận xét balo + quai lô 3 lệch, không khớp người
+(giống lỗi cắt lớp hồi đầu) nên ĐỔI CÁCH LÀM: không vẽ balo như lớp rời
+đặt đè nữa. Vẽ lại TOÀN THÂN bé đang đeo balo cho từng ảnh gốc (6 ảnh/bé:
+3 bộ × nghỉ/vẫy), cùng khung 1024×1536, cùng tư thế, chân và chiều cao
+khớp ảnh gốc (như cách làm bộ đồ lô 1/2 đã đạt). Sau đó tách lớp balo
+bằng hiệu giữa ảnh có balo và ảnh gốc — TÁCH KHÔNG SẠCH ở cả 2 bé
+(diff ngoài vùng balo: gái 22–42%, trai 22–89%; generator vẽ lại toàn bộ
+ảnh nên shading nhấp khắp nơi, không phải lệch vị trí; lớp thử tách đem
+chồng lên ảnh gốc thì khác tới 29–45% pixel, lộ đường nối) → GIỮ 12 ẢNH
+TOÀN THÂN CÓ BALO LÀM BIẾN THỂ (girl_full_0X[_wave]_backpack,
+boy_full_0X[_wave]_backpack), app đổi ảnh thay vì chồng lớp. Balo cũ
+(girl_backpack_01 / boy_backpack_01, lô 3) BỎ HẲN — Claude git rm 2 PNG
+cũ và bỏ khỏi manifest khi decode. Đẩy 21/11 thành 2 lần (6 gái + 6 trai)
+vì giới hạn HTTP ~3,6 MB/lần.
+
+### Bảng 12 ảnh (PNG cuối, semi 0,0000)
+- girl_full_01_backpack 446.892 B, 02 456.564 B, 03 483.699 B,
+  01w 456.579 B, 02w 436.213 B, 03w 517.440 B
+- boy_full_01_backpack 328.272 B, 02 304.171 B, 03 313.558 B,
+  01w 343.035 B, 02w 329.728 B, 03w 352.371 B
+
+### Căn chỉnh (đo bằng code)
+- Bé gái: tâm mắt khớp ảnh gốc trong ±5 px (mắt (504,561), chân y
+  1428–1429). 02w ban đầu lệch dọc ~10 px do nơ tím lọt vào mask đo mắt —
+  đã sửa riêng bằng co dọc 0,98805 quanh chân, kiểm lại đạt.
+- Bé trai: tâm mắt x lệch ≤2,1 px, y lệch 0,4–12,4 px ở bản vẫy (đầu hơi
+  nghiêng, cùng mức như bản vẫy lô 2); chân y=1429, cao bbox 1287 (khớp gốc).
+
+### Kiểm chứng
+Ghép phòng cỡ app (cao 360 px) cả 12 ảnh trên room_v3: quai bắt đầu ở
+ĐỈNH VAI, qua ngực nằm trên áo (có khóa điều chỉnh), túi sau lưng chỉ lộ
+mép trên sau vai + hai bên vai/hông; bản vẫy quai bên tay giơ vẫn trên vai.
+Phóng 3× nền xám 128: không lỗ alpha, không halo, không chấm đen (chấm đen
+còn lại là hạt dither rời rạc, cụm lớn nhất 7–8 px). Claude DUYỆT ảnh ghép
+xem trước 21/11 ~18:28 rồi mới đẩy.
+
+### Caveat
+- Đổi nghỉ → đeo-balo sẽ nhấp shading nhẹ (như caveat biến thể wave lô
+  1/2), ở cỡ điện thoại khó nhận ra.
