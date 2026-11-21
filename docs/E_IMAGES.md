@@ -935,3 +935,35 @@ nhân vật/UI vẫn MAXCOVERAGE như các lô trước. Biển gỗ vẽ lại 
 `e7d19a88` (thẻ được chọn, 1 file); đầu nhánh `e7d19a88`.
 15/17 blob SHA đối chiếu khớp trên nhánh; 2 nền (splash bg, onboarding bg) không tải lại
 được (giới hạn tool với file ≳400 KB) — cùng commit `10c90860` với 6 file đã xác minh.
+
+# Cửa hàng + đồ cho pet — (F) lô 7: shop v3b (9 file)
+
+Phong cách 3D mềm pastel như nhân vật (E) + phòng v3b + thị trấn v3b + UI lô 6.
+KHÔNG có chữ trên ảnh (app tự vẽ chữ tiếng Việt). PNG trong suốt, alpha sạch
+(semi 0,0000), không bóng đổ nền (app tự vẽ bóng) — trừ `shop_bg.png` là nền đục.
+
+## Bảng 9 file
+
+| file | kích thước | bytes | đích | ghi chú |
+|---|---|---|---|---|
+| shop_bg.png | 1600×900 | 552.506 | app/assets/images/backgrounds/ | Nền đục, kệ gỗ 2 rìa, giữa/dưới trống sáng (độ sáng giữa 210,5, đáy-giữa 225,3); MEDIANCUT |
+| pet_food_bone.png | 512×512 | 104.625 | app/assets/images/items/ | Bánh xương nâu vàng |
+| pet_food_fish.png | 512×512 | 192.615 | app/assets/images/items/ | Cá nướng nhỏ vàng nâu, đứng dọc |
+| pet_food_carrot.png | 512×512 | 87.680 | app/assets/images/items/ | Cà rốt cam, lá xanh |
+| pet_toy_ball.png | 512×512 | 109.940 | app/assets/images/items/ | Bóng sọc pastel |
+| pet_toy_yarn.png | 512×512 | 174.788 | app/assets/images/items/ | Cuộn len hồng, sợi thò ra còn nguyên |
+| pet_toy_plush.png | 512×512 | 175.296 | app/assets/images/items/ | Gấu bông mini kem + nơ hồng |
+| ui_icon_clothes.png | 256×256 | 37.911 | app/assets/images/ui/ | Nút kẹo hồng, áo trắng; cùng bộ nút lô 6 |
+| ui_icon_pet_items.png | 256×256 | 36.868 | app/assets/images/ui/ | Nút kẹo vàng cam, bát thức ăn pet trắng |
+
+Tổng PNG 1.472.229 B. Tách nền bằng khoảng cách RGB tới màu nền magenta từng file
+(ngưỡng 50) + despill viền (thay pixel viền lẫn nền bằng màu pixel trong kề);
+magenta còn sót theo ngưỡng chặt (< 60) chỉ 0–8 px/file; 0 px bóng đổ nướng sẵn.
+Nốt nhỏ: cá đứng dọc; viền hồng rất mờ còn lại ở mép gấu bông khi soi 2–3× trên
+nền trắng (ở cỡ app không thấy).
+
+Đẩy 9 `.b64` lên nhánh `task/E-nhan-vat-v3b` sau khi duyệt (2 lần, 8+1 file):
+`27fb3846` (6 món pet + 2 icon tab, 8 file), `f03322ae` (shop_bg, 1 file);
+đầu nhánh `f03322ae`. 8/9 blob SHA đối chiếu khớp trên nhánh; shop_bg không tải lại
+được (giới hạn tool với file ≳400 KB) — một mình trong commit `f03322ae`,
+blob SHA local `d4976e65f25f`, SHA-256 local `aa1f6210f75d`.
