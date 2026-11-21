@@ -44,8 +44,8 @@ Các điểm dưới đây ghi đè mọi chỗ nói khác trong kế hoạch.
 
 | Mã | Câu hỏi | Chốt |
 | --- | --- | --- |
-| a | "Dạng bài" là gì | Dạng bài = một `form` trong `gen.py`: 48 generator. Mỗi generator khai báo các mức nó hỗ trợ và chỉ sinh câu ở các mức đó. Không tự soạn thêm mức mới trong T1-05; việc bổ sung mức là nhiệm vụ nội dung riêng của Claude. |
-| b | Dạng không có mức Khó thì thành thạo thế nào | Thành thạo = đúng ngay lần đầu 4 trong 5 câu gần nhất ở mức cao nhất mà dạng hỗ trợ, và không thấp hơn mức Vừa nếu dạng có mức Vừa. Như vậy cả 48 dạng đều thành thạo được. |
+| a | "Dạng bài" là gì | Dạng bài = một `form` trong `gen.py`: 48 generator (lúc chốt T1-05; hiện app có **84 dạng**: thêm 24 dạng TIMO lớp 2 và 12 dạng đợt 3 — xem `question_registry.dart`, `tools/question_bank/TIMO3_FORMS.md`). Mỗi generator khai báo các mức nó hỗ trợ và chỉ sinh câu ở các mức đó. Không tự soạn thêm mức mới trong T1-05; việc bổ sung mức là nhiệm vụ nội dung riêng của Claude. |
+| b | Dạng không có mức Khó thì thành thạo thế nào | Thành thạo = đúng ngay lần đầu 4 trong 5 câu gần nhất ở mức cao nhất mà dạng hỗ trợ, và không thấp hơn mức Vừa nếu dạng có mức Vừa. Như vậy mọi dạng (48 lúc đó, nay 84) đều thành thạo được. |
 | c | Khoảng xu và thứ tự nhân thưởng | Thứ tự: xu gốc theo bậc, rồi chia đôi làm tròn lên nếu đúng sau gợi ý, rồi nhân đôi nếu là câu ôn tập. Test nghiệm thu T1-11: bé ở bậc 3-4, sổ ôn tập trống, đúng ngay hết 25 câu, tổng phải là 120 xu. Giữ khoảng 100-130 là mục tiêu thiết kế, không phải tiêu chí test cho mọi trường hợp. |
 | d | Nghiệm thu T1-05 cho câu trắc nghiệm chọn | Với dạng `choiceOnly` (compare, weekday, parityrule): chỉ số đáp án hợp lệ, 4 lựa chọn khác nhau (hoặc đủ số lựa chọn của dạng), lựa chọn đúng khớp với hàm giải độc lập, cả VI và EN. Các kiểm tra "số dương" và "3 đáp án nhiễu" chỉ áp dụng cho câu điền số. |
 | e | Bảng dữ liệu | T1-04 tạo 7 bảng như ghi. `inventory` tạo ở T2-05, `pets` ở T2-07 (bằng migration). `families`, `messages`, `custom_questions`, `content_packs` thuộc bản 0.3 và 0.5. Ngoại lệ cột: `children` không có `child_id` (có `family_id` để trống tới bản 0.3); `settings` có `child_id` để trống cho cài đặt chung. |
@@ -194,10 +194,14 @@ Kết quả của bản 0.2 là bé tạo nhân vật, ấp trứng, có phòng 
 
 ### T2-02 Vẽ nhân vật theo lớp
 
+> **Hiện trạng (21/11):** `CharacterView` ghép lớp đã thành legacy; app vẽ nhân vật bằng ảnh toàn thân qua `KidSprite` (`app/lib/features/character/kid_sprite.dart`). Xem `docs/ASSETS.md` mục "Nhân vật toàn thân (hiện hành)". Phần dưới giữ làm kế hoạch gốc.
+
 - **Làm:** widget `CharacterView` chồng các lớp theo thứ tự trong bản thiết kế, tô màu lớp xám bằng phép nhân màu (multiply) rồi đặt lớp `_line` lên trên. Dùng chung cho màn tạo nhân vật, phòng và tủ đồ. Hiệu ứng thở nhẹ và chớp mắt bằng animation đơn giản.
 - **Nghiệm thu:** golden test với 3 bộ phối đồ và 3 bảng màu. Vẽ một nhân vật đủ lớp dưới 16 ms trên máy ảo tầm trung.
 
 ### T2-03 Mở đầu: tạo nhân vật và chọn trứng
+
+> **Hiện trạng (21/11):** màn mở đầu có **4 bước cho cả nam và nữ**: giới tính, bộ đồ (3 bộ), đặt tên, chọn trứng (`_girlStepKeys` trong `onboarding_screen.dart`). Không còn chọn màu da, tóc, mắt, miệng. Phần dưới giữ làm kế hoạch gốc.
 
 - **Làm:** lần đầu mở app: chọn giới tính, màu da, kiểu và màu tóc, kiểu và màu mắt, kiểu miệng, đặt tên (tối đa 12 ký tự, không bắt buộc dấu). Sau đó chọn 1 trong 3 trứng: Chó Tinh Anh, Mèo Mũm Mĩm, Thỏ Bánh Bao. Trứng nở khi bé xong chặng đầu tiên, có hiệu ứng nở.
 - **Nghiệm thu:** integration test đi hết luồng mở đầu đến khi trứng nở, chụp màn hình từng bước. Đổi ý ở bước nào cũng quay lại được.
@@ -218,6 +222,8 @@ Kết quả của bản 0.2 là bé tạo nhân vật, ấp trứng, có phòng 
 - **Nghiệm thu:** unit test không để số dư âm, không mua trùng món đã có.
 
 ### T2-07 Pet lớn theo giai đoạn
+
+> **Hiện trạng (21/11):** pet lớn theo số ngày xong trọn đề ngày (mới nở 0–2, nhỡ 3–7, lớn từ 8), cỡ 30/40/58/72% chiều cao nhân vật — `app/lib/features/room/pet_growth.dart`; không dùng ngưỡng "thành thạo 10/30 dạng" ghi dưới.
 
 - **Làm:** pet có 3 giai đoạn: mới nở, nhỡ (bé thành thạo 10 dạng bài), lớn (30 dạng). Lên giai đoạn có hiệu ứng chúc mừng. Cho ăn và chơi chỉ để vui, không có trạng thái đói, ốm hay buồn. Bé có nhiều pet thì chọn một con đi theo trong phòng.
 - **Nghiệm thu:** unit test ngưỡng lên giai đoạn; kiểm tra bằng menu QA.

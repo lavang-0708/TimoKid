@@ -1,7 +1,15 @@
 # Hình trong app (hợp đồng nạp hình)
 
 Tài liệu này là **hợp đồng** cho mọi hình đưa vào app từ bản 0.2: tên lớp,
-thứ tự chồng, khung, cách đặt tên, cách đổi màu. Người cắt/vẽ hình làm
+thứ tự chồng, khung, cách đặt tên, cách đổi màu.
+
+> **Cập nhật 21/11 (sau PR #34):** nhân vật trong app hiện là **ảnh toàn
+> thân** (mục "Nhân vật toàn thân (hiện hành)" ngay dưới). Hệ nhân vật
+> chồng lớp cũ (`CharacterView`, các lớp `hair_back`/`body`/`top`…, bộ
+> `girlSet1`) chỉ còn là **legacy**: mục "Thứ tự lớp" và "Bộ nhân vật nữ 1"
+> bên dưới được giữ làm lịch sử + hợp đồng cho `kind: character_layer`
+> (file vẫn còn trên repo và vẫn được test cũ dùng), app không còn vẽ
+> nhân vật bằng cách đó. Người cắt/vẽ hình làm
 theo đúng tài liệu này; script `tools/assets/check_assets.py` kiểm tra
 tự động theo cùng các quy tắc (và chạy trong CI).
 
@@ -21,7 +29,80 @@ xem `docs/DESIGN.md` mục "Hướng dẫn vẽ cho họa sĩ".
 | `tools/assets/decode_incoming.py` | Giải mã ảnh Muse đẩy dạng base64 (xem "Đường đưa ảnh lên repo"). |
 | `app/test/assets_manifest_test.dart` | Test Dart gọi script kiểm tra trong lúc chạy `flutter test` (để CI kiểm tra mà không cần sửa workflow). |
 
-## Thứ tự lớp, từ dưới lên
+## Nhân vật toàn thân (hiện hành, E — 21/11)
+
+Mã nguồn: `app/lib/features/character/kid_assets.dart` (đường dẫn, bảng
+mã, miếng vá mắt), `kid_sprite.dart` (widget `KidSprite`),
+`kid_look_service.dart` (lưu lựa chọn trang phục). Hình do Muse vẽ, nhật ký
+từng lô ở `docs/E_IMAGES.md`.
+
+- **Một nhân vật duy nhất**: bé chọn gái (`girl`) hoặc trai (`boy`) ở màn
+  mở đầu. Giá trị lạ coi như `girl` (`kidGender`).
+- **Ảnh toàn thân**: mỗi dáng 3 bộ đồ (`kidOutfitIds`: `girl_top_01–03`,
+  `boy_outfit_01–03`; số bộ 1–3 lấy từ đuôi mã trong
+  `CharacterProfile.dress`, `kidOutfitNumber`, null/mã lạ về bộ 1) × 2
+  dáng (nghỉ, vẫy tay). PNG trong suốt khung **1024 x 1536**
+  (`kidFrameWidth`/`kidFrameHeight`); chân ở y = 1429 (`kidFeetY`), người
+  cao 1287 px (`kidBodyHeight`) ở mọi ảnh. Tên file:
+  `<dáng>_full_0<bộ>[_wave][_backpack].png`
+  (`kidFullAsset`), thư mục `app/assets/images/character/<dáng>/`;
+  `kind: character_full` trong manifest.
+- **Balo = biến thể ảnh toàn thân** `..._backpack` (Muse vẽ cả người đeo
+  balo vì balo lớp rời không khớp người), KHÔNG phải lớp phủ. Có cả bản
+  vẫy (`_wave_backpack`). Lớp balo rời `*_backpack_01` của lô 3 đã bị thay hẳn
+  (không còn file trong `app/assets/images/character/` và không có trong
+  code), dù `NAME_PATTERNS` của script còn nhận tên đó.
+- **Mắt nhắm (chớp mắt)**: một miếng vá PNG đặt đè lên ảnh khi chớp
+  (~0,25 giây mỗi ~3,6 giây), rect tính theo khung 1024x1536
+  (`kidEyePatch`). Bé gái: một patch dùng chung cả 6 ảnh
+  (`girl_eyes_closed_patch.png`, rect 300,490,410x140). Bé trai: patch
+  chung cho 3 ảnh nghỉ (`boy_eyes_closed_patch.png`, rect 291,506,432x205);
+  mỗi ảnh vẫy một patch riêng (`boy_eyes_closed_patch_0<bộ>_wave.png`,
+  rect riêng: 297,493,427x245 / 280,502,441x243 / 295,495,432x250) vì đầu
+  vẽ lại lệch vài px. `kind: character_patch`.
+- **Phụ kiện đầu** (lớp phủ cùng khung, `kidHeadAccessories`): mã `hat`
+  (gái `girl_hat_01` mũ beret, trai `boy_hat_01` mũ lưỡi trai) và `bow`
+  (gái `girl_bow_01` nơ cài tóc, trai `boy_clip_01` kẹp tóc ngôi sao).
+  Chỉ đeo một phụ kiện đầu; lưu ở `settings` khóa `kid_head_accessory`.
+- **Lớp phủ khác** (cùng khung, khớp cả ảnh nghỉ và vẫy): kính tròn
+  `<dáng>_glasses_01` (khóa `kid_glasses`) và giày trắng `<dáng>_shoes_02`
+  thay giày màu của bộ đồ (khóa `kid_white_shoes`). Balo lưu ở khóa
+  `kid_backpack`. Tất cả do `KidLookService` đọc/ghi theo từng bé; bộ đồ
+  đổi qua `setOutfit` (ghi lại `CharacterProfile.dress`).
+- **Khung đi bộ**: mỗi bộ đồ 2 hướng × 4 khung (`kidWalkFrames`):
+  `<dáng>_full_0<bộ>_walk_(dr|ur)_(a|b|c|d).png`; `dr` = đi xuống/ngang,
+  `ur` = đi lên (xa dần), vẽ hướng phải, app lật ngang khi đi sang trái
+  (`facingLeft`). Cả gái và trai đều có (`kidGendersWithWalkFrames`). Mỗi
+  khung là một ảnh toàn thân hoàn chỉnh; đổi khung theo chu kỳ 600 ms.
+  **Chỉ dùng khung đi bộ khi bé KHÔNG đeo gì thêm** (không kính, không giày
+  trắng, không balo, không phụ kiện đầu): lớp phủ vẽ theo dáng đứng nên đặt
+  lên khung đi bộ sẽ lệch (mắt-x lệch, xem `docs/E_IMAGES.md` lô 4). Đang
+  đeo bất cứ món nào thì khi đi app dùng ảnh đứng + nhún bước (nảy + nghiêng
+  nhẹ). Khi dùng khung đi bộ thì không chớp mắt và không vẽ lớp phủ.
+- **`KidSprite`**: thở nhẹ quanh chân (chân không rời đất), chớp mắt, vẫy
+  tay (`waving`), đi bộ, lật hướng; hiệu ứng lặp tắt bằng `AnimationGate`
+  khi chạy test. Dùng ở Phòng, Thị trấn, màn mở đầu và Tủ đồ.
+- **Kích thước trong Phòng**: người cao 360 px khung nền (hộp cao
+  `1536 × 360 / 1287` ≈ 430 px, nhân tỉ lệ chiều sâu); xem mục "Đi lại
+  trong Phòng" bên dưới.
+- Quy tắc kiểm của script: `kind: character_full` (khung 1024x1536, tên
+  theo `NAME_PATTERNS["character_full"]`) và `character_patch` (không kiểm
+  khung); xem `tools/assets/check_assets.py`.
+
+### Legacy: hệ nhân vật chồng lớp (T2-02, bộ nữ 1)
+
+Các mục "Thứ tự lớp", "Đổi màu (lớp xám) và file `_line`", "Bộ tóc…" và
+"Bộ nhân vật nữ 1" dưới đây mô tả hệ cũ: widget `CharacterView`
+(`app/lib/features/character/character_view.dart`) chồng lớp theo z trong
+manifest, nhân màu lớp xám; mô hình `CharacterOutfit` / `girlSet1` ở
+`character_model.dart`; lớp tạm xám cho bé trai ở `placeholder_layers.dart`.
+Hệ này đã bị thay vì cắt lớp làm vỡ hình. File code + ảnh lớp vẫn còn trên
+repo và các test cũ (`app/test/features/character/character_view_test.dart`,
+golden, fixtures) vẫn dùng — KHÔNG xóa khi chưa dọn cả test. Màn mở đầu chỉ
+còn import kiểu `CharacterLayerLoader` từ đó (tham số `previewLoader` của
+test); không còn chọn màu da/tóc/mắt/miệng.
+
+## Thứ tự lớp, từ dưới lên (legacy — hệ chồng lớp cũ)
 
 Khớp `docs/DESIGN.md` và các file khung `assets/templates/
 khung_nhan_vat_nu.svg`, `khung_nhan_vat_nam.svg` (mỗi khung có sẵn
@@ -72,7 +153,7 @@ Mã (`id`) của mỗi mục **trùng với tên file** (không tính đuôi):
 - Icon: `app/assets/images/icons/<tên>.svg` (icon cũ ở gốc
   `app/assets/images/` vẫn hợp lệ).
 
-## Đổi màu (lớp xám) và file `_line`
+## Đổi màu (lớp xám) và file `_line` (legacy — chỉ cho `character_layer`)
 
 - Phần cần đổi màu (da, tóc, mắt, miệng, vải quần áo) tô **một màu xám
   sáng duy nhất**, bóng đổ dùng xám đậm hơn. App nhân màu lên lớp xám
@@ -110,6 +191,12 @@ Mã (`id`) của mỗi mục **trùng với tên file** (không tính đuôi):
   chuỗi "TBD".
 
 ## Lô hình đầu tiên (đã liệt kê trong manifest)
+
+> Danh sách dưới là lô khai báo ban đầu (19/11), giữ làm lịch sử. Hiện
+> trạng manifest (21/11, 192 mục): cả **12 pet** (3 trứng + 3 mới nở + 3
+> nhỡ + 3 lớn) đã `ready`; nhân vật dùng `character_full` (80 mục `ready`)
+> + `character_patch` (5) thay cho các mục `character_layer` dáng nam/nữ
+> còn `planned` (48 mục, không còn kế hoạch vẽ).
 
 - **Dáng nữ** (29 mục, `planned`): thân ×1 (+ viền), mắt ×3 (+ viền),
   miệng ×3 (+ viền), tóc ×3 kiểu (sau + trước), áo ×3, quần/váy ×2,
@@ -173,7 +260,7 @@ flutter test test/assets_manifest_test.dart
 
 `.github/workflows/ci.yml` chạy `python3 tools/assets/check_assets.py` và `python3 tools/assets/check_assets_test.py` ngay sau bước "Câu hỏi mẫu (check.py)" (Claude thêm ngày 19/11). Test Dart `app/test/assets_manifest_test.dart` giữ làm kiểm tra dự phòng khi chạy `flutter test` ở local.
 
-## Bộ nhân vật nữ 1 (Claude ghép, 19/11)
+## Bộ nhân vật nữ 1 (Claude ghép, 19/11) — legacy
 
 Chủ dự án đã duyệt bản xem trước ngày 19/11. Bộ này cắt nguyên cô bé chính trên `girl_character_sheet` thay cho cách vẽ lại từng lớp (các bản vẽ lại v1–v5 và v3b đều chưa đạt phong cách).
 
@@ -405,52 +492,43 @@ sau nên thắng tap ở vùng chồng, đúng vì tháp ở trước).
 Nhà hồng không phải khu toán: bấm vào thì về Phòng
 (`town-room-house-button`).
 
-### Đường đi D1–D6 (khung nền 1600x900)
+### Đường đi C1/C2 (khung nền 1600x900)
 
-Khai báo trong `app/lib/features/town/town_roads.dart` (đo từ nền
-thật, gần đúng ±40 px — kiểm bằng test rồi hiệu chỉnh theo ảnh
-nếu lệch). Nửa rộng vùng đường 50 px (mặt đường + vỉa hè); xe chạy
-GIỮA làn, người đi trên vỉa hè (lệch tâm 25 px sang phía nam
-đường, tức phía dưới màn hình).
+Khai báo trong `app/lib/features/town/town_roads.dart` (`townRoads`).
+Nền `town_v3.png` chỉ có **hai đường chéo cắt nhau ở ngã tư lớn
+(~(1090, 650))**, nên app dùng đúng hai đoạn đường thẳng, đo từ mặt
+nhựa thật của nền (nửa rộng mặt nhựa ~32 px + vỉa hè ~28 px). Bộ 6
+đoạn D1–D6 từng khai báo ở PR #31 (và còn trong nhật ký
+`docs/C_IMAGES.md`) **đã bị thay** vì D1/D3/D5 lệch 40–100 px so với
+đường thật.
 
-- D1 ↙: (865, 125) → (600, 210) → (300, 360) → (0, 480).
-- D2 ↘: (865, 125) → (994, 180) → (1077, 210) → (1221, 270) →
-  (1320, 320) → (1385, 340) → (1420, 360) → (1434, 380) →
-  (1532, 400) → (1600, 430).
+- **C1** ↘ (chéo xuống-phải): (700, 459) → (1600, 904) — từ giữa Tiệm
+  bánh/Tháp qua ngã tư lớn ra mép phải dưới.
+- **C2** ↗ (chéo lên-phải): (770, 810) → (1560, 416) — từ ngã ba dưới
+  qua ngã tư lớn lên mép phải giữa.
+- Nửa rộng vùng đường `townRoadHalfWidth` = 60 px (mặt đường +
+  vỉa hè; hàm `isOnRoad`). Người đi bộ lệch khỏi tâm đường
+  `townSidewalkOffset` = 46 px sang phía nam (pháp tuyến có y > 0,
+  tức phía dưới màn hình, `sidewalkPoint`).
 
-Vòng sửa PR #31 (21/11): D2 cũ (880, 70) → (1120, 220) →
-(1420, 380) → (1600, 470) là đoạn thẳng cắt qua khối lều Hội chợ
-— xe hồng ở t = 0 nằm trên cỏ (990, 90). D2 mới đo lại tâm làn thật
-từ nền (quét điểm ảnh nhựa + xem ảnh phóng to có lưới 50 px): ngã
-giao D1×D2 dời về đúng tâm làn (865, 125) (điểm cũ (880, 70) nằm
-trên cỏ, trên vạch sang đường); D2 uốn theo đường nhựa thật — qua
-phải tháp Con số, giữa lều và vòng quay Hội chợ, ra mép phải ở
-y ≈ 430. D1 và D3 còn lệch ~40–100 px so với đường nhựa thật
-(đo bằng code: D1 chỉ 14% điểm mẫu nằm trên nhựa, D3 26%; D4/D5/D6
-77–87%) — chưa đo lại trong vòng này, để việc còn lại; xe chạy
-trên D1/D3 có thể hơi lệch tâm làn nhưng không cắt qua công trình
-(khóa bằng test rect chân công trình dưới đây).
-- D3 ↙: (720, 450) → (550, 560) → (250, 710) → (0, 830).
-- D4 ↘: (720, 450) → (880, 550) → (1090, 650) → (1400, 800) →
-  (1500, 850).
-- D5 ↙: (1400, 480) → (1250, 570) → (1100, 650) → (900, 750) →
-  (700, 850).
-- D6 ↘: (1150, 680) → (1300, 760) → (1500, 850) → (1600, 900).
+Tuyến xe/người (tới-lui ping-pong; tọa độ tâm chân/bánh):
 
-Ngã giao: D1×D2 (865, 125); D3×D4 (720, 450); D4×D5 (1100, 650);
-D5×D6 (1300, 760).
+| Ai | Tuyến (`town_roads.dart`) | Bám đường | Lệch |
+| --- | --- | --- | --- |
+| Xe 1 (hồng) `car1Route` | (774, 511) ↔ (1524, 882) | C1 | làn phía nam, cách tâm C1 ~14 px |
+| Xe 2 (xanh nhạt) `car2Route` | (856, 783) ↔ (1536, 443) | C2 | làn phía nam, cách tâm C2 ~14 px |
+| Người 1 (bé gái) `walker1Route` | (820, 785) ↔ (1250, 570) | tâm C2 | vẽ lệch xuống vỉa hè 46 px |
+| Người 2 (bé trai) `walker2Route` | (1150, 681) ↔ (1540, 874) | tâm C1 | vẽ lệch xuống vỉa hè 46 px |
 
-Tuyến xe/người (tới-lui ping-pong trên các đoạn):
+Xe 1 đã đối chiếu từng điểm (mỗi 5 px) với mặt nhựa của `town_v3.png`:
+chỉ lệch ở vạch qua đường của ngã tư (chú thích `car1Route`). Tuyến
+được khóa bằng test `town_roads_test.dart` (điểm đầu/cuối từng tuyến,
+hướng ở t = 0, không cắt rect chân công trình).
 
-- Xe 1 (hồng): (0, 480) → (300, 360) → (600, 210) → (865, 125) →
-  (994, 180) → (1077, 210) → (1221, 270) → (1320, 320) →
-  (1385, 340) → (1420, 360) → (1434, 380) → (1532, 400) →
-  (1600, 430) — D1 ngược + D2 xuôi.
-- Xe 2 (xanh nhạt): (0, 830) → (250, 710) → (550, 560) →
-  (720, 450) → (880, 550) → (1090, 650) → (1400, 800) →
-  (1500, 850) — D3 ngược + D4 xuôi.
-- Người 1 (bé gái): dọc vỉa hè D3, (0, 830) → (720, 450).
-- Người 2 (bé trai): dọc vỉa hè D5, (1400, 480) → (700, 850).
+> Chú thích đầu file `town_roads.dart` và vài comment trong
+> `town_map.dart`/`townBuildingFootprints` vẫn nhắc "D1–D6", "nửa rộng
+> 50 px", "25 px" — là comment cũ chưa sửa; số thật là các hằng ở trên
+> (60 px, 46 px) và hai đoạn C1/C2.
 
 ### Rect chân công trình — test độc lập (vòng sửa PR #31)
 
@@ -465,9 +543,10 @@ trong rect chân công trình nào — `townBuildingFootprints` trong
 Rect chân công trình KHÁC vùng bấm (vùng bấm rộng, bao cả sân/vườn
 để bé bấm dễ — đường chạy dọc mép sân/vườn nên rect bấm sẽ báo
 sai). Rect chân chỉ lấy khối chính, có chừa chỗ ở chỗ đường chạy
-sát; **Hội chợ TÁCH THÀNH 2 rect (lều + bệ vòng quay)** vì đường D2
-chạy giữa hai khối — rect gộp cũ (1080, 5, 480, 375) bao cả đường
-nên test không bắt được lỗi. Vùng bấm Hội chợ KHÔNG đổi (vẫn một
+sát; **Hội chợ TÁCH THÀNH 2 rect (lều + bệ vòng quay)** — lúc viết,
+đường D2 (nay đã bỏ) chạy giữa hai khối; rect gộp cũ (1080, 5, 480,
+375) bao cả đường nên test không bắt được lỗi. Danh sách rect vẫn là
+`townBuildingFootprints`, nay kiểm với tuyến C1/C2. Vùng bấm Hội chợ KHÔNG đổi (vẫn một
 rect 1080, 5, 480, 375 — bấm vào đường giữa hai khối vẫn mở Hội
 chợ, chấp nhận được). Danh sách rect (khung 1600x900): lâu đài
 (230, 0, 390, 150); tháp trên (670, 5, 115, 100) + tháp đế
@@ -548,17 +627,17 @@ bảng hướng mặt — ai "sửa" map theo tên file thì test đỏ.
   cổng tắt thì vị trí tĩnh t = 0, không tạo controller nào; cổng
   bật thì vẽ lại mỗi khung qua `AnimatedBuilder` (vị trí tính
   trong builder từ giá trị controller hiện tại).
-- Vị trí ở t = 0 (khóa bằng test + golden; vị trí chân đã lệch
-  vỉa hè đối với người đi bộ): xe 1 giữa D2 (~(995, 180), hướng
-  ↘), xe 2 giữa D4 (~(804, 502), hướng ↘), người 1 giữa D3
-  (~(407, 659), hướng ↗, khung a), người 2 giữa D5 (~(1192, 629),
-  hướng ↙, khung a). Xe 1 dời từ (~(1000, 145)) ở vòng sửa PR #31
-  (D2 mới).
+- Vị trí ở t = 0 (tính từ `phase` trong `_actors` của `town_map.dart` +
+  tuyến ở trên; vị trí chân người đã lệch vỉa hè 46 px): xe 1 ~(1239, 741)
+  hướng ↘ trên C1; xe 2 ~(1223, 599) hướng ↗ trên C2; người 1
+  ~(1073, 710) hướng ↗, khung a; người 2 ~(1254, 784) hướng ↘, khung a.
+  Test khóa điểm đầu tuyến + hướng ở t = 0 (`town_roads_test.dart`:
+  xe 1 ↘, xe 2 ↗).
 - Test golden phải nạp trước nền + 17 lớp động bằng `runAsync` +
   `precacheImage` (mẫu `room_golden_test.dart` / A1) — không có
   bước này thì ảnh chụp thiếu nền/lớp động.
 
-## Phòng v3b (D, 21/11)
+## Phòng v3b (D, 21/11; đi lại (G) + nhân vật toàn thân + pet lớn dần đã vào code ở PR #34)
 
 Chủ dự án đã duyệt phòng v3b ngày 21/11 ~01:31: phòng LIỀN MỘT ẢNH
 như phòng 3D thật, cùng phối cảnh 1 điểm tụ, cùng nguồn sáng (nắng
@@ -606,12 +685,15 @@ neo, tỉ lệ, rect món trong nền) xem `docs/D_IMAGES.md`.
   Mặt giường y≈540–560 (x 155–760, gấu neo y = 550); mặt tủ đầu
   giường y≈580 (x 30–260, đèn neo y = 580); mặt bàn học y≈490–515
   (x 1070–1470, bình neo y = 510, cốc neo y = 515).
-- **Dấu chân trên sàn** (cho PR (G) — vùng đi được = đa giác sàn
-  trừ các dấu chân này): giường (155,645)-(760,700); bàn học
+- **Dấu chân trên sàn** (`roomObstacleFootprints`; PR (G) ĐÃ LÀM —
+  vùng đi được = đa giác sàn trừ các dấu chân này, xem mục "Đi lại
+  trong Phòng (G)" dưới): giường (155,645)-(760,700); bàn học
   (1070,645)-(1470,790); tủ quần áo (1460,645)-(1600,880); tủ đầu
   giường (30,700)-(260,800). Kệ sách gắn tường nên không có dấu
   chân riêng (hình chiếu xuống sàn trùng dấu chân bàn học).
-- **Ghế ở bàn học** (cho PR (G) — tương tác ngồi ghế): rect ghế
+- **Ghế ở bàn học** (`roomChairRect`/`roomChairSeat`; mới là hằng số
+  đo sẵn — **chưa có tương tác ngồi ghế** trong code, PR (G) chỉ làm đi
+  lại): rect ghế
   (970,490)-(1240,790); mặt ghế (1000,615)-(1210,660), tâm
   ≈ (1105,640).
 - **Mốc tỉ lệ** (đo từ ảnh thật, khung 1600x900): mặt trước giường
@@ -622,13 +704,74 @@ neo, tỉ lệ, rect món trong nền) xem `docs/D_IMAGES.md`.
   ≈ (745,787)); rèm trái x ≈460–580, rèm phải x ≈1080–1180,
   y 60–460; kệ mây x 60–220, y 200–300; khung ảnh x 230–310,
   y 180–320; đèn mây trần x 730–870, y 0–55.
-- **Nhân vật + pet**: nhân vật cao 360 px trong khung nền (chân tại
-  (630,810), hộp 284x425, chân ở 91,1% chiều cao hộp — ~2,25 lần
-  mặt trước giường, đúng cỡ so với giường/tủ/cửa sổ); pet chân tại
-  (420,810), hộp vuông 140 px (thân pet cao ~120 px). Cả hai đứng
-  trên thảm, trước giường, có bóng đổ. Art nhân vật/pet hiện tại
-  là tạm (nữ bộ girl thật PR #18, nam lớp tạm xám, pet PNG thật
-  PR #21) — (E)/(F) thay sau.
+- **Nhân vật + pet** (hiện hành, `room_screen.dart`): nhân vật là
+  `KidSprite` (ảnh toàn thân, xem "Nhân vật toàn thân"), cao 360 px
+  trong khung nền — hộp cao `1536 × 360 / 1287` ≈ 430 px, rộng ≈ 286 px,
+  chân ở `kidFeetFraction` (1429/1536) chiều cao hộp; chỗ đứng mặc định
+  `roomCharacterFeet` = (630, 810), ~2,25 lần mặt trước giường, đúng cỡ
+  so với giường/tủ/cửa sổ. Pet (trứng hoặc 3 giai đoạn, PNG thật PR #21)
+  chân mặc định (420, 810), hộp vuông `petBoxSize(stage)` (xem "Thang cỡ
+  pet" dưới), chân (đất y = 440/512) ở 440/512 chiều cao hộp. Cả hai
+  đứng trên thảm, trước giường, có bóng đổ, và nhân thêm tỉ lệ chiều sâu
+  (`roomDepthScale`). Các hằng `roomCharacterBox` (284x425) và
+  `roomPetBox` (140x140) trong `room_assets.dart` là cỡ cũ của bản tạm,
+  chưa dọn và không còn quyết định cỡ vẽ.
+
+### Thang cỡ pet (F, `app/lib/features/room/pet_growth.dart`)
+
+Chiều cao thân pet tính theo tỉ lệ so với nhân vật (360 px khung Phòng,
+`petHeightRatio`); ảnh pet 512x512 có thân cao 400 px (y 40–440) ở mọi
+giai đoạn nên hộp vẽ = chiều cao thân × 512/400 (`petBoxSize`).
+
+| Giai đoạn (`PetStage`) | Tỉ lệ | Chiều cao thân | Hộp vẽ | Khi nào |
+| --- | --- | --- | --- | --- |
+| Trứng `egg` | 30% | 108 px | ~138 px | chưa nở |
+| Mới nở `newborn` | 40% | 144 px | ~184 px | 0–2 ngày xong đề |
+| Tuổi nhỡ `teen` | 58% | ~209 px | ~267 px | 3–7 ngày |
+| Trưởng thành `adult` | 72% | ~259 px | ~332 px | từ 8 ngày |
+
+- Tăng trưởng theo **số ngày bé xong TRỌN đề ngày** (đủ 5 chặng, đếm
+  thẳng từ bảng `daily_sets` bằng `PetGrowthService.doneDays`;
+  `petTeenDays` = 3, `petAdultDays` = 8), KHÔNG theo số dạng bài thành
+  thạo như bản thiết kế đầu (DESIGN/PLAN T2-07).
+- Nhỡ 58% là cỡ chủ dự án chốt "tạm thời để vậy xem sao". Bảng 33/43/58/69%
+  trong `docs/E_IMAGES.md` là đề xuất của giai đoạn vẽ, đã bị thay bằng
+  bảng này. Mã tên giai đoạn: `egg`/`newborn`/`teen`/`adult` (khớp tên
+  file `<loài>_<giai đoạn>.png`).
+
+### Đi lại trong Phòng (G, `app/lib/features/room/room_walk.dart`)
+
+ĐÃ LÀM (PR #34). Logic thuần, test ở `app/test/features/room/
+room_walk_test.dart`; `room_screen.dart` chỉ gọi `roomWalkTarget` /
+`roomWalkPath` / `roomPetFollowSpot` và chạy animation.
+
+- **Vùng đi được**: đa giác sàn `roomFloorPolygon` trừ dấu chân đồ đạc
+  `roomObstacleFootprints` (giường, bàn học, tủ quần áo, tủ đầu giường)
+  **phình ra** `roomWalkMargin` = 14 px; chân y giới hạn trong
+  [`roomWalkMinY` = 668, `roomWalkMaxY` = 880]; x cách mép ≥ 14 px; điểm
+  phải nằm trong sàn khi dịch lên 14 px (`roomWalkable`).
+- **Chạm đâu đi đó** (`roomWalkTarget`): chạm vào chỗ đứng được thì đi
+  tới đúng đó; chạm tường/giường/đồ thì dò XUỐNG dần (bước 4 px) tới chỗ
+  đứng được đầu tiên (nghĩa là đứng trước món đó), không được thì dò
+  ngang hai phía, cuối cùng về chỗ mặc định.
+- **Đường đi** (`roomWalkPath`): đi thẳng nếu đoạn không bị chặn; bị chặn
+  thì vòng: đi xuống một hàng y (bước 6 px, tới `roomWalkMaxY`), đi ngang,
+  rồi đi lên tới đích. Kiểm chặn bằng giao đoạn–hình chữ nhật CHÍNH XÁC
+  (Liang–Barsky) với từng dấu chân đã phình, không lấy mẫu (lấy mẫu lọt
+  góc); vùng sàn là hình lồi nên chỉ cần hai đầu mút đứng được.
+- **Tỉ lệ chiều sâu** (`roomDepthScale`): `1 + (y − 810) × 0,0016`, kẹp
+  trong [0,72; 1,12]; y = 810 đúng cỡ gốc, xa (y nhỏ) nhỏ dần. Nhân vật và
+  pet vẽ theo chân y (xa trước, gần sau) nên ai đứng trước che đúng.
+- **Tốc độ**: nhân vật `roomWalkSpeed` = 300 px khung/giây; pet 1,15 lần.
+  Hướng đi sang trái thì lật ngang (`facingLeft`); đi lên rõ rệt
+  (độ dốc > 0,35) thì dùng khung đi bộ `ur`.
+- **Pet theo sau** (`roomPetFollowSpot`): đứng sau lưng bé (ngược hướng
+  mặt) cách ~150 px, +6 px y; không đứng được thì thử phía trước, rồi về
+  chỗ gần nhất. Pet bắt đầu đi sau bé 350 ms, tới nơi thì quay mặt về phía
+  bé. Chỉ theo khi đã nở (trứng đứng yên).
+- Khi chạy test (`AnimationGate` tắt) nhân vật tới nơi ngay, không animation.
+- CHƯA làm: ngồi ghế ở bàn học (xem `roomChairSeat` ở trên).
+
 - **Kiểm chứng bằng code** (bài học PR #31 — xem `docs/D_IMAGES.md`
   mục 8): mọi điểm neo/đa giác/dấu chân đã kiểm bằng code trên ảnh
   nền thật (mẫu màu pixel + alpha bbox PNG riêng), không tin mắt.
@@ -640,7 +783,7 @@ neo, tỉ lệ, rect món trong nền) xem `docs/D_IMAGES.md`.
   khóa lại: điểm neo trên mặt phẳng đúng, rect hiển thị phủ khít
   món trong nền (dung sai 2 px), chân nhân vật/pet trên sàn, dấu
   chân chạm sàn.
-- **Manifest**: thêm 6 mục v3b (nền + 5 món) → 107 mục;
+- **Manifest**: thêm 6 mục v3b (nền + 5 món) → 107 mục lúc đó (nay 192, sau các lô nhân vật toàn thân);
   `check_assets.py` xanh. File + mục manifest v2 (`room_v2.png` +
   8 món, không dùng nữa) GIỮ NGUYÊN như tiền lệ `town_v2.png`
   (xóa mục khi file còn sẽ làm check fail); Claude có thể `git rm`

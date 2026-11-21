@@ -26,7 +26,7 @@ thì không mở.
   (n/3), ngày hỏi lại, mục nào đã đến hạn.
 - **20 lượt trả lời gần nhất** — mới nhất trước: dạng bài, mức, bậc,
   đúng ngay hay chưa, có phải câu ôn tập không, giờ làm.
-- **Xem thử dạng bài** — chọn 1 trong 48 dạng + mức nó hỗ trợ, bấm
+- **Xem thử dạng bài** — chọn 1 trong 84 dạng + mức nó hỗ trợ, bấm
   "Sinh câu" để xem đề song ngữ, hình (nếu có), đáp án đúng, gợi ý và
   lời giải. Chỉ sinh để xem: không ghi lượt trả lời, không động vào
   bậc/thành thạo/sổ ôn tập. "Câu khác" sinh câu mới cùng dạng/mức.

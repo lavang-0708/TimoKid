@@ -18,7 +18,7 @@ App Android giúp bé lớp 2 ôn thi Olympic Toán TIMO bằng cách giải to�
 
 ## Ngân hàng câu hỏi
 
-267 câu mẫu, 48 dạng bài (`form`), 5 mảng TIMO, song ngữ Việt – Anh. Kiểm tra độc lập:
+App sinh câu từ **84 dạng bài** (`form`) ở 5 mảng TIMO (lôgic 18, số học 15, lý thuyết số 17, hình học 17, tổ hợp 17; xem `app/lib/features/questions/question_registry.dart` và `tools/question_bank/TIMO3_FORMS.md`), song ngữ Việt – Anh. Bộ mẫu `tools/question_bank/questions.json` có 267 câu của 48 dạng gốc trong `gen.py`; `questions_timo2.json` có thêm mẫu của các dạng TIMO lớp 2. Kiểm tra độc lập bộ mẫu gốc:
 
 ```sh
 python3 tools/question_bank/check.py
