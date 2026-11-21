@@ -86,7 +86,7 @@ thấy.
 
 - Tâm mống mắt: trái **(388, 562)**, phải **(619, 559)** — tâm giữa
   hai mắt (504, 561). **Không** dùng mốc cũ y = 480 của bộ xám tạm.
-- Miệng cười: tâm **(517, 835)**.
+- Miệng cười: tâm **(517, 835)**. (Đính chính 21/11: miệng cười thật là (519,651); (517,835) là nơ ngực — xem mục lô 4 bé gái)
 - Chân neo: y = **1429** (đáy giày); bbox toàn thân cao 1287 px
   (y 142–1429). Trong phòng v3b: cao hiển thị **360 px, chân
   (630, 810)** theo `docs/D_IMAGES.md`.
@@ -744,3 +744,61 @@ xem trước 21/11 ~18:28 rồi mới đẩy.
 ### Caveat
 - Đổi nghỉ → đeo-balo sẽ nhấp shading nhẹ (như caveat biến thể wave lô
   1/2), ở cỡ điện thoại khó nhận ra.
+
+# (E) lô 4 — khung đi bộ bé gái (24 khung, 3 bộ × 2 hướng × 4 bước)
+
+Lô 4 làm khung đi bộ cho PR (G): mỗi bộ 2 hướng (dr xuống-phải, ur lên-phải,
+nghiêng 3/4) × 4 bước (a/b/c/d), mỗi khung MỘT ảnh toàn thân hoàn chỉnh
+1024×1536 PNG trong suốt, cùng phong cách 3D mềm, sáng trên-trái.
+Hướng trái app lật ngang nên không vẽ. Đẩy 3 lần × 8 file theo bộ
+(02: b584043a, 01: b43ed907, 03: 3d8559f0), .b64 4,15 / 4,28 / 5,02 MB.
+
+## Cách làm
+- Khung đầu mỗi hướng/bộ sửa mới từ ảnh nghỉ, các khung sau resume từ
+  snapshot khung trước — nhưng snapshot hết hạn sau ~1–2 giờ nên mọi lần
+  vẽ lại đều sửa mới từ ảnh nghỉ + kiểm ngay từng khung.
+- Prompt khóa đầu: "giữ đầu/tóc/mặt đúng vị trí, cỡ, chiều cao như ảnh gốc;
+  mắt cùng cao độ; không nâng đầu, không ngửa đầu, không phóng to đầu;
+  đầu không di chuyển, chỉ chân/tay đổi". Hướng ur: "nhìn hơi lên BẰNG MẮT,
+  đầu giữ ngang" (chữ "nhìn lên" làm máy nâng cả đầu 35–102 px).
+- Khung b/d: "chân lướt nhấc khỏi đất, vung TỚI TRƯỚC qua chân chống, gối
+  cong về trước, mũi chúc xuống-trước; không đá sau, không quá gối chân
+  chống; tay đánh ngược pha, khuỷu hơi cong, không chỉ thẳng".
+- Khung: tâm bbox ngang → x=512, chân y=1429, mắt-y 556–566 (co dọc ky
+  kẹp [0,97; 1,03]). KHÔNG căn mắt-x về 504: mặt 3/4 làm mắt nằm phải
+  576–724, ép về 504 cắt tóc trái ở mép khung (bài học vòng 1).
+- Mắt đo bằng detector gom cụm tròng xanh + lọc vùng đầu y 420–680
+  (nơ/cúc váy tím y~708–739 từng bị gom nhầm thành "mắt", làm ky sai 3%).
+  Miệng đo bằng code không tin được trên mặt 3/4 (bắt nhầm nơ ngực y~716)
+  — kiểm bằng mắt.
+
+## Đính chính mốc miệng (21/11)
+Miệng cười thật bé gái là (519, 651), KHÔNG phải (517, 835) như mục lô 1/2
+đang ghi — (517,835) là nơ ngực. Mắt→miệng ≈ 90 px (khớp bé trai ~94 px).
+Miệng bé trai (508,720) nên kiểm lại cùng cách trước giai đoạn code.
+
+## File (24 PNG, khung 1024×1536, PNG trong suốt, đã lượng tử 256 màu,
+## bán trong suốt 0,0000, chân y=1428–1429)
+girl_full_01_walk_dr_a/b/c/d.png, girl_full_01_walk_ur_a/b/c/d.png
+(tương tự 02 váy tím, 03 váy hồng + tạp dề trắng)
+[Bảng 24 khung: cỡ byte + tâm mắt + miệng + chân y + lỗ alpha — xem bảng
+trong báo cáo lô 4; mắt-y 556,9–566,2; mắt-x 576–724.]
+
+## Kiểm chứng chu trình (soi dải + ghép phòng, chân (630,810), cao 360 px)
+- 01 dr: dr_d vẽ lại (chân trái bắt chéo trước chân phải chống, hết đá sau);
+  tay vung giống dr_b chứ không gương hoàn hảo. 01 ur: passing đối xứng.
+- 02 dr: tốt, Δy ≤ 5 px (nhưng mắt-x nhảy dr_b→c 33 px, c→d 75 px — xem
+  caveat). 02 ur: ur_b sửa 2 vòng mới thành gương thật của ur_d (chân chống
+  đổi bên); chân lướt ur_b ở giữa nhịp vung, chưa vượt hẳn lên trước như ur_d.
+- 03 dr: b/d lướt đối nhau, tạp dề nguyên. 03 ur: ur_d vẽ lại thành gương
+  của ur_b (chân phải chống + chân trái lướt tới trước).
+- Không trượt chân; bóng đất magenta mờ ~1 px dưới vài bàn chân (chỉ thấy
+  khi phóng 2×).
+
+## Việc còn lại cho giai đoạn code (E) — bổ sung lô 4
+- Phụ kiện lô 3 KHÔNG khớp khi đi bộ (mắt-x 576–724 vs nghỉ 504): quyết
+  ẩn phụ kiện khi đi bộ, hoặc neo theo tâm mắt từng khung (bảng trên).
+  Miếng vá mắt nhắm cùng vấn đề.
+- 02 dr mắt-x nhảy 33–75 px giữa c→d: nếu cổng G yêu cầu ≤20 px cho cả
+  dr thì xem lại riêng.
+- Kiểm lại mốc miệng bé trai (508,720) trước khi dùng.
