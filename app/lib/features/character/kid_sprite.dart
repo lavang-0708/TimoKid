@@ -12,6 +12,7 @@
 /// `pumpAndSettle` dừng được và ảnh golden xác định.
 library;
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:material_ui/material_ui.dart';
@@ -34,7 +35,12 @@ class KidSprite extends StatefulWidget {
     this.facingLeft = false,
     this.animationsEnabled = true,
     this.width,
+    this.idleWave = false,
   });
+
+  /// Đứng yên lâu thì tự vẫy tay nhẹ (mỗi 9–15 giây, ~1,2 giây) như
+  /// nhân vật game đang chờ bé.
+  final bool idleWave;
 
   /// `girl` hoặc `boy`.
   final String gender;
@@ -71,6 +77,10 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
   AnimationController? _breath;
   AnimationController? _blink;
   AnimationController? _step;
+  AnimationController? _sway;
+  Timer? _idleTimer;
+  bool _autoWave = false;
+  final math.Random _rng = math.Random();
 
   bool get _on => widget.animationsEnabled && AnimationGate.enabled;
 
@@ -96,9 +106,34 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
     )..repeat();
     _step = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      // 4 khung đi bộ mỗi 720 ms (180 ms/khung): đi chậm, mềm hơn.
+      duration: const Duration(milliseconds: 720),
     );
     if (widget.walking) _step!.repeat();
+    // Đứng yên: lắc lư người/đầu rất nhẹ quanh chân (chu kỳ 3,2 giây).
+    _sway = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 3200),
+    )..repeat(reverse: true);
+    _scheduleIdleWave();
+  }
+
+  void _scheduleIdleWave() {
+    _idleTimer?.cancel();
+    if (!widget.idleWave || !_on) return;
+    _idleTimer = Timer(Duration(milliseconds: 9000 + _rng.nextInt(6000)), () {
+      if (!mounted) return;
+      if (!widget.walking && !widget.waving) {
+        setState(() => _autoWave = true);
+        _idleTimer = Timer(const Duration(milliseconds: 1200), () {
+          if (!mounted) return;
+          setState(() => _autoWave = false);
+          _scheduleIdleWave();
+        });
+      } else {
+        _scheduleIdleWave();
+      }
+    });
   }
 
   @override
@@ -106,6 +141,7 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
     super.didUpdateWidget(oldWidget);
     final step = _step;
     if (step == null) return;
+    if (widget.walking && _autoWave) _autoWave = false;
     if (widget.walking && !step.isAnimating) {
       step.repeat();
     } else if (!widget.walking && step.isAnimating) {
@@ -119,6 +155,8 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
     _breath?.dispose();
     _blink?.dispose();
     _step?.dispose();
+    _sway?.dispose();
+    _idleTimer?.cancel();
     super.dispose();
   }
 
@@ -134,7 +172,7 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final gender = kidGender(widget.gender);
     final outfit = widget.outfit.clamp(1, 3);
-    final wave = widget.waving;
+    final wave = widget.waving || (_autoWave && !widget.walking);
     final patch = kidEyePatch(gender, outfit, wave: wave);
     final accessory = kidHeadAccessoryAsset(gender, widget.headAccessory);
     final overlays = <String>[
@@ -223,7 +261,7 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
 
     if (_on) {
       body = AnimatedBuilder(
-        animation: Listenable.merge([_breath, _step]),
+        animation: Listenable.merge([_breath, _step, _sway]),
         builder: (context, child) {
           final b = Curves.easeInOut.transform(_breath!.value);
           final sy = 0.99 + 0.035 * b;
@@ -232,7 +270,11 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
           // Nhún bước: nảy lên 2 lần mỗi chu kỳ (2 bước), nghiêng theo bước.
           final bob = widget.walking && !_hasWalkFrames;
           final hop = bob ? (math.sin(s * 2 * math.pi)).abs() : 0.0;
-          final tilt = bob ? math.sin(s * 2 * math.pi) * 0.05 : 0.0;
+          final idle = !widget.walking && !wave;
+          final sway = idle
+              ? (Curves.easeInOut.transform(_sway!.value) - 0.5) * 0.035
+              : 0.0;
+          final tilt = (bob ? math.sin(s * 2 * math.pi) * 0.05 : 0.0) + sway;
           return FractionalTranslation(
             translation: Offset(0, -0.025 * hop),
             child: Transform.rotate(

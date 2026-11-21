@@ -1,4 +1,5 @@
-/// Nút Trở về tròn về Thị trấn (PR (B)).
+/// Nút Trở về tròn về Thị trấn (PR (B)); từ góp ý 21/11 là nút tròn
+/// nổi khối kiểu game ([GameRoundButton]) có mũi tên, thay nút trắng chữ.
 ///
 /// Dùng ở mọi màn trong nhà — màn Tòa nhà, Phòng, màn toán — thay cho
 /// nút chữ "Thị trấn"/"Về Thị trấn" trước đây: nút tròn trắng 56x56 dp,
@@ -14,39 +15,23 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../features/town/town_screen.dart';
-import 'press_bounce.dart';
+import 'game_ui.dart';
 
 class RoundBackButton extends StatelessWidget {
-  const RoundBackButton({super.key, this.onPressed});
+  const RoundBackButton({super.key, this.onPressed, this.size = 56});
 
   /// Bấm thì làm gì; mặc định về Thị trấn.
   final VoidCallback? onPressed;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
-    return PressBounce(
-      child: Material(
-        color: Colors.white,
-        shape: const CircleBorder(),
-        elevation: 4,
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: onPressed ?? () => context.go(TownScreen.route),
-          child: Tooltip(
-            message: 'Về Thị trấn',
-            child: const SizedBox(
-              width: 56,
-              height: 56,
-              child: Center(
-                child: Text(
-                  '←',
-                  style: TextStyle(fontSize: 30, color: Color(0xFF3B2E5A)),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+    return GameRoundButton(
+      icon: Icons.arrow_back_rounded,
+      color: const Color(0xFFFFA65C),
+      size: size,
+      tooltip: 'Về Thị trấn',
+      onPressed: onPressed ?? () => context.go(TownScreen.route),
     );
   }
 }

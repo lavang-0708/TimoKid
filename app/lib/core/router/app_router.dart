@@ -10,6 +10,7 @@ import '../../features/room/coming_soon_screen.dart';
 import '../../features/room/room_screen.dart';
 import '../../features/qa/qa_config.dart';
 import '../../features/qa/qa_menu_screen.dart';
+import '../../features/splash/splash_screen.dart';
 import '../../features/stage_result/stage_result_screen.dart';
 import '../../features/town/town_screen.dart';
 import '../database/database_provider.dart';
@@ -35,16 +36,23 @@ class AppRouter {
   static GoRouter create({
     bool showOnboarding = false,
     bool showHatch = false,
+    bool showSplash = false,
     CharacterLayerLoader? previewLoader,
   }) {
-    final initialLocation = showOnboarding
+    final firstScreen = showOnboarding
         ? OnboardingScreen.route
         : showHatch
         ? HatchScreen.route
         : RoomScreen.route;
+    // Góp ý 21/11: mở app thì qua màn khởi động có logo trước.
+    final initialLocation = showSplash ? SplashScreen.route : firstScreen;
     return GoRouter(
       initialLocation: initialLocation,
       routes: [
+        GoRoute(
+          path: SplashScreen.route,
+          builder: (context, state) => SplashScreen(next: firstScreen),
+        ),
         GoRoute(
           path: TownScreen.route,
           builder: (context, state) => const TownScreen(),

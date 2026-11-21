@@ -45,7 +45,7 @@ void main() {
     final size = tester.getSize(find.byType(RoundBackButton));
     expect(size.width, greaterThanOrEqualTo(56));
     expect(size.height, greaterThanOrEqualTo(56));
-    expect(find.text('←'), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
   });
 
   testWidgets('onPressed riêng thì gọi hàm đó, không về Thị trấn', (

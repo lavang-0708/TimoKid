@@ -135,7 +135,7 @@ void main() {
     expect(find.byKey(const Key('room-character')), findsNothing);
     expect(find.byKey(const Key('room-egg')), findsNothing);
     expect(find.byKey(const Key('room-locked-banner')), findsOneWidget);
-    expect(find.text('Đề ngày: 0/5 chặng'), findsOneWidget);
+    expect(find.text('0/5'), findsOneWidget);
   });
 
   testWidgets('đã tạo nhân vật nữ + trứng chó thì hiện nhân vật + trứng', (
@@ -157,9 +157,9 @@ void main() {
     await completeOnboardingGirl();
     await pumpRoom(tester);
 
-    expect(find.byIcon(Icons.lock_outlined), findsNWidgets(2));
+    expect(find.byIcon(Icons.lock_rounded), findsNWidgets(2));
     expect(find.byKey(const Key('room-town-button')), findsOneWidget);
-    expect(find.text('Xong đề ngày hôm nay!'), findsNothing);
+    expect(find.text('5/5'), findsNothing);
   });
 
   testWidgets('bấm Tủ đồ khi khóa thì hiện SnackBar + ra Thị trấn được', (
@@ -221,8 +221,8 @@ void main() {
     await pumpRoom(tester);
 
     expect(find.byKey(const Key('room-locked-banner')), findsNothing);
-    expect(find.text('Xong đề ngày hôm nay!'), findsOneWidget);
-    expect(find.byIcon(Icons.lock_outlined), findsNothing);
+    expect(find.text('5/5'), findsOneWidget);
+    expect(find.byIcon(Icons.lock_rounded), findsNothing);
     // Hồ sơ lưu váy tím (bộ 2).
     expect(find.byKey(const Key('kid-full-girl-2')), findsOneWidget);
 
@@ -499,7 +499,7 @@ void main() {
     await pumpRoom(tester);
 
     expect(find.byKey(const Key('room-locked-banner')), findsOneWidget);
-    expect(find.text('Đề ngày: 0/5 chặng'), findsOneWidget);
+    expect(find.text('0/5'), findsOneWidget);
   });
 
   testWidgets('trứng ở Phòng là PNG thật (PR #21), không còn SVG tạm', (

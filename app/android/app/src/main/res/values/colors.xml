@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Nền màn chờ hệ thống trước khi Flutter vẽ (khớp nền màn khởi động). -->
+    <color name="splash_background">#FFE3F0</color>
+</resources>

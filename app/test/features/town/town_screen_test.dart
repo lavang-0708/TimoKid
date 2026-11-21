@@ -13,7 +13,6 @@ import 'package:timokid/core/database/models.dart';
 import 'package:timokid/core/database/tables.dart';
 import 'package:timokid/core/time/clock.dart';
 import 'package:timokid/features/building/building_screen.dart';
-import 'package:timokid/features/character/kid_sprite.dart';
 import 'package:timokid/features/daily_set/daily_set_service.dart';
 import 'package:timokid/features/ladder/ladder_service.dart';
 import 'package:timokid/features/math/math_screen.dart';
@@ -115,7 +114,6 @@ void main() {
     await pumpTown(tester);
 
     expect(find.byKey(const Key('town-screen')), findsOneWidget);
-    expect(find.text('Thị trấn Diệu Kỳ'), findsOneWidget);
     for (final name in [
       'Lâu đài Lôgic',
       'Tiệm bánh Số học',
@@ -125,10 +123,17 @@ void main() {
     ]) {
       expect(find.text(name), findsOneWidget);
     }
-    expect(find.text('Chưa làm'), findsNWidgets(5));
-    expect(find.text('Đề ngày: 0/5 chặng'), findsOneWidget);
-    expect(find.text('0 xu'), findsOneWidget);
-    expect(find.text('◆ 0'), findsOneWidget);
+    expect(find.text('Đang làm'), findsNothing);
+    expect(find.text('Xong ✓'), findsNothing);
+    expect(find.text('0/5'), findsOneWidget);
+    expect(
+      tester.widget<Text>(find.byKey(const Key('town-xu-balance'))).data,
+      '0',
+    );
+    expect(
+      tester.widget<Text>(find.byKey(const Key('town-gem-balance'))).data,
+      '0',
+    );
     final bar = tester.widget<LinearProgressIndicator>(
       find.byKey(const Key('town-progress-bar')),
     );
@@ -147,8 +152,7 @@ void main() {
 
     expect(find.text('Xong ✓'), findsNWidgets(2));
     expect(find.text('Đang làm'), findsOneWidget);
-    expect(find.text('Chưa làm'), findsNWidgets(2));
-    expect(find.text('Đề ngày: 2/5 chặng'), findsOneWidget);
+    expect(find.text('2/5'), findsOneWidget);
     final bar = tester.widget<LinearProgressIndicator>(
       find.byKey(const Key('town-progress-bar')),
     );
@@ -170,8 +174,14 @@ void main() {
     );
     await pumpTown(tester);
 
-    expect(find.text('120 xu'), findsOneWidget);
-    expect(find.text('◆ 1'), findsOneWidget);
+    expect(
+      tester.widget<Text>(find.byKey(const Key('town-xu-balance'))).data,
+      '120',
+    );
+    expect(
+      tester.widget<Text>(find.byKey(const Key('town-gem-balance'))).data,
+      '1',
+    );
   });
 
   testWidgets('bấm nút khu thì sang màn tòa nhà rồi làm toán đúng chặng', (
@@ -198,14 +208,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('room-screen')), findsOneWidget);
-    expect(find.text('Phòng của bé'), findsOneWidget);
   });
 
   testWidgets('xong cả 5 chặng thì hiện đã xong đề ngày', (tester) async {
     await setStatuses(List.filled(5, StageStatus.done));
     await pumpTown(tester);
 
-    expect(find.text('Xong đề ngày hôm nay!'), findsOneWidget);
+    expect(find.text('5/5'), findsOneWidget);
     final bar = tester.widget<LinearProgressIndicator>(
       find.byKey(const Key('town-progress-bar')),
     );
@@ -228,7 +237,7 @@ void main() {
 
     expect(find.byKey(const Key('town-screen')), findsOneWidget);
     expect(find.text('Đang làm'), findsOneWidget);
-    expect(find.text('Đề ngày: 0/5 chặng'), findsOneWidget);
+    expect(find.text('0/5'), findsOneWidget);
   });
 
   testWidgets('bố cục vừa ở 640x320', (tester) async {
@@ -251,7 +260,10 @@ void main() {
     for (var i = 0; i < 5; i++) {
       expect(find.byKey(Key('town-stage-$i-button')), findsOneWidget);
     }
-    expect(find.text('45 xu'), findsOneWidget);
+    expect(
+      tester.widget<Text>(find.byKey(const Key('town-xu-balance'))).data,
+      '45',
+    );
   });
 
   testWidgets('chưa có hồ sơ thì không hiện nhân vật', (tester) async {
@@ -261,7 +273,7 @@ void main() {
     expect(find.byKey(const Key('town-character-name')), findsNothing);
   });
 
-  testWidgets('đã tạo nhân vật nữ thì hiện đúng nhân vật + tên (640x320)', (
+  testWidgets('đã tạo nhân vật nữ thì hiện tên trên thanh chỉ số (640x320)', (
     tester,
   ) async {
     await OnboardingService(db: db).completeOnboarding(
@@ -275,18 +287,16 @@ void main() {
     );
     await pumpTown(tester, size: const Size(640, 320));
 
-    expect(find.byKey(const Key('town-character')), findsOneWidget);
+    // Thị trấn toàn màn: không còn nhân vật cạnh bản đồ, chỉ tên
+    // trên thanh chỉ số.
+    expect(find.byKey(const Key('town-character')), findsNothing);
+    expect(find.byKey(const Key('town-character-name')), findsOneWidget);
     expect(find.text('An'), findsOneWidget);
-    // Ảnh toàn thân thật (E): bé gái bộ 2 (váy tím).
-    final view = tester.widget<KidSprite>(
-      find.byKey(const Key('town-character')),
-    );
-    expect(view.gender, 'girl');
-    expect(view.outfit, 2);
-    expect(find.byKey(const Key('kid-full-girl-2')), findsOneWidget);
   });
 
-  testWidgets('đã tạo nhân vật nam thì hiện ảnh bé trai thật', (tester) async {
+  testWidgets('đã tạo nhân vật nam thì hiện tên, không có ảnh cạnh bản đồ', (
+    tester,
+  ) async {
     await OnboardingService(db: db).completeOnboarding(
       childId: childId,
       profile: CharacterProfile.defaults().copyWith(
@@ -297,9 +307,7 @@ void main() {
     );
     await pumpTown(tester);
 
-    expect(find.byKey(const Key('town-character')), findsOneWidget);
+    expect(find.byKey(const Key('town-character')), findsNothing);
     expect(find.text('Bình'), findsOneWidget);
-    // Ảnh toàn thân bé trai (E), bộ 1 mặc định.
-    expect(find.byKey(const Key('kid-full-boy-1')), findsOneWidget);
   });
 }

@@ -5,11 +5,9 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/models.dart';
 import '../../core/database/tables.dart';
+import '../../core/widgets/game_ui.dart';
 import '../building/building_screen.dart';
 import '../character/character_bounce.dart';
-import '../character/kid_assets.dart';
-import '../character/kid_look_service.dart';
-import '../character/kid_sprite.dart';
 import '../daily_set/daily_set_config.dart';
 import '../daily_set/daily_set_service.dart';
 import '../ladder/ladder_service.dart';
@@ -62,10 +60,6 @@ class _TownScreenState extends ConsumerState<TownScreen> {
   bool _loading = true;
   String? _error;
   CharacterProfile? _profile;
-  String? _headAccessory;
-  bool _glasses = false;
-  bool _whiteShoes = false;
-  bool _backpack = false;
 
   @override
   void initState() {
@@ -102,21 +96,12 @@ class _TownScreenState extends ConsumerState<TownScreen> {
       );
       final balances = await rewardService.balances(childId);
       final profile = await OnboardingService(db: db).loadProfile(childId);
-      final looks = KidLookService(db: db);
-      final accessory = await looks.headAccessory(childId);
-      final glasses = await looks.glasses(childId);
-      final whiteShoes = await looks.whiteShoes(childId);
-      final backpack = await looks.backpack(childId);
       if (!mounted) return;
       setState(() {
         _statuses = statuses;
         _xu = balances[Currency.xu] ?? 0;
         _gems = balances[Currency.gem] ?? 0;
         _profile = profile;
-        _headAccessory = accessory;
-        _glasses = glasses;
-        _whiteShoes = whiteShoes;
-        _backpack = backpack;
         _loading = false;
         _error = null;
       });
@@ -158,122 +143,107 @@ class _TownScreenState extends ConsumerState<TownScreen> {
     final done = statuses.where((s) => s == StageStatus.done).length;
     final total = DailySetConfig.stagesPerDay;
     final profile = _profile;
+    // Góp ý 21/11: bản đồ phủ kín màn hình, không còn cột nhân vật bên
+    // cạnh; chỉ số là một dòng kiểu game ở trên cùng, nút về Phòng là
+    // nút tròn có icon.
     return Scaffold(
       key: const Key('town-screen'),
-      appBar: AppBar(
-        title: const Text('Thị trấn Diệu Kỳ'),
-        actions: [
-          TextButton.icon(
-            key: const Key('town-room-button'),
-            onPressed: () => context.go(RoomScreen.route),
-            icon: const Icon(Icons.home_outlined),
-            label: const Text('Phòng'),
+      backgroundColor: const Color(0xFFDDEFD6),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: TownMap(
+              statuses: statuses,
+              onAreaTap: (i) => context.go(
+                BuildingScreen.route,
+                extra: BuildingScreenArgs(stageIndex: i),
+              ),
+              onRoomTap: () => context.go(RoomScreen.route),
+            ),
           ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Text(
-                  '$_xu xu',
-                  key: const Key('town-xu-balance'),
-                  style: const TextStyle(fontSize: 22),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  '◆ $_gems',
-                  key: const Key('town-gem-balance'),
-                  style: const TextStyle(fontSize: 22),
-                ),
-                const Spacer(),
-                // Co lại + cắt `...` khi hẹp (vd: phông test Ahem
-                // rộng, màn 608x248, đề đã xong): cùng cách sửa
-                // header màn Phòng ở T2-04.
-                Flexible(
-                  child: Text(
-                    done == total
-                        ? 'Xong đề ngày hôm nay!'
-                        : 'Đề ngày: $done/$total chặng',
-                    key: const Key('town-progress-text'),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    // Canh phải để khi đủ chỗ thì chữ vẫn nằm ở mép
-                    // phải như trước khi bọc Flexible (Flexible chia
-                    // chỗ trống với Spacer nên chữ mặc định sẽ dồn trái).
-                    textAlign: TextAlign.right,
-                    style: const TextStyle(fontSize: 22),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(
-              key: const Key('town-progress-bar'),
-              value: done / total,
-              minHeight: 12,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Nhân vật đã tạo đứng ở cột trái (chỉ khi đã có hồ
-                  // sơ); tên bên dưới. Không có hồ sơ (máy 0.1 cũ)
-                  // thì 5 nút khu chiếm hết chiều rộng như trước.
-                  if (profile != null) ...[
-                    SizedBox(
-                      width: 120,
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: CharacterBounce(
-                              // Thở/chớp mắt bật (kiểu game); cổng
-                              // AnimationGate tắt khi chạy test.
-                              child: KidSprite(
-                                key: const Key('town-character'),
-                                gender: profile.gender,
-                                outfit: kidOutfitNumber(profile.dress),
-                                headAccessory: _headAccessory,
-                                glasses: _glasses,
-                                whiteShoes: _whiteShoes,
-                                backpack: _backpack,
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 6, 8, 0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GameRoundButton(
+                      key: const Key('town-room-button'),
+                      icon: Icons.home_rounded,
+                      color: const Color(0xFFFF9EB5),
+                      label: 'Phòng',
+                      tooltip: 'Về Phòng',
+                      onPressed: () => context.go(RoomScreen.route),
+                    ),
+                    // Chỉ số dồn sang phải để không che Lâu đài ở góc trái.
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: GameHudBar(
+                          children: [
+                            if (profile != null)
+                              Flexible(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                  ),
+                                  child: Text(
+                                    profile.name,
+                                    key: const Key('town-character-name'),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: gameOutlinedText(16),
+                                  ),
+                                ),
+                              ),
+                            GameStat(
+                              icon: Icons.monetization_on_rounded,
+                              color: const Color(0xFFF5B83D),
+                              text: '$_xu',
+                              textKey: const Key('town-xu-balance'),
+                            ),
+                            GameStat(
+                              icon: Icons.diamond_rounded,
+                              color: const Color(0xFFA07BE0),
+                              text: '$_gems',
+                              textKey: const Key('town-gem-balance'),
+                            ),
+                            GameStat(
+                              icon: Icons.star_rounded,
+                              color: const Color(0xFFFFC94D),
+                              text: '$done/$total',
+                              textKey: const Key('town-progress-text'),
+                            ),
+                            SizedBox(
+                              width: 56,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: LinearProgressIndicator(
+                                  key: const Key('town-progress-bar'),
+                                  value: done / total,
+                                  minHeight: 8,
+                                  backgroundColor: const Color(0x55FFFFFF),
+                                  color: const Color(0xFFFFC94D),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            profile.name,
-                            key: const Key('town-character-name'),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 12),
                   ],
-                  Expanded(
-                    child: TownMap(
-                      statuses: statuses,
-                      onAreaTap: (i) => context.go(
-                        BuildingScreen.route,
-                        extra: BuildingScreenArgs(stageIndex: i),
-                      ),
-                      onRoomTap: () => context.go(RoomScreen.route),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

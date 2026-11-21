@@ -43,6 +43,7 @@ Future<void> main() async {
         router: AppRouter.create(
           showOnboarding: showOnboarding,
           showHatch: showHatch,
+          showSplash: true,
         ),
       ),
     ),

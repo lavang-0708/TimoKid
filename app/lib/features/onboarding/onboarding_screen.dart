@@ -25,6 +25,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/animation/animation_gate.dart';
 import '../../core/database/database_provider.dart';
+import '../../core/widgets/game_ui.dart';
 import '../../core/widgets/press_bounce.dart';
 import '../character/character_bounce.dart';
 import '../character/character_view.dart' show CharacterLayerLoader;
@@ -177,15 +178,32 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       key: const Key('onboarding-screen'),
       // Không co thân khi bàn phím ảo mở (xem [_body]).
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Tạo nhân vật'),
-        // Mở đầu là bắt buộc ở lần đầu mở app nên không có nút về
-        // của hệ thống; nút "Quay lại" trong thân lo việc đổi ý.
-        automaticallyImplyLeading: false,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-        child: _body(),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Nền sân khấu kiểu game: trời hồng tím + hai đốm sáng.
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFFFD9EC),
+                  Color(0xFFE4D7FF),
+                  Color(0xFFC9F0E4),
+                ],
+              ),
+            ),
+          ),
+          const Positioned(left: -60, top: -60, child: _Glow(size: 220)),
+          const Positioned(right: -40, bottom: -70, child: _Glow(size: 260)),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: _body(),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -193,86 +211,139 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   /// Thân mở đầu: một bố cục cố định duy nhất (xem trước + lựa
   /// chọn cạnh nhau, nút điều hướng luôn thấy).
   ///
-  /// Không đổi bố cục theo bàn phím ảo (sửa lỗi bản v0.0.2): bản
-  /// trước chuyển sang bố cục cuộn khi `viewInsets.bottom > 0`, cây
-  /// widget đổi nên ô tên bị dựng lại, mất focus, bàn phím đóng ngay
-  /// khi bé vừa bấm vào ô tên — không gõ được. Giờ Scaffold không co
-  /// thân theo bàn phím (`resizeToAvoidBottomInset: false`): bàn phím
-  /// che phần dưới, ô tên ở trên vẫn thấy; bấm Xong/Tiếp thì bàn phím
-  /// đóng (unfocus trong `_next`/`onSubmitted`).
+  /// Không đổi bố cục theo bàn phím ảo (sửa lỗi bản v0.0.2): đổi cây
+  /// widget làm ô tên mất focus. Scaffold không co thân theo bàn phím
+  /// (`resizeToAvoidBottomInset: false`): bàn phím che phần dưới, ô tên
+  /// ở trên vẫn thấy; bấm Xong/Tiếp thì bàn phím đóng.
   Widget _body() {
     return Column(
       children: [
         _headerRow(),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         Expanded(child: _middleRow()),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         _navRow(),
       ],
     );
   }
 
-  /// Hàng đếm bước + tiêu đề bước.
+  /// Hàng đếm bước (viên tròn cam + chấm tiến độ) + tiêu đề bước.
   Widget _headerRow() {
     return Row(
       children: [
-        Text(
-          'Bước ${_step + 1}/${_stepTitles.length}',
-          key: const Key('onboarding-step-counter'),
-          style: const TextStyle(fontSize: 18),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFFFFB86B), Color(0xFFFF8A3D)],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white, width: 2),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x33000000),
+                offset: Offset(0, 2),
+                blurRadius: 3,
+              ),
+            ],
+          ),
+          child: Text(
+            'Bước ${_step + 1}/${_stepTitles.length}',
+            key: const Key('onboarding-step-counter'),
+            style: gameOutlinedText(15),
+          ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 8),
+        for (var i = 0; i < _stepTitles.length; i++)
+          Container(
+            width: i == _step ? 18 : 9,
+            height: 9,
+            margin: const EdgeInsets.only(right: 4),
+            decoration: BoxDecoration(
+              color: i <= _step ? const Color(0xFFFF8A3D) : Colors.white70,
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+        const SizedBox(width: 8),
         Expanded(
           child: Text(
             _stepTitles[_step],
             key: const Key('onboarding-step-title'),
-            style: const TextStyle(fontSize: 22),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              color: gameInk,
+            ),
           ),
         ),
       ],
     );
   }
 
-  /// Hàng giữa: xem trước nhân vật + lựa chọn của bước (cuộn được
-  /// để vừa màn 640x320).
+  /// Hàng giữa: nhân vật đứng trên bục (trái) + bảng lựa chọn (phải).
   Widget _middleRow() {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Xem trước nhân vật (ẩn ở bước chọn trứng để đủ
-        // chỗ cho 3 thẻ trứng).
+        // Xem trước nhân vật (ẩn ở bước chọn trứng để đủ chỗ 3 trứng).
         if (!_isEggStep) ...[
           SizedBox(
             width: 170,
-            child: Column(
+            child: Stack(
+              alignment: Alignment.bottomCenter,
               children: [
-                Expanded(
+                const Positioned(
+                  bottom: 0,
+                  left: 10,
+                  right: 10,
+                  height: 26,
+                  child: _Pedestal(),
+                ),
+                Positioned.fill(
+                  bottom: 10,
                   child: CharacterBounce(
                     popKey: _previewPopKey,
-                    // Thở/chớp mắt bật (kiểu game); cổng AnimationGate
-                    // tắt khi chạy test để pumpAndSettle dừng được.
+                    // Thở/chớp mắt/vẫy tay (kiểu game); cổng
+                    // AnimationGate tắt khi chạy test.
                     child: KidSprite(
                       key: const Key('onboarding-preview'),
                       gender: _draft.gender,
                       outfit: kidOutfitNumber(_draft.dress),
+                      idleWave: true,
                     ),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
         ],
-        Expanded(child: SingleChildScrollView(child: _stepBody())),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xD9FFFFFF),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: Colors.white, width: 3),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x22000000),
+                  offset: Offset(0, 3),
+                  blurRadius: 6,
+                ),
+              ],
+            ),
+            child: SingleChildScrollView(child: _stepBody()),
+          ),
+        ),
       ],
     );
   }
 
-  /// Hai nút điều hướng co lại khi màn hẹp (chữ trong nút
-  /// thu nhỏ theo, không tràn): nút "Xong — vào Phòng" ở
-  /// bước trứng dài nên ở màn 608 dp (font DejaVu trong
-  /// test) hai nút cộng lại vượt chiều rộng; khi chạy app
-  /// (font Nunito) vẫn vừa như trước, không đổi gì.
+  /// Hai nút kẹo (Quay lại xanh dương, Tiếp/Xong xanh lá); co lại khi
+  /// màn hẹp (chữ trong nút thu nhỏ theo, không tràn).
   Widget _navRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -282,14 +353,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             child: PressBounce(
               child: ElevatedButton.icon(
                 key: const Key('onboarding-back-button'),
-                icon: const Text('←', style: TextStyle(fontSize: 24)),
-                label: const FittedBox(
+                icon: const Icon(Icons.arrow_back_rounded, size: 26),
+                label: FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: Text('Quay lại', style: TextStyle(fontSize: 20)),
+                  child: Text('Quay lại', style: gameOutlinedText(19)),
                 ),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(56, 56),
-                ),
+                style: _candyStyle(const Color(0xFF5BA8F5)),
                 onPressed: _saving ? null : _back,
               ),
             ),
@@ -308,17 +377,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 fit: BoxFit.scaleDown,
                 child: Text(
                   _isEggStep ? 'Xong — vào Phòng' : 'Tiếp theo',
-                  style: const TextStyle(fontSize: 20),
+                  style: gameOutlinedText(19),
                 ),
               ),
               icon: _saving
                   ? const SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 3),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        color: Colors.white,
+                      ),
                     )
-                  : const Text('→', style: TextStyle(fontSize: 24)),
-              style: ElevatedButton.styleFrom(minimumSize: const Size(56, 56)),
+                  : const Icon(Icons.arrow_forward_rounded, size: 26),
+              style: _candyStyle(const Color(0xFF4CC46A)),
               onPressed: (_canContinue && !_saving) ? _next : null,
             ),
           ),
@@ -327,14 +399,31 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
+  /// Kiểu nút kẹo: tròn to, viền trắng, đổ bóng; tắt thì xám nhạt.
+  ButtonStyle _candyStyle(Color color) => ElevatedButton.styleFrom(
+    minimumSize: const Size(56, 52),
+    padding: const EdgeInsets.symmetric(horizontal: 22),
+    backgroundColor: color,
+    foregroundColor: Colors.white,
+    disabledBackgroundColor: const Color(0xFFCFCBD9),
+    disabledForegroundColor: Colors.white70,
+    elevation: 4,
+    shadowColor: const Color(0x66000000),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(28),
+      side: const BorderSide(color: Colors.white, width: 3),
+    ),
+  );
+
   Widget _stepBody() {
     switch (_stepKey) {
       case 'gender':
-        return _optionList<String>(
+        return _pickCards(
           options: onboardingGenders,
           labels: onboardingGenderNames,
           selected: _draft.gender,
           keyPrefix: 'onboarding-gender',
+          image: (g) => kidFullAsset(kidGender(g), 1),
           // Đổi dáng thì về bộ 1 của dáng đó (mã bộ đồ theo dáng).
           onSelected: (value) => setState(
             () => _draft = value == _draft.gender
@@ -397,11 +486,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         // E: 3 bộ đồ toàn thân của dáng đã chọn; chưa chọn (null) =
         // bộ 1.
         final ids = kidOutfitIds[kidGender(_draft.gender)]!;
-        return _optionList<String>(
+        return _pickCards(
           options: ids,
           labels: kidOutfitNames,
           selected: _draft.dress ?? ids.first,
           keyPrefix: 'onboarding-dress',
+          image: (id) =>
+              kidFullAsset(kidGender(_draft.gender), kidOutfitNumber(id)),
           onSelected: (value) =>
               setState(() => _draft = _draft.copyWith(dress: value)),
         );
@@ -450,11 +541,37 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               // (cùng hiệu ứng với unfocus trong _next/_back).
               textInputAction: TextInputAction.done,
               onSubmitted: (_) => FocusScope.of(context).unfocus(),
-              style: const TextStyle(fontSize: 24),
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                color: gameInk,
+              ),
               decoration: InputDecoration(
                 hintText: 'Tên nhân vật',
                 errorText: _nameError,
-                border: const OutlineInputBorder(),
+                filled: true,
+                fillColor: Colors.white,
+                prefixIcon: const Icon(
+                  Icons.edit_rounded,
+                  color: Color(0xFFFF8A3D),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFFFB86B),
+                    width: 2,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFFF8A3D),
+                    width: 3,
+                  ),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
               ),
               onChanged: (value) {
                 setState(() {
@@ -488,6 +605,32 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           ],
         );
     }
+  }
+
+  /// Hàng thẻ hình (giới tính, bộ đồ): ảnh nửa người trên + tên.
+  Widget _pickCards({
+    required List<String> options,
+    required Map<String, String> labels,
+    required String selected,
+    required String keyPrefix,
+    required String Function(String) image,
+    required ValueChanged<String> onSelected,
+  }) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      alignment: WrapAlignment.center,
+      children: [
+        for (final o in options)
+          _PickCard(
+            key: Key('$keyPrefix-$o'),
+            label: labels[o] ?? o,
+            image: image(o),
+            selected: o == selected,
+            onTap: () => onSelected(o),
+          ),
+      ],
+    );
   }
 
   /// Danh sách lựa chọn dạng nút lớn (giới tính, kiểu tóc/mắt/miệng).
@@ -594,37 +737,229 @@ class _EggCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return _GameCard(
       key: Key('onboarding-egg-$species'),
+      selected: selected,
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: selected ? const Color(0xFFBFE8CF) : Colors.white,
-          border: Border.all(
-            color: selected ? Colors.green.shade700 : Colors.black26,
-            width: selected ? 4 : 2,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 130,
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                const Positioned(
+                  bottom: 0,
+                  left: 14,
+                  right: 14,
+                  height: 18,
+                  child: _Pedestal(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: _EggWiggle(
+                    child: Image.asset(
+                      eggSpeciesAssets[species]!,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
+          const SizedBox(height: 6),
+          Text(
+            name,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: gameInk,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Thẻ chọn kiểu game: nền trắng kem, chọn thì viền cam + nền vàng
+/// nhạt + huy hiệu tích xanh; bấm nảy nhẹ.
+class _GameCard extends StatelessWidget {
+  const _GameCard({
+    super.key,
+    required this.selected,
+    required this.onTap,
+    required this.child,
+    this.width,
+  });
+
+  final bool selected;
+  final VoidCallback onTap;
+  final Widget child;
+  final double? width;
+
+  @override
+  Widget build(BuildContext context) {
+    return PressBounce(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Stack(
+          clipBehavior: Clip.none,
+          // Thẻ trứng nằm trong Expanded: giãn hết bề ngang được cấp.
+          fit: StackFit.passthrough,
           children: [
-            SizedBox(
-              height: 120,
-              child: _EggWiggle(
-                child: Image.asset(
-                  eggSpeciesAssets[species]!,
-                  fit: BoxFit.contain,
+            Container(
+              width: width,
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: selected
+                      ? const [Color(0xFFFFF4C2), Color(0xFFFFD86B)]
+                      : const [Colors.white, Color(0xFFF1ECFF)],
+                ),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: selected
+                      ? const Color(0xFFFFA726)
+                      : const Color(0xFFD8CFF5),
+                  width: selected ? 4 : 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: selected
+                        ? const Color(0x66FFA726)
+                        : const Color(0x22000000),
+                    offset: const Offset(0, 3),
+                    blurRadius: selected ? 8 : 4,
+                  ),
+                ],
+              ),
+              child: child,
+            ),
+            if (selected)
+              const Positioned(
+                right: -6,
+                top: -6,
+                child: CircleAvatar(
+                  radius: 13,
+                  backgroundColor: Colors.white,
+                  child: CircleAvatar(
+                    radius: 11,
+                    backgroundColor: Color(0xFF4CC46A),
+                    child: Icon(
+                      Icons.check_rounded,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              name,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 20),
-            ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Thẻ hình nửa người trên của nhân vật + tên lựa chọn.
+class _PickCard extends StatelessWidget {
+  const _PickCard({
+    super.key,
+    required this.label,
+    required this.image,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final String image;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return _GameCard(
+      selected: selected,
+      onTap: onTap,
+      width: 128,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: SizedBox(
+              height: 92,
+              width: double.infinity,
+              child: FittedBox(
+                fit: BoxFit.cover,
+                alignment: const Alignment(0, -0.7),
+                child: Image.asset(image, width: 1024, height: 1536),
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: gameInk,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Bục đứng hình elip dưới nhân vật/trứng.
+class _Pedestal extends StatelessWidget {
+  const _Pedestal();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFFFFFFFF), Color(0xFFC7B8F0)],
+        ),
+        borderRadius: const BorderRadius.all(Radius.elliptical(200, 30)),
+        border: Border.all(color: const Color(0xFFA996E0), width: 2),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x33000000),
+            offset: Offset(0, 4),
+            blurRadius: 6,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Đốm sáng mờ trang trí nền.
+class _Glow extends StatelessWidget {
+  const _Glow({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [Color(0x99FFFFFF), Color(0x00FFFFFF)],
         ),
       ),
     );
