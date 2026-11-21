@@ -115,3 +115,32 @@ String? kidHeadAccessoryAsset(String gender, String? accessory) {
   if (entry == null) return null;
   return 'assets/images/character/$g/${entry.$2}.png';
 }
+
+/// Dáng đã có khung đi bộ (lô 4 của Muse). Bé gái đang vẽ: chưa có
+/// thì [KidSprite] nhún bước bằng ảnh đứng.
+const Set<String> kidGendersWithWalkFrames = <String>{'boy'};
+
+/// 4 khung đi bộ (a–d) của một bộ đồ; [up] = đi lên (xa dần, `ur`),
+/// ngược lại đi xuống/ngang (`dr`). Hướng phải; app lật ngang khi đi
+/// sang trái. Null nếu dáng chưa có khung đi bộ.
+List<String>? kidWalkFrames(String gender, int outfit, {required bool up}) {
+  final g = kidGender(gender);
+  if (!kidGendersWithWalkFrames.contains(g)) return null;
+  final dir = up ? 'ur' : 'dr';
+  return <String>[
+    for (final f in const ['a', 'b', 'c', 'd'])
+      'assets/images/character/$g/${g}_full_0${outfit}_walk_${dir}_$f.png',
+  ];
+}
+
+/// Lớp phủ kính tròn (cùng khung, khớp ảnh đứng và vẫy).
+String kidGlassesAsset(String gender) {
+  final g = kidGender(gender);
+  return 'assets/images/character/$g/${g}_glasses_01.png';
+}
+
+/// Lớp phủ giày trắng thay giày màu của bộ đồ (cùng khung).
+String kidWhiteShoesAsset(String gender) {
+  final g = kidGender(gender);
+  return 'assets/images/character/$g/${g}_shoes_02.png';
+}

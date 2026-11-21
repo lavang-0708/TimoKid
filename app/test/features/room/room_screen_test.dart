@@ -248,9 +248,21 @@ void main() {
       ),
       'hat',
     );
+    await tester.ensureVisible(find.byKey(const Key('room-wardrobe-glasses')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('room-wardrobe-glasses')));
+    await tester.pumpAndSettle();
+    expect(
+      await db.settingsDao.getValue(childId: childId, key: 'kid_glasses'),
+      'true',
+    );
     await tester.tapAt(const Offset(400, 20));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('kid-full-girl-3')), findsOneWidget);
+    expect(
+      find.byKey(const Key('kid-overlay-girl_glasses_01.png')),
+      findsOneWidget,
+    );
     expect(
       find.descendant(
         of: find.byKey(const Key('room-character')),
@@ -371,6 +383,45 @@ void main() {
       isFalse,
     );
     // Gỡ cây widget (dừng hiệu ứng lặp) trước khi test kết thúc.
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('bé trai đi bằng khung đi bộ thật, đứng lại thì về ảnh đứng', (
+    tester,
+  ) async {
+    await OnboardingService(db: db).completeOnboarding(
+      childId: childId,
+      profile: CharacterProfile.defaults().copyWith(
+        gender: 'boy',
+        dress: 'boy_outfit_02',
+        name: 'Bình',
+      ),
+      eggSpecies: 'cat',
+    );
+    AnimationGate.enabled = true;
+    addTearDown(() => AnimationGate.enabled = false);
+    await pumpRoom(tester, settle: false);
+    final box = tester.getRect(find.byKey(const Key('room-floor')));
+    // Chạm xa về phía trước bên phải: đi xuống-phải (khung `dr`).
+    await tester.tapAt(
+      Offset(
+        box.left + 1300 / 1600 * box.width,
+        box.top + 860 / 900 * box.height,
+      ),
+    );
+    for (var i = 0; i < 4; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    final frame = tester.widget<Image>(find.byKey(const Key('kid-walk-frame')));
+    expect(
+      (frame.image as AssetImage).assetName,
+      startsWith('assets/images/character/boy/boy_full_02_walk_dr_'),
+    );
+    for (var i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(find.byKey(const Key('kid-walk-frame')), findsNothing);
+    expect(find.byKey(const Key('kid-full-boy-2')), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
   });
 

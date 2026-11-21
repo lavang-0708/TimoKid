@@ -13,8 +13,13 @@ List<String> kidImagePaths() => <String>[
       kidEyePatch(g, n).asset,
       kidEyePatch(g, n, wave: true).asset,
     ],
-  for (final g in ['girl', 'boy'])
+  for (final g in ['girl', 'boy']) ...[
     for (final a in ['hat', 'bow']) kidHeadAccessoryAsset(g, a)!,
+    kidGlassesAsset(g),
+    kidWhiteShoesAsset(g),
+    for (var n = 1; n <= 3; n++)
+      for (final up in [false, true]) ...?kidWalkFrames(g, n, up: up),
+  ],
   for (final s in ['dog', 'cat', 'rabbit'])
     for (final st in ['egg', 'newborn', 'teen', 'adult'])
       'assets/images/pets/${s}_$st.png',

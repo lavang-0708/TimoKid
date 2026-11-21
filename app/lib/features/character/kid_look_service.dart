@@ -16,6 +16,24 @@ class KidLookService {
   final AppDatabase db;
 
   static const String headAccessoryKey = 'kid_head_accessory';
+  static const String glassesKey = 'kid_glasses';
+  static const String whiteShoesKey = 'kid_white_shoes';
+
+  Future<bool> _flag(String childId, String key) async =>
+      await db.settingsDao.getValue(childId: childId, key: key) == 'true';
+
+  Future<void> _setFlag(String childId, String key, bool on) =>
+      db.settingsDao.setValue(childId: childId, key: key, value: '$on');
+
+  /// Đeo kính tròn không.
+  Future<bool> glasses(String childId) => _flag(childId, glassesKey);
+  Future<void> setGlasses(String childId, bool on) =>
+      _setFlag(childId, glassesKey, on);
+
+  /// Đi giày trắng (thay giày màu của bộ đồ) không.
+  Future<bool> whiteShoes(String childId) => _flag(childId, whiteShoesKey);
+  Future<void> setWhiteShoes(String childId, bool on) =>
+      _setFlag(childId, whiteShoesKey, on);
 
   /// Phụ kiện đầu đang đeo (`hat`/`bow`), null nếu không đeo.
   Future<String?> headAccessory(String childId) async {

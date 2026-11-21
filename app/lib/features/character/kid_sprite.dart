@@ -25,7 +25,10 @@ class KidSprite extends StatefulWidget {
     required this.gender,
     required this.outfit,
     this.headAccessory,
+    this.glasses = false,
+    this.whiteShoes = false,
     this.waving = false,
+    this.walkingUp = false,
     this.walking = false,
     this.facingLeft = false,
     this.animationsEnabled = true,
@@ -41,7 +44,14 @@ class KidSprite extends StatefulWidget {
   /// Phụ kiện đầu: `hat`, `bow` hoặc null.
   final String? headAccessory;
 
+  /// Đeo kính tròn / đi giày trắng (lớp phủ cùng khung).
+  final bool glasses;
+  final bool whiteShoes;
+
   final bool waving;
+
+  /// Đang đi lên (xa dần): dùng khung đi bộ `ur` thay vì `dr`.
+  final bool walkingUp;
   final bool walking;
   final bool facingLeft;
   final bool animationsEnabled;
@@ -60,6 +70,13 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
 
   bool get _on => widget.animationsEnabled && AnimationGate.enabled;
 
+  /// Đang dùng khung đi bộ thật (không cần nhún bằng ảnh đứng).
+  bool get _hasWalkFrames =>
+      !widget.glasses &&
+      !widget.whiteShoes &&
+      widget.headAccessory == null &&
+      kidWalkFrames(widget.gender, widget.outfit, up: false) != null;
+
   @override
   void initState() {
     super.initState();
@@ -74,7 +91,7 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
     )..repeat();
     _step = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 420),
+      duration: const Duration(milliseconds: 600),
     );
     if (widget.walking) _step!.repeat();
   }
@@ -115,6 +132,17 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
     final wave = widget.waving;
     final patch = kidEyePatch(gender, outfit, wave: wave);
     final accessory = kidHeadAccessoryAsset(gender, widget.headAccessory);
+    final overlays = <String>[
+      if (widget.whiteShoes) kidWhiteShoesAsset(gender),
+      if (widget.glasses) kidGlassesAsset(gender),
+      ?accessory,
+    ];
+    // Khung đi bộ thật chỉ dùng khi không đeo lớp phủ nào (lớp phủ vẽ
+    // theo dáng đứng, đặt lên khung đi bộ sẽ lệch); còn lại nhún bước
+    // bằng ảnh đứng.
+    final walkFrames = (widget.walking && overlays.isEmpty && _on)
+        ? kidWalkFrames(gender, outfit, up: widget.walkingUp)
+        : null;
 
     Widget body = LayoutBuilder(
       builder: (context, constraints) {
@@ -133,23 +161,43 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
           height: h,
           child: Stack(
             children: [
-              Positioned.fill(
-                child: _frameImage(
-                  kidFullAsset(gender, outfit, wave: wave),
-                  Key('kid-full-$gender-$outfit${wave ? '-wave' : ''}'),
+              if (walkFrames != null)
+                Positioned.fill(
+                  child: AnimatedBuilder(
+                    animation: _step!,
+                    builder: (context, _) {
+                      final i = (_step!.value * 4).floor().clamp(0, 3);
+                      return _frameImage(
+                        walkFrames[i],
+                        const Key('kid-walk-frame'),
+                      );
+                    },
+                  ),
+                )
+              else
+                Positioned.fill(
+                  child: _frameImage(
+                    kidFullAsset(gender, outfit, wave: wave),
+                    Key('kid-full-$gender-$outfit${wave ? '-wave' : ''}'),
+                  ),
                 ),
-              ),
-              if (_blink != null)
+              if (_blink != null && walkFrames == null)
                 AnimatedBuilder(
                   animation: _blink!,
                   builder: (context, child) =>
                       _blink!.value > 0.93 ? child! : const SizedBox.shrink(),
                   child: eyes,
                 ),
-              if (accessory != null)
-                Positioned.fill(
-                  child: _frameImage(accessory, const Key('kid-accessory')),
-                ),
+              if (walkFrames == null)
+                for (final o in overlays)
+                  Positioned.fill(
+                    child: _frameImage(
+                      o,
+                      o == accessory
+                          ? const Key('kid-accessory')
+                          : Key('kid-overlay-${o.split('/').last}'),
+                    ),
+                  ),
             ],
           ),
         );
@@ -169,8 +217,9 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
           final sx = 1.01 - 0.025 * b;
           final s = _step!.value;
           // Nhún bước: nảy lên 2 lần mỗi chu kỳ (2 bước), nghiêng theo bước.
-          final hop = widget.walking ? (math.sin(s * 2 * math.pi)).abs() : 0.0;
-          final tilt = widget.walking ? math.sin(s * 2 * math.pi) * 0.05 : 0.0;
+          final bob = widget.walking && !_hasWalkFrames;
+          final hop = bob ? (math.sin(s * 2 * math.pi)).abs() : 0.0;
+          final tilt = bob ? math.sin(s * 2 * math.pi) * 0.05 : 0.0;
           return FractionalTranslation(
             translation: Offset(0, -0.025 * hop),
             child: Transform.rotate(

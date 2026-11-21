@@ -63,6 +63,8 @@ class _TownScreenState extends ConsumerState<TownScreen> {
   String? _error;
   CharacterProfile? _profile;
   String? _headAccessory;
+  bool _glasses = false;
+  bool _whiteShoes = false;
 
   @override
   void initState() {
@@ -99,7 +101,10 @@ class _TownScreenState extends ConsumerState<TownScreen> {
       );
       final balances = await rewardService.balances(childId);
       final profile = await OnboardingService(db: db).loadProfile(childId);
-      final accessory = await KidLookService(db: db).headAccessory(childId);
+      final looks = KidLookService(db: db);
+      final accessory = await looks.headAccessory(childId);
+      final glasses = await looks.glasses(childId);
+      final whiteShoes = await looks.whiteShoes(childId);
       if (!mounted) return;
       setState(() {
         _statuses = statuses;
@@ -107,6 +112,8 @@ class _TownScreenState extends ConsumerState<TownScreen> {
         _gems = balances[Currency.gem] ?? 0;
         _profile = profile;
         _headAccessory = accessory;
+        _glasses = glasses;
+        _whiteShoes = whiteShoes;
         _loading = false;
         _error = null;
       });
@@ -229,6 +236,8 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                                 gender: profile.gender,
                                 outfit: kidOutfitNumber(profile.dress),
                                 headAccessory: _headAccessory,
+                                glasses: _glasses,
+                                whiteShoes: _whiteShoes,
                               ),
                             ),
                           ),

@@ -90,6 +90,9 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   Timer? _bubbleTimer;
   String? _childId;
   String? _headAccessory;
+  bool _glasses = false;
+  bool _whiteShoes = false;
+  bool _kidWalkingUp = false;
   PetStage _petStage = PetStage.newborn;
   int _petDays = 0;
 
@@ -139,7 +142,10 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       final roomService = RoomService(db: db);
       final unlocked = await roomService.isPlayUnlocked(childId);
       final done = await roomService.doneStageCount(childId);
-      final accessory = await KidLookService(db: db).headAccessory(childId);
+      final looks = KidLookService(db: db);
+      final accessory = await looks.headAccessory(childId);
+      final glasses = await looks.glasses(childId);
+      final whiteShoes = await looks.whiteShoes(childId);
       final growth = PetGrowthService(db: db);
       final petDays = await growth.doneDays(childId);
       final petStage = hatched ? petStageForDays(petDays) : PetStage.egg;
@@ -153,6 +159,8 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       setState(() {
         _childId = childId;
         _headAccessory = accessory;
+        _glasses = glasses;
+        _whiteShoes = whiteShoes;
         _petDays = petDays;
         _petStage = petStage;
         _profile = profile;
@@ -351,11 +359,41 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                               gender: gender,
                               outfit: outfit,
                               headAccessory: id,
+                              glasses: _glasses,
+                              whiteShoes: _whiteShoes,
                               animationsEnabled: false,
                             ),
                           ),
                       ],
                     ),
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 12,
+                    children: [
+                      FilterChip(
+                        key: const Key('room-wardrobe-glasses'),
+                        label: const Text('Kính tròn'),
+                        selected: _glasses,
+                        onSelected: (on) async {
+                          await looks.setGlasses(childId, on);
+                          if (!mounted) return;
+                          setState(() => _glasses = on);
+                          setSheet(() {});
+                        },
+                      ),
+                      FilterChip(
+                        key: const Key('room-wardrobe-white-shoes'),
+                        label: const Text('Giày trắng'),
+                        selected: _whiteShoes,
+                        onSelected: (on) async {
+                          await looks.setWhiteShoes(childId, on);
+                          if (!mounted) return;
+                          setState(() => _whiteShoes = on);
+                          setSheet(() {});
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -439,6 +477,10 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       }
 
       setState(() {
+        if (isKid) {
+          // Đi lên (xa dần) rõ rệt thì dùng khung đi bộ `ur`.
+          _kidWalkingUp = (point.dy - from.dy) < -0.35 * dist;
+        }
         if ((point.dx - from.dx).abs() > 2) {
           if (isKid) {
             _kidFacingLeft = point.dx < from.dx;
@@ -692,8 +734,11 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                           gender: profile.gender,
                           outfit: kidOutfitNumber(profile.dress),
                           headAccessory: _headAccessory,
+                          glasses: _glasses,
+                          whiteShoes: _whiteShoes,
                           waving: _kidWaving,
                           walking: _kidWalking,
+                          walkingUp: _kidWalkingUp,
                           facingLeft: _kidFacingLeft,
                         ),
                       ),
