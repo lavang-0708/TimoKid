@@ -892,3 +892,46 @@ PNG vẽ thân cao 400 px mọi giai đoạn là đúng.
 `61871d58` (chó + mèo, 8 file), `111613a1` (thỏ, 4 file); đầu nhánh `111613a1`;
 12/12 blob SHA đối chiếu khớp trên nhánh. Khung đi (walk_a/b) chưa làm — chỉ sau khi duyệt
 12 ảnh đứng.
+
+# Giao diện kiểu game — (F) lô 6: UI v3b (17 file, app/assets/images/ui/)
+
+Phong cách 3D mềm pastel như nhân vật (E) + phòng v3b + thị trấn v3b.
+KHÔNG có chữ trên ảnh (app tự vẽ chữ tiếng Việt) — trừ `ui_logo.png` chỉ có chữ Latin "TimoKid".
+PNG trong suốt, alpha sạch (semi 0,0000), không bóng đổ nền (app tự vẽ bóng).
+
+## Bảng 17 file
+
+| file | kích thước | bytes | ghi chú |
+|---|---|---|---|
+| ui_btn_back.png | 256×256 | 35.809 | Nút kẹo hồng, mũi tên trái trắng to |
+| ui_btn_back_pressed.png | 256×256 | 37.145 | Cùng nút, lún xuống + tối hơn |
+| ui_icon_wardrobe.png | 256×256 | 37.927 | Nút xanh dương, tủ + móc áo |
+| ui_icon_shop.png | 256×256 | 36.712 | Nút xanh lá, túi mua sắm |
+| ui_icon_town.png | 256×256 | 41.527 | Nút tím, nhà nhỏ |
+| ui_icon_room.png | 256×256 | 31.709 | Nút cam, giường nhỏ |
+| ui_coin.png | 128×128 | 14.754 | Xu vàng, sao nổi trên mặt, không nền tròn |
+| ui_gem.png | 128×128 | 12.129 | Kim cương tím |
+| ui_star.png | 128×128 | 10.654 | Sao vàng 5 cánh |
+| ui_hud_bar.png | 1024×128 | 1.636 | Thanh trong mờ (alpha 168); dải giữa x100–924 đơn sắc tuyệt đối theo hàng x (đo bằng code), kéo giãn ngang được |
+| ui_sign_board.png | 768×320 | 50.423 | Biển gỗ + 2 dây, giữa trống; nội dung 768×267 letterbox, không méo |
+| ui_logo.png | 1024×512 | 222.368 | "TimoKid" gradient hồng→tím, viền trắng; bé gái + bé trai + 3 pet quanh chữ |
+| ui_splash_bg.png | 1600×900 | 572.623 | Trời pastel mây + thị trấn mờ xa (đục) |
+| ui_onboarding_bg.png | 1600×900 | 437.561 | Phòng thay đồ, giữa trống (đục) |
+| ui_pedestal.png | 512×256 | 32.703 | Bệ 2 tầng tím + kem |
+| ui_card.png | 384×480 | 2.960 | Khung thẻ, viền sáng trắng |
+| ui_card_selected.png | 384×480 | 6.068 | Viền vàng + quầng phát sáng |
+
+Tổng PNG 1.584.708 B. Thanh HUD và 2 thẻ có semi > 0 theo thiết kế
+(nền trong mờ / quầng sáng), không phải bẩn. 0 px magenta còn sót (đo bằng code).
+Bóng tiếp đất nướng sẵn màu magenta đậm đã xoá bằng 3 lớp (cắt đáy + tẩy viền + tô lại).
+2 nền dùng MEDIANCUT (tường/trời mượt hơn MAXCOVERAGE: 125 vs 16 màu tường);
+nhân vật/UI vẫn MAXCOVERAGE như các lô trước. Biển gỗ vẽ lại bản rộng rồi letterbox
+để không méo. Nốt nhỏ: dây treo biển mỏng ở cỡ app; 2 chấm tối ~2 px ở 2 đầu đáy bệ
+(chỉ thấy khi phóng 2×); logo tóc bé gái hơi sáng hơn bản final.
+
+Đẩy 17 `.b64` lên nhánh `task/E-nhan-vat-v3b`, 3 lần (8+8+1):
+`f11fa270` (nút + icon menu + xu + kim cương, 8 file),
+`10c90860` (sao + thanh HUD + biển gỗ + logo + splash + onboarding + bệ + thẻ, 8 file),
+`e7d19a88` (thẻ được chọn, 1 file); đầu nhánh `e7d19a88`.
+15/17 blob SHA đối chiếu khớp trên nhánh; 2 nền (splash bg, onboarding bg) không tải lại
+được (giới hạn tool với file ≳400 KB) — cùng commit `10c90860` với 6 file đã xác minh.
