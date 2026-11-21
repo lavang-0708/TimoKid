@@ -802,3 +802,32 @@ trong báo cáo lô 4; mắt-y 556,9–566,2; mắt-x 576–724.]
 - 02 dr mắt-x nhảy 33–75 px giữa c→d: nếu cổng G yêu cầu ≤20 px cho cả
   dr thì xem lại riêng.
 - Kiểm lại mốc miệng bé trai (508,720) trước khi dùng.
+
+## (E) fix4 — xoá bóng chân 48 khung đi bộ + tóc búi thừa balo (21/11)
+
+Claude review sau khi decode balo + khung đi bộ bé gái (PR #34, commit
+299b934): (1) Cả 3 ảnh balo vẫy bé gái (01w/02w/03w, rõ nhất 03w) có
+đỉnh đầu tách thành 2 thùy tròn, ảnh gốc không có — đo bằng code thì
+silhouette đỉnh đầu đã khớp gốc trong 1–3 px, lỗi là rãnh ngôi giữa
+quá sâu (khác biệt shading, không phải tóc thừa mọc ra). Đã sửa bằng
+cách copy vùng đỉnh đầu từ ảnh gốc (x340–710, y130–300, feather 8 px,
+chỉ trong giao alpha để silhouette không đổi), map màu về đúng palette
+256 màu của file balo gốc: đỉnh đầu mượt như gốc, không thấy đường nối
+(zoom 2× + ghép phòng cỡ app). Bé trai vẫy và 6 ảnh balo nghỉ không có
+búi, để nguyên. (2) Dưới chân vài khung đi bộ (ví dụ gái 02_dr_b,
+02_dr_d) có vệt bóng hồng/tím đậm loang ra sàn, ở cỡ app nhìn như vết bẩn
+hồng — đã xoá bóng đổ dưới chân ở 41 khung đi bộ (trong 48 khung; 7 khung
+bé gái vốn đã sạch: 01_dr_d, 02_dr_a, 02_ur_d, 03_dr_b, 03_dr_d, 03_ur_a,
+03_ur_b), GIỮ NGUYÊN đế giày; app tự vẽ bóng ellipse nên ảnh không cần
+bóng nền. Cách xóa: gái 2 lượt mask magenta (lượt 1 hue 325–338, lượt 2
+mở hue 315–342/338 để bắt phần tối hue ~320 và phần sáng hue ~341 của
+vệt bóng), component ≥40 px, vùng y1320–1430; trai xóa component alpha
+tách rời trong y≥1280 (<1.500 px). Tổng 101.239 px đã xóa (gái 83.364,
+trai 17.875); vệt lớn nhất 02_dr_d 25.934 px, 02_dr_b 22.707 px. Mặt dưới
+đế giày giữ nguyên có chủ đích; bé trai còn vệt tối mỏng + mảnh hồng
+dính liền đế (≤97 px/khung ở bộ 01/02) không tách được mà không chạm đế,
+ở cỡ app gần như không thấy. Chân y đổi tối đa 2 px (02_ur_b gái,
+03_ur_b trai). Kiểm: ghép phòng cỡ app không còn vết hồng trên sàn;
+phóng 3× vùng chân đế giày nguyên vẹn; 41/41 file ≤256 màu, semi 0.0000.
+Đẩy đè cùng tên file, 6 lần (tối đa 8 file/lần): e44bf11f, 48469861,
+b1a6b1dd, eaeaf8de, 0b135535, 79efdef6.
