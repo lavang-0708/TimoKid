@@ -3,7 +3,13 @@ import {
   addDays,
   dayRange,
   formatDuration,
+  buildCharacterView,
+  countFullyDoneSets,
+  formStatsByStrand,
   formatVnDateTime,
+  parseFlag,
+  petDaysToNextStage,
+  petStageForDays,
   messageStatus,
   relativeVi,
   summarizeStats,
@@ -128,5 +134,113 @@ describe('jwtFresh', () => {
     expect(jwtFresh(mk(now / 1000 + 30), now)).toBe(false);
     expect(jwtFresh('abc', now)).toBe(false);
     expect(jwtFresh(null, now)).toBe(false);
+  });
+});
+
+describe('thống kê từng dạng', () => {
+  const att = (form_id: string, ok: boolean, n = 1) =>
+    Array.from({ length: n }, () => ({ form_id, correct_first_try: ok }));
+  const ids = ['logic.age', 'logic.backward', 'logic.cut', 'geo.fence', 'arith.quick'];
+
+  it('liệt kê cả dạng chưa làm, gom theo mảng và đúng thứ tự mảng', () => {
+    const r = formStatsByStrand([], ids);
+    expect(r.map((s) => s.strand)).toEqual(['logic', 'arith', 'number', 'geo', 'comb']);
+    expect(r[0].total).toBe(3);
+    expect(r[0].attempted).toBe(0);
+    expect(r[0].accuracy).toBeNull();
+    expect(r[0].forms.every((f) => f.attempts === 0 && f.accuracy === null && !f.weak)).toBe(true);
+  });
+
+  it('dạng yếu trước, rồi đúng thấp trước, chưa làm cuối', () => {
+    const a = [
+      ...att('logic.age', true, 5), // 100%
+      ...att('logic.backward', true, 1), ...att('logic.backward', false, 5), // 1/6 yếu
+    ];
+    const logic = formStatsByStrand(a, ids)[0];
+    expect(logic.forms.map((f) => f.formId)).toEqual(['logic.backward', 'logic.age', 'logic.cut']);
+    expect(logic.forms[0]).toMatchObject({ attempts: 6, correctFirstTry: 1, weak: true });
+    expect(logic.attempted).toBe(2);
+    expect(logic.attempts).toBe(11);
+    expect(logic.accuracy).toBeCloseTo(6 / 11);
+  });
+
+  it('ít hơn 5 lượt thì chưa gọi là yếu dù đúng 0%', () => {
+    const f = formStatsByStrand(att('geo.fence', false, 4), ids)[3].forms.find((x) => x.formId === 'geo.fence')!;
+    expect(f.weak).toBe(false);
+    expect(f.accuracy).toBe(0);
+  });
+
+  it('dạng không có trong danh sách app nhưng có lượt làm vẫn hiện; mã lạ bị bỏ', () => {
+    const r = formStatsByStrand([...att('arith.old', true, 2), ...att('zzz.x', true, 2)], ids);
+    expect(r[1].forms.map((f) => f.formId)).toContain('arith.old');
+    expect(r.flatMap((s) => s.forms).some((f) => f.formId === 'zzz.x')).toBe(false);
+  });
+});
+
+describe('pet lớn dần', () => {
+  it('mốc giai đoạn 0-2 / 3-7 / từ 8', () => {
+    expect([0, 2].map(petStageForDays)).toEqual(['newborn', 'newborn']);
+    expect([3, 7].map(petStageForDays)).toEqual(['teen', 'teen']);
+    expect([8, 30].map(petStageForDays)).toEqual(['adult', 'adult']);
+  });
+  it('số ngày tới giai đoạn sau', () => {
+    expect(petDaysToNextStage(0)).toBe(3);
+    expect(petDaysToNextStage(2)).toBe(1);
+    expect(petDaysToNextStage(3)).toBe(5);
+    expect(petDaysToNextStage(7)).toBe(1);
+    expect(petDaysToNextStage(8)).toBeNull();
+  });
+  it('chỉ tính đề có đủ 5 chặng đều done (chuỗi JSON hoặc mảng)', () => {
+    const done = ['done', 'done', 'done', 'done', 'done'];
+    expect(
+      countFullyDoneSets([
+        { stage_status: done },
+        { stage_status: JSON.stringify(done) },
+        { stage_status: ['done', 'done', 'done', 'done', 'todo'] },
+        { stage_status: ['done', 'done', 'done', 'done'] },
+        { stage_status: 'hỏng' },
+      ]),
+    ).toBe(2);
+  });
+});
+
+describe('hồ sơ nhân vật', () => {
+  it('chưa có dòng nào -> null (app chưa đồng bộ)', () => {
+    expect(buildCharacterView({}, 0)).toBeNull();
+    expect(buildCharacterView({ kid_glasses: undefined }, 5)).toBeNull();
+  });
+  it('đọc hồ sơ dạng chuỗi JSON, phụ kiện, cờ chuỗi và pet', () => {
+    const v = buildCharacterView(
+      {
+        character_profile: JSON.stringify({ gender: 'boy', name: ' Bé A ', dress: 'boy_outfit_03' }),
+        kid_head_accessory: 'bow',
+        kid_glasses: 'true',
+        kid_white_shoes: 'false',
+        kid_backpack: true,
+        selected_egg: 'cat',
+        egg_hatched: 'true',
+      },
+      4,
+    )!;
+    expect(v).toMatchObject({
+      name: 'Bé A', gender: 'boy', outfitNumber: 3, head: 'bow',
+      glasses: true, whiteShoes: false, backpack: true,
+      species: 'cat', hatched: true, stage: 'teen', daysToNext: 4,
+    });
+  });
+  it('dress null hoặc lạ -> bộ 1; giá trị lạ -> mặc định an toàn', () => {
+    const v = buildCharacterView(
+      { character_profile: { gender: 'x', dress: null }, kid_head_accessory: 'none', selected_egg: 'dragon' },
+      0,
+    )!;
+    expect(v).toMatchObject({ gender: 'girl', outfitNumber: 1, head: null, species: null, stage: null });
+    expect(buildCharacterView({ character_profile: { dress: 'girl_top_09' } }, 0)!.outfitNumber).toBe(1);
+  });
+  it('chưa nở -> giai đoạn trứng; trưởng thành -> không còn ngày tới', () => {
+    expect(buildCharacterView({ selected_egg: 'dog' }, 9)).toMatchObject({ stage: 'egg', daysToNext: null });
+    expect(buildCharacterView({ selected_egg: 'dog', egg_hatched: 'true' }, 9)).toMatchObject({ stage: 'adult', daysToNext: null });
+  });
+  it('parseFlag', () => {
+    expect([parseFlag('true'), parseFlag(true), parseFlag('false'), parseFlag(undefined), parseFlag(null)]).toEqual([true, true, false, false, false]);
   });
 });

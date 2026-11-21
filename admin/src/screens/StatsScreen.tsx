@@ -1,9 +1,18 @@
 import { useState } from 'react';
 import { http } from '../client';
 import { Card, ErrorBox, RangePicker, Spinner, useLoad } from '../common';
-import { loadStats } from '../lib/data';
-import { STRANDS, STRAND_COLORS, STRAND_NAMES } from '../lib/labels';
-import { formatDuration, formatPercent, shortDay } from '../lib/logic';
+import { loadCharacter, loadStats } from '../lib/data';
+import {
+  GENDER_NAMES,
+  HEAD_ACCESSORY_NAMES,
+  OUTFIT_NAMES,
+  PET_SPECIES_NAMES,
+  PET_STAGE_NAMES,
+  STRANDS,
+  STRAND_COLORS,
+  STRAND_NAMES,
+} from '../lib/labels';
+import { formatDuration, formatPercent, shortDay, type CharacterView } from '../lib/logic';
 
 export function StatsScreen({ childId }: { childId: string }) {
   const [range, setRange] = useState(7);
@@ -48,6 +57,8 @@ export function StatsScreen({ childId }: { childId: string }) {
             <DayChart perDay={d.summary.perDay} />
           </Card>
 
+          <CharacterCard childId={childId} />
+
           <div className="grid">
             <div className="stat" style={{ background: '#fff6d8' }}><b>{d.balances.xu}</b><span>Xu hiện có</span></div>
             <div className="stat" style={{ background: '#e4f3ff' }}><b>{d.balances.gem}</b><span>Kim cương hiện có</span></div>
@@ -77,5 +88,52 @@ function DayChart({ perDay }: { perDay: { day: string; minutes: number; question
       </div>
       <p className="muted" style={{ marginBottom: 0 }}>Cao nhất: {max} phút/ngày.</p>
     </>
+  );
+}
+
+function CharacterCard({ childId }: { childId: string }) {
+  const q = useLoad(() => loadCharacter(http, childId), [childId]);
+  return (
+    <Card title="Nhân vật và pet của bé" tone="mint">
+      {q.error != null && <ErrorBox error={q.error} onRetry={q.reload} />}
+      {q.loading && !q.data && <Spinner />}
+      {!q.loading && q.error == null && q.data === null && (
+        <p className="muted" style={{ margin: 0 }}>Chưa có dữ liệu — app chưa đồng bộ.</p>
+      )}
+      {q.data && <CharacterBody v={q.data} />}
+    </Card>
+  );
+}
+
+function CharacterBody({ v }: { v: CharacterView }) {
+  const worn = [
+    v.head ? HEAD_ACCESSORY_NAMES[v.gender][v.head] : null,
+    v.glasses ? 'Kính tròn' : null,
+    v.whiteShoes ? 'Giày trắng' : null,
+    v.backpack ? 'Balo' : null,
+  ].filter((x): x is string => x !== null);
+  let pet = 'Chưa chọn trứng';
+  if (v.species) {
+    const sp = PET_SPECIES_NAMES[v.species];
+    pet = v.stage === 'egg' ? `Trứng ${sp} (chưa nở)` : `${sp}, ${PET_STAGE_NAMES[v.stage ?? 'newborn']}`;
+  }
+  return (
+    <ul className="list">
+      <li><span>Tên</span><b>{v.name || 'Chưa đặt tên'}</b></li>
+      <li><span>Dáng</span><b>{GENDER_NAMES[v.gender]}</b></li>
+      <li><span>Bộ đồ</span><b>{OUTFIT_NAMES[v.gender][v.outfitNumber - 1]}</b></li>
+      <li><span>Phụ kiện đang đeo</span><b>{worn.length > 0 ? worn.join(', ') : 'Không có'}</b></li>
+      <li><span>Pet</span><b>{pet}</b></li>
+      {v.hatched && v.species && (
+        <li>
+          <span>Lớn lên</span>
+          <b>
+            {v.daysToNext === null
+              ? `Đã trưởng thành (${v.doneDays} ngày xong đề)`
+              : `Còn ${v.daysToNext} ngày xong đề nữa để lên giai đoạn sau (đã ${v.doneDays})`}
+          </b>
+        </li>
+      )}
+    </ul>
   );
 }

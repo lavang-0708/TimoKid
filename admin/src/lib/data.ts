@@ -3,17 +3,22 @@
 import type { NeonHttp } from './http';
 import { ApiError } from './http';
 import {
+  buildCharacterView,
+  countFullyDoneSets,
   dayRange,
+  formStatsByStrand,
   summarizeStats,
   vnStartOfDay,
   weakForms,
   type AttemptLite,
+  type CharacterView,
   type DailyStatRow,
   type StatsSummary,
+  type StrandFormStats,
   type ValidMessage,
   type WeakForm,
 } from './logic';
-import { REWARD_FIELDS, STRANDS, type Strand } from './labels';
+import { ALL_FORM_IDS, REWARD_FIELDS, STRANDS, type Strand } from './labels';
 
 export interface Family {
   id: string;
@@ -128,6 +133,8 @@ export async function loadStats(http: NeonHttp, childId: string, rangeDays: numb
 export interface FormsData {
   mastered: SkillRow[];
   weak: WeakForm[];
+  /** Thống kê từng dạng theo mảng, gồm cả dạng chưa làm. */
+  byStrand: StrandFormStats[];
   review: ReviewRow[];
 }
 
@@ -139,7 +146,7 @@ export async function loadForms(http: NeonHttp, childId: string, rangeDays: numb
     getAll<AttemptLite>(http, `attempts?child_id=eq.${c}&created_at=gte.${from}&select=form_id,correct_first_try`),
     getAll<ReviewRow>(http, `review_queue?child_id=eq.${c}&deleted_at=is.null&select=id,form_id,rung,due_date,correct_streak&order=due_date.asc`),
   ]);
-  return { mastered, weak: weakForms(attempts), review };
+  return { mastered, weak: weakForms(attempts), byStrand: formStatsByStrand(attempts, ALL_FORM_IDS), review };
 }
 
 // ---------------------------------------------------------- thư và quà
@@ -230,3 +237,27 @@ function isObj(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v);
 }
 
+
+// ---------------------------------------------------- nhân vật và pet
+
+const CHARACTER_KEYS = [
+  'character_profile',
+  'kid_head_accessory',
+  'kid_glasses',
+  'kid_white_shoes',
+  'kid_backpack',
+  'selected_egg',
+  'egg_hatched',
+];
+
+/** Chỉ đọc. Trả null nếu app chưa đồng bộ dòng settings nào của nhân vật/pet. */
+export async function loadCharacter(http: NeonHttp, childId: string): Promise<CharacterView | null> {
+  const c = enc(childId);
+  const [rows, sets] = await Promise.all([
+    getAll<{ key: string; value: unknown }>(http, `settings?child_id=eq.${c}&key=in.(${CHARACTER_KEYS.join(',')})&select=key,value`),
+    getAll<{ stage_status: unknown }>(http, `daily_sets?child_id=eq.${c}&select=stage_status`),
+  ]);
+  const settings: Record<string, unknown> = {};
+  for (const r of rows) settings[r.key] = r.value;
+  return buildCharacterView(settings, countFullyDoneSets(sets));
+}

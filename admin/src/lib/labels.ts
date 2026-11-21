@@ -18,7 +18,8 @@ export const STRAND_COLORS: Record<Strand, string> = {
 };
 
 // Tên dạng bài tiếng Việt. Mã không có trong bảng thì hiện nguyên mã.
-const FORM_LABELS: Record<string, string> = {
+// labels.test.ts đối chiếu bảng này với mã nguồn Dart của app (84 dạng).
+export const FORM_LABELS: Record<string, string> = {
   'logic.age': 'Tuổi',
   'logic.backward': 'Tính ngược',
   'logic.balance': 'Cân thăng bằng',
@@ -31,9 +32,7 @@ const FORM_LABELS: Record<string, string> = {
   'logic.trees': 'Trồng cây',
   'logic.weekday': 'Thứ trong tuần',
   'logic.classsize': 'Sĩ số lớp',
-  'logic.weekday_rel': 'Thứ, hôm qua, ngày mai',
-  'logic.order3': 'Xếp thứ tự nặng nhẹ',
-  'logic.seq_grow': 'Dãy số tăng dần đều',
+  'logic.seqgrow': 'Dãy số tăng dần đều',
   'logic.interleave': 'Hai dãy số xen kẽ',
   'logic.cyclepattern': 'Hình lặp theo chu kỳ',
   'logic.laps': 'Chạy vòng và nghỉ',
@@ -52,9 +51,8 @@ const FORM_LABELS: Record<string, string> = {
   'arith.runsum': 'Tổng dãy cách đều',
   'arith.cryptarith': 'Phép tính chữ số ẩn',
   'arith.arrowchain': 'Chuỗi mũi tên',
-  'arith.signs': 'Điền dấu cộng trừ',
   'arith.flowerx': 'Phép tính bông hoa',
-  'arith.factor_out': 'Đặt thừa số chung',
+  'arith.factorout': 'Đặt thừa số chung',
   'number.cards': 'Ghép thẻ số',
   'number.clues': 'Đoán số theo gợi ý',
   'number.digitcount': 'Đếm số chữ số',
@@ -66,7 +64,7 @@ const FORM_LABELS: Record<string, string> = {
   'number.place': 'Hàng của chữ số',
   'number.round': 'Làm tròn số',
   'number.digitcond': 'Đếm số theo điều kiện chữ số',
-  'number.parity_ops': 'Chẵn lẻ của phép tính',
+  'number.parityops': 'Chẵn lẻ của phép tính',
   'number.countsteps': 'Đếm bước',
   'number.between': 'Đếm số nằm giữa',
   'number.giveequal': 'Cho đi để bằng nhau',
@@ -101,8 +99,8 @@ const FORM_LABELS: Record<string, string> = {
   'comb.split': 'Chia nhóm',
   'comb.tournament': 'Thi đấu vòng tròn',
   'comb.freebie': 'Mua tặng kèm',
-  'comb.kth_choose': 'Chọn theo thứ tự',
-  'comb.makenum_parity': 'Lập số chẵn lẻ',
+  'comb.pick2': 'Chọn 2 bạn trong nhóm',
+  'comb.makenumparity': 'Lập số chẵn lẻ',
   'comb.minsum2': 'Tổng nhỏ nhất của hai số',
   'comb.vases': 'Cắm hoa vào lọ',
   'comb.dice': 'Gieo hai xúc xắc',
@@ -133,3 +131,33 @@ export const REWARD_FIELDS: { key: string; label: string; unit: string; def: num
   { key: 'daily_complete_gem', label: 'Xong đề ngày', unit: 'kim cương', def: 1 },
   { key: 'mastery_gem', label: 'Thành thạo một dạng mới', unit: 'kim cương', def: 2 },
 ];
+
+// Tên nhân vật và pet, mirror từ app (app/lib/features/character/kid_assets.dart,
+// onboarding_config.dart, room/pet_growth.dart).
+export const OUTFIT_NAMES: Record<'girl' | 'boy', [string, string, string]> = {
+  girl: ['Váy hồng', 'Váy tím', 'Váy hồng tạp dề'],
+  boy: ['Áo xanh, quần short', 'Áo hoodie xanh lá', 'Áo đỏ, quần jean'],
+};
+
+export const HEAD_ACCESSORY_NAMES: Record<'girl' | 'boy', { hat: string; bow: string }> = {
+  girl: { hat: 'Mũ beret', bow: 'Nơ cài tóc' },
+  boy: { hat: 'Mũ lưỡi trai', bow: 'Kẹp tóc ngôi sao' },
+};
+
+export const GENDER_NAMES = { girl: 'Bé gái', boy: 'Bé trai' } as const;
+
+export const PET_SPECIES_NAMES = {
+  dog: 'Chó Tinh Anh',
+  cat: 'Mèo Mũm Mĩm',
+  rabbit: 'Thỏ Bánh Bao',
+} as const;
+
+export const PET_STAGE_NAMES = {
+  egg: 'trứng',
+  newborn: 'mới nở',
+  teen: 'tuổi nhỡ',
+  adult: 'trưởng thành',
+} as const;
+
+/** Mã mọi dạng bài của app (labels.test.ts bảo đảm khớp mã nguồn Dart). */
+export const ALL_FORM_IDS: readonly string[] = Object.keys(FORM_LABELS);
