@@ -14,9 +14,9 @@
 /// (không `cover` như màn Phòng — `cover` cắt nền sẽ làm lệch vùng
 /// bấm).
 ///
-/// Xe chạy GIỮA làn, người đi trên vỉa hè (lệch tâm đường 25 px),
-/// theo các tuyến khai báo trong `town_roads.dart` (đoạn đường
-/// D1–D6, nửa rộng vùng đường 50 px). Xe/người chọn biến thể lớp
+/// Xe chạy GIỮA làn, người đi trên vỉa hè (lệch tâm đường
+/// [townSidewalkOffset] = 46 px), theo các tuyến khai báo trong
+/// `town_roads.dart` (đường C1/C2, nửa rộng vùng đường 60 px). Xe/người chọn biến thể lớp
 /// (dr/ur) + lật ngang theo hướng di chuyển (xem `town_roads.dart`
 /// — `ur` của xe là xe nhìn từ sau, đầu xe ↖). Lớp động vẽ theo
 /// thứ tự chiều sâu: càng ở dưới màn hình (y chân lớn) càng vẽ sau
@@ -170,7 +170,7 @@ class _RouteActor {
   /// Vị trí ban đầu 0..1 (cũng là vị trí khi cổng tắt).
   final double phase;
 
-  /// true = người đi bộ: lệch 25 px sang vỉa hè phía nam đường.
+  /// true = người đi bộ: lệch [townSidewalkOffset] px sang vỉa hè phía nam đường.
   final bool sidewalk;
 }
 
