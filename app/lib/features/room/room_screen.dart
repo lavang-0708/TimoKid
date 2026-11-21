@@ -63,12 +63,22 @@ import '../shop/shop_screen.dart';
 import '../shop/shop_service.dart';
 import '../town/town_screen.dart';
 import 'pet_growth.dart';
+import 'pet_sprite.dart';
 import 'room_assets.dart';
 import 'room_service.dart';
 import 'room_walk.dart';
 
 class RoomScreen extends ConsumerStatefulWidget {
-  const RoomScreen({super.key});
+  /// [cleanBackground] mặc định theo [roomCleanBackgroundReady]; chỉ
+  /// đặt khác để test nhánh nền sạch.
+  const RoomScreen({
+    super.key,
+    this.cleanBackground = roomCleanBackgroundReady,
+  });
+
+  /// true = dùng `room_v3_clean.png` + vẽ lại 5 PNG nội thất rời;
+  /// false = nền `room_v3.png` đã có sẵn 5 món, chỉ đặt vùng chạm.
+  final bool cleanBackground;
 
   static const String route = '/room';
 
@@ -845,6 +855,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
         // Giữ đáy (sàn, nơi bé đi lại); phần trần bị cắt khi màn dài.
         alignment: const Alignment(0, 0.9),
         builder: (context, w, h) {
+          final clean = widget.cleanBackground;
           double fx(double x) => x / roomFrameWidth * w;
           double fy(double y) => y / roomFrameHeight * h;
 
@@ -948,25 +959,30 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                     ),
                   ),
                   child: Image.asset(
-                    roomBackgroundAsset,
+                    clean ? roomCleanBackgroundAsset : roomBackgroundAsset,
                     fit: BoxFit.fill,
                     width: w,
                     height: h,
                   ),
                 ),
               ),
-              // Bóng đổ (theo chân y).
-              for (final item in itemsByFeet)
-                frameShadow(item.anchor, item.placeSize),
-              // 5 món nội thất (theo chân y).
+              // Nền sạch: bóng đổ do app vẽ (theo chân y). Nền cũ đã có
+              // bóng + món vẽ sẵn nên không vẽ thêm.
+              if (clean)
+                for (final item in itemsByFeet)
+                  frameShadow(item.anchor, item.placeSize),
+              // 5 món nội thất (theo chân y): nền sạch thì vẽ PNG rời;
+              // nền cũ thì chỉ đặt vùng chạm vô hình đúng chỗ món vẽ
+              // sẵn trong nền (không vẽ PNG rời → không hình đôi).
               for (final item in itemsByFeet)
                 Positioned(
-                  left: fx(item.placeX),
-                  top: fy(item.placeY),
-                  width: fx(item.placeSize),
-                  height: fy(item.placeSize),
+                  left: fx(clean ? item.placeX : item.bakedRect.left),
+                  top: fy(clean ? item.placeY : item.bakedRect.top),
+                  width: fx(clean ? item.placeSize : item.bakedRect.width),
+                  height: fy(clean ? item.placeSize : item.bakedRect.height),
                   child: _RoomItemSlot(
                     item: item,
+                    showImage: clean,
                     onTap: () => _showBubble(item.reaction),
                   ),
                 ),
@@ -1004,27 +1020,126 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   }
 }
 
-/// Một món nội thất v3b: chạm vào thì hiện bong bóng phản ứng.
+/// Một món nội thất v3b: chạm vào thì hiện bong bóng phản ứng + nháy
+/// sao "pop" tại chỗ món.
 ///
-/// Món là PNG 512x512 trong suốt đặt khớp món vẽ sẵn trong nền
-/// (xem [RoomFurniture.placeX]/[placeY]/[placeSize]); bóng đổ do
-/// app vẽ ở tầng cảnh (xem `_buildScene`), không nướng trong PNG.
+/// [showImage] = true (nền sạch): vẽ PNG 512x512 trong suốt đặt khớp
+/// ([RoomFurniture.placeX]/[placeY]/[placeSize]); bóng đổ do app vẽ ở
+/// tầng cảnh (xem `_buildScene`), không nướng trong PNG. [showImage]
+/// = false (nền `room_v3.png` đã vẽ sẵn món): chỉ là vùng chạm vô
+/// hình phủ đúng món trong nền ([RoomFurniture.bakedRect]).
 /// Khóa widget giữ nguyên như bản v2 (`room-furniture-<tên>`) để
 /// test cũ vẫn tìm được món.
-class _RoomItemSlot extends StatelessWidget {
-  const _RoomItemSlot({required this.item, required this.onTap});
+class _RoomItemSlot extends StatefulWidget {
+  const _RoomItemSlot({
+    required this.item,
+    required this.onTap,
+    required this.showImage,
+  });
 
   final RoomFurniture item;
   final VoidCallback onTap;
+  final bool showImage;
+
+  @override
+  State<_RoomItemSlot> createState() => _RoomItemSlotState();
+}
+
+class _RoomItemSlotState extends State<_RoomItemSlot>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pop = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 600),
+  );
+
+  @override
+  void dispose() {
+    _pop.dispose();
+    super.dispose();
+  }
+
+  void _onTap() {
+    // Hiệu ứng một lần, tắt khi chạy test (cổng AnimationGate) để ảnh
+    // chụp xác định.
+    if (AnimationGate.enabled) _pop.forward(from: 0);
+    widget.onTap();
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      key: Key(item.key),
-      onTap: onTap,
-      child: Image.asset(item.asset, fit: BoxFit.fill),
+      key: Key(widget.item.key),
+      behavior: HitTestBehavior.opaque,
+      onTap: _onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        fit: StackFit.expand,
+        children: [
+          if (widget.showImage)
+            Image.asset(widget.item.asset, fit: BoxFit.fill),
+          AnimatedBuilder(
+            animation: _pop,
+            builder: (context, _) {
+              final t = _pop.value;
+              if (t <= 0 || t >= 1) return const SizedBox.shrink();
+              return IgnorePointer(
+                child: CustomPaint(
+                  key: Key('${widget.item.key}-pop'),
+                  painter: _PopPainter(t),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
+}
+
+/// Nháy "pop": vòng sáng nở ra + 4 sao nhỏ bay ra 4 góc rồi mờ dần,
+/// tâm là giữa vùng chạm của món.
+class _PopPainter extends CustomPainter {
+  const _PopPainter(this.t);
+
+  final double t;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = size.center(Offset.zero);
+    final e = Curves.easeOut.transform(t);
+    final fade = 1 - t;
+    final r = math.max(size.width, size.height) * (0.25 + 0.45 * e);
+    canvas.drawCircle(
+      c,
+      r,
+      Paint()
+        ..color = const Color(0xFFFFE08A).withValues(alpha: 0.9 * fade)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4 * fade + 1,
+    );
+    final star = Paint()
+      ..color = const Color(0xFFFFC93C).withValues(alpha: fade);
+    final reach = math.max(size.width, size.height) * (0.3 + 0.5 * e);
+    for (var i = 0; i < 4; i++) {
+      final a = -math.pi / 4 + i * math.pi / 2;
+      final p = c + Offset(math.cos(a), math.sin(a)) * reach;
+      final s = 7.0 * (1 - 0.4 * t);
+      final path = Path()
+        ..moveTo(p.dx, p.dy - s)
+        ..lineTo(p.dx + s * 0.35, p.dy - s * 0.35)
+        ..lineTo(p.dx + s, p.dy)
+        ..lineTo(p.dx + s * 0.35, p.dy + s * 0.35)
+        ..lineTo(p.dx, p.dy + s)
+        ..lineTo(p.dx - s * 0.35, p.dy + s * 0.35)
+        ..lineTo(p.dx - s, p.dy)
+        ..lineTo(p.dx - s * 0.35, p.dy - s * 0.35)
+        ..close();
+      canvas.drawPath(path, star);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _PopPainter old) => old.t != t;
 }
 
 /// Bóng đổ mềm: ellipse đen 20%, viền mờ dần (làm mờ bằng
@@ -1051,9 +1166,10 @@ class _SoftShadowPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// Ô pet/trứng: trứng chưa nở thì hiện trứng, đã nở thì hiện pet theo
-/// giai đoạn lớn (F). Chạm vào thì nảy nhẹ + bong bóng lời. Đang đi thì
-/// nhún bước; [facingLeft] lật ngang.
+/// Ô pet/trứng: trứng chưa nở thì hiện trứng (lắc lư chờ nở), đã nở
+/// thì hiện pet theo giai đoạn lớn (F) với động tác riêng
+/// ([PetSprite]: đi nước kiệu, thở/vẫy đuôi, động tác ngẫu nhiên,
+/// nhảy vui + tim khi bé chạm). [facingLeft] lật ngang.
 class _PetSlot extends StatelessWidget {
   const _PetSlot({
     required this.species,
@@ -1075,88 +1191,28 @@ class _PetSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final asset = hatched
-        ? petAsset(species, stage == PetStage.egg ? PetStage.newborn : stage)
-        : eggSpeciesAssets[species]!;
-    Widget picture = Image.asset(
-      asset,
-      fit: BoxFit.contain,
-      gaplessPlayback: true,
-    );
-    if (facingLeft) picture = Transform.flip(flipX: true, child: picture);
-    final shown = hatched
-        ? _PetHop(walking: walking, child: picture)
-        : _RoomEggWiggle(child: picture);
+    final Widget shown;
+    if (hatched) {
+      shown = PetSprite(
+        species: species,
+        stage: stage == PetStage.egg ? PetStage.newborn : stage,
+        walking: walking,
+        facingLeft: facingLeft,
+        happyTick: bounce,
+      );
+    } else {
+      Widget egg = Image.asset(
+        eggSpeciesAssets[species]!,
+        fit: BoxFit.contain,
+        gaplessPlayback: true,
+      );
+      if (facingLeft) egg = Transform.flip(flipX: true, child: egg);
+      shown = _RoomEggWiggle(child: egg);
+    }
     return GestureDetector(
       key: Key(hatched ? 'room-pet' : 'room-egg'),
       onTap: onTap,
-      child: TweenAnimationBuilder<double>(
-        key: ValueKey(bounce),
-        tween: Tween(begin: 0.85, end: 1.0),
-        duration: const Duration(milliseconds: 300),
-        builder: (context, scale, child) =>
-            Transform.scale(scale: scale, child: child),
-        child: shown,
-      ),
-    );
-  }
-}
-
-/// Pet nhún nhảy khi đi (nảy 2 lần mỗi chu kỳ 360 ms); đứng yên thì
-/// thở nhẹ. Tắt khi chạy test ([AnimationGate]).
-class _PetHop extends StatefulWidget {
-  const _PetHop({required this.walking, required this.child});
-
-  final bool walking;
-  final Widget child;
-
-  @override
-  State<_PetHop> createState() => _PetHopState();
-}
-
-class _PetHopState extends State<_PetHop> with SingleTickerProviderStateMixin {
-  AnimationController? _c;
-
-  @override
-  void initState() {
-    super.initState();
-    if (!AnimationGate.enabled) return;
-    _c = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _c?.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final c = _c;
-    if (c == null) return widget.child;
-    return AnimatedBuilder(
-      animation: c,
-      builder: (context, child) {
-        final t = c.value * 2 * math.pi;
-        if (widget.walking) {
-          // 5 nhịp nảy mỗi chu kỳ 1,8 giây (~360 ms một nhịp).
-          final hop = math.sin(t * 5).abs();
-          return FractionalTranslation(
-            translation: Offset(0, -0.08 * hop),
-            child: child,
-          );
-        }
-        final breath = 1 + 0.025 * math.sin(t);
-        return Transform(
-          alignment: const Alignment(0, 0.72),
-          transform: Matrix4.diagonal3Values(2 - breath, breath, 1),
-          child: child,
-        );
-      },
-      child: widget.child,
+      child: shown,
     );
   }
 }

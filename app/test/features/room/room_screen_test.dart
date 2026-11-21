@@ -25,6 +25,7 @@ import 'package:timokid/features/onboarding/egg_service.dart';
 import 'package:timokid/features/onboarding/onboarding_model.dart';
 import 'package:timokid/features/onboarding/onboarding_service.dart';
 import 'package:timokid/features/room/coming_soon_screen.dart';
+import 'package:timokid/features/room/room_assets.dart';
 import 'package:timokid/features/room/room_screen.dart';
 import 'package:timokid/features/shop/shop_screen.dart';
 import 'package:timokid/features/town/town_screen.dart';
@@ -62,6 +63,7 @@ void main() {
     WidgetTester tester, {
     Size size = const Size(800, 360),
     bool settle = true,
+    bool clean = false,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
@@ -74,7 +76,7 @@ void main() {
       routes: [
         GoRoute(
           path: RoomScreen.route,
-          builder: (context, state) => const RoomScreen(),
+          builder: (context, state) => RoomScreen(cleanBackground: clean),
         ),
         GoRoute(
           path: TownScreen.route,
@@ -642,7 +644,7 @@ void main() {
     );
   });
 
-  testWidgets('nền + nội thất ở Phòng là PNG thật v3b, không còn SVG', (
+  testWidgets('nền cũ đã có sẵn 5 món: không vẽ PNG rời đè lên, không SVG', (
     tester,
   ) async {
     await completeOnboardingGirl();
@@ -655,6 +657,50 @@ void main() {
         .map((p) => p.assetName)
         .toList();
     expect(assetNames, contains('assets/images/backgrounds/room_v3.png'));
+    expect(assetNames, isNot(contains(roomCleanBackgroundAsset)));
+    // Góp ý 22/11: PNG rời đè lên món vẽ sẵn trong nền gây hình đôi.
+    expect(assetNames.where((n) => n.contains('furniture/')), isEmpty);
+    // Vùng chạm vẫn có đủ 5 khóa, đặt đúng hộp món trong nền.
+    final floor = tester.getRect(find.byKey(const Key('room-floor')));
+    for (final item in roomFurniture) {
+      final r = tester.getRect(find.byKey(Key(item.key)));
+      expect(
+        r.left,
+        closeTo(floor.left + item.bakedRect.left / 1600 * floor.width, 0.6),
+      );
+      expect(
+        r.top,
+        closeTo(floor.top + item.bakedRect.top / 900 * floor.height, 0.6),
+      );
+      expect(r.width, closeTo(item.bakedRect.width / 1600 * floor.width, 0.6));
+      expect(
+        r.height,
+        closeTo(item.bakedRect.height / 900 * floor.height, 0.6),
+      );
+    }
+    expect(find.byType(SvgPicture), findsNothing);
+  });
+
+  testWidgets('có nền sạch (cờ bật): dùng room_v3_clean + vẽ lại 5 PNG rời', (
+    tester,
+  ) async {
+    await completeOnboardingGirl();
+    await pumpRoom(tester, clean: true);
+    // Chưa có file room_v3_clean.png trong repo nên ảnh nền báo lỗi
+    // nạp; bỏ qua ngoại lệ đó, chỉ kiểm cây widget.
+    tester.takeException();
+
+    final assetNames = tester
+        .widgetList<Image>(find.byType(Image))
+        .map((w) => w.image)
+        .whereType<AssetImage>()
+        .map((p) => p.assetName)
+        .toList();
+    expect(assetNames, contains(roomCleanBackgroundAsset));
+    expect(
+      assetNames,
+      isNot(contains('assets/images/backgrounds/room_v3.png')),
+    );
     for (final name in [
       'gau_bong_v3',
       'den_sao_v3',
@@ -664,7 +710,28 @@ void main() {
     ]) {
       expect(assetNames, contains('assets/images/furniture/$name.png'));
     }
-    expect(find.byType(SvgPicture), findsNothing);
+  });
+
+  testWidgets('chạm món trong nền: bong bóng + nháy sao pop rồi tắt', (
+    tester,
+  ) async {
+    await completeOnboardingGirl();
+    AnimationGate.enabled = true;
+    addTearDown(() => AnimationGate.enabled = false);
+    await pumpRoom(tester, settle: false);
+
+    expect(find.byKey(const Key('room-furniture-binh-hoa-pop')), findsNothing);
+    await tester.tap(find.byKey(const Key('room-furniture-binh-hoa')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.text('Hoa thơm quá!'), findsOneWidget);
+    expect(
+      find.byKey(const Key('room-furniture-binh-hoa-pop')),
+      findsOneWidget,
+    );
+    await tester.pump(const Duration(milliseconds: 700));
+    expect(find.byKey(const Key('room-furniture-binh-hoa-pop')), findsNothing);
+    await tester.pumpWidget(const SizedBox());
   });
 
   testWidgets('pet đã nở ở Phòng là PNG thật (PR #21)', (tester) async {

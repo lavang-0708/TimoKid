@@ -13,6 +13,18 @@ import 'dart:ui';
 /// Đường dẫn asset PNG nền phòng v3b.
 const String roomBackgroundAsset = 'assets/images/backgrounds/room_v3.png';
 
+/// Nền phòng SẠCH (không có gấu bông, đèn sao, bình hoa, cốc bút,
+/// chậu cây vẽ sẵn) — Muse đang vẽ `room_v3_clean.png`.
+const String roomCleanBackgroundAsset =
+    'assets/images/backgrounds/room_v3_clean.png';
+
+/// Đã có nền sạch chưa. `false` (hiện tại): nền `room_v3.png` đã VẼ
+/// SẴN 5 món (nhỏ hơn và lệch so với PNG rời) nên app KHÔNG vẽ PNG
+/// rời đè lên (tránh hình đôi) mà chỉ đặt vùng chạm vô hình đúng chỗ
+/// món trong nền ([RoomFurniture.bakedRect]). `true`: dùng nền sạch
+/// và vẽ lại 5 PNG rời như thiết kế ban đầu.
+const bool roomCleanBackgroundReady = false;
+
 /// Khung nền 1600x900 — mọi tọa độ trong file này theo khung đó.
 const double roomFrameWidth = 1600;
 const double roomFrameHeight = 900;
@@ -35,6 +47,7 @@ class RoomFurniture {
     required this.placeY,
     required this.placeSize,
     required this.anchor,
+    required this.bakedRect,
   });
 
   /// Khóa widget của món (để test tìm).
@@ -60,6 +73,11 @@ class RoomFurniture {
 
   /// Điểm neo đáy món (khung 1600x900) — bóng đổ vẽ ngay dưới đó.
   final Offset anchor;
+
+  /// Hộp bao món VẼ SẴN trong nền `room_v3.png` (khung 1600x900, đo
+  /// bằng PIL trên ảnh thật 22/11). Khi [roomCleanBackgroundReady]
+  /// còn `false` đây là vùng chạm vô hình của món.
+  final Rect bakedRect;
 }
 
 /// Nội thất v3b (5 món, đặt khớp món vẽ sẵn trong nền).
@@ -73,6 +91,7 @@ const List<RoomFurniture> roomFurniture = [
     placeY: 343,
     placeSize: 239,
     anchor: Offset(415, 550),
+    bakedRect: Rect.fromLTRB(340, 440, 456, 548),
   ),
   RoomFurniture(
     key: 'room-furniture-den-sao',
@@ -83,6 +102,7 @@ const List<RoomFurniture> roomFurniture = [
     placeY: 408,
     placeSize: 196,
     anchor: Offset(150, 580),
+    bakedRect: Rect.fromLTRB(92, 486, 210, 604),
   ),
   RoomFurniture(
     key: 'room-furniture-chau-cay',
@@ -93,6 +113,7 @@ const List<RoomFurniture> roomFurniture = [
     placeY: 378,
     placeSize: 358,
     anchor: Offset(842, 686),
+    bakedRect: Rect.fromLTRB(783, 538, 902, 684),
   ),
   RoomFurniture(
     key: 'room-furniture-binh-hoa',
@@ -103,6 +124,7 @@ const List<RoomFurniture> roomFurniture = [
     placeY: 273,
     placeSize: 283,
     anchor: Offset(1305, 510),
+    bakedRect: Rect.fromLTRB(1230, 396, 1357, 545),
   ),
   RoomFurniture(
     key: 'room-furniture-coc-sao',
@@ -113,6 +135,7 @@ const List<RoomFurniture> roomFurniture = [
     placeY: 378,
     placeSize: 161,
     anchor: Offset(1099, 515),
+    bakedRect: Rect.fromLTRB(1076, 441, 1144, 523),
   ),
 ];
 
