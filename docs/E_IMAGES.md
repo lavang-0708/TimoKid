@@ -485,7 +485,7 @@ giày = 0,0000 (mép cứng sau dilate, như ảnh toàn thân lô 1/2).
 ## Vị trí / điểm neo (khung 1024×1536, bbox đo bằng code từ PNG cuối)
 
 Mốc ảnh toàn thân để căn: gái tâm mắt (388,562)/(619,559), miệng
-(517,835), chân y=1429; trai tâm mắt (398,626)/(611,626), miệng
+(517,835) (Đính chính 21/11: miệng thật là (519,651); (517,835) là nơ ngực), chân y=1429; trai tâm mắt (398,626)/(611,626), miệng
 ≈(508,720), chân y=1429.
 
 - Mũ: gái bbox x[287,721] y[53,364] (đỉnh tóc y≈142, đội đúng đỉnh
