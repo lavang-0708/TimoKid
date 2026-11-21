@@ -289,15 +289,30 @@ Nền hồng cá hồi gần màu da/má hồng nên keying ăn cả chi tiết 
   mọc viền tối đa 3 px vào dải mờ (khoảng cách tới nền 10–25),
   không bao giờ vào nền thuần (khoảng cách < 10) — khôi phục
   đúng mép mềm của ảnh gốc, không tạo quầng hồng.
-- **Lỗi `_hsv` trong `patch.py` của lô 1 (phát hiện khi làm patch
-  trai):** hàm `_hsv` quên chia kênh G cho 255 (`g = a3[..., 1]`
-  thay vì `/ 255`) → mask tròng trắng `sclera` và mask mi `lash`
-  gần như rỗng → vùng mí chỉ còn tròng nâu giãn → **đồng tử và
-  tròng trắng lọt qua patch** (patch gái có thể cũng bị nhẹ, chỉ
-  ít thấy vì đồng tử gái nhỏ hơn và chỉ số kiểm của gái chỉ đếm
-  px xanh). Đã sửa ở `boy_patch.py` (chia đủ 3 kênh + giãn vùng
-  mí 14 px). **Claude quyết có làm lại patch gái không** — patch
-  gái đã decode và duyệt, không tự làm lại trong lô này.
+- **Nghi ngờ `_hsv` trong `patch.py` của lô 1 — ĐÃ KIỂM LẠI, KHÔNG ĐÚNG:**
+  khi làm patch trai, agent nghi hàm `_hsv` quên chia kênh G cho 255
+  (`g = a3[..., 1]` thay vì `/ 255`) nên mask tròng trắng `sclera` và
+  mask mi `lash` gần như rỗng, đồng tử và tròng trắng lọt qua patch.
+  Kiểm lại: code thật ở `patch.py` dòng 31 chia đủ cả 3 kênh
+  (`r, g, b = a3[..., 0] / 255, a3[..., 1] / 255, a3[..., 2] / 255`),
+  và đo ảnh ghép mắt nhắm của gái cho 0 px trắng / 6 px rất tối trên
+  729.000 px — **patch gái KHÔNG rò, giữ nguyên**. `boy_patch.py`
+  vẫn chia đủ 3 kênh + giãn vùng mí 14 px như đã làm.
+
+## Tẩy chấm đen (sửa nhỏ sau đẩy lô 2, chưa decode)
+
+Soi ảnh ghép thấy các chấm đen lạ (tàn dư keying, đen tuyệt đối, nằm
+trên da) trên 4/6 ảnh toàn thân; tẩy bằng cách lấy median màu da kề
+bên, chỉ đổi đúng các điểm đó (alpha không đổi):
+- `boy_full_01`: vệt đen 50 px trên tai phải (728–735, 678–688).
+- `boy_full_01_wave`: chấm đen 35 px trên tai phải (722–727, 684–694).
+- `boy_full_03`: chấm đen 11 px trên tai phải (781–784, 585–588) +
+  chấm 2 px trên tai phải (730, 677–678).
+- `boy_full_03_wave`: chấm đen 12 px trên tai phải (722–725, 683–686)
+  + các chấm đen trên cằm/hàm trái (38 px, 18 px và vài chấm 1–2 px).
+- `boy_full_02` và `boy_full_02_wave`: không có chấm đen, không sửa.
+- Không sửa bóng đổ dưới hàm/dưới tai (có giống nhau ở cả 6 ảnh, là
+  chi tiết vẽ có chủ đích); tai trái bộ 03 soi 5× không thấy chấm đen.
 
 ## Kiểm chứng tư thế (thành thật)
 
