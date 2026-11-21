@@ -212,14 +212,41 @@ void main() {
       await tester.pumpAndSettle();
       _checkNoError(tester, 'thị trấn có nhân vật nữ');
       expect(find.byKey(const Key('town-character')), findsOneWidget);
+      // (C) v3b: 6 vùng bấm + 9 lớp động hiện ở t=0 vẫn có đủ ở
+      // 608x248 (màn hẹp nhất) — nhãn co còn 60% nên không tràn.
+      for (var i = 0; i < 5; i++) {
+        expect(find.byKey(Key('town-stage-$i-button')), findsOneWidget);
+      }
+      expect(find.byKey(const Key('town-room-house-button')), findsOneWidget);
+      for (final layer in [
+        'cloud_01',
+        'cloud_02',
+        'cloud_03',
+        'car_01_dr',
+        // Xe 2 ở t = 0 chạy lên-phải (tuyến C2 (856,783)→(1536,443))
+        // nên lớp hiện là `car_02_ur`, không phải `car_02_dr` như
+        // thời đường D (sửa 7afc275 đổi D1–D6 thành C1/C2 nhưng
+        // không cập nhật danh sách này).
+        'car_02_ur',
+        'person_01_ur_a',
+        'person_02_dr_a',
+        'tree_01',
+        'tree_02',
+      ]) {
+        expect(
+          find.byKey(Key('town-layer-$layer')),
+          findsOneWidget,
+          reason: 'thiếu lớp động $layer ở 608x248',
+        );
+      }
     });
 
-    testWidgets('thị trấn v2 không tràn ở 640x320, bấm khu 0 sang màn toán', (
+    testWidgets('thị trấn v3b không tràn ở 640x320, bấm khu 0 sang màn toán', (
       tester,
     ) async {
-      // A2: bản đồ thị trấn v2 (nền + 10 lớp động + 6 vùng bấm) phải
+      // (C): bản đồ thị trấn v3b (nền + 17 lớp động + 6 vùng bấm) phải
       // vừa ở 640x320 (cỡ thiết kế) kể cả khi có cột nhân vật, và
-      // bấm khu 0 phải sang màn toán không tràn.
+      // bấm khu 0 phải sang màn tòa nhà không tràn.
       tester.view.physicalSize = const Size(640, 320);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {

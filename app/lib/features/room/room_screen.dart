@@ -1,10 +1,10 @@
-/// Màn Phòng — màn chính từ bản 0.2 (T2-04).
+/// Màn Phòng — màn chính từ bản 0.2 (T2-04), nền v3b từ (D).
 ///
-/// Nền phòng, nhân vật, pet, nội thất ở các ô cố định; 2 nút ở cột
-/// phải: Tủ đồ, Cửa hàng. Nút Trở về tròn ở góc trên trái về Thị trấn
-/// (PR (B), xem [RoundBackButton]) thay cho nút chữ "Thị trấn" trước
-/// đây. Tủ đồ và Cửa hàng là T2-05/T2-06 nên nút chỉ dẫn tới màn chờ
-/// "sắp mở" khi đã mở khóa.
+/// Nền phòng, nhân vật, pet, nội thất đặt đúng vị trí khung 1600x900;
+/// 2 nút ở cột phải: Tủ đồ, Cửa hàng. Nút Trở về tròn ở góc trên trái
+/// về Thị trấn (PR (B), xem [RoundBackButton]) thay cho nút chữ
+/// "Thị trấn" trước đây. Tủ đồ và Cửa hàng là T2-05/T2-06 nên nút
+/// chỉ dẫn tới màn chờ "sắp mở" khi đã mở khóa.
 ///
 /// Cổng mỗi ngày: chưa xong đề ngày thì Tủ đồ, Cửa hàng và chơi với
 /// pet bị khóa ([RoomService.isPlayUnlocked] đọc trạng thái 5 chặng
@@ -16,14 +16,16 @@
 /// Không có AppBar (khác Thị trấn): tiết kiệm ~56 dp chiều cao để vừa
 /// màn 608x248; tiêu đề + số dư + tiến độ nằm ở hàng đầu màn.
 ///
-/// Hình: nền phòng + nội thất là PNG thật phong cách v2 (A1):
-/// nền `room_v2.png` (1600x900) + 8 món đồ rời 512x512, xem
-/// `room_assets.dart` và `docs/ASSETS.md` mục "Phòng v2". Bóng đổ
-/// dưới mỗi món đặt sàn do app vẽ (ellipse mờ đen 20%), không
-/// nướng trong PNG. Trứng/pet mới nở là PNG thật (PR #21,
-/// `app/assets/images/pets/`, đọc qua map ở `onboarding_config.dart`
-/// như mở đầu/màn nở); nhân vật dùng `CharacterView` + bộ girl thật
-/// (nữ) hoặc lớp tạm xám (nam, chưa có hình thật).
+/// Hình: nền phòng + nội thất là PNG thật phong cách v3b (D):
+/// nền `room_v3.png` (1600x900) + 5 món đồ rời 512x512 đặt khớp món
+/// vẽ sẵn trong nền, xem `room_assets.dart` và `docs/ASSETS.md` mục
+/// "Phòng v3b" (vị trí đo từ PNG thật, đã hiệu chỉnh bằng code —
+/// xem `docs/D_IMAGES.md` mục 8). Bóng đổ dưới mỗi món đặt sàn do
+/// app vẽ (ellipse mờ đen 20%), không nướng trong PNG. Trứng/pet
+/// mới nở là PNG thật (PR #21, `app/assets/images/pets/`, đọc qua
+/// map ở `onboarding_config.dart` như mở đầu/màn nở); nhân vật dùng
+/// `CharacterView` + bộ girl thật (nữ) hoặc lớp tạm xám (nam, chưa
+/// có hình thật — (E) thay sau).
 ///
 /// Nhân vật ở Phòng linh động kiểu game như ở Thị trấn (PR ưu tiên
 /// sau v0.0.3): thở squash/stretch + bấm vào nhảy lên lấp lánh (xem
@@ -338,172 +340,135 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
     );
   }
 
-  /// Khung cảnh phòng: nền + nội thất ở ô cố định + nhân vật + pet/trứng.
-  /// Vị trí tính theo tỉ lệ khung cảnh (LayoutBuilder) để vừa cả
-  /// 608x248 lẫn 640x320.
+  /// Khung cảnh phòng v3b: nền 1600x900 + 5 món đặt khớp món trong nền.
+  ///
+  /// Cảnh chiếm toàn bộ bề rộng màn hình, tỉ lệ 16:9 cố định nên mọi
+  /// vị trí (khung 1600x900, xem [room_assets.dart]) đặt chính xác ở
+  /// mọi cỡ màn hình, không bị cắt như `BoxFit.cover` ở bản v2.
+  /// Bóng đổ do app vẽ (ellipse mờ đen 20%) ngay dưới điểm neo đáy
+  /// của mỗi món; thứ tự vẽ theo chân y (xa trước, gần sau): bình
+  /// hoa, cốc bút, gấu bông, đèn sao, chậu cây, rồi nhân vật + pet
+  /// đứng trên sàn.
   Widget _buildScene(CharacterProfile? profile) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final w = constraints.maxWidth;
-        final h = constraints.maxHeight;
-        // Nhân vật cao 92% khung cảnh, rộng theo tỉ lệ 2:3 của khung
-        // 1024x1536, không quá 28% chiều rộng khung cảnh.
-        final charHeight = h * 0.92;
-        final charWidth = (charHeight * 2 / 3).clamp(0.0, w * 0.28);
-        final charLeft = w * 0.34;
-        final petSize = h * 0.38;
-        final petLeft = charLeft + charWidth + 10;
-        return Stack(
-          children: [
-            Positioned.fill(
-              child: Image.asset(roomBackgroundAsset, fit: BoxFit.cover),
-            ),
-            // Nội thất v2 (A1): 8 món, ô vuông (rộng = cao) để ảnh
-            // 512x512 lấp đầy ô và mép đáy khớp `bottomRow` khi vẽ
-            // bóng (xem `_FurnitureSlot`). Dây cờ + đèn sao treo
-            // trên tường, khung ảnh treo tường trái, còn lại đặt sàn.
-            Positioned(
-              left: w * 0.01,
-              top: 0,
-              width: w * 0.36,
-              height: w * 0.36,
-              child: _FurnitureSlot(
-                furniture: roomFurniture[0],
-                onTap: () => _showBubble(roomFurniture[0].reaction),
-              ),
-            ),
-            Positioned(
-              right: w * 0.02,
-              top: h * 0.01,
-              width: w * 0.19,
-              height: w * 0.19,
-              child: _FurnitureSlot(
-                furniture: roomFurniture[1],
-                onTap: () => _showBubble(roomFurniture[1].reaction),
-              ),
-            ),
-            Positioned(
-              left: w * 0.03,
-              top: h * 0.32,
-              width: w * 0.13,
-              height: w * 0.13,
-              child: _FurnitureSlot(
-                furniture: roomFurniture[2],
-                onTap: () => _showBubble(roomFurniture[2].reaction),
-              ),
-            ),
-            Positioned(
-              left: w * 0.02,
-              bottom: h * 0.02,
-              width: w * 0.14,
-              height: w * 0.14,
-              child: _FurnitureSlot(
-                furniture: roomFurniture[3],
-                onTap: () => _showBubble(roomFurniture[3].reaction),
-              ),
-            ),
-            Positioned(
-              left: w * 0.17,
-              bottom: h * 0.01,
-              width: w * 0.14,
-              height: w * 0.14,
-              child: _FurnitureSlot(
-                furniture: roomFurniture[4],
-                onTap: () => _showBubble(roomFurniture[4].reaction),
-              ),
-            ),
-            Positioned(
-              right: w * 0.01,
-              bottom: h * 0.02,
-              width: w * 0.16,
-              height: w * 0.16,
-              child: _FurnitureSlot(
-                furniture: roomFurniture[7],
-                onTap: () => _showBubble(roomFurniture[7].reaction),
-              ),
-            ),
-            if (profile != null)
-              Positioned(
-                left: charLeft,
-                bottom: 0,
-                width: charWidth,
-                height: charHeight,
-                child: CharacterBounce(
-                  child: CharacterView(
-                    key: const Key('room-character'),
-                    outfit: _outfitFor(profile),
-                    loader: _loaderFor(profile),
-                    // Thở/chớp mắt bật (kiểu game, như ở Thị trấn);
-                    // cổng AnimationGate tắt khi chạy test để
-                    // pumpAndSettle dừng được (xem chú thích đầu file).
-                    animationsEnabled: true,
-                  ),
+    return Center(
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final w = constraints.maxWidth;
+            final h = constraints.maxHeight;
+            double fx(double x) => x / roomFrameWidth * w;
+            double fy(double y) => y / roomFrameHeight * h;
+
+            /// Bóng đổ mềm ngay dưới [anchor]: rộng 85% và cao 10%
+            /// chiều rộng món (nhân vật/pet dùng bề rộng hình).
+            Widget frameShadow(Offset anchor, double width) {
+              final sw = width * 0.85;
+              final sh = width * 0.10;
+              return Positioned(
+                left: fx(anchor.dx - sw / 2),
+                top: fy(anchor.dy - sh * 0.3),
+                width: fx(sw),
+                height: fy(sh),
+                child: const _SoftShadow(),
+              );
+            }
+
+            // 5 món xếp theo chân y (xa trước, gần sau) để món gần
+            // che đúng món xa khi chồng lấn.
+            final itemsByFeet = <RoomFurniture>[
+              roomFurniture[3], // bình hoa (neo y = 510)
+              roomFurniture[4], // cốc bút (neo y = 515)
+              roomFurniture[0], // gấu bông (neo y = 550)
+              roomFurniture[1], // đèn sao (neo y = 580)
+              roomFurniture[2], // chậu cây (neo y = 686)
+            ];
+            return Stack(
+              children: [
+                Image.asset(
+                  roomBackgroundAsset,
+                  fit: BoxFit.fill,
+                  width: w,
+                  height: h,
                 ),
-              ),
-            // Gấu bông + cốc đặt TRƯỚC chân nhân vật (vẽ sau nhân
-            // vật): để sau thì bị nhân vật che gần hết, chỉ ló một
-            // mép; đặt trước thì như đồ chơi để trên sàn trước mặt bé.
-            Positioned(
-              left: w * 0.31,
-              bottom: 0,
-              width: w * 0.13,
-              height: w * 0.13,
-              child: _FurnitureSlot(
-                furniture: roomFurniture[5],
-                onTap: () => _showBubble(roomFurniture[5].reaction),
-              ),
-            ),
-            Positioned(
-              left: w * 0.45,
-              bottom: 0,
-              width: w * 0.08,
-              height: w * 0.08,
-              child: _FurnitureSlot(
-                furniture: roomFurniture[6],
-                onTap: () => _showBubble(roomFurniture[6].reaction),
-              ),
-            ),
-            if (_eggSpecies != null)
-              Positioned(
-                left: petLeft,
-                bottom: 0,
-                width: petSize,
-                height: petSize,
-                child: _PetSlot(
-                  species: _eggSpecies!,
-                  hatched: _hatched,
-                  bounce: _petBounce,
-                  onTap: _onPetTap,
-                ),
-              ),
-            if (_bubbleText != null)
-              Positioned(
-                top: 4,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFD9C2E8)),
-                    ),
-                    child: Text(
-                      _bubbleText!,
-                      key: const Key('room-reaction-bubble'),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 16),
+                // Bóng đổ (theo chân y).
+                for (final item in itemsByFeet)
+                  frameShadow(item.anchor, item.placeSize),
+                // Bóng nhân vật + pet (chân y = 810, gần nhất).
+                frameShadow(roomCharacterFeet, 240),
+                frameShadow(roomPetFeet, roomPetBox.width),
+                // 5 món nội thất (theo chân y).
+                for (final item in itemsByFeet)
+                  Positioned(
+                    left: fx(item.placeX),
+                    top: fy(item.placeY),
+                    width: fx(item.placeSize),
+                    height: fy(item.placeSize),
+                    child: _RoomItemSlot(
+                      item: item,
+                      onTap: () => _showBubble(item.reaction),
                     ),
                   ),
-                ),
-              ),
-          ],
-        );
-      },
+                if (profile != null)
+                  Positioned(
+                    left: fx(roomCharacterBox.left),
+                    top: fy(roomCharacterBox.top),
+                    width: fx(roomCharacterBox.width),
+                    child: CharacterBounce(
+                      child: CharacterView(
+                        key: const Key('room-character'),
+                        outfit: _outfitFor(profile),
+                        loader: _loaderFor(profile),
+                        // Thở/chớp mắt bật (kiểu game, như ở Thị trấn);
+                        // cổng AnimationGate tắt khi chạy test để
+                        // pumpAndSettle dừng được (xem chú thích đầu file).
+                        animationsEnabled: true,
+                      ),
+                    ),
+                  ),
+                if (_eggSpecies != null)
+                  Positioned(
+                    left: fx(roomPetBox.left),
+                    top: fy(roomPetBox.top),
+                    width: fx(roomPetBox.width),
+                    height: fy(roomPetBox.height),
+                    child: _PetSlot(
+                      species: _eggSpecies!,
+                      hatched: _hatched,
+                      bounce: _petBounce,
+                      onTap: _onPetTap,
+                    ),
+                  ),
+                if (_bubbleText != null)
+                  Positioned(
+                    top: 4,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: const Color(0xFFD9C2E8)),
+                        ),
+                        child: Text(
+                          _bubbleText!,
+                          key: const Key('room-reaction-bubble'),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -541,47 +506,25 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
       profile.gender == 'girl' ? null : placeholderLayerLoader;
 }
 
-/// Một món nội thất: chạm vào thì hiện bong bóng phản ứng.
+/// Một món nội thất v3b: chạm vào thì hiện bong bóng phản ứng.
 ///
-/// Món đặt sàn có bóng đổ mềm do app vẽ (ellipse mờ đen 20% ngay
-/// dưới mép đáy, neo theo [RoomFurniture.bottomRow]); món treo
-/// ([RoomFurniture.hanging]) thì không có bóng. PNG đồ rời không
-/// còn bóng nướng sẵn (xem `docs/ASSETS.md` mục "Phòng v2").
-class _FurnitureSlot extends StatelessWidget {
-  const _FurnitureSlot({required this.furniture, required this.onTap});
+/// Món là PNG 512x512 trong suốt đặt khớp món vẽ sẵn trong nền
+/// (xem [RoomFurniture.placeX]/[placeY]/[placeSize]); bóng đổ do
+/// app vẽ ở tầng cảnh (xem `_buildScene`), không nướng trong PNG.
+/// Khóa widget giữ nguyên như bản v2 (`room-furniture-<tên>`) để
+/// test cũ vẫn tìm được món.
+class _RoomItemSlot extends StatelessWidget {
+  const _RoomItemSlot({required this.item, required this.onTap});
 
-  final RoomFurniture furniture;
+  final RoomFurniture item;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      key: Key(furniture.key),
+      key: Key(item.key),
       onTap: onTap,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          // Ô luôn vuông (rộng = cao) nên ảnh 512x512 lấp đầy ô,
-          // mép đáy nằm đúng ở bottomRow/512 chiều cao ô.
-          final size = constraints.maxWidth;
-          final bottom = size * furniture.bottomRow / 512;
-          final shadowHeight = size * 0.10;
-          return Stack(
-            children: [
-              if (!furniture.hanging)
-                Positioned(
-                  left: size * 0.075,
-                  top: bottom - shadowHeight * 0.3,
-                  width: size * 0.85,
-                  height: shadowHeight,
-                  child: const _SoftShadow(),
-                ),
-              Positioned.fill(
-                child: Image.asset(furniture.asset, fit: BoxFit.contain),
-              ),
-            ],
-          );
-        },
-      ),
+      child: Image.asset(item.asset, fit: BoxFit.fill),
     );
   }
 }

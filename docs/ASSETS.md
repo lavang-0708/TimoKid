@@ -320,3 +320,328 @@ file + dòng manifest giữ nguyên.
   `precacheImage` (mẫu `room_golden_test.dart` / A1) — không có
   bước này thì ảnh chụp thiếu nền/lớp động (test đầu chạy khi ảnh
   chưa kịp về, test sau mới có vì đã cache).
+
+## Thị trấn v3b (C, 21/11)
+
+Phong cách v3b đã duyệt (chủ dự án, 21/11 ~01:31): thị trấn
+isometric như v2 nhưng đủ đúng 6 công trình đặc trưng theo mảng
+(đỏ theo brief A1), đường nối rõ có vạch kẻ + vỉa hè, khoảng trống
+trên đường để xe/người đi. Nền + 17 lớp động vẽ mới bằng AI theo
+`docs/DESIGN.md`, `source` trong manifest ghi "Muse vẽ AI 21/11
+theo DESIGN.md".
+
+- **Nền** `app/assets/images/backgrounds/town_v3.png`: PNG 1600x900
+  (678.089 byte — lượng tử hóa 256 màu + dithering Floyd-Steinberg
+  vì đủ màu vượt 1 MB). Đường + vỉa hè TRỐNG (không vẽ sẵn xe hay
+  người — app vẽ lớp động chạy theo đường); giữ đúng bố cục 6 công
+  trình như ảnh xem trước v3b đã duyệt. Nền v2 `town_v2.png` giữ
+  `ready` trong manifest (file vẫn còn, không dùng nữa — như tiền
+  lệ `town_01.jpg`). App vẽ nền bằng `Image.asset` với
+  `BoxFit.fill` trong khung 16/9 — KHÔNG dùng `cover` như màn
+  Phòng, vì `cover` cắt nền sẽ làm lệch vùng bấm.
+- **Lớp động** `app/assets/images/town/<tên>.png`: PNG trong suốt
+  512x512, `kind: town_layer`, `status: ready`. 17 lớp: mây trắng
+  ×3 (`cloud_01`, `cloud_02`, `cloud_03`), xe hơi ×4 (`car_01_dr`,
+  `car_01_ur`, `car_02_dr`, `car_02_ur`), người ×8 (`person_01`,
+  `person_02` × `dr`/`ur` × khung bước chân `a`/`b`), cây ×2
+  (`tree_01` xanh tán tròn, `tree_02` hoa anh đào). KHÔNG còn đài
+  phun nước (thị trấn v3b có ao, không có đài phun) — file
+  `fountain.png` + dòng manifest giữ nguyên (file vẫn còn).
+  4 file nhìn ngang cũ (`car_01`, `car_02`, `person_01`,
+  `person_02`) không dùng nữa: đã XÓA KHỎI MANIFEST, file vẫn còn
+  trên nhánh — Claude `git rm` (xem HANDOVER); tới lúc đó
+  `check_assets.py` báo đúng 4 lỗi "file hình không có dòng
+  manifest" (là lỗi đã biết, không phải lỗi code).
+  Tỉ lệ điểm ảnh bán trong suốt (0 < alpha < 255) đo bằng code
+  < 5% mọi lớp (Claude đo lại 0,2–0,7%, tree_02 1,8%). Danh sách
+  đường dẫn dùng chung để test golden nạp trước ảnh:
+  `townLayerAssets` trong `app/lib/features/town/town_assets.dart`
+  (phải khớp spec trong `app/lib/features/town/town_map.dart`).
+
+### Vị trí 6 công trình (khung nền 1600x900)
+
+Đo từ nền thật, ghi trong `docs/C_IMAGES.md` (x, y, rộng, cao).
+Vùng bấm KHÔNG lấy nguyên rect đo được mà cắt bớt để nhãn các
+công trình không bị vùng bấm khác che (nhãn dán ở dải cuối vùng,
+cao ~140 px theo khung nền, tính cả nhãn phình ở màn nhỏ). Kiểm
+bằng test (`town_roads_test.dart`): tâm 6 vùng mỗi vùng chỉ nằm
+trong đúng vùng đó; không vùng bấm nào che nhãn vùng khác.
+
+- Lâu đài Lôgic (xanh đá, có cờ): 165, 0, 450, 290 (giữ nguyên —
+  không chồng nhãn).
+- Tiệm bánh Số học (vàng, biển bánh sừng bò): 290, 305, 350, 255
+  (giữ nguyên).
+- Tháp Con số (vàng, đồng hồ mặt số): 620, 5, 460, 385 — cắt trái
+  520→620 (khỏi che nhãn Lâu đài) và kéo lên y = 5 để bao cả thân
+  tháp + đồng hồ + chóp (rect chỉ lấy phần sân trước thì đồng hồ
+  bấm không được).
+- Vườn Hình học (bồn cây + đồ chơi khối): 480, 565, 445, 180 —
+  cắt trên 520→565 (khỏi che nhãn Tiệm bánh; đồ chơi khối ở
+  y~570–690 vẫn trong vùng).
+- Hội chợ Tổ hợp (lều sọc + vòng quay): 1080, 5, 480, 375 — cắt
+  trái 1020→1080 (khỏi che nhãn Tháp Con số; lều 1100–1290 +
+  vòng quay 1400–1560 vẫn trong vùng).
+- Nhà của bé (nhà hồng, hàng rào trắng): 35, 565, 445, 290 — cắt
+  trên 525→565 (khỏi che nhãn Tiệm bánh) và cắt phải 490→480
+  (khỏi che nhãn Vườn Hình học; thân nhà vẫn trong vùng).
+
+Chồng lấp còn lại (đã kiểm, không ảnh hưởng nhãn): Tiệm bánh ×
+Tháp Con số 20×85 px (mép mái tiệm bánh chạm sân tháp — Tháp vẽ
+sau nên thắng tap ở vùng chồng, đúng vì tháp ở trước).
+
+### Map khu vực ↔ công trình
+
+5 khu toán đặt lên 5 công trình v3b (xem
+`app/lib/features/town/town_assets.dart`):
+
+- Lôgic → Lâu đài Lôgic; Số học → Tiệm bánh Số học;
+  Hình học → Vườn Hình học.
+- Con số → Tháp Con số; Tổ hợp → Hội chợ Tổ hợp. Hai chỗ này ở
+  v2 là CHƯA CHẮC (trong ảnh v2 không có tháp hay hội chợ nên tạm
+  map Con số → cửa hàng thú cưng, Tổ hợp → tiệm quần áo); bản v3b
+  đã vẽ đúng 2 công trình này nên map trên là map trực tiếp theo
+  tên công trình — không còn là loại trừ nữa.
+
+Nhà hồng không phải khu toán: bấm vào thì về Phòng
+(`town-room-house-button`).
+
+### Đường đi D1–D6 (khung nền 1600x900)
+
+Khai báo trong `app/lib/features/town/town_roads.dart` (đo từ nền
+thật, gần đúng ±40 px — kiểm bằng test rồi hiệu chỉnh theo ảnh
+nếu lệch). Nửa rộng vùng đường 50 px (mặt đường + vỉa hè); xe chạy
+GIỮA làn, người đi trên vỉa hè (lệch tâm 25 px sang phía nam
+đường, tức phía dưới màn hình).
+
+- D1 ↙: (865, 125) → (600, 210) → (300, 360) → (0, 480).
+- D2 ↘: (865, 125) → (994, 180) → (1077, 210) → (1221, 270) →
+  (1320, 320) → (1385, 340) → (1420, 360) → (1434, 380) →
+  (1532, 400) → (1600, 430).
+
+Vòng sửa PR #31 (21/11): D2 cũ (880, 70) → (1120, 220) →
+(1420, 380) → (1600, 470) là đoạn thẳng cắt qua khối lều Hội chợ
+— xe hồng ở t = 0 nằm trên cỏ (990, 90). D2 mới đo lại tâm làn thật
+từ nền (quét điểm ảnh nhựa + xem ảnh phóng to có lưới 50 px): ngã
+giao D1×D2 dời về đúng tâm làn (865, 125) (điểm cũ (880, 70) nằm
+trên cỏ, trên vạch sang đường); D2 uốn theo đường nhựa thật — qua
+phải tháp Con số, giữa lều và vòng quay Hội chợ, ra mép phải ở
+y ≈ 430. D1 và D3 còn lệch ~40–100 px so với đường nhựa thật
+(đo bằng code: D1 chỉ 14% điểm mẫu nằm trên nhựa, D3 26%; D4/D5/D6
+77–87%) — chưa đo lại trong vòng này, để việc còn lại; xe chạy
+trên D1/D3 có thể hơi lệch tâm làn nhưng không cắt qua công trình
+(khóa bằng test rect chân công trình dưới đây).
+- D3 ↙: (720, 450) → (550, 560) → (250, 710) → (0, 830).
+- D4 ↘: (720, 450) → (880, 550) → (1090, 650) → (1400, 800) →
+  (1500, 850).
+- D5 ↙: (1400, 480) → (1250, 570) → (1100, 650) → (900, 750) →
+  (700, 850).
+- D6 ↘: (1150, 680) → (1300, 760) → (1500, 850) → (1600, 900).
+
+Ngã giao: D1×D2 (865, 125); D3×D4 (720, 450); D4×D5 (1100, 650);
+D5×D6 (1300, 760).
+
+Tuyến xe/người (tới-lui ping-pong trên các đoạn):
+
+- Xe 1 (hồng): (0, 480) → (300, 360) → (600, 210) → (865, 125) →
+  (994, 180) → (1077, 210) → (1221, 270) → (1320, 320) →
+  (1385, 340) → (1420, 360) → (1434, 380) → (1532, 400) →
+  (1600, 430) — D1 ngược + D2 xuôi.
+- Xe 2 (xanh nhạt): (0, 830) → (250, 710) → (550, 560) →
+  (720, 450) → (880, 550) → (1090, 650) → (1400, 800) →
+  (1500, 850) — D3 ngược + D4 xuôi.
+- Người 1 (bé gái): dọc vỉa hè D3, (0, 830) → (720, 450).
+- Người 2 (bé trai): dọc vỉa hè D5, (1400, 480) → (700, 850).
+
+### Rect chân công trình — test độc lập (vòng sửa PR #31)
+
+Test "mọi điểm trên tuyến nằm trong vùng đường đã khai báo" không
+bắt được lỗi khai báo sai (vùng sai thì test vẫn xanh — đúng lỗi D2
+cũ cắt qua lều). Thêm test độc lập trong `town_roads_test.dart`:
+không điểm nào của bất kỳ tuyến nào (kể cả lệch vỉa hè) được nằm
+trong rect chân công trình nào — `townBuildingFootprints` trong
+`town_roads.dart` + hàm `routeHitsBuilding` (lấy mẫu mỗi 5 px, cả
+2 chiều) + test hồi quy: tuyến xe 1 với D2 cũ PHẢI chạm lều.
+
+Rect chân công trình KHÁC vùng bấm (vùng bấm rộng, bao cả sân/vườn
+để bé bấm dễ — đường chạy dọc mép sân/vườn nên rect bấm sẽ báo
+sai). Rect chân chỉ lấy khối chính, có chừa chỗ ở chỗ đường chạy
+sát; **Hội chợ TÁCH THÀNH 2 rect (lều + bệ vòng quay)** vì đường D2
+chạy giữa hai khối — rect gộp cũ (1080, 5, 480, 375) bao cả đường
+nên test không bắt được lỗi. Vùng bấm Hội chợ KHÔNG đổi (vẫn một
+rect 1080, 5, 480, 375 — bấm vào đường giữa hai khối vẫn mở Hội
+chợ, chấp nhận được). Danh sách rect (khung 1600x900): lâu đài
+(230, 0, 390, 150); tháp trên (670, 5, 115, 100) + tháp đế
+(670, 295, 115, 40); lều (1050, 0, 300, 195); bệ vòng quay
+(1340, 150, 180, 130); tiệm bánh (350, 340, 220, 200); vườn
+(570, 620, 330, 125); nhà hồng (75, 545, 235, 130); công viên
+(850, 340, 450, 180); hồ (1320, 590, 220, 170). Nhà cao (lâu đài,
+tháp) chỉ lấy phần trên + chân đế — rect toàn thân phủ cả mặt
+đường chạy sau lưng nó. Chi tiết chừa chỗ từng rect xem chú thích
+trong `town_roads.dart`.
+
+### Hướng và lật (quan trọng — có test khóa lại)
+
+Xe/người vẽ góc isometric 3/4, mỗi mẫu 2 hướng (`dr`/`ur`); 2
+hướng còn lại app lật ngang. Hướng mặt đo bằng mắt trên PNG thật
+(xem bằng mắt từng lớp + ghi chú của Claude khi review decode
+lần 2) — KHÔNG suy từ tên file, vì tên `ur` dễ gây nhầm:
+
+- Xe `dr`: góc 3/4 trước, đầu xe ↘. Xe `ur`: NHÌN TỪ SAU, đầu
+  xe ↖ (đuôi xe ở phía dưới-phải) — tức `ur` đi ↖ khi không lật,
+  và đi ↗ khi lật ngang. Đây là điểm Claude dặn riêng (bản ghi
+  giai đoạn 1b viết `ur` chạy ↗ là SAI đối với xe — chỉ đúng với
+  người).
+- Người `dr`: góc 3/4 trước, mặt ↘. Người `ur`: NHÌN TỪ SAU,
+  mặt ↗ — tức `ur` đi ↗ khi không lật, và đi ↖ khi lật ngang.
+
+Bảng chọn (xem `town_roads.dart` — `carSpriteFor` /
+`personSpriteFor`): ↘ → `dr` không lật; ↙ → `dr` lật ngang;
+↖ → xe `ur` không lật, người `ur` lật ngang; ↗ → xe `ur` lật
+ngang, người `ur` không lật. Test hướng
+(`town_roads_test.dart`) kiểm đủ 4 hướng × 2 mẫu xe + 2 mẫu người
+(hướng mặt thực tế sau lật phải bằng hướng di chuyển) và khóa
+bảng hướng mặt — ai "sửa" map theo tên file thì test đỏ.
+
+### Neo chân, cỡ hiển thị, bóng đổ, thứ tự chiều sâu
+
+- Neo chân trong khung ảnh 512 (đo từ PNG thật): xe đáy y = 390,
+  người đáy y = 470, cây xanh 484, cây anh đào 469. Hộp ảnh là
+  hình vuông, neo chân tại `anchorRow/512` chiều cao hộp.
+- Cỡ hiển thị: hộp xe rộng 0,105 bề rộng bản đồ (~110–120 px dài
+  trên đường — xe 3/4 bị rút ngắn theo phối cảnh, bề ngang ảnh
+  302–371 px so với xe cũ nhìn ngang 430–432 px); hộp người rộng
+  0,04 bề rộng bản đồ (~55–60 px cao). Cây: cây xanh chân
+  (130, 230), hộp rộng 0,08; cây anh đào chân (1000, 865), hộp
+  rộng 0,09 (dải cỏ đáy, không chồng công trình, không chặn đường).
+  Chân cây xanh dời từ (72, 200) về (130, 230) ở vòng sửa PR #31:
+  chân cũ đặt trên mép lối đi sáng màu nên nhìn như nổi trên vỉa
+  hè — chân mới đúng gốc cây vẽ sẵn, trên cỏ.
+- Bóng đổ: PNG lớp động KHÔNG có bóng sẵn — app vẽ ellipse mềm
+  (đen 20%, blur 4, mẫu `_SoftShadow` ở màn Phòng) dưới chân
+  xe/người/cây, rộng 0,85 hộp, cao 0,10 hộp, neo theo hàng đáy.
+  (Vòng sửa PR #31: cây trước đây không có bóng app — nay có, như
+  xe/người.)
+- Thứ tự vẽ: lớp mặt đất (2 cây + 2 xe + 2 người) sắp theo y chân
+  — càng ở dưới màn hình (y chân lớn) càng vẽ sau, che lớp ở trên
+  (công trình trước che xe sau); rồi mây trên trời; vùng bấm trên
+  cùng. Xe/người không đi xuyên qua công trình: tuyến chỉ chạy
+  trên đường đã khai báo.
+- Người đi bộ đổi qua lại khung a/b mỗi 30 px đường đã đi thành
+  dáng đi + nhún nhẹ theo nhịp bước (ảnh nhún, bóng ở yên dưới
+  chân). Ở t = 0 cả hai người đều ở khung a nên golden xác định.
+
+### Chuyển động
+
+- Chuyển động bằng Flutter animation
+  (`app/lib/features/town/town_map.dart` + `town_roads.dart`):
+  mây trôi ngang chậm (mỗi mây tốc độ/hướng khác nhau, lặp 90 s)
+  — vòng sửa PR #31: mây CHỈ ở dải trời y < 120 (khung nền),
+  nhỏ hơn (rộng 0,09/0,085/0,07 bề rộng bản đồ) và mờ hơn
+  (opacity 0,75); mây cũ to + thấp (mép dưới tới y ≈ 150–210) đè
+  lều Hội chợ và cỏ. Mép dưới phần mây nhìn thấy tính từ alpha
+  PNG thật (xem chú thích trong `town_map.dart`): mây 1 ≈ 111,
+  mây 2 ≈ 112, mây 3 ≈ 90 — đều < 120, không chạm nhãn (nhãn ở
+  y ≥ 250);
+  xe chạy tới-lui 30 s một lượt ping-pong; người đi bộ tới-lui
+  24 s một lượt; cây đung đưa nhẹ (±2° quanh gốc, chu kỳ 4 s).
+- Tất cả tắt được qua cổng [AnimationGate] trong test (mẫu PR #22):
+  cổng tắt thì vị trí tĩnh t = 0, không tạo controller nào; cổng
+  bật thì vẽ lại mỗi khung qua `AnimatedBuilder` (vị trí tính
+  trong builder từ giá trị controller hiện tại).
+- Vị trí ở t = 0 (khóa bằng test + golden; vị trí chân đã lệch
+  vỉa hè đối với người đi bộ): xe 1 giữa D2 (~(995, 180), hướng
+  ↘), xe 2 giữa D4 (~(804, 502), hướng ↘), người 1 giữa D3
+  (~(407, 659), hướng ↗, khung a), người 2 giữa D5 (~(1192, 629),
+  hướng ↙, khung a). Xe 1 dời từ (~(1000, 145)) ở vòng sửa PR #31
+  (D2 mới).
+- Test golden phải nạp trước nền + 17 lớp động bằng `runAsync` +
+  `precacheImage` (mẫu `room_golden_test.dart` / A1) — không có
+  bước này thì ảnh chụp thiếu nền/lớp động.
+
+## Phòng v3b (D, 21/11)
+
+Chủ dự án đã duyệt phòng v3b ngày 21/11 ~01:31: phòng LIỀN MỘT ẢNH
+như phòng 3D thật, cùng phối cảnh 1 điểm tụ, cùng nguồn sáng (nắng
+từ cửa sổ lớn), bóng đổ xuống sàn; đồ rời nhỏ chỉ đặt ở mặt phẳng
+đã có trong ảnh, vẽ đúng góc nhìn của mặt đó. Nền + 5 món vẽ mới
+bằng AI theo `docs/DESIGN.md`, `source` trong manifest ghi
+"Muse vẽ AI 21/11 theo DESIGN.md". Chi tiết từng món (vị trí, điểm
+neo, tỉ lệ, rect món trong nền) xem `docs/D_IMAGES.md`.
+
+- **Nền** `app/assets/images/backgrounds/room_v3.png`: PNG 1600x900
+  RGB, **694.028 byte** (ảnh gốc 2048x1152 resize về 1600x900,
+  lượng tử hóa 256 màu + dithering Floyd–Steinberg — cùng cách làm
+  PR #26 và PR (C)). Giường + gối + gấu, đèn sao, bàn học + cốc +
+  bình hoa, kệ sách, tủ quần áo, thảm tròn, chậu cây, cửa sổ +
+  bóng nắng trên sàn gỗ còn nguyên, không cắt cụt.
+- **Đồ rời** `app/assets/images/furniture/<tên>_v3.png`: PNG trong
+  suốt 512x512, `kind: furniture`, `status: ready`, tỉ lệ bán trong
+  suốt 0,00% cả 5 món. KHÔNG cắt từ nền (viền mềm/phát sáng/tương
+  phản thấp nên cắt không sạch) — vẽ riêng rồi đặt đúng vị trí để
+  phủ khít món vẽ sẵn trong nền (món vẽ sẵn đóng vai trò nền, không
+  lộ ra gây hình đôi). Đã ghép thử cả 5 món lên nền ở đúng vị trí
+  và xem bằng mắt: không hình đôi, món nằm đúng mặt phẳng
+  (giường/bàn/sàn), đúng phối cảnh, không nổi, không lệch.
+
+| Món | Vị trí đặt (cỡ) | Điểm neo (đáy) | Tỉ lệ |
+|---|---|---|---|
+| Gấu bông | (296,343) 239 | (415,550) | 0,466 |
+| Đèn sao | (49,408) 196 | (150,580) | 0,383 |
+| Chậu cây | (678,378) 358 | (842,686) | 0,70 |
+| Bình hoa | (1162,273) 283 | (1305,510) | 0,553 |
+| Cốc bút | (1027,378) 161 | (1099,515) | 0,315 |
+
+- **Cách vẽ cảnh** (`app/lib/features/room/room_screen.dart`):
+  cảnh chiếm toàn bộ bề rộng, tỉ lệ 16:9 cố định (`AspectRatio`
+  + `LayoutBuilder`), nền vẽ `BoxFit.fill` — KHÔNG dùng `cover`
+  như bản v2 vì `cover` cắt nền làm lệch vị trí khung 1600x900.
+  Mọi tọa độ trong `room_assets.dart` theo khung nền 1600x900.
+- **Bóng đổ**: PNG đồ rời không nướng bóng; app vẽ ellipse mờ đen
+  20% ngay dưới điểm neo đáy của mỗi món (rộng 85% bề ngang món,
+  cao 10% bề ngang, mép trên ở neo − 0,3×cao bóng — cùng quy tắc
+  A1), vẽ theo chân y: bình hoa, cốc bút, gấu bông, đèn sao, chậu
+  cây, rồi nhân vật + pet (chân y = 810, gần nhất).
+- **Sàn** (đa giác, nơi nhân vật + pet đứng, khung 1600x900):
+  (0,795), (400,645), (1200,645), (1600,795), (1600,900), (0,900).
+  Mặt giường y≈540–560 (x 155–760, gấu neo y = 550); mặt tủ đầu
+  giường y≈580 (x 30–260, đèn neo y = 580); mặt bàn học y≈490–515
+  (x 1070–1470, bình neo y = 510, cốc neo y = 515).
+- **Dấu chân trên sàn** (cho PR (G) — vùng đi được = đa giác sàn
+  trừ các dấu chân này): giường (155,645)-(760,700); bàn học
+  (1070,645)-(1470,790); tủ quần áo (1460,645)-(1600,880); tủ đầu
+  giường (30,700)-(260,800). Kệ sách gắn tường nên không có dấu
+  chân riêng (hình chiếu xuống sàn trùng dấu chân bàn học).
+- **Ghế ở bàn học** (cho PR (G) — tương tác ngồi ghế): rect ghế
+  (970,490)-(1240,790); mặt ghế (1000,615)-(1210,660), tâm
+  ≈ (1105,640).
+- **Mốc tỉ lệ** (đo từ ảnh thật, khung 1600x900): mặt trước giường
+  cao 160 px; tủ quần áo y 70–880; bàn học cao 300 px; tủ đầu
+  giường x 30–260, mặt y≈580, đáy y≈795; kệ sách x 1150–1470,
+  y 40–640; cửa sổ x 590–1080, y 100–450; lò sưởi x 640–930,
+  y 490–600; thảm tròn ellipse x 430–1060, y 700–875 (tâm
+  ≈ (745,787)); rèm trái x ≈460–580, rèm phải x ≈1080–1180,
+  y 60–460; kệ mây x 60–220, y 200–300; khung ảnh x 230–310,
+  y 180–320; đèn mây trần x 730–870, y 0–55.
+- **Nhân vật + pet**: nhân vật cao 360 px trong khung nền (chân tại
+  (630,810), hộp 284x425, chân ở 91,1% chiều cao hộp — ~2,25 lần
+  mặt trước giường, đúng cỡ so với giường/tủ/cửa sổ); pet chân tại
+  (420,810), hộp vuông 140 px (thân pet cao ~120 px). Cả hai đứng
+  trên thảm, trước giường, có bóng đổ. Art nhân vật/pet hiện tại
+  là tạm (nữ bộ girl thật PR #18, nam lớp tạm xám, pet PNG thật
+  PR #21) — (E)/(F) thay sau.
+- **Kiểm chứng bằng code** (bài học PR #31 — xem `docs/D_IMAGES.md`
+  mục 8): mọi điểm neo/đa giác/dấu chân đã kiểm bằng code trên ảnh
+  nền thật (mẫu màu pixel + alpha bbox PNG riêng), không tin mắt.
+  Đã sửa: 3 món thiếu 2 px ở đáy (gấu/đèn/bình dời xuống 2 px);
+  thảm tròn khai báo sai (đúng x 430–1060, y 700–875); rèm trái/
+  phải khai báo sai (trái x ≈460–580, phải x ≈1080–1180); rect
+  hiển thị đèn/cốc lệch 1–3 px (đèn x[86,209], cốc x[1058,1138]
+  y[404,514]). Test `app/test/features/room/room_anchors_test.dart`
+  khóa lại: điểm neo trên mặt phẳng đúng, rect hiển thị phủ khít
+  món trong nền (dung sai 2 px), chân nhân vật/pet trên sàn, dấu
+  chân chạm sàn.
+- **Manifest**: thêm 6 mục v3b (nền + 5 món) → 107 mục;
+  `check_assets.py` xanh. File + mục manifest v2 (`room_v2.png` +
+  8 món, không dùng nữa) GIỮ NGUYÊN như tiền lệ `town_v2.png`
+  (xóa mục khi file còn sẽ làm check fail); Claude có thể `git rm`
+  file + mục v2 sau (xem "Việc còn lại" trong PR (D)).

@@ -27,11 +27,11 @@ chroma-key, đặt đúng vị trí để phủ khít món đã vẽ sẵn trong
 
 | Món | Đích | PNG | Content bbox trong khung 512 | Ảnh 512 đặt tại (cỡ) | Rect hiển thị | Điểm neo (đáy) | Tỉ lệ |
 |---|---|---|---|---|---|---|---|
-| Gấu bông | `app/assets/images/furniture/gau_bong_v3.png` | 306.655 byte | (125,95,388,444) 264x350 | (296,341) 239x239 | x[354,477] y[385,548] | (415,548) | 0,466 |
-| Đèn sao | `app/assets/images/furniture/den_sao_v3.png` | 242.411 byte | (96,91,418,449) 323x359 | (49,406) 196x196 | x[89,212] y[441,578] | (150,578) | 0,383 |
+| Gấu bông | `app/assets/images/furniture/gau_bong_v3.png` | 306.655 byte | (125,95,388,444) 264x350 | (296,343) 239x239 | x[354,477] y[387,550] | (415,550) | 0,466 |
+| Đèn sao | `app/assets/images/furniture/den_sao_v3.png` | 242.411 byte | (96,91,418,449) 323x359 | (49,408) 196x196 | x[86,209] y[443,580] | (150,580) | 0,383 |
 | Chậu cây | `app/assets/images/furniture/chau_cay_v3.png` | 222.629 byte | (99,119,373,440) 275x322 | (678,378) 358x358 | x[747,939] y[461,686] | (842,686) | 0,70 |
-| Bình hoa | `app/assets/images/furniture/binh_hoa_v3.png` | 242.783 byte | (156,106,360,429) 205x324 | (1162,271) 283x283 | x[1248,1361] y[330,508] | (1305,508) | 0,553 |
-| Cốc bút | `app/assets/images/furniture/coc_sao_v3.png` | 238.805 byte | (100,83,354,433) 255x351 | (1027,378) 161x161 | x[1059,1139] y[404,515] | (1099,515) | 0,315 |
+| Bình hoa | `app/assets/images/furniture/binh_hoa_v3.png` | 242.783 byte | (156,106,360,429) 205x324 | (1162,273) 283x283 | x[1248,1361] y[332,510] | (1305,510) | 0,553 |
+| Cốc bút | `app/assets/images/furniture/coc_sao_v3.png` | 238.805 byte | (100,83,354,433) 255x351 | (1027,378) 161x161 | x[1058,1138] y[404,514] | (1099,515) | 0,315 |
 
 Rect món vẽ sẵn trong nền (để đối chiếu — lớp rời phủ khít các rect này):
 
@@ -58,9 +58,9 @@ Rect món vẽ sẵn trong nền (để đối chiếu — lớp rời phủ kh�
 
 - Sàn (đa giác, nơi nhân vật + pet đứng):
   (0,795), (400,645), (1200,645), (1600,795), (1600,900), (0,900).
-- Mặt giường (nệm/chăn, nơi gấu ngồi): y≈540–560, x 155–760; gấu neo y=548.
-- Mặt tủ đầu giường: y≈580, x 30–260; đèn neo y=578.
-- Mặt bàn học: y≈490–515, x 1070–1470; bình neo y=508, cốc neo y=515.
+- Mặt giường (nệm/chăn, nơi gấu ngồi): y≈540–560, x 155–760; gấu neo y=550.
+- Mặt tủ đầu giường: y≈580, x 30–260; đèn neo y=580.
+- Mặt bàn học: y≈490–515, x 1070–1470; bình neo y=510, cốc neo y=515.
 - Mặt kệ sách (kệ gắn tường phía trên bàn): các đợt kệ y≈180, 330, 470
   (xấp xỉ), x 1150–1470.
 
@@ -91,12 +91,14 @@ Rect món vẽ sẵn trong nền (để đối chiếu — lớp rời phủ kh�
 - Bàn học: cao 300 px (sàn y≈790 đến mặt bàn y≈490).
 - Ghế: mặt ghế cao 150 px so với sàn (sàn y≈790 đến mặt ghế y≈640).
 - Lò sưởi (radiator): x 640–930, y 490–600.
-- Thảm tròn: ellipse x 430–1080, y 640–790.
+- Thảm tròn: ellipse x 430–1060, y 700–875 (tâm ≈ (745, 787), rx ≈ 315, ry ≈ 88).
 - Kệ mây (tường trái): x 60–220, y 200–300.
 - Khung ảnh: x 230–310, y 180–320.
 - Đèn mây trần: x 730–870, y 0–55 (cắt ở mép trên).
 - Tủ đầu giường: x 30–260, mặt y≈580, đáy y≈795.
 - Kệ sách: x 1150–1470, y 40–640.
+- Rèm trái: x ≈460–580, y 60–460 (rèm vải kem, mép trái khó tách khỏi tường vì cùng tông — sai số ±15 px).
+- Rèm phải: x ≈1080–1180, y 60–460 (phần nhìn thấy 1080–1150, còn lại bị kệ sách che).
 
 ## 7. Ghi chú cho giai đoạn 2 (code)
 
@@ -118,3 +120,32 @@ Rect món vẽ sẵn trong nền (để đối chiếu — lớp rời phủ kh�
 - Đồng bộ theo quy tắc chủ dự án 21/11: cùng phong cách 3D mềm, cùng hướng
   sáng trên-trái, cùng tỉ lệ — nhân vật đứng trong phòng phải đúng cỡ so với
   giường/tủ/cửa sổ (xem mốc mục 6), chân chạm sàn, có bóng đổ đúng mặt sàn.
+
+## 8. Hiệu chỉnh bằng code ở giai đoạn 2 (21/11, sau bài học PR #31)
+
+Mọi điểm neo/đa giác/dấu chân trên đây đã kiểm chứng lại bằng code
+trên ảnh `room_v3.png` thật (mẫu màu pixel + quét hàng/cột), không
+tin mắt. Kết quả: bbox alpha 5 món khớp khai báo; bán trong suốt
+0,00% cả 5; 5 điểm neo đúng mặt phẳng; đa giác sàn + 4 dấu chân +
+ghế đúng; đa số mốc tỉ lệ đúng. **Đã sửa 3 chỗ khai báo sai:**
+
+- **3 món thiếu 2 px ở đáy:** rect hiển thị của gấu/đèn/bình ngắn
+  hơn rect món trong nền đúng 2 px ở mép đáy (548 < 550, 578 < 580,
+  508 < 510) — dời vị trí đặt của 3 món xuống 2 px (bảng mục 2 và
+  điểm neo mục 3 đã sửa theo: gấu neo 548→550, đèn 578→580,
+  bình 508→510).
+- **Thảm tròn:** khai báo cũ ellipse x 430–1080, y 640–790 là SAI —
+  đo bằng code (phân loại theo r−b: thảm lavender/hồng có b gần r,
+  sàn gỗ có b thấp hơn r nhiều): thảm thật x 430–1060, y 700–875
+  (tâm ≈ (745, 787)). Đáy thảm tới y≈875, không phải 790.
+- **Rèm:** khai báo cũ "rèm trái x 590–750, rèm phải x 1300–1450"
+  là SAI — vùng 590–750 là cửa sổ, vùng 1300–1450 là kệ sách.
+  Rèm trái thật x ≈460–580, rèm phải thật x ≈1080–1180 (nhìn thấy
+  1080–1150), cùng y 60–460.
+- **Rect hiển thị đèn/cốc:** khai báo cũ đèn x[89,212], cốc
+  x[1059,1139] y[404,515] lệch 1–3 px so với content bbox + vị
+  trí đặt (đèn đúng x[86,209], cốc đúng x[1058,1138] y[404,514]) —
+  đã sửa bảng mục 2. Đèn và cốc đều thiếu ~1 px ở một mép so với
+  rect món trong nền (đèn thiếu mép phải 210 > 209, cốc thiếu mép
+  đáy 515 > 514) — trong sai số đo, mắt không thấy (đèn phát sáng,
+  cốc cùng tông bàn), test neo chấp nhận dung sai 2 px.
