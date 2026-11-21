@@ -206,14 +206,19 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       final g = profile.gender;
       final n = kidOutfitNumber(profile.dress);
       final paths = <String>[
+        kidFullAsset(g, n, backpack: _backpack),
         kidFullAsset(g, n, wave: true, backpack: _backpack),
-        kidEyePatch(g, n, wave: true).asset,
         ...?kidWalkFrames(g, n, up: false),
         ...?kidWalkFrames(g, n, up: true),
       ];
       for (final p in paths) {
-        precacheImage(AssetImage(p), context, onError: (_, _) {});
+        precacheImage(kidImage(p), context, onError: (_, _) {});
       }
+      precacheImage(
+        AssetImage(kidEyePatch(g, n, wave: true).asset),
+        context,
+        onError: (_, _) {},
+      );
     });
   }
 
@@ -586,19 +591,49 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
         _petWalking = true;
       }
     });
-    for (final point in path) {
-      if (!mounted || !current()) return;
-      final from = isKid ? _kidFeet : _petFeet;
-      final dist = (point - from).distance;
-      if (dist < 1) continue;
+    // Cả đường đi là một lượt hoạt ảnh liền (tăng tốc, đi đều, giảm
+    // tốc), không dừng ở từng góc — góp ý v0.0.13: đi bị giật cục.
+    final start = isKid ? _kidFeet : _petFeet;
+    final points = <Offset>[start];
+    for (final p in path) {
+      if ((p - points.last).distance >= 1) points.add(p);
+    }
+    if (points.length > 1) {
+      final cumulative = <double>[0];
+      for (var i = 1; i < points.length; i++) {
+        cumulative.add(cumulative.last + (points[i] - points[i - 1]).distance);
+      }
+      final length = cumulative.last;
       final speed = isKid ? roomWalkSpeed : roomWalkSpeed * 1.15;
-      controller.duration = Duration(
-        milliseconds: (dist / speed * 1000).round(),
-      );
+      final seconds = roomWalkDuration(length, speed: speed);
+      controller.duration = Duration(milliseconds: (seconds * 1000).round());
+      var segment = -1;
       void tick() {
         if (!current()) return;
-        final p = Offset.lerp(from, point, controller.value)!;
+        final d = roomWalkDistanceAt(
+          controller.value * seconds,
+          length,
+          speed: speed,
+        );
+        final (p, i) = roomPointAlong(points, cumulative, d);
         setState(() {
+          if (i != segment) {
+            segment = i;
+            final from = points[i];
+            final to = points[i + 1];
+            final segLen = (to - from).distance;
+            if (isKid) {
+              // Đi lên (xa dần) rõ rệt thì dùng khung đi bộ `ur`.
+              _kidWalkingUp = (to.dy - from.dy) < -0.35 * segLen;
+            }
+            if ((to.dx - from.dx).abs() > 2) {
+              if (isKid) {
+                _kidFacingLeft = to.dx < from.dx;
+              } else {
+                _petFacingLeft = to.dx < from.dx;
+              }
+            }
+          }
           if (isKid) {
             _kidFeet = p;
           } else {
@@ -607,19 +642,6 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
         });
       }
 
-      setState(() {
-        if (isKid) {
-          // Đi lên (xa dần) rõ rệt thì dùng khung đi bộ `ur`.
-          _kidWalkingUp = (point.dy - from.dy) < -0.35 * dist;
-        }
-        if ((point.dx - from.dx).abs() > 2) {
-          if (isKid) {
-            _kidFacingLeft = point.dx < from.dx;
-          } else {
-            _petFacingLeft = point.dx < from.dx;
-          }
-        }
-      });
       controller.addListener(tick);
       try {
         await controller.forward(from: 0).orCancel;

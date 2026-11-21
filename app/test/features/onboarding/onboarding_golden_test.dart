@@ -20,6 +20,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:timokid/features/character/kid_assets.dart';
 import 'package:timokid/core/database/app_database.dart';
 import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/core/theme/app_theme.dart';
@@ -126,6 +127,10 @@ void main() {
         ...kidImagePaths(),
       ]) {
         await precacheImage(AssetImage(path), context);
+        // Ảnh khung nhân vật hiển thị qua ResizeImage (khóa đệm riêng).
+        if (path.startsWith('assets/images/character/')) {
+          await precacheImage(kidImage(path), context);
+        }
       }
     });
     await tester.pump();

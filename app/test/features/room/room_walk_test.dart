@@ -114,4 +114,41 @@ void main() {
       expect(petBoxSize(PetStage.teen) * 400 / 512, closeTo(208.8, 0.1));
     });
   });
+
+  group('hồ sơ tốc độ đi (góp ý v0.0.13: đi giật, nhanh)', () {
+    test('quãng đi tăng dần, liền mạch, tới đích đúng lúc', () {
+      for (final length in [40.0, 300.0, 900.0]) {
+        final total = roomWalkDuration(length);
+        var last = 0.0;
+        for (var i = 0; i <= 200; i++) {
+          final d = roomWalkDistanceAt(total * i / 200, length);
+          expect(d, greaterThanOrEqualTo(last - 1e-9));
+          // Không nhảy cóc: mỗi bước 1/200 không vượt 2 lần tốc độ đều.
+          expect(d - last, lessThanOrEqualTo(2 * roomWalkSpeed * total / 200));
+          last = d;
+        }
+        expect(last, closeTo(length, 1e-6));
+      }
+    });
+
+    test('đi đều đúng tốc độ ở giữa quãng dài, chậm lúc đầu/cuối', () {
+      const length = 900.0;
+      final total = roomWalkDuration(length);
+      const dt = 0.01;
+      double v(double t) =>
+          (roomWalkDistanceAt(t + dt, length) - roomWalkDistanceAt(t, length)) /
+          dt;
+      expect(v(total / 2), closeTo(roomWalkSpeed, 1));
+      expect(v(0), lessThan(roomWalkSpeed * 0.1));
+      expect(v(total - dt), lessThan(roomWalkSpeed * 0.1));
+    });
+
+    test('điểm trên đường gấp khúc theo quãng', () {
+      const pts = [Offset(0, 0), Offset(100, 0), Offset(100, 50)];
+      const cum = [0.0, 100.0, 150.0];
+      expect(roomPointAlong(pts, cum, 50), (const Offset(50, 0), 0));
+      expect(roomPointAlong(pts, cum, 125), (const Offset(100, 25), 1));
+      expect(roomPointAlong(pts, cum, 999), (const Offset(100, 50), 1));
+    });
+  });
 }

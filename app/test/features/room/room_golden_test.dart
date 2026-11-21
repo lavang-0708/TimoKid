@@ -17,6 +17,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:timokid/features/character/kid_assets.dart';
 import 'package:timokid/core/database/app_database.dart';
 import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/core/database/models.dart';
@@ -165,6 +166,10 @@ void main() {
         ...kidImagePaths(),
       ]) {
         await precacheImage(AssetImage(path), context);
+        // Ảnh khung nhân vật hiển thị qua ResizeImage (khóa đệm riêng).
+        if (path.startsWith('assets/images/character/')) {
+          await precacheImage(kidImage(path), context);
+        }
       }
       // Nền + nội thất PNG v3b (D): nạp trước để ảnh chụp golden
       // không trắng trơn (cùng lý do như trứng/pet).

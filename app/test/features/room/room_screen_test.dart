@@ -9,6 +9,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:timokid/features/character/kid_sprite.dart';
+
+import '../../helpers/kid_images.dart';
+
 import 'package:timokid/core/animation/animation_gate.dart';
 import 'package:timokid/core/database/app_database.dart';
 import 'package:timokid/core/database/database_provider.dart';
@@ -460,9 +463,9 @@ void main() {
     expect(mid.center.dx, lessThan(start.center.dx));
     // Bé gái có khung đi bộ thật (lô 4): bộ 2, đi xuống/ngang → `dr`.
     expect(
-      (tester.widget<Image>(find.byKey(const Key('kid-walk-frame'))).image
-              as AssetImage)
-          .assetName,
+      assetNameOf(
+        tester.widget<Image>(find.byKey(const Key('kid-walk-frame'))).image,
+      ),
       startsWith('assets/images/character/girl/girl_full_02_walk_dr_'),
     );
     expect(
@@ -471,8 +474,8 @@ void main() {
           .having((k) => k.walking, 'walking', isTrue)
           .having((k) => k.facingLeft, 'facingLeft', isTrue),
     );
-    // Đi hết đường (~2 giây) rồi đứng lại.
-    for (var i = 0; i < 40; i++) {
+    // Đi hết đường (tốc độ 120 px/giây, ~8 giây) rồi đứng lại.
+    for (var i = 0; i < 100; i++) {
       await tester.pump(const Duration(milliseconds: 100));
     }
     final kid = tester.widget<KidSprite>(
@@ -528,14 +531,22 @@ void main() {
     }
     final frame = tester.widget<Image>(find.byKey(const Key('kid-walk-frame')));
     expect(
-      (frame.image as AssetImage).assetName,
+      assetNameOf(frame.image),
       startsWith('assets/images/character/boy/boy_full_02_walk_dr_'),
     );
-    for (var i = 0; i < 40; i++) {
+    for (var i = 0; i < 100; i++) {
       await tester.pump(const Duration(milliseconds: 100));
     }
     expect(find.byKey(const Key('kid-walk-frame')), findsNothing);
-    expect(find.byKey(const Key('kid-full-boy-2')), findsOneWidget);
+    // Ảnh đứng bộ 2 (có thể đang tự vẫy tay khi đứng lâu).
+    expect(
+      find.byWidgetPredicate(
+        (w) =>
+            w.key is ValueKey<String> &&
+            (w.key! as ValueKey<String>).value.startsWith('kid-full-boy-2'),
+      ),
+      findsOneWidget,
+    );
     await tester.pumpWidget(const SizedBox());
   });
 
