@@ -12,6 +12,7 @@ Các dòng lịch sử bên dưới viết tại thời điểm từng PR; số 
 - **Phòng v3b**: đi lại (G) ĐÃ LÀM ở `app/lib/features/room/room_walk.dart` (đa giác sàn trừ dấu chân đồ đạc, chạm đâu đi đó, đường vòng, giao đoạn–hình chữ nhật chính xác, tỉ lệ chiều sâu `1 + (y−810)·0,0016` kẹp 0,72–1,12, pet theo sau). Chưa làm: ngồi ghế.
 - **Pet lớn dần (F)**: theo số ngày xong trọn đề ngày — mới nở 0–2, nhỡ 3–7, lớn từ 8; cỡ 30/40/58/72% nhân vật cao 360 px (`pet_growth.dart`).
 - **Thị trấn**: đường là hai đoạn C1/C2 (không còn D1–D6), nửa rộng 60 px, vỉa hè 46 px (`town_roads.dart`).
+- **Cửa hàng + kho đồ (T2-06)**: route `/shop` (`app/lib/features/shop/`: `shop_catalog.dart` danh mục + giá hằng số, `shop_service.dart` mua/kho/giữ đồ, `shop_screen.dart` màn kiểu game). Schema database **v2**: bảng `inventory` (child_id, item_id, acquired_at, source = `shop`/`starter`/`grandfather`, unique (child_id, item_id)) thêm bằng migration giữ nguyên dữ liệu cũ. Mua = một transaction: dòng âm `wallet_ledger` (`shop_buy`, refId = mã món) + dòng `inventory`; không mua trùng, không để âm. Tủ đồ chỉ cho mặc món đã có (món chưa có hiện ổ khóa + giá, bấm thì mở Cửa hàng); máy cũ được giữ đồ đang mặc (`ShopService.grandfather`, idempotent, chạy khi mở Tủ đồ/Cửa hàng); mở đầu cho bộ đồ đã chọn là `starter`. Chưa có "Đồ hiếm" (kim cương) vì chưa có hình.
 
 ## Trạng thái hiện tại (lịch sử, đến PR #32)
 

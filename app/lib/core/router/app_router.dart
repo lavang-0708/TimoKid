@@ -8,6 +8,7 @@ import '../../features/onboarding/hatch_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/room/coming_soon_screen.dart';
 import '../../features/room/room_screen.dart';
+import '../../features/shop/shop_screen.dart';
 import '../../features/qa/qa_config.dart';
 import '../../features/qa/qa_menu_screen.dart';
 import '../../features/splash/splash_screen.dart';
@@ -60,6 +61,10 @@ class AppRouter {
         GoRoute(
           path: RoomScreen.route,
           builder: (context, state) => const RoomScreen(),
+        ),
+        GoRoute(
+          path: ShopScreen.route,
+          builder: (context, state) => const ShopScreen(),
         ),
         GoRoute(
           path: ComingSoonScreen.route,

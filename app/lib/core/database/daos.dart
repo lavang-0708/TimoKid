@@ -625,3 +625,54 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
     return query.getSingleOrNull();
   }
 }
+
+/// Kho đồ của bé (T2-06): món đã sở hữu. Không mua trùng nhờ unique
+/// (child_id, item_id); [grant] bỏ qua nếu đã có.
+@DriftAccessor(tables: [Inventory])
+class InventoryDao extends DatabaseAccessor<AppDatabase>
+    with _$InventoryDaoMixin {
+  InventoryDao(super.db);
+
+  /// Thêm món cho bé; trả true nếu vừa thêm, false nếu bé đã có món này.
+  Future<bool> grant({
+    required String childId,
+    required String itemId,
+    required String source,
+  }) async {
+    return transaction(() async {
+      if (await has(childId, itemId)) return false;
+      final now = db.clock.now();
+      await into(db.inventory).insert(
+        InventoryCompanion.insert(
+          id: newId(),
+          childId: childId,
+          itemId: itemId,
+          acquiredAt: now,
+          source: source,
+          createdAt: now,
+          updatedAt: now,
+        ),
+        // Phòng hờ: unique (child_id, item_id) cũng chặn ở tầng SQLite.
+        mode: InsertMode.insertOrIgnore,
+      );
+      return true;
+    });
+  }
+
+  /// Bé đã có món này chưa.
+  Future<bool> has(String childId, String itemId) async {
+    final row =
+        await (select(db.inventory)..where(
+              (t) => t.childId.equals(childId) & t.itemId.equals(itemId),
+            ))
+            .getSingleOrNull();
+    return row != null;
+  }
+
+  /// Mọi món bé đang có, theo thứ tự có món.
+  Future<List<InventoryData>> getAll(String childId) =>
+      (select(db.inventory)
+            ..where((t) => t.childId.equals(childId))
+            ..orderBy([(t) => OrderingTerm.asc(t.acquiredAt)]))
+          .get();
+}

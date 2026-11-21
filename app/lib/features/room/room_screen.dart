@@ -3,8 +3,8 @@
 /// Nền phòng, nhân vật, pet, nội thất đặt đúng vị trí khung 1600x900;
 /// 2 nút ở cột phải: Tủ đồ, Cửa hàng. Nút Trở về tròn ở góc trên trái
 /// về Thị trấn (PR (B), xem [RoundBackButton]) thay cho nút chữ
-/// "Thị trấn" trước đây. Tủ đồ và Cửa hàng là T2-05/T2-06 nên nút
-/// chỉ dẫn tới màn chờ "sắp mở" khi đã mở khóa.
+/// "Thị trấn" trước đây. Tủ đồ là bảng chọn đồ (chỉ món đã có), Cửa hàng
+/// (T2-06) là màn `/shop`.
 ///
 /// Cổng mỗi ngày: chưa xong đề ngày thì Tủ đồ, Cửa hàng và chơi với
 /// pet bị khóa ([RoomService.isPlayUnlocked] đọc trạng thái 5 chặng
@@ -58,8 +58,10 @@ import '../onboarding/onboarding_model.dart';
 import '../onboarding/onboarding_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
+import '../shop/shop_catalog.dart';
+import '../shop/shop_screen.dart';
+import '../shop/shop_service.dart';
 import '../town/town_screen.dart';
-import 'coming_soon_screen.dart';
 import 'pet_growth.dart';
 import 'room_assets.dart';
 import 'room_service.dart';
@@ -274,6 +276,11 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     final db = ref.read(databaseProvider);
     final looks = KidLookService(db: db);
     final gender = kidGender(profile.gender);
+    // Máy cài trước bản có cửa hàng: giữ đồ đang mặc rồi mới đọc kho.
+    final shop = ShopService(db: db);
+    await shop.grandfather(childId);
+    final owned = await shop.owned(childId);
+    if (!mounted) return;
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -287,11 +294,14 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
             required Widget child,
             required String label,
             required VoidCallback onTap,
+            String? lockedItemId,
           }) => Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6),
             child: InkWell(
               key: key,
-              onTap: onTap,
+              onTap: lockedItemId == null
+                  ? onTap
+                  : () => _openShopFromWardrobe(sheetContext),
               borderRadius: BorderRadius.circular(14),
               child: Container(
                 width: 104,
@@ -309,11 +319,29 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(height: 92, child: child),
+                    SizedBox(
+                      height: 92,
+                      child: lockedItemId == null
+                          ? child
+                          : Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: Opacity(opacity: 0.5, child: child),
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  top: 0,
+                                  child: _wardrobeLock(lockedItemId),
+                                ),
+                              ],
+                            ),
+                    ),
                     const SizedBox(height: 4),
                     Text(
-                      label,
-                      maxLines: 2,
+                      lockedItemId == null
+                          ? label
+                          : '$label\n${_priceOf(gender, lockedItemId)} xu',
+                      maxLines: 3,
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontSize: 13),
                     ),
@@ -322,6 +350,31 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
               ),
             ),
           );
+          // Món bật/tắt (kính, balo, giày): chưa có thì hiện ổ khóa + giá,
+          // bấm vào mở Cửa hàng.
+          Widget toggle({
+            required Key key,
+            required String label,
+            required String itemId,
+            required bool selected,
+            required Future<void> Function(bool on) onChanged,
+          }) {
+            if (owned.contains(itemId)) {
+              return FilterChip(
+                key: key,
+                label: Text(label),
+                selected: selected,
+                onSelected: onChanged,
+              );
+            }
+            return ActionChip(
+              key: key,
+              avatar: _wardrobeLock(itemId),
+              label: Text('$label · ${_priceOf(gender, itemId)} xu'),
+              onPressed: () => _openShopFromWardrobe(sheetContext),
+            );
+          }
+
           final accessories = kidHeadAccessories[gender]!;
           return SafeArea(
             child: SingleChildScrollView(
@@ -341,6 +394,10 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                           choice(
                             key: Key('room-wardrobe-outfit-$n'),
                             selected: n == outfit,
+                            lockedItemId:
+                                owned.contains(kidOutfitIds[gender]![n - 1])
+                                ? null
+                                : kidOutfitIds[gender]![n - 1],
                             label:
                                 kidOutfitNames[kidOutfitIds[gender]![n - 1]]!,
                             onTap: () async {
@@ -372,6 +429,10 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                           choice(
                             key: Key('room-wardrobe-accessory-${id ?? 'none'}'),
                             selected: id == _headAccessory,
+                            lockedItemId:
+                                (id == null || owned.contains(headItemId(id)))
+                                ? null
+                                : headItemId(id),
                             label: id == null
                                 ? 'Không đeo'
                                 : accessories[id]!.$1,
@@ -398,33 +459,36 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                   Wrap(
                     spacing: 12,
                     children: [
-                      FilterChip(
+                      toggle(
                         key: const Key('room-wardrobe-glasses'),
-                        label: const Text('Kính tròn'),
+                        label: 'Kính tròn',
+                        itemId: glassesItemId,
                         selected: _glasses,
-                        onSelected: (on) async {
+                        onChanged: (on) async {
                           await looks.setGlasses(childId, on);
                           if (!mounted) return;
                           setState(() => _glasses = on);
                           setSheet(() {});
                         },
                       ),
-                      FilterChip(
+                      toggle(
                         key: const Key('room-wardrobe-backpack'),
-                        label: const Text('Balo'),
+                        label: 'Balo',
+                        itemId: backpackItemId,
                         selected: _backpack,
-                        onSelected: (on) async {
+                        onChanged: (on) async {
                           await looks.setBackpack(childId, on);
                           if (!mounted) return;
                           setState(() => _backpack = on);
                           setSheet(() {});
                         },
                       ),
-                      FilterChip(
+                      toggle(
                         key: const Key('room-wardrobe-white-shoes'),
-                        label: const Text('Giày trắng'),
+                        label: 'Giày trắng',
+                        itemId: whiteShoesItemId,
                         selected: _whiteShoes,
-                        onSelected: (on) async {
+                        onChanged: (on) async {
                           await looks.setWhiteShoes(childId, on);
                           if (!mounted) return;
                           setState(() => _whiteShoes = on);
@@ -440,6 +504,35 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
         },
       ),
     );
+  }
+
+  /// Ổ khóa nhỏ cho món chưa mua trong Tủ đồ.
+  Widget _wardrobeLock(String itemId) => Container(
+    key: Key('room-wardrobe-lock-$itemId'),
+    width: 22,
+    height: 22,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: const Color(0xFF6E6680),
+      border: Border.all(color: Colors.white, width: 1.5),
+    ),
+    child: const Icon(Icons.lock_rounded, size: 13, color: Colors.white),
+  );
+
+  int _priceOf(String gender, String itemId) =>
+      shopItemById(gender, itemId)?.priceXu ?? 0;
+
+  /// Bấm món chưa mua trong Tủ đồ: đóng bảng, mở Cửa hàng ("Mua ở
+  /// Cửa hàng").
+  void _openShopFromWardrobe(BuildContext sheetContext) {
+    Navigator.of(sheetContext).pop();
+    _openShop();
+  }
+
+  /// Sang Cửa hàng, quay lại thì tải lại số dư (mua xong xu giảm).
+  Future<void> _openShop() async {
+    await context.push(ShopScreen.route);
+    if (mounted) _refresh();
   }
 
   /// Bấm vào nhân vật: vẫy tay chào 1,4 giây.
@@ -661,13 +754,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                       label: 'Cửa hàng',
                       locked: !_unlocked,
                       onPressed: () => _unlocked
-                          ? context.push(
-                              ComingSoonScreen.route,
-                              extra: const ComingSoonArgs(
-                                title: 'Cửa hàng',
-                                message: 'Cửa hàng sắp mở ở bản sau nhé! Xong đề ngày là được mua đồ.',
-                              ),
-                            )
+                          ? _openShop()
                           : _showLockedReminder('Cửa hàng'),
                     ),
                   ],

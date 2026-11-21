@@ -13,6 +13,9 @@ library;
 
 import 'dart:ui' show Rect;
 
+import 'package:flutter/painting.dart'
+    show AssetImage, ImageProvider, ResizeImage;
+
 /// Khung ảnh nhân vật.
 const double kidFrameWidth = 1024;
 const double kidFrameHeight = 1536;
@@ -149,3 +152,9 @@ String kidWhiteShoesAsset(String gender) {
   final g = kidGender(gender);
   return 'assets/images/character/$g/${g}_shoes_02.png';
 }
+
+/// Ảnh nhân vật giải mã nhỏ lại (rộng [width] px) cho chỗ vẽ nhiều thẻ
+/// cùng lúc (Cửa hàng): ảnh gốc 1024x1536 giải mã đủ cỡ thì mỗi ảnh
+/// tốn ~6 MB bộ nhớ. Golden test nạp trước đúng provider này.
+ImageProvider kidImage(String path, {int width = 400}) =>
+    ResizeImage(AssetImage(path), width: width);
