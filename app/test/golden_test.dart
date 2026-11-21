@@ -6,6 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+import 'helpers/ui_images.dart';
+
 import 'package:timokid/core/database/app_database.dart';
 import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/core/router/app_router.dart';
@@ -109,7 +112,7 @@ void main() {
     final context = tester.element(find.byType(Scaffold).first);
     await tester.runAsync(() async {
       await precacheImage(const AssetImage(townBackgroundAsset), context);
-      for (final path in townLayerAssets) {
+      for (final path in [...townLayerAssets, ...uiImagePaths]) {
         await precacheImage(AssetImage(path), context);
       }
     });

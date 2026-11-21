@@ -3,6 +3,8 @@
 /// `runAsync`, thiếu bước này thì ảnh chụp trắng trơn).
 library;
 
+import 'ui_images.dart';
+
 import 'package:timokid/features/character/kid_assets.dart';
 
 List<String> kidImagePaths() => <String>[
@@ -25,4 +27,5 @@ List<String> kidImagePaths() => <String>[
   for (final s in ['dog', 'cat', 'rabbit'])
     for (final st in ['egg', 'newborn', 'teen', 'adult'])
       'assets/images/pets/${s}_$st.png',
+  ...uiImagePaths,
 ];

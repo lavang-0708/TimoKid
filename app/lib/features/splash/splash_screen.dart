@@ -3,8 +3,7 @@
 ///
 /// Hiệu ứng là một lượt rồi dừng (không lặp) nên `pumpAndSettle` vẫn
 /// dừng được; khi cổng [AnimationGate] tắt (test) thì chuyển ngay.
-/// Logo tạm vẽ bằng chữ + ảnh 2 bé; khi Muse vẽ xong `ui_logo.png` thì
-/// thay vào [_Logo].
+/// Logo và nền là ảnh lô 6 (`ui_logo.png`, `ui_splash_bg.png`).
 library;
 
 import 'package:go_router/go_router.dart';
@@ -12,7 +11,6 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/animation/animation_gate.dart';
 import '../../core/widgets/game_ui.dart';
-import '../character/kid_assets.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key, required this.next});
@@ -68,12 +66,12 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       key: const Key('splash-screen'),
-      body: DecoratedBox(
+      body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFBFE3FF), Color(0xFFFFE3F0), Color(0xFFFFF3D9)],
+          color: Color(0xFFFFE3F0),
+          image: DecorationImage(
+            image: AssetImage('$uiArt/ui_splash_bg.png'),
+            fit: BoxFit.cover,
           ),
         ),
         child: SafeArea(
@@ -113,58 +111,22 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-/// Logo tạm: 2 bé hai bên + chữ "TimoKid" tròn mập viền trắng.
+/// Logo TimoKid (ảnh lô 6: chữ + bé gái, bé trai, 3 pet) + khẩu hiệu.
 class _Logo extends StatelessWidget {
   const _Logo();
 
   @override
   Widget build(BuildContext context) {
-    Widget kid(String g) => SizedBox(
-      height: 150,
-      child: Image.asset(kidFullAsset(g, 1, wave: true), fit: BoxFit.contain),
-    );
-    return Row(
+    return Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        kid('girl'),
-        const SizedBox(width: 8),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              children: [
-                Text(
-                  'TimoKid',
-                  style: TextStyle(
-                    fontSize: 56,
-                    fontWeight: FontWeight.w900,
-                    foreground: Paint()
-                      ..style = PaintingStyle.stroke
-                      ..strokeWidth = 8
-                      ..color = Colors.white,
-                  ),
-                ),
-                const Text(
-                  'TimoKid',
-                  key: Key('splash-title'),
-                  style: TextStyle(
-                    fontSize: 56,
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFF8E6FD8),
-                    shadows: [
-                      Shadow(color: Color(0x553B2E5A), offset: Offset(0, 4)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Text('Học toán TIMO mà chơi', style: gameOutlinedText(16)),
-            const SizedBox(height: 18),
-          ],
+        Image.asset(
+          '$uiArt/ui_logo.png',
+          key: const Key('splash-title'),
+          height: 190,
+          semanticLabel: 'TimoKid',
         ),
-        const SizedBox(width: 8),
-        kid('boy'),
+        Text('Học toán TIMO mà chơi', style: gameOutlinedText(16)),
       ],
     );
   }

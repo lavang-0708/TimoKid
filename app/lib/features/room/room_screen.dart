@@ -583,7 +583,14 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const RoundBackButton(key: Key('room-town-button')),
+                    GameRoundButton(
+                      key: const Key('room-town-button'),
+                      icon: Icons.location_city_rounded,
+                      image: '$uiArt/ui_icon_town.png',
+                      color: const Color(0xFFA07BE0),
+                      label: 'Thị trấn',
+                      onPressed: () => context.go(TownScreen.route),
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Align(
@@ -607,18 +614,21 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                               ),
                             GameStat(
                               icon: Icons.monetization_on_rounded,
+                              image: '$uiArt/ui_coin.png',
                               color: const Color(0xFFF5B83D),
                               text: '$_xu',
                               textKey: const Key('room-xu-balance'),
                             ),
                             GameStat(
                               icon: Icons.diamond_rounded,
+                              image: '$uiArt/ui_gem.png',
                               color: const Color(0xFFA07BE0),
                               text: '$_gems',
                               textKey: const Key('room-gem-balance'),
                             ),
                             GameStat(
                               icon: Icons.star_rounded,
+                              image: '$uiArt/ui_star.png',
                               color: const Color(0xFFFFC94D),
                               text: _unlocked
                                   ? '$total/$total'
@@ -634,6 +644,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                     GameRoundButton(
                       key: const Key('room-wardrobe-button'),
                       icon: Icons.checkroom_rounded,
+                      image: '$uiArt/ui_icon_wardrobe.png',
                       color: const Color(0xFFB48CF2),
                       label: 'Tủ đồ',
                       locked: !_unlocked,
@@ -645,6 +656,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                     GameRoundButton(
                       key: const Key('room-shop-button'),
                       icon: Icons.storefront_rounded,
+                      image: '$uiArt/ui_icon_shop.png',
                       color: const Color(0xFF5DC3A8),
                       label: 'Cửa hàng',
                       locked: !_unlocked,

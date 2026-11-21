@@ -13,6 +13,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+import '../../helpers/ui_images.dart';
+
 import 'package:timokid/core/database/app_database.dart';
 import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/core/theme/app_theme.dart';
@@ -85,6 +88,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('building-screen')), findsOneWidget);
+    await precacheUiImages(tester);
     await expectLater(
       find.byKey(const Key('building-screen')),
       matchesGoldenFile('../../goldens/building_800x360.png'),
