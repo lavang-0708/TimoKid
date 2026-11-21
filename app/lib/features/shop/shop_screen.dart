@@ -1,0 +1,800 @@
+/// Màn Cửa hàng (T2-06): bé tiêu xu mua quần áo và phụ kiện.
+///
+/// Giao diện kiểu game như Phòng/Thị trấn: nút Trở về tròn + thanh
+/// chỉ số (xu, kim cương) ở hàng đầu, hai nút nhóm hàng (Quần áo,
+/// Phụ kiện) dạng viên thuốc to, lưới thẻ món (cuộn dọc khi màn thấp).
+/// Mỗi thẻ: hình nhân vật cắt theo món, tên, giá kèm xu, nút "Mua"
+/// (đủ xu), "Còn thiếu N xu" (mờ, không bấm được) hoặc "Đã có ✓".
+/// Bấm Mua → hộp xác nhận to ("Mua"/"Thôi") → mua xong có băng
+/// "Mua xong!" nảy lên rồi tự tắt.
+///
+/// Việc mua và kho đồ nằm ở [ShopService]; màn này chỉ hiển thị.
+/// Hiệu ứng nảy chạy một lần, tắt hẳn khi [AnimationGate.enabled]
+/// là false để `pumpAndSettle` trong test dừng được.
+library;
+
+import 'dart:async';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:material_ui/material_ui.dart';
+
+import '../../core/animation/animation_gate.dart';
+import '../../core/database/database_provider.dart';
+import '../../core/database/tables.dart';
+import '../../core/widgets/game_ui.dart';
+import '../../core/widgets/press_bounce.dart';
+import '../../core/widgets/round_back_button.dart';
+import '../character/kid_assets.dart';
+import '../onboarding/onboarding_service.dart';
+import '../room/room_screen.dart';
+import 'shop_catalog.dart';
+import 'shop_service.dart';
+
+class ShopScreen extends ConsumerStatefulWidget {
+  const ShopScreen({super.key});
+
+  static const String route = '/shop';
+
+  @override
+  ConsumerState<ShopScreen> createState() => _ShopScreenState();
+}
+
+class _ShopScreenState extends ConsumerState<ShopScreen> {
+  bool _loading = true;
+  String? _error;
+  String? _childId;
+  String _gender = 'girl';
+  int _outfit = 1;
+  int _xu = 0;
+  int _gems = 0;
+  Set<String> _owned = const {};
+  ShopCategory _category = ShopCategory.outfits;
+  bool _buying = false;
+  String? _boughtName;
+  int _boughtCount = 0;
+  Timer? _bannerTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _refresh();
+  }
+
+  @override
+  void dispose() {
+    _bannerTimer?.cancel();
+    super.dispose();
+  }
+
+  ShopService get _service => ShopService(db: ref.read(databaseProvider));
+
+  Future<void> _refresh() async {
+    try {
+      final db = ref.read(databaseProvider);
+      final childId = await db.ensureSeeded();
+      final profile = await OnboardingService(db: db).loadProfile(childId);
+      final service = _service;
+      // Máy cài trước bản có cửa hàng: giữ đồ đang mặc (idempotent).
+      await service.grandfather(childId);
+      final owned = await service.owned(childId);
+      final balances = await service.balances(childId);
+      if (!mounted) return;
+      setState(() {
+        _childId = childId;
+        _gender = kidGender(profile?.gender ?? 'girl');
+        _outfit = kidOutfitNumber(profile?.dress);
+        _owned = owned;
+        _xu = balances[Currency.xu] ?? 0;
+        _gems = balances[Currency.gem] ?? 0;
+        _loading = false;
+        _error = null;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = '$e';
+        _loading = false;
+      });
+    }
+  }
+
+  void _back() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(RoomScreen.route);
+    }
+  }
+
+  Future<void> _onBuyTap(ShopItem item) async {
+    final childId = _childId;
+    if (childId == null || _buying) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) =>
+          _ConfirmDialog(item: item, gender: _gender, outfit: _outfit),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _buying = true);
+    try {
+      final result = await _service.buy(
+        childId: childId,
+        gender: _gender,
+        itemId: item.id,
+      );
+      await _refresh();
+      if (!mounted) return;
+      if (result == BuyResult.bought) {
+        _showBought(item.name);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              result == BuyResult.insufficient
+                  ? 'Chưa đủ xu rồi, làm thêm bài nhé!'
+                  : 'Bé đã có món này rồi!',
+            ),
+          ),
+        );
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Chưa mua được, bé thử lại nhé')),
+      );
+    } finally {
+      if (mounted) setState(() => _buying = false);
+    }
+  }
+
+  void _showBought(String name) {
+    _bannerTimer?.cancel();
+    setState(() {
+      _boughtName = name;
+      _boughtCount++;
+    });
+    _bannerTimer = Timer(const Duration(milliseconds: 1600), () {
+      if (mounted) setState(() => _boughtName = null);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const Scaffold(
+        key: Key('shop-screen'),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (_error != null) {
+      return Scaffold(
+        key: const Key('shop-screen'),
+        body: Center(child: Text('Không tải được Cửa hàng: $_error')),
+      );
+    }
+    final items = [
+      for (final i in shopItemsFor(_gender))
+        if (i.category == _category) i,
+    ];
+    return Scaffold(
+      key: const Key('shop-screen'),
+      backgroundColor: const Color(0xFFE9DDF7),
+      body: Stack(
+        children: [
+          const Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/backgrounds/shop_bg.png'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+              child: Column(
+                children: [
+                  _header(),
+                  const SizedBox(height: 6),
+                  Expanded(child: _grid(items)),
+                ],
+              ),
+            ),
+          ),
+          if (_boughtName != null)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Center(
+                  child: _BoughtBanner(
+                    key: ValueKey('bought-$_boughtCount'),
+                    name: _boughtName!,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _header() {
+    return Row(
+      children: [
+        RoundBackButton(
+          key: const Key('shop-back-button'),
+          tooltip: 'Về Phòng',
+          onPressed: _back,
+        ),
+        const SizedBox(width: 8),
+        GameHudBar(
+          children: [
+            GameStat(
+              icon: Icons.monetization_on_rounded,
+              image: '$uiArt/ui_coin.png',
+              color: const Color(0xFFF5B83D),
+              text: '$_xu',
+              textKey: const Key('shop-xu-balance'),
+            ),
+            GameStat(
+              icon: Icons.diamond_rounded,
+              image: '$uiArt/ui_gem.png',
+              color: const Color(0xFFA07BE0),
+              text: '$_gems',
+              textKey: const Key('shop-gem-balance'),
+            ),
+          ],
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerRight,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final c in ShopCategory.values) ...[
+                  _TabPill(
+                    key: Key('shop-tab-${c.key}'),
+                    category: c,
+                    selected: c == _category,
+                    onTap: () => setState(() => _category = c),
+                  ),
+                  if (c != ShopCategory.values.last) const SizedBox(width: 8),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _grid(List<ShopItem> items) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0x99FFFFFF),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white, width: 2),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: SingleChildScrollView(
+          key: const Key('shop-grid'),
+          padding: const EdgeInsets.all(8),
+          child: SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                for (final item in items)
+                  _ItemCard(
+                    key: Key('shop-item-${item.id}'),
+                    item: item,
+                    gender: _gender,
+                    outfit: _outfit,
+                    owned: _owned.contains(item.id),
+                    xu: _xu,
+                    onBuy: () => _onBuyTap(item),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Nút nhóm hàng dạng viên thuốc to, có icon.
+class _TabPill extends StatelessWidget {
+  const _TabPill({
+    super.key,
+    required this.category,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final ShopCategory category;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final icon = category == ShopCategory.outfits
+        ? Image.asset('$uiArt/ui_icon_clothes.png', width: 30, height: 30)
+        : Icon(
+            Icons.auto_awesome_rounded,
+            size: 24,
+            color: selected ? gameInk : const Color(0xFF8E6FD8),
+          );
+    return PressBounce(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Semantics(
+          button: true,
+          selected: selected,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 48),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: selected
+                    ? const [Color(0xFFFFE08A), Color(0xFFFFB84D)]
+                    : const [Colors.white, Color(0xFFEDE4FB)],
+              ),
+              borderRadius: BorderRadius.circular(26),
+              border: Border.all(
+                color: selected ? Colors.white : const Color(0xFFD0BFF0),
+                width: selected ? 3 : 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: selected
+                      ? const Color(0x66FFA726)
+                      : const Color(0x22000000),
+                  offset: const Offset(0, 3),
+                  blurRadius: 5,
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                icon,
+                const SizedBox(width: 6),
+                Text(
+                  category.label,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    color: gameInk,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Hình món: nhân vật (bộ đồ hiện tại của bé) cắt theo món, như thẻ
+/// chọn bộ đồ ở mở đầu. Bộ đồ: cả bộ; phụ kiện: ảnh nhân vật + lớp phủ.
+class ShopItemArt extends StatelessWidget {
+  const ShopItemArt({
+    super.key,
+    required this.item,
+    required this.gender,
+    required this.outfit,
+  });
+
+  final ShopItem item;
+  final String gender;
+
+  /// Bộ đồ 1–3 làm nền cho phụ kiện.
+  final int outfit;
+
+  /// Cắt phần nào của ảnh toàn thân: đầu, thân trên hay chân.
+  Alignment get _crop => switch (item.kind) {
+    ShopItemKind.outfit => const Alignment(0, -0.7),
+    ShopItemKind.headAccessory ||
+    ShopItemKind.glasses => const Alignment(0, -0.85),
+    ShopItemKind.backpack => const Alignment(0, -0.35),
+    ShopItemKind.whiteShoes => const Alignment(0, 1),
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final n = item.outfit ?? outfit;
+    final base = kidFullAsset(
+      gender,
+      n,
+      backpack: item.kind == ShopItemKind.backpack,
+    );
+    final overlay = switch (item.kind) {
+      ShopItemKind.headAccessory => kidHeadAccessoryAsset(
+        gender,
+        item.accessory,
+      ),
+      ShopItemKind.glasses => kidGlassesAsset(gender),
+      ShopItemKind.whiteShoes => kidWhiteShoesAsset(gender),
+      _ => null,
+    };
+    Widget layer(String path) => Image(
+      image: kidImage(path),
+      width: kidFrameWidth,
+      height: kidFrameHeight,
+      fit: BoxFit.fill,
+    );
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: FittedBox(
+        fit: BoxFit.cover,
+        alignment: _crop,
+        child: SizedBox(
+          width: kidFrameWidth,
+          height: kidFrameHeight,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [layer(base), if (overlay != null) layer(overlay)],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Giá kèm biểu tượng xu.
+class _Price extends StatelessWidget {
+  const _Price(this.xu, {this.size = 16});
+
+  final int xu;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image.asset('$uiArt/ui_coin.png', width: size + 6, height: size + 6),
+        const SizedBox(width: 3),
+        Text(
+          '$xu',
+          style: TextStyle(
+            fontSize: size,
+            fontWeight: FontWeight.w900,
+            color: gameInk,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Nút kẹo to: xanh (Mua), xám (không đủ xu), vàng (Thôi) ...
+class _CandyButton extends StatelessWidget {
+  const _CandyButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.color = const Color(0xFF4CC38A),
+    this.height = 44,
+    this.fontSize = 18,
+  });
+
+  final String text;
+  final VoidCallback? onPressed;
+  final Color color;
+  final double height;
+  final double fontSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onPressed != null;
+    final base = enabled ? color : const Color(0xFFC9C3D6);
+    final top = Color.lerp(base, Colors.white, 0.3)!;
+    final edge = Color.lerp(base, Colors.black, 0.28)!;
+    return PressBounce(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onPressed,
+        child: Semantics(
+          button: true,
+          enabled: enabled,
+          label: text,
+          child: Container(
+            height: height + 4,
+            padding: const EdgeInsets.only(bottom: 4),
+            decoration: BoxDecoration(
+              color: edge,
+              borderRadius: BorderRadius.circular(height / 2 + 2),
+            ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [top, base],
+                ),
+                borderRadius: BorderRadius.circular(height / 2),
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  text,
+                  maxLines: 1,
+                  style: gameOutlinedText(fontSize),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Thẻ một món.
+class _ItemCard extends StatelessWidget {
+  const _ItemCard({
+    super.key,
+    required this.item,
+    required this.gender,
+    required this.outfit,
+    required this.owned,
+    required this.xu,
+    required this.onBuy,
+  });
+
+  final ShopItem item;
+  final String gender;
+  final int outfit;
+  final bool owned;
+  final int xu;
+  final VoidCallback onBuy;
+
+  static const double width = 136;
+  static const double height = 196;
+
+  @override
+  Widget build(BuildContext context) {
+    final missing = item.priceXu - xu;
+    final Widget action;
+    if (owned) {
+      action = Container(
+        key: Key('shop-owned-${item.id}'),
+        height: 44,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: const Color(0xFFE3F7E6),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0xFF43A047), width: 2),
+        ),
+        child: const FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            'Đã có ✓',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w900,
+              color: Color(0xFF2E7D32),
+            ),
+          ),
+        ),
+      );
+    } else if (missing > 0) {
+      action = _CandyButton(
+        key: Key('shop-buy-${item.id}'),
+        text: 'Còn thiếu $missing xu',
+        fontSize: 14,
+        onPressed: null,
+      );
+    } else {
+      action = _CandyButton(
+        key: Key('shop-buy-${item.id}'),
+        text: 'Mua',
+        onPressed: onBuy,
+      );
+    }
+    return SizedBox(
+      width: width,
+      height: height,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              owned ? '$uiArt/ui_card_selected.png' : '$uiArt/ui_card.png',
+              fit: BoxFit.fill,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+            child: Column(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ShopItemArt(
+                      item: item,
+                      gender: gender,
+                      outfit: outfit,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                SizedBox(
+                  height: 18,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      item.name,
+                      maxLines: 1,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: gameInk,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 22, child: _Price(item.priceXu)),
+                const SizedBox(height: 2),
+                action,
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Hộp xác nhận mua: to, thân thiện, hai nút "Mua" / "Thôi".
+class _ConfirmDialog extends StatelessWidget {
+  const _ConfirmDialog({
+    required this.item,
+    required this.gender,
+    required this.outfit,
+  });
+
+  final ShopItem item;
+  final String gender;
+  final int outfit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      key: const Key('shop-confirm-dialog'),
+      backgroundColor: Colors.white,
+      insetPadding: const EdgeInsets.all(12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: const BorderSide(color: Color(0xFFD0BFF0), width: 3),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: SingleChildScrollView(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 92,
+                height: 110,
+                child: ShopItemArt(item: item, gender: gender, outfit: outfit),
+              ),
+              const SizedBox(width: 12),
+              Flexible(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 260),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Mua ${item.name} nhé?',
+                        key: const Key('shop-confirm-title'),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        style: const TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.w900,
+                          color: gameInk,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Center(child: _Price(item.priceXu, size: 20)),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _CandyButton(
+                              key: const Key('shop-confirm-cancel'),
+                              text: 'Thôi',
+                              color: const Color(0xFFFFA64D),
+                              height: 48,
+                              onPressed: () => Navigator.of(context).pop(false),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _CandyButton(
+                              key: const Key('shop-confirm-buy'),
+                              text: 'Mua',
+                              height: 48,
+                              onPressed: () => Navigator.of(context).pop(true),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Băng "Mua xong!": nảy to rồi lắng (một lần), cổng tắt thì hiện tĩnh.
+class _BoughtBanner extends StatelessWidget {
+  const _BoughtBanner({super.key, required this.name});
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    final banner = Container(
+      key: const Key('shop-bought-banner'),
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF7BDC9F), Color(0xFF3FB27A)],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: Colors.white, width: 3),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x55000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.asset('$uiArt/ui_star.png', width: 36, height: 36),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text('Mua xong!', maxLines: 1, style: gameOutlinedText(30)),
+          ),
+        ],
+      ),
+    );
+    if (!AnimationGate.enabled) return banner;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.3, end: 1),
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.elasticOut,
+      builder: (context, scale, child) =>
+          Transform.scale(scale: scale, child: child),
+      child: banner,
+    );
+  }
+}

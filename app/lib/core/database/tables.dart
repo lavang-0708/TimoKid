@@ -281,6 +281,38 @@ class WalletLedger extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Món đồ bé đã sở hữu (T2-06, schema v2). Một dòng là một món của một
+/// bé; `item_id` là mã món trong danh mục cửa hàng (`shop_catalog.dart`,
+/// vd `girl_top_02`, `head_hat`). Không mua trùng: unique (child_id,
+/// item_id). `source`: `shop` (mua), `starter` (bộ đồ chọn ở mở đầu),
+/// `grandfather` (máy cài trước bản có cửa hàng: đồ đang mặc được giữ).
+class Inventory extends Table {
+  TextColumn get id => text()();
+
+  TextColumn get childId => text()();
+
+  TextColumn get itemId => text()();
+
+  DateTimeColumn get acquiredAt => dateTime()();
+
+  /// Nguồn có món: `shop`, `starter` hoặc `grandfather`.
+  TextColumn get source => text()();
+
+  DateTimeColumn get createdAt => dateTime()();
+
+  DateTimeColumn get updatedAt => dateTime()();
+
+  BoolColumn get synced => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {childId, itemId},
+  ];
+}
+
 /// Mức thưởng, khóa mức khó và các cài đặt khác.
 /// Một dòng là một khóa: `key` + `value` (JSON, để lưu được mọi kiểu:
 /// số, chuỗi, danh sách, map). `child_id` để trống (null) nghĩa là

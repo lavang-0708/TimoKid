@@ -1,4 +1,4 @@
-/// Database Drift của TimoKid: 7 bảng bản 0.1, schema v1.
+/// Database Drift của TimoKid: 7 bảng bản 0.1 + `inventory` (T2-06), schema v2.
 ///
 /// Mở file `timokid.sqlite` trong thư mục tài liệu của app trên máy thật
 /// (qua `drift_flutter`). Test truyền executor riêng
@@ -40,6 +40,7 @@ const defaultRewardsJson =
     DailySets,
     WalletLedger,
     Settings,
+    Inventory,
   ],
   daos: [
     ChildrenDao,
@@ -49,6 +50,7 @@ const defaultRewardsJson =
     DailySetsDao,
     WalletDao,
     SettingsDao,
+    InventoryDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -63,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
   Clock clock;
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -77,6 +79,12 @@ class AppDatabase extends _$AppDatabase {
       // lớp database phải import feature mở đầu; tên khóa giữ đồng
       // bộ với `OnboardingService.onboardingCompletedKey`.
       await _seedSetting('onboarding_completed', 'false');
+    },
+    onUpgrade: (migrator, from, to) async {
+      // v1 → v2 (T2-06): thêm bảng `inventory`; mọi dữ liệu cũ giữ nguyên.
+      if (from < 2) {
+        await migrator.createTable(inventory);
+      }
     },
   );
 
@@ -104,7 +112,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   /// Đặt lại toàn bộ database về trạng thái mới cài (CHỈ menu QA debug
-  /// gọi, xem `QaService.clearAllData`): DROP toàn bộ 7 bảng rồi tạo
+  /// gọi, xem `QaService.clearAllData`): DROP toàn bộ bảng rồi tạo
   /// lại (kể cả trigger append-only) + gieo dữ liệu mặc định.
   ///
   /// Không dùng DELETE: trigger append-only chặn DELETE trên

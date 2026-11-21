@@ -26,6 +26,7 @@ import 'package:timokid/features/onboarding/onboarding_model.dart';
 import 'package:timokid/features/onboarding/onboarding_service.dart';
 import 'package:timokid/features/room/coming_soon_screen.dart';
 import 'package:timokid/features/room/room_screen.dart';
+import 'package:timokid/features/shop/shop_screen.dart';
 import 'package:timokid/features/town/town_screen.dart';
 
 AppDatabase openMemoryDb({Clock? clock}) => AppDatabase(
@@ -78,6 +79,10 @@ void main() {
         GoRoute(
           path: TownScreen.route,
           builder: (context, state) => const TownScreen(),
+        ),
+        GoRoute(
+          path: ShopScreen.route,
+          builder: (context, state) => const ShopScreen(),
         ),
         GoRoute(
           path: ComingSoonScreen.route,
@@ -221,6 +226,10 @@ void main() {
   ) async {
     await completeOnboardingGirl();
     await markAllDone();
+    // Bé đã mua bộ 3, mũ, kính, balo (Cửa hàng) nên mặc thử được.
+    for (final id in ['girl_top_03', 'head_hat', 'glasses', 'backpack']) {
+      await db.inventoryDao.grant(childId: childId, itemId: id, source: 'shop');
+    }
     await pumpRoom(tester);
 
     expect(find.byKey(const Key('room-locked-banner')), findsNothing);
@@ -305,7 +314,9 @@ void main() {
     expect((pet.center.dx - after.center.dx).abs(), lessThan(box.width * 0.2));
   });
 
-  testWidgets('xong đề ngày thì Cửa hàng sang màn chờ', (tester) async {
+  testWidgets('xong đề ngày thì Cửa hàng mở màn /shop, quay lại về Phòng', (
+    tester,
+  ) async {
     await completeOnboardingGirl();
     await markAllDone();
     await pumpRoom(tester);
@@ -313,10 +324,100 @@ void main() {
     await tester.tap(find.byKey(const Key('room-shop-button')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('coming-soon-screen')), findsOneWidget);
+    expect(find.byKey(const Key('shop-screen')), findsOneWidget);
+    expect(find.byKey(const Key('coming-soon-screen')), findsNothing);
+
+    await tester.tap(find.byKey(const Key('shop-back-button')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('room-screen')), findsOneWidget);
+  });
+
+  testWidgets('Tủ đồ: món chưa mua có ổ khóa + giá, bấm thì mở Cửa hàng', (
+    tester,
+  ) async {
+    await completeOnboardingGirl();
+    await markAllDone();
+    await pumpRoom(tester);
+
+    await tester.tap(find.byKey(const Key('room-wardrobe-button')));
+    await tester.pumpAndSettle();
+
+    // Bé đang mặc váy tím (bộ 2) nên đã có; bộ 1 và 3 chưa mua.
     expect(
-      find.text('Cửa hàng sắp mở ở bản sau nhé! Xong đề ngày là được mua đồ.'),
+      find.byKey(const Key('room-wardrobe-lock-girl_top_02')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const Key('room-wardrobe-lock-girl_top_01')),
       findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('room-wardrobe-lock-girl_top_03')),
+      findsOneWidget,
+    );
+    expect(find.text('Váy hồng\n80 xu'), findsOneWidget);
+    expect(
+      find.byKey(const Key('room-wardrobe-lock-head_hat')),
+      findsOneWidget,
+    );
+    await tester.ensureVisible(find.byKey(const Key('room-wardrobe-glasses')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('room-wardrobe-lock-glasses')), findsOneWidget);
+
+    // Bấm bộ chưa mua: KHÔNG đổi đồ, mở Cửa hàng.
+    await tester.ensureVisible(find.byKey(const Key('room-wardrobe-outfit-3')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('room-wardrobe-outfit-3')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('shop-screen')), findsOneWidget);
+    final profile = await OnboardingService(db: db).loadProfile(childId);
+    expect(profile!.dress, 'girl_top_02');
+  });
+
+  testWidgets('Tủ đồ: không mặc được kính chưa mua, mua xong mặc được', (
+    tester,
+  ) async {
+    await completeOnboardingGirl();
+    await markAllDone();
+    await db.walletDao.addEntry(
+      childId: childId,
+      currency: 'xu',
+      amount: 100,
+      reason: 'test',
+    );
+    await pumpRoom(tester);
+
+    await tester.tap(find.byKey(const Key('room-wardrobe-button')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('room-wardrobe-glasses')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('room-wardrobe-glasses')));
+    await tester.pumpAndSettle();
+    expect(
+      await db.settingsDao.getValue(childId: childId, key: 'kid_glasses'),
+      isNot('true'),
+    );
+    // Đang ở Cửa hàng: mua kính.
+    expect(find.byKey(const Key('shop-screen')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('shop-tab-accessories')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('shop-buy-glasses')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('shop-confirm-buy')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('shop-back-button')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('room-wardrobe-button')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('room-wardrobe-lock-glasses')), findsNothing);
+    await tester.ensureVisible(find.byKey(const Key('room-wardrobe-glasses')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('room-wardrobe-glasses')));
+    await tester.pumpAndSettle();
+    expect(
+      await db.settingsDao.getValue(childId: childId, key: 'kid_glasses'),
+      'true',
     );
   });
 

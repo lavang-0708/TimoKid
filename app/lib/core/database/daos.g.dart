@@ -86,3 +86,15 @@ class SettingsDaoManager {
   $$SettingsTableTableManager get settings =>
       $$SettingsTableTableManager(_db.attachedDatabase, _db.settings);
 }
+
+mixin _$InventoryDaoMixin on DatabaseAccessor<AppDatabase> {
+  $InventoryTable get inventory => attachedDatabase.inventory;
+  InventoryDaoManager get managers => InventoryDaoManager(this);
+}
+
+class InventoryDaoManager {
+  final _$InventoryDaoMixin _db;
+  InventoryDaoManager(this._db);
+  $$InventoryTableTableManager get inventory =>
+      $$InventoryTableTableManager(_db.attachedDatabase, _db.inventory);
+}

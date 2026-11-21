@@ -178,10 +178,6 @@ void main() {
         ...roomFurniture.map((f) => f.asset),
       ]) {
         await precacheImage(AssetImage(path), context);
-        // Ảnh khung nhân vật hiển thị qua ResizeImage (khóa đệm riêng).
-        if (path.startsWith('assets/images/character/')) {
-          await precacheImage(kidImage(path), context);
-        }
       }
     });
     await tester.pump();
