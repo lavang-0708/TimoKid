@@ -34,8 +34,9 @@ khung_nhan_vat_nu.svg`, `khung_nhan_vat_nam.svg` (mỗi khung có sẵn
 | 3 | `shoes` | Giày | |
 | 4 | `bottom` | Quần hoặc váy | |
 | 5 | `top` | Áo | Áo liền thân (váy đầm) xếp vào lớp `top`, lớp `bottom` để trống. |
-| 6 | `eyes` | Mắt | Mắt và miệng cùng z 6, khác vị trí nên không che nhau. |
+| 6 | `eyes` | Mắt | Mắt, miệng và tay cùng z 6, khác vị trí nên không che nhau. |
 | 6 | `mouth` | Miệng | |
+| 6 | `arm` | Tay | Tay nằm trên váy (thấy ở hai bên), dưới tóc trước (tóc che khớp vai). Mới ở (E) lô 1 — xem `docs/E_IMAGES.md`. |
 | 7 | `hair_front` | Tóc trước | |
 | 8 | `accessory_head` | Phụ kiện đầu | Phụ kiện đầu và tay cùng z 8. |
 | 8 | `accessory_hand` | Phụ kiện tay | |

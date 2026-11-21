@@ -72,6 +72,7 @@ LAYERS = [
     {"id": "top", "z": 5, "name_vi": "Áo"},
     {"id": "eyes", "z": 6, "name_vi": "Mắt"},
     {"id": "mouth", "z": 6, "name_vi": "Miệng"},
+    {"id": "arm", "z": 6, "name_vi": "Tay"},
     {"id": "hair_front", "z": 7, "name_vi": "Tóc trước"},
     {"id": "accessory_head", "z": 8, "name_vi": "Phụ kiện đầu"},
     {"id": "accessory_hand", "z": 8, "name_vi": "Phụ kiện tay"},
