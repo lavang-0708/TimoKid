@@ -151,14 +151,6 @@ Bảng chiều cao hiển thị đề xuất (chung mọi loài; chiều cao bé
   (trứng < mới nở < nhỡ < trưởng thành), chưa duyệt riêng.
 - Test kiểm thứ tự + giá trị nhỡ 58% thêm ở **giai đoạn code (E)**.
 
-**Ghi chú (đã làm trong code):** bảng đề xuất 33/43/58/69% ở trên KHÔNG
-được dùng nguyên. Code (`app/lib/features/room/pet_growth.dart`,
-`petHeightRatio`) chốt **trứng 30%, mới nở 40%, nhỡ 58%, trưởng thành 72%**
-của nhân vật cao 360 px; nhỡ 58% giữ đúng như chủ dự án đã duyệt. Pet lớn
-theo số ngày bé xong trọn đề ngày (mới nở 0–2, nhỡ 3–7, lớn từ 8). Bảng
-hiện hành nằm ở `docs/ASSETS.md` mục "Thang cỡ pet"; test thứ tự cỡ + nhỡ
-= 208,8 px ở `app/test/features/room/room_walk_test.dart`.
-
 ## Việc còn lại cho giai đoạn code (E)
 
 - Entry manifest cho 7 file trên (loại file mới `girl_full_*` +
@@ -173,13 +165,6 @@ hiện hành nằm ở `docs/ASSETS.md` mục "Thang cỡ pet"; test thứ tự 
   mới nở < nhỡ < trưởng thành, nhỡ = 209 px / 58%).
 - Test neo: chân nhân vật, pet, đồ nằm trong vùng sàn/mặt phẳng đã
   khai báo. Tràn 608×248 + 640×320. Full suite xanh. Mở PR.
-
-**Ghi chú (đã làm trong code, PR #34):** entry manifest đã thêm (loại
-`character_full`, `character_patch`). Không sửa `CharacterView` mà viết
-widget mới `KidSprite` (`app/lib/features/character/kid_sprite.dart`) dùng
-ảnh toàn thân + patch mắt nhắm theo rect từng ảnh (`kid_assets.dart`,
-`kidEyePatch`); không còn `_eyeCenter`. `CharacterView` chỉ còn là legacy.
-Thang cỡ pet: xem ghi chú ở trên.
 
 ---
 
@@ -445,10 +430,6 @@ bộ viền ngoài; đếm bằng code số pixel alpha = 0 trong vùng thân.
   bảng patch ở mục "Sửa lỗi cắt nền").
 - Thang cỡ pet + test neo + tràn 608×248 + 640×320 + full suite
   xanh (như mục việc còn lại của lô 1).
-
-**Ghi chú (đã làm trong code):** như lô 1 — `KidSprite` + `kidEyePatch`
-(bé trai: patch chung cho 3 ảnh nghỉ, patch riêng cho mỗi ảnh vẫy); không
-chỉnh `_eyeCenter`.
 - **Không cần làm lại patch mắt nhắm bé gái** (nghi ngờ `_hsv` đã
   kiểm lại, không đúng — xem mục "Bài học keying riêng của lô 2" trên).
 
@@ -586,16 +567,6 @@ Mốc ảnh toàn thân để căn: gái tâm mắt (388,562)/(619,559), miệng
   giày thay thế là món đổi giày gốc.
 - Thang cỡ pet + test neo + tràn 608×248 + 640×320 + full suite
   xanh (như mục việc còn lại của lô 1/2).
-
-**Ghi chú (đã làm trong code, quyết định khác dự kiến):** phụ kiện vẽ bằng
-`KidSprite` (không phải `CharacterView`). Mũ/nơ-kẹp (`kidHeadAccessories`),
-kính (`kidGlassesAsset`) và giày trắng (`kidWhiteShoesAsset`) là lớp phủ
-cùng khung. **Balo KHÔNG vẽ chồng**: dùng biến thể ảnh toàn thân
-`..._backpack` (xem mục "fix3 giai đoạn 2 — balo") qua `kidFullAsset(...,
-backpack: true)`. Lựa chọn lưu bằng `KidLookService` (`kid_head_accessory`,
-`kid_glasses`, `kid_white_shoes`, `kid_backpack`) và đổi trong Tủ đồ ở
-màn Phòng (`room_screen.dart`). Hiện trạng đầy đủ: `docs/ASSETS.md` mục
-"Nhân vật toàn thân (hiện hành)".
 
 ## Sửa kính lô 3 — xoá hình chữ nhật trong tròng phải (đẩy sau fix2, 21/11)
 
@@ -832,13 +803,6 @@ trong báo cáo lô 4; mắt-y 556,9–566,2; mắt-x 576–724.]
   dr thì xem lại riêng.
 - Kiểm lại mốc miệng bé trai (508,720) trước khi dùng.
 
-**Ghi chú (đã làm trong code, PR #34):** quyết định ở mục phụ kiện — khung
-đi bộ thật CHỈ dùng khi bé không đeo kính/giày trắng/balo/phụ kiện đầu
-(`_hasWalkFrames` trong `kid_sprite.dart`); đang đeo món nào thì khi đi dùng
-ảnh đứng + nhún bước. Khi hiện khung đi bộ thì không chớp mắt và không vẽ
-lớp phủ, nên không cần neo lại theo mắt-x từng khung. Đi lại trong Phòng đã
-làm ở `app/lib/features/room/room_walk.dart` (`kidWalkFrames` chọn `dr`/`ur`).
-
 ## (E) fix4 — xoá bóng chân 48 khung đi bộ + tóc búi thừa balo (21/11)
 
 Claude review sau khi decode balo + khung đi bộ bé gái (PR #34, commit
@@ -867,3 +831,64 @@ dính liền đế (≤97 px/khung ở bộ 01/02) không tách được mà kh�
 phóng 3× vùng chân đế giày nguyên vẹn; 41/41 file ≤256 màu, semi 0.0000.
 Đẩy đè cùng tên file, 6 lần (tối đa 8 file/lần): e44bf11f, 48469861,
 b1a6b1dd, eaeaf8de, 0b135535, 79efdef6.
+
+# Pet v3b — (F) lô 5: vẽ lại 12 pet theo tấm v2
+
+Vẽ lại 3 loài × 4 giai đoạn theo phong cách 3D mềm mới (chủ dự án xác nhận 21/11 ~01:16;
+giữ bản mới như ảnh, KHÔNG gộp dấu hiệu pet cũ — chủ dự án chốt 21/11 ~21:06).
+Thay 1:1 file cũ PR #21, giữ đúng tên `app/assets/images/pets/<loài>_<giai đoạn>.png`.
+
+## Nhận diện 3 loài theo v2 (khác hẳn bản cũ PR #21)
+
+| Loài | Bản cũ PR #21 | Bản mới v2 (lô 5) |
+|---|---|---|
+| Chó Tinh Anh | Shiba tai nhọn + đồ thám hiểm | Chó vàng tai cụp, không đồ, thè lưỡi, mắt nâu to, mũi đen |
+| Mèo Mũm Mĩm | Kem + nơ/len | Tabby cam + vòng cổ xanh dương + chuông bạc |
+| Thỏ Bánh Bao | Cà rốt + nơ hồng | Trắng mắt xanh; trứng XANH NHẠT; nhỡ khăn xanh lá, trưởng thành tai cụp + khăn len nâu + hoa hồng |
+
+## Bảng 12 file (khung 512×512, thân cao 400 px, đất y=440, semi 0,0000, 0 px dưới y=440, 256 màu)
+
+| file | bytes | bbox | cao | lỗ lớn nhất |
+|---|---|---|---|---|
+| dog_egg | 79.058 | x[1,509] y[40,439] | 400 | 0 |
+| dog_newborn | 109.783 | x[23,487] y[40,439] | 400 | 0 |
+| dog_teen | 107.268 | x[74,436] y[40,439] | 400 | 0 |
+| dog_adult | 99.286 | x[101,410] y[40,439] | 400 | 2 |
+| cat_egg | 90.921 | x[78,432] y[40,439] | 400 | 371 (khe thật giữa vỏ và đuôi) |
+| cat_newborn | 83.249 | x[152,417] y[40,439] | 400 | 0 |
+| cat_teen | 85.384 | x[130,381] y[40,439] | 400 | 0 |
+| cat_adult | 96.105 | x[111,389] y[40,439] | 400 | 52 (khe thật giữa 2 chân trước) |
+| rabbit_egg | 67.946 | x[120,391] y[40,439] | 400 | 4 |
+| rabbit_newborn | 90.255 | x[113,422] y[40,437] | 398 | 1 |
+| rabbit_teen | 89.480 | x[99,411] y[40,439] | 400 | 301 (khe thật tai cụp–đầu) |
+| rabbit_adult | 93.109 | x[102,409] y[40,439] | 400 | 16 |
+
+Tổng PNG 1.091.844 B. Lỗ trong mắt thỏ nhỡ (113 + 49 px) đã lấp; các lỗ còn lại đều là khe thật.
+Nốt nhỏ: vệt xanh nhạt ~1 px dưới đáy trứng/mới nở thỏ + viền xanh mờ dưới trứng mèo
+(viền bóng còn sót, ở cỡ app trong phòng không thấy); trứng chó rộng 509 px (tai + đuôi thò 2 bên).
+
+## 3 điểm sửa theo review (chủ dự án chốt 21/11 ~21:06)
+
+1. **Thỏ nhỡ tai cụp:** vẽ lại `rabbit_teen.png` — tai dựng thành tai cụp rủ 2 bên như
+   trưởng thành (ngắn hơn một chút), giữ khăn xanh lá; 3 giai đoạn đã nở cùng tai cụp.
+   Chó v2 vẽ lại bị loại (mặt đổi quá nhiều), vẽ lại v3 giữ mặt chibi như nhỡ mới đạt.
+2. **Chó/mèo trưởng thành lớn hơn nhỡ rõ:** vẽ lại `dog_adult.png` (thân dài hơn, chân cao
+   hơn, mặt bớt tròn) và `cat_adult.png` (thân dài hơn, chân cao hơn, mặt bớt tròn) —
+   ghép nhỡ + trưởng thành cạnh bé trong phòng thấy pet lớn lên rõ.
+3. **Mảnh vỏ trong vùng thân:** `cat_newborn.png` xoá 3.864 px mảnh văng xa (mảnh trái
+   2.318 px, mảnh dưới-trái 806 px, mảnh dưới-phải 673 px + 20 đốm ≤10 px); giữ mảnh sát
+   vỏ 363 px + mảnh giữa dưới đáy vỏ 147 px. `rabbit_newborn.png` xoá mảnh vỏ nửa bát trái
+   6.145 px (6.030 px + 115 px vụn mép); mảnh phải + vệt xanh 62 px giữ lại vì dính liền
+   vỏ chính, đọc như mảnh vỏ trứng trong vùng thân. Hệ quả: thỏ mới nở cao 398 (đáy y=437)
+   thay vì 400 — lệch 2 px, ở cỡ app chưa tới 1 px.
+
+## Tỉ lệ hiển thị (CHỐT theo code PR #34, v0.0.11)
+
+Trứng 30% (108 px), mới nở 40% (144 px), nhỡ 58% (209 px), trưởng thành 72% (259 px)
+chiều cao bé (360 px). Bảng cũ 33/43/58/69% HẾT HIỆU LỰC (chỉ nhỡ 58% khớp).
+PNG vẽ thân cao 400 px mọi giai đoạn là đúng.
+
+Đẩy 12 `.b64` lên nhánh `task/E-nhan-vat-v3b`, 2 lần (tối đa 8 file/lần):
+`61871d58` (chó + mèo, 8 file), `111613a1` (thỏ, 4 file); đầu nhánh `111613a1`;
+12/12 blob SHA đối chiếu khớp trên nhánh. Khung đi (walk_a/b) chưa làm — chỉ sau khi duyệt
+12 ảnh đứng.
