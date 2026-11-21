@@ -332,7 +332,11 @@ class _MathScreenState extends ConsumerState<MathScreen>
         key: const Key('math-screen'),
         appBar: AppBar(
           title: const Text('Làm toán'),
-          leading: const RoundBackButton(key: Key('math-back-button')),
+          toolbarHeight: 66,
+          leadingWidth: 72,
+          leading: const Center(
+            child: RoundBackButton(key: Key('math-back-button')),
+          ),
         ),
         body: Center(child: Text('Không tải được đề: $_error')),
       );
@@ -342,7 +346,11 @@ class _MathScreenState extends ConsumerState<MathScreen>
         key: const Key('math-screen'),
         appBar: AppBar(
           title: const Text('Làm toán'),
-          leading: const RoundBackButton(key: Key('math-back-button')),
+          toolbarHeight: 66,
+          leadingWidth: 72,
+          leading: const Center(
+            child: RoundBackButton(key: Key('math-back-button')),
+          ),
         ),
         body: const Center(child: Text('Bé đã xong đề ngày hôm nay rồi!')),
       );
@@ -384,7 +392,11 @@ class _MathScreenState extends ConsumerState<MathScreen>
         title: Text(title),
         // Bé được rời chặng giữa chừng: chặng đang làm giữ trạng thái
         // `in_progress` nên vào lại vẫn làm tiếp từ đầu chặng.
-        leading: const RoundBackButton(key: Key('math-back-button')),
+        toolbarHeight: 66,
+        leadingWidth: 72,
+        leading: const Center(
+          child: RoundBackButton(key: Key('math-back-button')),
+        ),
         actions: [
           // Ví xu của chặng (đích đến của hiệu ứng xu bay).
           Padding(

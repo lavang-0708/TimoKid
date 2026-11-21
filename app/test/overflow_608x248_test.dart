@@ -209,7 +209,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       _checkNoError(tester, 'thị trấn có nhân vật nữ');
-      expect(find.byKey(const Key('town-character')), findsOneWidget);
+      expect(find.byKey(const Key('town-character-name')), findsOneWidget);
       // (C) v3b: 6 vùng bấm + 9 lớp động hiện ở t=0 vẫn có đủ ở
       // 608x248 (màn hẹp nhất) — nhãn co còn 60% nên không tràn.
       for (var i = 0; i < 5; i++) {
@@ -288,7 +288,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       _checkNoError(tester, 'thị trấn 640x320');
-      expect(find.byKey(const Key('town-character')), findsOneWidget);
+      expect(find.byKey(const Key('town-character-name')), findsOneWidget);
       for (var i = 0; i < 5; i++) {
         expect(find.byKey(Key('town-stage-$i-button')), findsOneWidget);
       }

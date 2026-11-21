@@ -115,15 +115,16 @@ void main() {
   testWidgets('bấm đúng tâm từng rect thì gọi đúng khu / Phòng', (
     tester,
   ) async {
-    // Bản đồ 800x360 trong SizedBox: AspectRatio 16:9 → bản đồ
-    // 640x360, căn giữa (lệch trái 80 dp). Tâm rect (tọa độ khung
-    // nền 1600x900) đổi sang tọa độ màn hình theo tỉ lệ đó.
-    const mapLeft = 80.0;
-    const mapWidth = 640.0;
-    const mapHeight = 360.0;
+    // Bản đồ 800x360 trong SizedBox: phủ kín (cover) 16:9 → bản đồ
+    // 800x450, căn dọc Alignment(0, -0.75) → lệch trên
+    // -(450-360)*(1-0.75)/2 = -11.25 dp. Tâm rect (tọa độ khung nền
+    // 1600x900) đổi sang tọa độ màn hình theo tỉ lệ đó.
+    const mapWidth = 800.0;
+    const mapHeight = 450.0;
+    const mapTop = -11.25;
     Offset toScreen(Offset framePoint) => Offset(
-      mapLeft + framePoint.dx / townFrameWidth * mapWidth,
-      framePoint.dy / townFrameHeight * mapHeight,
+      framePoint.dx / townFrameWidth * mapWidth,
+      mapTop + framePoint.dy / townFrameHeight * mapHeight,
     );
 
     final tapped = <int>[];

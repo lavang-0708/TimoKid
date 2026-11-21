@@ -25,7 +25,7 @@ const double roomWalkMinY = 668;
 const double roomWalkMaxY = 880;
 
 /// Tốc độ đi (px khung / giây).
-const double roomWalkSpeed = 300;
+const double roomWalkSpeed = 170;
 
 /// Chỗ đứng có hợp lệ không: trong sàn, không đè dấu chân đồ đạc.
 bool roomWalkable(Offset p) {

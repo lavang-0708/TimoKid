@@ -36,6 +36,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/animation/animation_gate.dart';
 import '../../core/database/models.dart';
+import '../../core/widgets/game_ui.dart';
 import '../../core/widgets/press_bounce.dart';
 import 'town_assets.dart';
 import 'town_roads.dart';
@@ -320,30 +321,47 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
   double get _peopleT => _peopleController?.value ?? 0;
   double get _treeT => _treesController?.value ?? 0;
 
+  /// Vị trí kéo dọc bản đồ (-1 = mép trên, 1 = mép dưới).
+  double _panY = -0.75;
+
+  Widget _coverMap() {
+    return GameCoverFrame(
+      frameSize: const Size(townFrameWidth, townFrameHeight),
+      alignment: Alignment(0, _panY),
+      builder: (context, w, h) => Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(townBackgroundAsset, fit: BoxFit.fill),
+          ),
+          ..._dynamicLayers(w, h),
+          ..._tapZones(w, h),
+          ..._signs(w, h),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Vẽ lại bản đồ mỗi khung hình khi hiệu ứng chạy; khi cổng tắt
     // thì vẽ một lần tĩnh. Cây widget dựng mới mỗi lần vẽ nên vị trí
     // lớp động đọc đúng giá trị bộ điều khiển hiện tại.
     Widget buildMap() {
-      return Center(
-        child: AspectRatio(
-          aspectRatio: 16 / 9,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final w = constraints.maxWidth;
-              final h = constraints.maxHeight;
-              return Stack(
-                children: [
-                  Positioned.fill(
-                    child: Image.asset(townBackgroundAsset, fit: BoxFit.fill),
-                  ),
-                  ..._dynamicLayers(w, h),
-                  ..._tapZones(w, h),
-                ],
-              );
-            },
-          ),
+      // Góp ý 21/11: bản đồ phủ kín màn hình; phần bị cắt (màn dài hơn
+      // 16:9) thì bé kéo lên/xuống để xem, như bản đồ trong game.
+      return LayoutBuilder(
+        builder: (context, c) => GestureDetector(
+          key: const Key('town-map-pan'),
+          behavior: HitTestBehavior.translucent,
+          onVerticalDragUpdate: (d) {
+            final overflow =
+                c.maxWidth * townFrameHeight / townFrameWidth - c.maxHeight;
+            if (overflow <= 1) return;
+            setState(() {
+              _panY = (_panY - d.delta.dy * 2 / overflow).clamp(-1.0, 1.0);
+            });
+          },
+          child: _coverMap(),
         ),
       );
     }
@@ -437,8 +455,13 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
     final size = w * actor.width;
     final anchorX = state.point.dx / townFrameWidth * w;
     final anchorY = state.point.dy / townFrameHeight * h;
-    // Mép đáy (chân/bánh xe) nằm ở anchorRow/512 chiều cao hộp.
-    final bottom = size * actor.anchorRow / 512;
+    // Mép đáy (chân/bánh xe) nằm ở anchorRow/512 chiều cao hộp. Đo
+    // riêng từng ảnh (góp ý 21/11: xe/người "bay lơ lửng" vì mốc chung
+    // 390/470 thấp hơn điểm chạm đất thật của bánh xe/bàn chân).
+    final bottom =
+        size *
+        (townSpriteGroundRow[state.choice.asset] ?? actor.anchorRow) /
+        512;
     final shadowHeight = size * 0.10;
     Widget sprite = Image.asset(state.choice.asset, fit: BoxFit.contain);
     if (state.choice.flipHorizontal) {
@@ -516,7 +539,6 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
     // chữ đầy đủ; bản đồ nhỏ hơn co tối đa còn 60% để vừa 608x248
     // mà không tràn — chữ nhỏ ở cỡ này chỉ để test, máy thật dùng
     // cỡ đầy đủ).
-    final labelScale = (w / 400).clamp(0.6, 1.0);
     return [
       for (var i = 0; i < townAreas.length; i++)
         Positioned(
@@ -532,16 +554,6 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
                 children: [
                   const Positioned.fill(
                     child: ColoredBox(color: Colors.transparent),
-                  ),
-                  Positioned(
-                    left: 2,
-                    right: 2,
-                    bottom: 2,
-                    child: _AreaLabel(
-                      area: townAreas[i],
-                      status: widget.statuses[i],
-                      scale: labelScale,
-                    ),
                   ),
                 ],
               ),
@@ -562,16 +574,65 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
                 const Positioned.fill(
                   child: ColoredBox(color: Colors.transparent),
                 ),
-                Positioned(
-                  left: 2,
-                  right: 2,
-                  bottom: 2,
-                  child: _RoomLabel(scale: labelScale),
-                ),
               ],
             ),
           ),
         ),
+      ),
+    ];
+  }
+
+  /// Biển tên kiểu game trên từng công trình (góp ý 21/11: thay ô chữ
+  /// trắng). Bấm vào biển cũng vào khu như bấm công trình.
+  List<Widget> _signs(double w, double h) {
+    final scale = (w / 900).clamp(0.55, 1.3);
+    Widget place(int index, Widget sign, VoidCallback onTap, Key key) {
+      final a = townSignAnchors[index];
+      return Positioned(
+        left: a.dx / townFrameWidth * w - 150 * scale,
+        width: 300 * scale,
+        top: a.dy / townFrameHeight * h - 60 * scale,
+        height: 60 * scale,
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: GestureDetector(key: key, onTap: onTap, child: sign),
+        ),
+      );
+    }
+
+    return [
+      for (var i = 0; i < townAreas.length; i++)
+        place(
+          i,
+          GameSign(
+            text: townAreas[i].name,
+            scale: scale,
+            color: Color.lerp(
+              const Color(0xFFC98F5A),
+              Color(townAreas[i].color),
+              0.35,
+            )!,
+            badge: switch (widget.statuses[i]) {
+              StageStatus.done => 'Xong ✓',
+              StageStatus.inProgress => 'Đang làm',
+              _ => null,
+            },
+            badgeColor: widget.statuses[i] == StageStatus.done
+                ? const Color(0xFF5DBB63)
+                : const Color(0xFFF0A23B),
+          ),
+          () => widget.onAreaTap(i),
+          Key('town-stage-$i-sign'),
+        ),
+      place(
+        townAreas.length,
+        GameSign(
+          text: 'Phòng của bé',
+          scale: scale,
+          color: const Color(0xFFE58FB0),
+        ),
+        widget.onRoomTap,
+        const Key('town-room-sign'),
       ),
     ];
   }
@@ -638,109 +699,32 @@ class _SoftShadowPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// Nhãn dán trên công trình: tên khu + nhãn trạng thái chặng hôm nay.
-class _AreaLabel extends StatelessWidget {
-  const _AreaLabel({
-    required this.area,
-    required this.status,
-    required this.scale,
-  });
+/// Hàng chạm đất (trong ảnh 512x512) của từng ảnh xe/người, đo bằng code
+/// từ alpha của PNG thật: hàng cuối còn ≥ 25 px đặc (bánh xe/đế giày),
+/// bỏ đường viền mảnh và vệt bóng nhạt bên dưới.
+const Map<String, double> townSpriteGroundRow = <String, double>{
+  'assets/images/town/car_01_dr.png': 357,
+  'assets/images/town/car_01_ur.png': 359,
+  'assets/images/town/car_02_dr.png': 372,
+  'assets/images/town/car_02_ur.png': 380,
+  'assets/images/town/person_01_dr_a.png': 461,
+  'assets/images/town/person_01_dr_b.png': 461,
+  'assets/images/town/person_01_ur_a.png': 461,
+  'assets/images/town/person_01_ur_b.png': 461,
+  'assets/images/town/person_02_dr_a.png': 460,
+  'assets/images/town/person_02_dr_b.png': 460,
+  'assets/images/town/person_02_ur_a.png': 460,
+  'assets/images/town/person_02_ur_b.png': 460,
+};
 
-  final TownArea area;
-  final String status;
-
-  /// Hệ số co chữ theo bề rộng bản đồ (1.0 ở bản đồ ≥ 400 dp).
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    final (label, chipColor) = switch (status) {
-      StageStatus.done => ('Xong ✓', Colors.green.shade600),
-      StageStatus.inProgress => ('Đang làm', Colors.amber.shade700),
-      _ => ('Chưa làm', Colors.grey.shade600),
-    };
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2 * scale),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.88),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Color(area.color)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            area.name,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 12 * scale, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 2 * scale),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 6 * scale, vertical: 1),
-            decoration: BoxDecoration(
-              color: chipColor,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                label,
-                style: TextStyle(fontSize: 10 * scale, color: Colors.white),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Nhãn dán trên nhà hồng: tên + gợi ý vào phòng (không có trạng
-/// thái chặng như 5 khu toán).
-class _RoomLabel extends StatelessWidget {
-  const _RoomLabel({required this.scale});
-
-  /// Hệ số co chữ theo bề rộng bản đồ (1.0 ở bản đồ ≥ 400 dp).
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2 * scale),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.88),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFF2A7C3)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Phòng của bé',
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 12 * scale, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 2 * scale),
-          // Thu nhỏ cả hàng khi hẹp (font test Ahem rộng hơn Nunito
-          // thật nên ở local hàng này vượt chiều rộng nhãn — giống
-          // cách nhãn trạng thái dùng FittedBox ở _AreaLabel).
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.home_outlined, size: 12 * scale),
-                const SizedBox(width: 2),
-                Text('Vào phòng', style: TextStyle(fontSize: 10 * scale)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+/// Điểm đặt biển tên (tâm đáy biển, khung nền 1600x900) của 5 khu theo
+/// thứ tự [townAreas], rồi nhà của bé ở cuối. Đặt trên mặt tiền công
+/// trình như biển hiệu, không che lối vào.
+const List<Offset> townSignAnchors = <Offset>[
+  Offset(470, 250), // Lâu đài Lôgic
+  Offset(470, 395), // Tiệm bánh Số học
+  Offset(770, 300), // Tháp Con số
+  Offset(770, 700), // Vườn Hình học
+  Offset(1120, 230), // Hội chợ Tổ hợp
+  Offset(220, 600), // Phòng của bé
+];

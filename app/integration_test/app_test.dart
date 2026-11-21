@@ -125,7 +125,6 @@ void main() {
     // giữa phòng, trứng chó ở bên cạnh; đề ngày chưa xong nên
     // Tủ đồ/Cửa hàng khóa, có banner nhắc ra Thị trấn.
     expect(find.byKey(const Key('room-screen')), findsOneWidget);
-    expect(find.text('Phòng của bé'), findsOneWidget);
     expect(find.byKey(const Key('room-character')), findsOneWidget);
     expect(find.byKey(const Key('room-egg')), findsOneWidget);
     expect(find.text('An'), findsOneWidget);
@@ -136,8 +135,7 @@ void main() {
     await tapVisible(const Key('room-town-button'));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('town-screen')), findsOneWidget);
-    expect(find.text('Thị trấn Diệu Kỳ'), findsOneWidget);
-    expect(find.byKey(const Key('town-character')), findsOneWidget);
+    expect(find.byKey(const Key('town-character-name')), findsOneWidget);
     expect(find.text('An'), findsOneWidget);
     await takeShot('town');
 

@@ -44,6 +44,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/animation/animation_gate.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/tables.dart';
+import '../../core/widgets/game_ui.dart';
 import '../../core/widgets/press_bounce.dart';
 import '../../core/widgets/round_back_button.dart';
 import '../character/character_bounce.dart';
@@ -177,6 +178,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
         _loading = false;
         _error = null;
       });
+      _precacheKid();
       if (grewUp && eggSpecies != null) {
         _showBubble(
           'Pet đã lớn thành ${petStageNames[petStage]}! Giỏi quá!',
@@ -190,6 +192,27 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
         _loading = false;
       });
     }
+  }
+
+  /// Nạp trước ảnh vẫy + khung đi bộ của bộ đồ hiện tại để lần đi đầu
+  /// không bị khựng vì giải mã ảnh (góp ý 21/11: đi bị giật).
+  void _precacheKid() {
+    final profile = _profile;
+    if (profile == null || !AnimationGate.enabled) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final g = profile.gender;
+      final n = kidOutfitNumber(profile.dress);
+      final paths = <String>[
+        kidFullAsset(g, n, wave: true, backpack: _backpack),
+        kidEyePatch(g, n, wave: true).asset,
+        ...?kidWalkFrames(g, n, up: false),
+        ...?kidWalkFrames(g, n, up: true),
+      ];
+      for (final p in paths) {
+        precacheImage(AssetImage(p), context, onError: (_, _) {});
+      }
+    });
   }
 
   /// Hiện bong bóng phản ứng 1,5 giây rồi tự ẩn.
@@ -541,142 +564,146 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     }
     final profile = _profile;
     final total = DailySetConfig.stagesPerDay;
+    // Góp ý 21/11: Phòng phủ kín màn hình, chỉ số là một dòng trên cùng
+    // kiểu game, Tủ đồ/Cửa hàng là nút tròn có icon ở góc phải.
     return Scaffold(
       key: const Key('room-screen'),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                const RoundBackButton(key: Key('room-town-button')),
-                const SizedBox(width: 8),
-                const Text('Phòng của bé', style: TextStyle(fontSize: 20)),
-                if (profile != null) ...[
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      profile.name,
-                      key: const Key('room-character-name'),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  ),
-                ] else
-                  const Spacer(),
-                Text(
-                  '$_xu xu',
-                  key: const Key('room-xu-balance'),
-                  style: const TextStyle(fontSize: 18),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  '◆ $_gems',
-                  key: const Key('room-gem-balance'),
-                  style: const TextStyle(fontSize: 18),
-                ),
-                const SizedBox(width: 12),
-                Flexible(
-                  child: Text(
-                    _unlocked
-                        ? 'Xong đề ngày hôm nay!'
-                        : 'Đề ngày: $_done/$total chặng',
-                    key: const Key('room-progress-text'),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    // Canh phải để khi đủ chỗ thì chữ vẫn nằm ở mép
-                    // phải như trước khi bọc Flexible (Flexible chia
-                    // chỗ trống với tên nên chữ mặc định sẽ dồn trái).
-                    textAlign: TextAlign.right,
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                ),
-              ],
-            ),
-            if (!_unlocked) ...[
-              const SizedBox(height: 6),
-              Container(
-                key: const Key('room-locked-banner'),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF3D6),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFFFD166)),
-                ),
+      backgroundColor: const Color(0xFFF3E6D8),
+      body: Stack(
+        children: [
+          Positioned.fill(child: _buildScene(profile)),
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 6, 8, 0),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const RoundBackButton(key: Key('room-town-button')),
+                    const SizedBox(width: 8),
                     Expanded(
-                      child: Text(
-                        'Chưa xong đề ngày — ra Thị trấn giúp các bạn nhé!',
-                        key: const Key('room-locked-hint'),
-                        style: const TextStyle(fontSize: 16),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: GameHudBar(
+                          children: [
+                            if (profile != null)
+                              Flexible(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                  ),
+                                  child: Text(
+                                    profile.name,
+                                    key: const Key('room-character-name'),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: gameOutlinedText(16),
+                                  ),
+                                ),
+                              ),
+                            GameStat(
+                              icon: Icons.monetization_on_rounded,
+                              color: const Color(0xFFF5B83D),
+                              text: '$_xu',
+                              textKey: const Key('room-xu-balance'),
+                            ),
+                            GameStat(
+                              icon: Icons.diamond_rounded,
+                              color: const Color(0xFFA07BE0),
+                              text: '$_gems',
+                              textKey: const Key('room-gem-balance'),
+                            ),
+                            GameStat(
+                              icon: Icons.star_rounded,
+                              color: const Color(0xFFFFC94D),
+                              text: _unlocked
+                                  ? '$total/$total'
+                                  : '$_done/$total',
+                              textKey: const Key('room-progress-text'),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    PressBounce(
-                      child: TextButton(
-                        key: const Key('room-goto-town-button'),
-                        onPressed: () => context.go(TownScreen.route),
-                        child: const Text('Ra Thị trấn'),
-                      ),
+                    const SizedBox(width: 8),
+
+                    GameRoundButton(
+                      key: const Key('room-wardrobe-button'),
+                      icon: Icons.checkroom_rounded,
+                      color: const Color(0xFFB48CF2),
+                      label: 'Tủ đồ',
+                      locked: !_unlocked,
+                      onPressed: () => _unlocked
+                          ? _openWardrobe()
+                          : _showLockedReminder('Tủ đồ'),
+                    ),
+                    const SizedBox(width: 8),
+                    GameRoundButton(
+                      key: const Key('room-shop-button'),
+                      icon: Icons.storefront_rounded,
+                      color: const Color(0xFF5DC3A8),
+                      label: 'Cửa hàng',
+                      locked: !_unlocked,
+                      onPressed: () => _unlocked
+                          ? context.push(
+                              ComingSoonScreen.route,
+                              extra: const ComingSoonArgs(
+                                title: 'Cửa hàng',
+                                message: 'Cửa hàng sắp mở ở bản sau nhé! Xong đề ngày là được mua đồ.',
+                              ),
+                            )
+                          : _showLockedReminder('Cửa hàng'),
                     ),
                   ],
                 ),
               ),
-            ],
-            const SizedBox(height: 8),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(child: _buildScene(profile)),
-                  const SizedBox(width: 12),
-                  SizedBox(
-                    width: 132,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _RoomButton(
-                          key: const Key('room-wardrobe-button'),
-                          label: 'Tủ đồ',
-                          icon: _unlocked
-                              ? Icons.checkroom_outlined
-                              : Icons.lock_outlined,
-                          locked: !_unlocked,
-                          onPressed: () => _unlocked
-                              ? _openWardrobe()
-                              : _showLockedReminder('Tủ đồ'),
+            ),
+          ),
+          // Nhắc khóa ở dưới thanh chỉ số (không che sàn để bé chạm đi).
+          if (!_unlocked)
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 70,
+              child: SafeArea(
+                bottom: false,
+                child: Center(
+                  child: GestureDetector(
+                    key: const Key('room-goto-town-button'),
+                    onTap: () => context.go(TownScreen.route),
+                    child: Container(
+                      key: const Key('room-locked-banner'),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xE6FFF3D6),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: const Color(0xFFFFC94D),
+                          width: 2,
                         ),
-                        const SizedBox(height: 8),
-                        _RoomButton(
-                          key: const Key('room-shop-button'),
-                          label: 'Cửa hàng',
-                          icon: _unlocked
-                              ? Icons.shopping_bag_outlined
-                              : Icons.lock_outlined,
-                          locked: !_unlocked,
-                          onPressed: () => _unlocked
-                              ? context.push(
-                                  ComingSoonScreen.route,
-                                  extra: const ComingSoonArgs(
-                                    title: 'Cửa hàng',
-                                    message: 'Cửa hàng sắp mở ở bản sau nhé! Xong đề ngày là được mua đồ.',
-                                  ),
-                                )
-                              : _showLockedReminder('Cửa hàng'),
+                      ),
+                      child: Text(
+                        'Xong đề ngày ở Thị trấn để mở Tủ đồ, Cửa hàng nhé!',
+                        key: const Key('room-locked-hint'),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: gameInk,
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ],
+                ),
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -692,166 +719,165 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   /// đứng trên sàn.
   Widget _buildScene(CharacterProfile? profile) {
     return Center(
-      child: AspectRatio(
-        aspectRatio: 16 / 9,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final w = constraints.maxWidth;
-            final h = constraints.maxHeight;
-            double fx(double x) => x / roomFrameWidth * w;
-            double fy(double y) => y / roomFrameHeight * h;
+      child: GameCoverFrame(
+        frameSize: const Size(roomFrameWidth, roomFrameHeight),
+        // Giữ đáy (sàn, nơi bé đi lại); phần trần bị cắt khi màn dài.
+        alignment: const Alignment(0, 0.9),
+        builder: (context, w, h) {
+          double fx(double x) => x / roomFrameWidth * w;
+          double fy(double y) => y / roomFrameHeight * h;
 
-            /// Bóng đổ mềm ngay dưới [anchor]: rộng 85% và cao 10%
-            /// chiều rộng món (nhân vật/pet dùng bề rộng hình).
-            Widget frameShadow(Offset anchor, double width) {
-              final sw = width * 0.85;
-              final sh = width * 0.10;
-              return Positioned(
-                left: fx(anchor.dx - sw / 2),
-                top: fy(anchor.dy - sh * 0.3),
-                width: fx(sw),
-                height: fy(sh),
-                child: const _SoftShadow(),
-              );
-            }
-
-            // 5 món xếp theo chân y (xa trước, gần sau) để món gần
-            // che đúng món xa khi chồng lấn.
-            final itemsByFeet = <RoomFurniture>[
-              roomFurniture[3], // bình hoa (neo y = 510)
-              roomFurniture[4], // cốc bút (neo y = 515)
-              roomFurniture[0], // gấu bông (neo y = 550)
-              roomFurniture[1], // đèn sao (neo y = 580)
-              roomFurniture[2], // chậu cây (neo y = 686)
-            ];
-            // (G) Nhân vật và pet: cỡ theo chiều sâu (chân y), vẽ theo
-            // chân y (xa trước, gần sau) để ai đứng trước thì che đúng.
-            final kidScale = roomDepthScale(_kidFeet.dy);
-            final kidBoxH = kidFrameHeight * 360 / kidBodyHeight * kidScale;
-            final kidBoxW = kidBoxH * kidFrameWidth / kidFrameHeight;
-            final petScale = roomDepthScale(_petFeet.dy);
-            final petBox = petBoxSize(_petStage) * petScale;
-            final actors = <(double, List<Widget>)>[
-              if (profile != null)
-                (
-                  _kidFeet.dy,
-                  [
-                    frameShadow(_kidFeet, 240 * kidScale),
-                    Positioned(
-                      left: fx(_kidFeet.dx - kidBoxW / 2),
-                      top: fy(_kidFeet.dy - kidFeetFraction * kidBoxH),
-                      width: fx(kidBoxW),
-                      height: fy(kidBoxH),
-                      child: CharacterBounce(
-                        onTap: _onKidTap,
-                        child: KidSprite(
-                          key: const Key('room-character'),
-                          gender: profile.gender,
-                          outfit: kidOutfitNumber(profile.dress),
-                          headAccessory: _headAccessory,
-                          glasses: _glasses,
-                          whiteShoes: _whiteShoes,
-                          backpack: _backpack,
-                          waving: _kidWaving,
-                          walking: _kidWalking,
-                          walkingUp: _kidWalkingUp,
-                          facingLeft: _kidFacingLeft,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              if (_eggSpecies != null)
-                (
-                  _petFeet.dy,
-                  [
-                    frameShadow(_petFeet, petBox * 0.7),
-                    Positioned(
-                      left: fx(_petFeet.dx - petBox / 2),
-                      top: fy(_petFeet.dy - petBox * 440 / 512),
-                      width: fx(petBox),
-                      height: fy(petBox),
-                      child: _PetSlot(
-                        species: _eggSpecies!,
-                        hatched: _hatched,
-                        stage: _petStage,
-                        bounce: _petBounce,
-                        walking: _petWalking,
-                        facingLeft: _petFacingLeft,
-                        onTap: _onPetTap,
-                      ),
-                    ),
-                  ],
-                ),
-            ]..sort((a, b) => a.$1.compareTo(b.$1));
-            return Stack(
-              children: [
-                // Chạm vào nền (sàn, tường, giường) thì nhân vật đi tới
-                // chỗ sàn tương ứng; món đồ/nhân vật/pet nằm trên nên
-                // chạm vào chúng vẫn ra phản ứng riêng.
-                Positioned.fill(
-                  child: GestureDetector(
-                    key: const Key('room-floor'),
-                    behavior: HitTestBehavior.opaque,
-                    onTapUp: (d) => _onFloorTap(
-                      Offset(
-                        d.localPosition.dx / w * roomFrameWidth,
-                        d.localPosition.dy / h * roomFrameHeight,
-                      ),
-                    ),
-                    child: Image.asset(
-                      roomBackgroundAsset,
-                      fit: BoxFit.fill,
-                      width: w,
-                      height: h,
-                    ),
-                  ),
-                ),
-                // Bóng đổ (theo chân y).
-                for (final item in itemsByFeet)
-                  frameShadow(item.anchor, item.placeSize),
-                // 5 món nội thất (theo chân y).
-                for (final item in itemsByFeet)
-                  Positioned(
-                    left: fx(item.placeX),
-                    top: fy(item.placeY),
-                    width: fx(item.placeSize),
-                    height: fy(item.placeSize),
-                    child: _RoomItemSlot(
-                      item: item,
-                      onTap: () => _showBubble(item.reaction),
-                    ),
-                  ),
-                for (final actor in actors) ...actor.$2,
-                if (_bubbleText != null)
-                  Positioned(
-                    top: 4,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFFD9C2E8)),
-                        ),
-                        child: Text(
-                          _bubbleText!,
-                          key: const Key('room-reaction-bubble'),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+          /// Bóng đổ mềm ngay dưới [anchor]: rộng 85% và cao 10%
+          /// chiều rộng món (nhân vật/pet dùng bề rộng hình).
+          Widget frameShadow(Offset anchor, double width) {
+            final sw = width * 0.85;
+            final sh = width * 0.10;
+            return Positioned(
+              left: fx(anchor.dx - sw / 2),
+              top: fy(anchor.dy - sh * 0.3),
+              width: fx(sw),
+              height: fy(sh),
+              child: const _SoftShadow(),
             );
-          },
-        ),
+          }
+
+          // 5 món xếp theo chân y (xa trước, gần sau) để món gần
+          // che đúng món xa khi chồng lấn.
+          final itemsByFeet = <RoomFurniture>[
+            roomFurniture[3], // bình hoa (neo y = 510)
+            roomFurniture[4], // cốc bút (neo y = 515)
+            roomFurniture[0], // gấu bông (neo y = 550)
+            roomFurniture[1], // đèn sao (neo y = 580)
+            roomFurniture[2], // chậu cây (neo y = 686)
+          ];
+          // (G) Nhân vật và pet: cỡ theo chiều sâu (chân y), vẽ theo
+          // chân y (xa trước, gần sau) để ai đứng trước thì che đúng.
+          final kidScale = roomDepthScale(_kidFeet.dy);
+          final kidBoxH = kidFrameHeight * 360 / kidBodyHeight * kidScale;
+          final kidBoxW = kidBoxH * kidFrameWidth / kidFrameHeight;
+          final petScale = roomDepthScale(_petFeet.dy);
+          final petBox = petBoxSize(_petStage) * petScale;
+          final actors = <(double, List<Widget>)>[
+            if (profile != null)
+              (
+                _kidFeet.dy,
+                [
+                  frameShadow(_kidFeet, 240 * kidScale),
+                  Positioned(
+                    left: fx(_kidFeet.dx - kidBoxW / 2),
+                    top: fy(_kidFeet.dy - kidFeetFraction * kidBoxH),
+                    width: fx(kidBoxW),
+                    height: fy(kidBoxH),
+                    child: CharacterBounce(
+                      onTap: _onKidTap,
+                      child: KidSprite(
+                        key: const Key('room-character'),
+                        gender: profile.gender,
+                        outfit: kidOutfitNumber(profile.dress),
+                        headAccessory: _headAccessory,
+                        glasses: _glasses,
+                        whiteShoes: _whiteShoes,
+                        backpack: _backpack,
+                        waving: _kidWaving,
+                        walking: _kidWalking,
+                        walkingUp: _kidWalkingUp,
+                        idleWave: true,
+                        facingLeft: _kidFacingLeft,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            if (_eggSpecies != null)
+              (
+                _petFeet.dy,
+                [
+                  frameShadow(_petFeet, petBox * 0.7),
+                  Positioned(
+                    left: fx(_petFeet.dx - petBox / 2),
+                    top: fy(_petFeet.dy - petBox * 440 / 512),
+                    width: fx(petBox),
+                    height: fy(petBox),
+                    child: _PetSlot(
+                      species: _eggSpecies!,
+                      hatched: _hatched,
+                      stage: _petStage,
+                      bounce: _petBounce,
+                      walking: _petWalking,
+                      facingLeft: _petFacingLeft,
+                      onTap: _onPetTap,
+                    ),
+                  ),
+                ],
+              ),
+          ]..sort((a, b) => a.$1.compareTo(b.$1));
+          return Stack(
+            children: [
+              // Chạm vào nền (sàn, tường, giường) thì nhân vật đi tới
+              // chỗ sàn tương ứng; món đồ/nhân vật/pet nằm trên nên
+              // chạm vào chúng vẫn ra phản ứng riêng.
+              Positioned.fill(
+                child: GestureDetector(
+                  key: const Key('room-floor'),
+                  behavior: HitTestBehavior.opaque,
+                  onTapUp: (d) => _onFloorTap(
+                    Offset(
+                      d.localPosition.dx / w * roomFrameWidth,
+                      d.localPosition.dy / h * roomFrameHeight,
+                    ),
+                  ),
+                  child: Image.asset(
+                    roomBackgroundAsset,
+                    fit: BoxFit.fill,
+                    width: w,
+                    height: h,
+                  ),
+                ),
+              ),
+              // Bóng đổ (theo chân y).
+              for (final item in itemsByFeet)
+                frameShadow(item.anchor, item.placeSize),
+              // 5 món nội thất (theo chân y).
+              for (final item in itemsByFeet)
+                Positioned(
+                  left: fx(item.placeX),
+                  top: fy(item.placeY),
+                  width: fx(item.placeSize),
+                  height: fy(item.placeSize),
+                  child: _RoomItemSlot(
+                    item: item,
+                    onTap: () => _showBubble(item.reaction),
+                  ),
+                ),
+              for (final actor in actors) ...actor.$2,
+              if (_bubbleText != null)
+                Positioned(
+                  top: 4,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFD9C2E8)),
+                      ),
+                      child: Text(
+                        _bubbleText!,
+                        key: const Key('room-reaction-bubble'),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -1066,50 +1092,6 @@ class _RoomEggWiggleState extends State<_RoomEggWiggle>
         child: child,
       ),
       child: widget.child,
-    );
-  }
-}
-
-/// Nút ở cột phải màn Phòng (Tủ đồ / Cửa hàng).
-class _RoomButton extends StatelessWidget {
-  const _RoomButton({
-    super.key,
-    required this.label,
-    required this.icon,
-    required this.locked,
-    required this.onPressed,
-  });
-
-  final String label;
-  final IconData icon;
-  final bool locked;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: PressBounce(
-        child: ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: locked
-                ? Colors.grey.shade300
-                : const Color(0xFFC9B8F0),
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-          ),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 22),
-                const SizedBox(width: 6),
-                Text(label, style: const TextStyle(fontSize: 18)),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

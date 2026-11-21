@@ -198,7 +198,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('room-screen')), findsOneWidget);
-    expect(find.text('Phòng của bé'), findsOneWidget);
 
     final service = OnboardingService(db: db);
     expect(await service.isCompleted(), isTrue);
