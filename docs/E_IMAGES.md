@@ -606,3 +606,99 @@ Claude decode lô 2 + lô 3, commit `5945c4f` (21/11 ~17:13): lô 2 bé trai Đ�
 - Rò — nói thẳng, KHÔNG đạt đúng 0 tuyệt đối theo cách đếm nghiêm nhất, nhưng bề mặt giày đã che kín hoàn toàn. Hai cách đếm: (a) đếm khoan dung (loại pixel là da ở bất kỳ biến thể nào, kiểu lô 3): **0 px trên cả 12 ảnh**; (b) đếm nghiêm theo từng bộ (đỉnh giày riêng mỗi bộ, chỉ loại da của chính bộ đó): gái 91–315 px/bộ, trai 0–389 px/bộ (02: 1 px, 03: 27 px, 01w: 389 px). Toàn bộ là pixel mép 1–2 px ở đỉnh quai/cổ giày và viền lỗ cổ giày — nơi 6 bản render lệch nhau 1–3 px nên một file chung không thể vừa che hết giày bộ này vừa không chạm da bộ khác. Ở cỡ app chúng vô hình (đã kiểm trên room); ở 3× chỉ còn thấy mờ 1 px viền tím nhạt quanh lỗ cổ giày gái và 1–2 chấm 1 px ở đỉnh nơ/cổ giày. Muốn ép về 0 phải phủ trắng lên da/quần ở bộ khác — đã thử một bản như vậy và nó tạo vệt trắng ngang chân bé trai nên đã hoàn lại. Phủ lố lên da trên đỉnh giày: gái 0–1 px, trai 0–39 px (không đáng kể). Quần dài của trai bộ 02/03 vẫn hiện đúng trên giày (không bị phủ trắng), da cổ chân của trai bộ 01 vẫn lộ tự nhiên — đó là hành vi đúng, không phải rò.
 - Nhờ Claude soi kỹ ở 3× vùng lỗ cổ giày gái (viền tím nhạt 1 px) và đỉnh cổ giày trai bộ 01w — nếu không chấp nhận thì hướng sửa tiếp là phủ thêm 1 px đúng các pixel tối đó, không phải vẽ lại.
 - File thay thế (đẩy .b64, Claude decode): app/assets/images/character/girl/girl_shoes_02.png, app/assets/images/character/boy/boy_shoes_02.png. Balo cũ (girl_backpack_01 / boy_backpack_01) KHÔNG đẩy kèm — làm lại theo cách mới ở giai đoạn 2.
+
+## (E) lô 4 — khung đi bộ bé trai (24 khung, 3 bộ × 2 hướng × 4 bước)
+
+Phục vụ PR (G) đi lại trong phòng. Mỗi khung là MỘT ảnh toàn thân hoàn
+chỉnh 1024×1536 PNG trong suốt, cùng phong cách 3D mềm, sáng trên-trái,
+cùng tư thế/mặt/đồ với ảnh nghỉ — chỉ đổi tư thế chân/tay/thân.
+Hướng: dr = đi xuống-phải nghiêng 3/4, ur = đi lên-phải nghiêng 3/4;
+hướng trái app lật ngang. Chu trình a/b/c/d: a = chân trái bước trước
+gót chạm, chân phải sau mũi đẩy; b = passing (chân trái thẳng dưới thân,
+chân phải co nhấc sau); c = mirror của a; d = mirror của b; d→a nối vòng.
+Mốc chung: chân y=1429, tâm mắt y≈626 (như ảnh nghỉ), chiều cao khớp ảnh
+nghỉ. Đẩy 21/11 thành 3 commit vì giới hạn kỹ thuật (xem cuối mục):
+`b4e13bce` (bộ 01), `fc2c0f5d` (bộ 02), `732f68c3` (bộ 03, đầu nhánh).
+Đối chiếu blob SHA + kích thước trên nhánh khớp 24/24.
+
+### Cách làm
+Vẽ khung đầu mỗi hướng/bộ bằng cách sửa ảnh nghỉ thô, rồi resume chỉ đổi
+chân/tay cho các khung sau (như biến thể wave lô 1/2). Keying bằng
+`walk-boy/work/walk_key.py` (chuyển từ `boy2/work/boy_key.py`, cùng logic
+key/chuẩn hóa; đo chân từ pixel dist>100 thay vì bbox vì bbox tính cả bóng
+đổ; ky = 803/(feet_y_raw·s − eye_y), kẹp [0,94, 1,0], co quanh chân để mắt
+về y 626). Cả 24 khung quantize về 256 màu theo `boy2/work/quantize.py`
+(MAXCOVERAGE + Floyd–Steinberg, giữ alpha gốc — cùng chuẩn ảnh nghỉ lô
+1/2) để vừa giới hạn đẩy; semi vẫn 0,0000, bbox giữ nguyên.
+
+### Bảng 24 khung (PNG cuối, semi 0,0000, chân y=1429)
+- 01_dr_a 350.052 B, bbox (83,156,940,1429), mắt (512,9, 625,5), ky 0,9896
+- 01_dr_b 349.502 B, bbox (78,158,944,1429), mắt (517,8, 626,1), ky 0,9872
+- 01_dr_c 335.898 B, bbox (84,158,940,1429), mắt (525,8, 623,5), ky 0,9871
+- 01_dr_d 331.915 B, bbox (85,166,937,1429), mắt (537,9, 625,3), ky 0,9816
+- 01_ur_a 322.036 B, bbox (167,166,856,1429), mắt (700,8, 625,5), ky 0,9805
+- 01_ur_b 328.092 B, bbox (154,188,869,1429), mắt (680,8, 625,9), ky 0,9641
+- 01_ur_c 346.289 B, bbox (157,169,867,1429), mắt (694,6, 626,7), ky 0,9795
+- 01_ur_d 327.773 B, bbox (157,198,867,1429), mắt (681,5, 625,6), ky 0,9560
+- 02_dr_a 358.406 B, bbox (88,171,935,1429), mắt (495,9, 623,2), ky 0,9776
+- 02_dr_b 350.452 B, bbox (90,168,933,1429), mắt (525,8, 622,7), ky 0,9799
+- 02_dr_c 335.452 B, bbox (91,178,925,1429), mắt (452,0, 626,0), ky 0,9722
+- 02_dr_d 368.970 B, bbox (90,167,932,1429), mắt (540,4, 555,6)*, ky 0,9817
+- 02_ur_a 383.151 B, bbox (161,183,862,1429), mắt (698,1, 626,2), ky 0,9679
+- 02_ur_b 363.479 B, bbox (173,206,849,1429), mắt ~626†, ky 0,9503
+- 02_ur_c 401.016 B, bbox (142,201,881,1429), mắt (692,8, 625,3), ky 0,9536
+- 02_ur_d 328.349 B, bbox (178,211,844,1429), mắt (553,0, 637,7)*, ky 0,9461
+- 03_dr_a 339.861 B, bbox (93,184,930,1429), mắt (511,8, 624,2), ky 0,9670
+- 03_dr_b 318.712 B, bbox (183,170,841,1429), mắt (705,5, 626,3), ky 0,9786
+- 03_dr_c 331.026 B, bbox (94,187,928,1429), mắt (509,1, 625,0), ky 0,9651
+- 03_dr_d 326.874 B, bbox (175,174,849,1429), mắt (714,6, 625,4), ky 0,9754
+- 03_ur_a 320.006 B, bbox (146,174,877,1429), mắt (677,7, 626,8), ky 0,9751
+- 03_ur_b 297.546 B, bbox (185,185,839,1429), mắt (718,9, 626,3), ky 0,9669
+- 03_ur_c 330.946 B, bbox (151,172,872,1429), mắt (677,9, 626,4), ky 0,9767
+- 03_ur_d 290.445 B, bbox (186,199,838,1429), mắt (721,9, 626,3), ky 0,9563
+
+\* Detector mắt nâu bắt nhầm trên mặt xoay (02_dr_d y=555,6 là lông mày,
+02_ur_d y=637,7 là mắt xa). Đo chéo bằng đồng tử: 02_dr_d y=599,5,
+02_ur_d y=601,4, khung chuẩn 01_dr_a y=604,0 → vị trí đúng, chỉ detector
+sai. † 02_ur_b detector trả None sau khi thêm dải y (xem dưới); đồng tử
+phải y=601,9 (chuẩn 604,0) → vị trí đúng.
+
+### Kiểm chứng chu trình
+Ghép 4 khung mỗi hướng thành dải (nền tối, cao 360 px) + ghép vào phòng
+v3b (chân (630,810), cao 360 px): đi tự nhiên, chân xen kẽ đúng, tay đánh
+ngược pha, đầu ổn định, không giật, không trượt chân. Lỗ: 02_dr/02_ur =
+0; lỗ lớn 01_dr_b 21.987 px và 03_dr_c 8.906 px là khe hở thật giữa 2 chân
+bước; 02_ur_b 2.548 px là khe nách thật; 02_ur_a 50 px là khe nhỏ thật.
+
+### Hai lỗi đã sửa trước khi đẩy
+1. 02_ur_a và 02_ur_b tay phải giơ cao ngang vai (cả 3 khung a/b/c gốc
+   đều giơ cao, chỉ c đã sửa) → vẽ lại a/b, hạ tay phải xuống ngang hông,
+   giữ nguyên chân/mặt/đồ; dải 02_ur sau sửa đồng đều cả 4 khung.
+2. Detector mắt ở norm-loop bắt nhầm lông mày của 02_ur_b (y=432,7 trong
+   ảnh a2) → ky kẹp 0,94 → mắt rơi xuống 638–649. Đã thêm dải y [530,670]
+   vào detector (mắt thật ở a2 581–606, ảnh cuối 620–650; lông mày 432 và
+   tóc 507 bị loại) rồi key lại 02_ur_a/b; đồng tử xác nhận vị trí đúng.
+   Lưu ý cho giai đoạn code: detector mắt nâu không tin được trên mặt
+   xoay ur — mốc mắt từng khung nên đo bằng đồng tử hoặc ghi tay theo bảng
+   trên (tiền lệ: patch mắt riêng theo ảnh như lô 2).
+3. Ghép phòng bản đầu sai tỉ lệ vì ảnh preview phòng là 2048×1152 trong
+   khi khung app 1600×900 (tỉ lệ ×1,28): chân phải ở y≈1037 và bé cao
+   ~461 px trong preview, không phải 810/360.
+
+### Giới hạn đẩy (bài học cho các lô sau)
+- Connector push-files giới hạn TỔNG 16 MiB (16.777.216 byte) cho một lần
+  gọi, không phải theo file (đo bằng tổng tích lũy: dư sau 14 file đúng
+  1.217.688, sau 15 file đúng 683.000).
+- HTTP MCP trả 413 khi body quá lớn: 10,8 MB lỗi, 12 file (5,47 MB) lỗi,
+  8 file (3,59 MB) thành công — giới hạn HTTP nằm giữa 3,59 và 5,47 MB.
+  **Mỗi lần push-files chỉ nên đẩy tối đa 8 file (~3,6 MB).**
+- File .b64 đơn lẻ cũng có trần: 02_ur_c bản gốc 926.877 byte → .b64
+  1.235.836 byte vượt trần 1.217.688 byte của file (đã xử lý bằng quantize
+  256 màu còn 401.016 byte).
+
+### Caveat
+- Viền hồng nhạt 1–2 px quanh tóc và dưới bàn chân, thấy trên nền tối ở
+  cỡ dải; trên sàn phòng sáng không lộ, ở cỡ app dưới ngưỡng thấy.
+- 02_ur_c sau quantize x_max lệch 1 px so với bản gốc (882→881).
+- Dải + ghép phòng dựng từ bản chưa quantize; khác biệt chỉ ở màu dither,
+  dưới ngưỡng thấy ở cỡ hiển thị.
