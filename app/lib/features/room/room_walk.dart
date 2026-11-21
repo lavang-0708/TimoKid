@@ -14,6 +14,8 @@ library;
 import 'dart:math' as math;
 import 'dart:ui';
 
+import 'package:flutter/animation.dart' show Curves;
+
 import 'room_assets.dart';
 
 /// Lề an toàn quanh dấu chân đồ đạc và mép sàn (px khung 1600x900).
@@ -24,8 +26,60 @@ const double roomWalkMargin = 14;
 const double roomWalkMinY = 668;
 const double roomWalkMaxY = 880;
 
-/// Tốc độ đi (px khung / giây).
-const double roomWalkSpeed = 170;
+/// Tốc độ đi đều (px khung / giây). Góp ý v0.0.13: 170 còn nhanh.
+const double roomWalkSpeed = 120;
+
+/// Thời gian tăng tốc lúc bắt đầu đi và giảm tốc lúc dừng (giây).
+const double roomWalkRamp = 0.3;
+
+/// Thời gian đi hết quãng [length] (giây): đi đều [speed] cộng một
+/// [ramp] cho phần tăng/giảm tốc.
+double roomWalkDuration(double length, {double speed = roomWalkSpeed}) =>
+    length / speed + roomWalkRamp;
+
+/// Quãng đã đi sau [t] giây (0..[length]) theo hồ sơ tốc độ hình
+/// thang: tăng tốc đều trong [roomWalkRamp], đi đều, giảm tốc đều để
+/// dừng — không khựng ở đầu/cuối, không giật ở các góc đường đi.
+double roomWalkDistanceAt(
+  double t,
+  double length, {
+  double speed = roomWalkSpeed,
+}) {
+  const a = roomWalkRamp;
+  final total = roomWalkDuration(length, speed: speed);
+  if (t <= 0) return 0;
+  if (t >= total) return length;
+  if (total < 2 * a) {
+    // Quãng ngắn: không kịp đạt tốc độ đều — dùng đường cong êm.
+    return length * Curves.easeInOut.transform(t / total);
+  }
+  if (t < a) return speed * t * t / (2 * a);
+  if (t > total - a) {
+    final r = total - t;
+    return length - speed * r * r / (2 * a);
+  }
+  return speed * a / 2 + speed * (t - a);
+}
+
+/// Điểm trên đường gấp khúc [points] ở quãng [d] tính từ điểm đầu,
+/// kèm chỉ số đoạn đang đi ([cumulative] là quãng cộng dồn tới từng
+/// điểm, phần tử đầu là 0).
+(Offset, int) roomPointAlong(
+  List<Offset> points,
+  List<double> cumulative,
+  double d,
+) {
+  for (var i = 1; i < points.length; i++) {
+    if (d <= cumulative[i] || i == points.length - 1) {
+      final segLen = cumulative[i] - cumulative[i - 1];
+      final f = segLen <= 0
+          ? 1.0
+          : ((d - cumulative[i - 1]) / segLen).clamp(0.0, 1.0);
+      return (Offset.lerp(points[i - 1], points[i], f)!, i - 1);
+    }
+  }
+  return (points.last, 0);
+}
 
 /// Chỗ đứng có hợp lệ không: trong sàn, không đè dấu chân đồ đạc.
 bool roomWalkable(Offset p) {

@@ -3,6 +3,8 @@
 /// `runAsync`, thiếu bước này thì ảnh chụp trắng trơn).
 library;
 
+import 'package:material_ui/material_ui.dart';
+
 import 'ui_images.dart';
 
 import 'package:timokid/features/character/kid_assets.dart';
@@ -29,3 +31,10 @@ List<String> kidImagePaths() => <String>[
       'assets/images/pets/${s}_$st.png',
   ...uiImagePaths,
 ];
+
+/// Tên file ảnh của [provider] (ảnh nhân vật được bọc [ResizeImage]).
+String assetNameOf(ImageProvider<Object> provider) => switch (provider) {
+  ResizeImage(:final imageProvider) => assetNameOf(imageProvider),
+  AssetImage(:final assetName) => assetName,
+  _ => '$provider',
+};
