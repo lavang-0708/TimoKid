@@ -165,3 +165,176 @@ Bảng chiều cao hiển thị đề xuất (chung mọi loài; chiều cao bé
   mới nở < nhỡ < trưởng thành, nhỡ = 209 px / 58%).
 - Test neo: chân nhân vật, pet, đồ nằm trong vùng sàn/mặt phẳng đã
   khai báo. Tràn 608×248 + 640×320. Full suite xanh. Mở PR.
+
+---
+
+# Nhân vật bé trai v3b — (E) lô 2 (cách mới, như lô 1 làm lại)
+
+Lô 2 chỉ làm **bé trai** (3 bộ đồ toàn thân, 3 biến thể tay vẫy, miếng vá
+mắt nhắm), theo đúng cách mới của lô 1 (ảnh toàn thân hoàn chỉnh, không
+cắt lớp). Nguồn: Muse vẽ AI 21/11 theo `docs/DESIGN.md`, từ bản gốc
+nam v1 đã được chủ dự án duyệt (3 bộ: áo thun xanh + short xanh, hoodie
+xanh lá + quần xanh lá, áo thun đỏ + quần jean xanh). **Lưu ý tên gọi:**
+Muse chỉ vẽ **nam v1**; Claude vẫn ghi "nam v2" — lô này làm từ nam
+v1, nếu có file nam v2 khác thì báo lại, đừng tự bịa. Trong app mỗi
+lần chỉ có **một** nhân vật, nam hoặc nữ theo lựa chọn ở màn mở đầu,
+cộng thêm pet của bé.
+
+## Cách vẽ (giữ tư thế giống nhau là điểm then chốt)
+
+- Vẽ ảnh toàn thân bộ 1 trước, rồi **chỉnh sửa từ ảnh đó** (resume/
+  tiếp tục) để đổi chỉ quần áo cho bộ 2/3 và đổi chỉ tay phải cho các
+  biến thể vẫy — không vẽ lại từ đầu từng ảnh.
+- Nền generator là màu đặc hồng cá hồi (trung vị RGB ≈ (222, 134,
+  134)). Tách nền bằng **keying theo khoảng cách RGB** tới màu nền,
+  ngưỡng 20 (như lô 1; không dùng hue — váy/áo gần màu nền sẽ mất).
+
+## File (7 PNG, khung 1024×1536, PNG trong suốt, đã lượng tử)
+
+Đường đích `app/assets/images/character/boy/`. Cỡ dưới là sau lượng tử
+256 màu MAXCOVERAGE + Floyd–Steinberg (giữ alpha); trước lượng tử
+726–843 KB. Tỉ lệ bán trong suốt (0 < alpha < 255) đo bằng code.
+
+| File | Vai trò | Cỡ (byte) | Bán trong suốt |
+| --- | --- | --- | --- |
+| `boy_full_01.png` | Toàn thân, áo thun xanh + short xanh, sneaker xanh nhạt (bộ 1) | 295.092 | 0,0000 |
+| `boy_full_02.png` | Toàn thân, hoodie xanh lá + quần xanh lá, sneaker xanh lá (bộ 2) | 329.300 | 0,0000 |
+| `boy_full_03.png` | Toàn thân, áo thun đỏ + quần jean xanh xắn gấu, sneaker đỏ (bộ 3) | 307.809 | 0,0000 |
+| `boy_full_01_wave.png` | Bộ 1, tay phải giơ lên vẫy | 311.293 | 0,0000 |
+| `boy_full_02_wave.png` | Bộ 2, tay phải vẫy | 353.258 | 0,0000 |
+| `boy_full_03_wave.png` | Bộ 3, tay phải vẫy | 309.586 | 0,0000 |
+| `boy_eyes_closed_patch.png` | Miếng vá mắt nhắm (xem dưới) | 45.075 | 17,82% * |
+
+\* Patch có viền feather 14 px (alpha dốc dần về 0 ở mép rect) nên
+17,82% pixel bán trong suốt là **do thiết kế**; phần trong hoàn toàn
+đục. 6 ảnh toàn thân cứng 0,0000.
+
+## Mốc khung đo được (khung 1024×1536, đo bằng code từ ảnh thật)
+
+- Tâm mống mắt: trái **(398, 626)**, phải **(611, 626)** — tâm giữa
+  hai mắt (504, 626). Mắt các ảnh: y 614–626 (biến thể vẫy lệch
+  ±6 px do vẽ lại, mắt-x sai ≤ 0,4 px).
+- Miệng cười: tâm **≈ (508, 720)** ±7 px (đo: 01 (509, 720), 03
+  (501, 713); bộ 02 bộ đo tự động bắt nhầm bóng cổ áo, đã đo lại
+  bằng mắt từ ảnh phóng to).
+- Chân neo: y = **1429** (đáy giày); bbox toàn thân cao 1287 px
+  (y 142–1429); bbox x 150–157 tới 851–857. Trong phòng v3b: cao
+  hiển thị **360 px, chân (630, 810)** theo `docs/D_IMAGES.md`.
+- Tay vẫy là tay **phải** của nhân vật (phía trái ảnh khi nhìn từ
+  trước) giơ lên; các ảnh wave căn cùng tâm mắt/chân với ảnh nghỉ.
+
+## KHÁC BIỆT TỈ LỆ SO VỚI BÉ GÁI (ghi thật, không ép khớp)
+
+Mắt bé trai thấp hơn bé gái ~65 px (tâm mắt-y ≈ 626 so với 561),
+miệng cao hơn (y ≈ 720 so với 835): đầu/tóc bé trai to hơn, mặt
+gọn hơn (mắt→miệng ~94 px so với ~274 px của bé gái). Ép mắt về
+y = 561 cần co dọc 7,4% (ky = 1,074) làm méo hình, nên **giữ
+ky = 1,0 (không co dọc)**: chân + chiều cao toàn thân khớp hệt
+bé gái (y = 1429, cao 1287 px), mắt ở độ cao tự nhiên của bé
+trai. Hai bé không bao giờ cùng lên màn hình (mỗi lần chỉ một
+nhân vật), nên không xung đột thị giác. **Giai đoạn code:**
+`_eyeCenter` đo riêng theo từng nhân vật (nữ y ≈ 561, nam
+y ≈ 626); patch mắt đặt theo rect riêng của từng bé (xem dưới).
+
+## Miếng vá mắt nhắm
+
+- Rect **432×205 tại (291, 506)** trong khung 1024×1536 (bao cả
+  hai mắt + da quanh mắt). Vùng mí = toàn bộ mắt mở (tròng trắng
+  + mống mắt + mi + đồng tử) của ảnh gốc, giãn 14 px — lấy từ
+  `sclera | iris | lash` (vùng mí 33.384 px, bbox x 311–702,
+  y 526–690). **Không** chỉ vùng mống mắt (vùng đó quá nhỏ, để lộ
+  đồng tử/tròng trắng — lỗi này đã gặp khi thử lần đầu).
+- Trong vùng mí lấy pixel từ ảnh mắt nhắm (mí đóng kín + đường mi
+  cong); ngoài vùng mí lấy pixel từ ảnh mở (da quanh mắt từ ảnh
+  gốc). Viền feather 14 px.
+- **Bóng nếp mí trên: KHÔNG làm nhạt bằng blend** (đã thử, bỏ).
+  Blend 60% về ảnh mở ở vùng trên đường mi làm lộ lại nửa trên
+  tròng mắt (vùng nếp mí chồng lên đỉnh tròng; mask tròng không
+  phủ kín viền tròng). Patch lấy **nguyên pixel ảnh nhắm** trong
+  vùng mí — bóng nếp mí ở mức tự nhiên của ảnh nhắm, tương đương
+  patch bé gái (Claude chỉ ghi chú nhỏ ở patch gái, không chặn).
+- Kiểm: đặt patch lên cả 3 bộ + cả 3 biến thể vẫy, phóng to vùng
+  mắt 3× — **0 tròng nâu / tròng trắng / đồng tử lộ** (đọc bằng
+  mắt trên cả 6 ảnh: mí đóng kín, đường mi rõ, không thấy đường
+  viền rect). Chỉ số tự động còn 162 px "màu tròng" trong đĩa mắt
+  (so với ~1330 px ở ảnh mở) — đó là **lỗi của chỉ số** (mask màu
+  tròng bắt cả lông mày + màu nếp mí của ảnh nhắm), không phải
+  tròng thật; kiểm bằng mắt là căn cứ chính.
+
+## Bài học keying riêng của lô 2 (bổ sung cho lô 1)
+
+Nền hồng cá hồi gần màu da/má hồng nên keying ăn cả chi tiết mặt
+— phải vá bằng code, không chỉ bằng mắt:
+
+- **Lỗ má hồng:** má hồng nằm trong ngưỡng 20 của nền → thủng lỗ
+  879–2128 px trên mặt. Quy tắc lấp lỗ kín: lấp nếu < 3000 px
+  **hoặc** (median khoảng cách tới nền > 8 **và** < 10000 px) —
+  lỗ thật (khe giữa tay/chân) có màu nền thuần (median ~0–6) nên
+  không bị lấp. Sau vá: 01/03 còn 0 lỗ kín, 02 còn 1 lỗ 71 px ở
+  áo hoodie (y 1130, không nhìn thấy).
+- **Khe thật phải giữ:** khe giữa hai chân (01w, 1462 px) và khe
+  nách tay giơ (03w, 1858 px) là nền thật xuyên qua — **không
+  lấp** (chỉ lấp lỗ < 1000 px ở vùng mặt y < 900).
+- **Viền đen do resize (lỗi nặng nhất lô 2):** resize LANCZOS
+  thường trên RGBA nội suy RGB với nền đen trong suốt → để lại
+  pixel đen đục 1–2 px ở mép (tai phải 03 có vệt đen dài, 1013
+  px đen). Sửa: **resize premultiplied-alpha** (nhân RGB với
+  alpha trước, chia lại sau) + sửa pixel đen ở mép bằng màu pixel
+  đục gần nhất + despeckle (median 5×5) cho chấm đen/trắng do
+  ringing ở đầu ngón tay. **Không dùng binary_closing trên mask
+  ở bước cuối** — closing đẩy pixel đen của canvas thành đục.
+  Sau sửa: tai sạch, tay sạch, đồng tử (màu đen thật) giữ nguyên.
+- **Khuyết mép tai/cằm:** viền silhouette mờ dần vào nền 3–6 px;
+  ngưỡng 20 cắt thành khuyết (tai phải 03 khuyết 4–5 px). Sửa:
+  mọc viền tối đa 3 px vào dải mờ (khoảng cách tới nền 10–25),
+  không bao giờ vào nền thuần (khoảng cách < 10) — khôi phục
+  đúng mép mềm của ảnh gốc, không tạo quầng hồng.
+- **Lỗi `_hsv` trong `patch.py` của lô 1 (phát hiện khi làm patch
+  trai):** hàm `_hsv` quên chia kênh G cho 255 (`g = a3[..., 1]`
+  thay vì `/ 255`) → mask tròng trắng `sclera` và mask mi `lash`
+  gần như rỗng → vùng mí chỉ còn tròng nâu giãn → **đồng tử và
+  tròng trắng lọt qua patch** (patch gái có thể cũng bị nhẹ, chỉ
+  ít thấy vì đồng tử gái nhỏ hơn và chỉ số kiểm của gái chỉ đếm
+  px xanh). Đã sửa ở `boy_patch.py` (chia đủ 3 kênh + giãn vùng
+  mí 14 px). **Claude quyết có làm lại patch gái không** — patch
+  gái đã decode và duyệt, không tự làm lại trong lô này.
+
+## Kiểm chứng tư thế (thành thật)
+
+- **Căn tư thế: đạt.** Tâm mắt-x sai ≤ 0,4 px, chân y = 1429
+  trên cả 6 ảnh; mắt-y lệch ±6 px giữa các ảnh (vẽ lại); composite
+  trên nền tối + nền phòng: cùng một bé trai, 3 bộ đồ khác nhau;
+  biến thể vẫy chỉ đổi tay phải (tay giơ lên, bàn tay mở).
+- **Diff pixel ngoài vùng tay KHÔNG ≈ 0** (như lô 1): face-diff
+  01–02: 20,7% (tốt nhất 14,3% ở dx=-2 dy=4); 01–03: 16,9%
+  (tốt nhất 9,4%); 01–01w: 41,4%; 02–02w: 13,5% (cặp tốt nhất);
+  03–03w: 37,0%. Nguyên nhân như lô 1: mỗi biến thể là một lần
+  vẽ lại — nếp áo, sợi tóc, shading dịch nhẹ ở thang 10+ px;
+  không phải lệch tư thế (trung vị màu da/tóc khớp trong 3 mức,
+  tâm mắt khớp 0,4 px). Khi app đổi nghỉ → vẫy sẽ thấy shading
+  nhấp nhẹ; ở cỡ hiển thị trên điện thoại khó nhận ra, composite
+  phòng xác nhận bằng mắt là cùng một bé.
+- Lỗ alpha kín ≥ 3 px: **0** trên 01/03 (02 còn 1 lỗ 71 px ở áo).
+  Không mép cắt thẳng, không vệt màu lạ (sau các bước vá trên).
+- Ghép phòng v3b (cao 360 px, chân (630, 810), có bóng ellipse
+  mềm dưới chân): tỉ lệ tự nhiên so với giường/ghế, chân chạm
+  thảm, mặt khớp nam v1 (tóc nâu ngắn, mắt nâu to có ánh, miệng
+  cười, má hồng). Biến thể vẫy đứng cùng vị trí, tay giơ tự nhiên.
+
+## Việc còn lại cho giai đoạn code (E) — bổ sung lô 2
+
+- Entry manifest cho 7 file trên (loại file mới `boy_full_*` +
+  `boy_eyes_closed_patch`; **không** dùng mã lớp `arm`, không lớp
+  `body`/`top`/`eyes`/`mouth` riêng) + cập nhật `source` thành
+  "Muse vẽ AI 21/11 theo DESIGN.md". Bộ nam v1 này là bộ nam
+  duy nhất (không dùng bộ nam PR #18 — bộ đó là nữ; nam chưa
+  từng có bộ nào trong app).
+- `CharacterView` dùng ảnh toàn thân + patch mắt nhắm (đặt patch
+  tại **(291, 506)** trong khung, rect 432×205) + đổi qua lại ảnh
+  wave khi vẫy; chỉnh `_eyeCenter` theo nhân vật (nam y ≈ 626,
+  nữ y ≈ 561).
+- Thang cỡ pet + test neo + tràn 608×248 + 640×320 + full suite
+  xanh (như mục việc còn lại của lô 1).
+- **Claude quyết:** có làm lại patch mắt nhắm bé gái không (lỗi
+  `_hsv` kể trên — patch gái có thể lọt đồng tử/tròng trắng khi
+  soi 3×).
