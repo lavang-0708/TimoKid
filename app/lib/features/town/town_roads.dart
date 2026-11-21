@@ -1,8 +1,10 @@
 /// Đường đi + hướng/lật cho bản đồ Thị trấn v3b (PR (C)).
 ///
 /// Logic thuần (không widget) để test được trực tiếp:
-/// - 6 đoạn đường D1–D6 (khai báo trong `docs/C_IMAGES.md`, khung
-///   nền 1600x900, nửa rộng vùng đường 50 px);
+/// - 2 đoạn đường C1/C2 đo từ mặt nhựa thật của `town_v3.png` (khung
+///   nền 1600x900, nửa rộng vùng đường [townRoadHalfWidth] = 60 px;
+///   xem `docs/ASSETS.md` mục "Đường đi C1/C2"). Ghi chú D1–D6 ở dưới
+///   là lịch sử các vòng sửa trước khi đo lại;
 /// - tuyến xe/người chạy tới-lui trên các đoạn đó (ping-pong);
 /// - chọn biến thể lớp (dr/ur) + lật ngang theo hướng di chuyển;
 /// - khung bước chân người đi bộ.
@@ -42,7 +44,7 @@ class TownRoadSegment {
     this.halfWidth = townRoadHalfWidth,
   });
 
-  /// Tên đoạn (D1–D6).
+  /// Tên đoạn (C1/C2).
   final String name;
 
   /// Các điểm của polyline, tọa độ px theo khung nền 1600x900.
@@ -106,7 +108,7 @@ double distanceToRoads(Offset point) {
 }
 
 /// Điểm có nằm trong vùng đường đã khai báo không (tâm đường +
-/// nửa rộng 50 px, cộng thêm [margin] nếu cần dung sai).
+/// nửa rộng [townRoadHalfWidth], cộng thêm [margin] nếu cần dung sai).
 bool isOnRoad(Offset point, [double margin = 0]) {
   return distanceToRoads(point) <= townRoadHalfWidth + margin;
 }
@@ -114,16 +116,16 @@ bool isOnRoad(Offset point, [double margin = 0]) {
 /// 4 hướng di chuyển trên đường chéo isometric (tọa độ khung nền:
 /// x tăng = sang phải, y tăng = xuống dưới).
 enum TownTravelDirection {
-  /// Xuống-phải (x tăng, y tăng): chạy trên D2/D4/D6.
+  /// Xuống-phải (x tăng, y tăng): chạy xuôi C1.
   downRight,
 
-  /// Xuống-trái (x giảm, y tăng): chạy trên D1/D3/D5.
+  /// Xuống-trái (x giảm, y tăng): chạy ngược C2.
   downLeft,
 
-  /// Lên-phải (x tăng, y giảm): chạy ngược D1/D3/D5.
+  /// Lên-phải (x tăng, y giảm): chạy xuôi C2.
   upRight,
 
-  /// Lên-trái (x giảm, y giảm): chạy ngược D2/D4/D6.
+  /// Lên-trái (x giảm, y giảm): chạy ngược C1.
   upLeft,
 }
 

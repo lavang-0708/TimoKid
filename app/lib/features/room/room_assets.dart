@@ -166,6 +166,11 @@ const Offset roomChairSeatCenter = Offset(1105, 640);
 /// 1024x1536, tức ~2,25 lần mặt trước giường 160 px — đúng cỡ so
 /// với giường/tủ/cửa sổ, xem `docs/ASSETS.md` mục "Phòng v3b").
 /// Chân nằm ở 91,1% chiều cao hộp (đường đất y = 1400/1536).
+///
+/// Từ (E)/(G) Phòng KHÔNG vẽ theo hộp này nữa: nhân vật vẽ từ chân
+/// (mặc định [roomCharacterFeet], đổi khi đi) với cỡ
+/// `kidFrameHeight * 360 / kidBodyHeight` nhân tỉ lệ chiều sâu
+/// (`room_walk.dart`). Giữ hằng này làm mốc cho test neo cũ.
 const Rect roomCharacterBox = Rect.fromLTRB(488, 423, 772, 848);
 
 /// Chân nhân vật (khung 1600x900).
@@ -174,6 +179,9 @@ const Offset roomCharacterFeet = Offset(630, 810);
 /// Hộp pet/trứng trong khung nền: chân tại (420, 810), hộp vuông
 /// 140 px (thân pet cao ~120 px); chân (đường đất y = 440/512) ở
 /// 86% chiều cao hộp.
+///
+/// Từ (F) cỡ pet theo giai đoạn (`petBoxSize` trong `pet_growth.dart`);
+/// hộp này chỉ còn là mốc cho test neo cũ.
 const Rect roomPetBox = Rect.fromLTRB(350, 690, 490, 830);
 
 /// Chân pet (khung 1600x900).

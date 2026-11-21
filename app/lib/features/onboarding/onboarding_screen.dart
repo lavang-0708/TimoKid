@@ -1,28 +1,18 @@
 /// Màn mở đầu (T2-03, PLAN + DESIGN "Lần đầu mở app").
 ///
-/// Dáng nữ (bộ nhân vật nữ 1, PR #18 đã merge) chỉ có 5 bước: giới tính, màu tóc, váy, đặt tên, chọn
-/// trứng. Thân đã có sẵn mắt/miệng/tất/giày/bộ đồ gốc nên KHÔNG có
-/// bước màu da/kiểu mắt/kiểu miệng; kiểu tóc cố định `girl_hair_01`.
-/// Dáng nam chưa có hình thật nên giữ 7 bước cũ với xem trước tạm.
-/// Đổi ý ở bước nào cũng quay lại được (nút "Quay lại" ở mọi bước
-/// trừ bước đầu). Lưu một lần ở cuối (xem [OnboardingService]) rồi
-/// vào Thị trấn; tắt app giữa chừng thì lần sau mở lại từ đầu.
+/// Từ (E) cả hai dáng có cùng 4 bước: giới tính, bộ đồ (3 bộ ảnh toàn
+/// thân của dáng đã chọn, xem `kid_assets.dart`), đặt tên, chọn trứng.
+/// Màu da/tóc/mắt cố định theo hình đã duyệt nên không còn bước chọn
+/// màu. Đổi ý ở bước nào cũng quay lại được (nút "Quay lại" ở mọi bước
+/// trừ bước đầu); đổi dáng thì về bộ 1 của dáng đó. Lưu một lần ở cuối
+/// (xem [OnboardingService]) rồi vào Phòng; tắt app giữa chừng thì lần
+/// sau mở lại từ đầu.
 ///
-/// Xem trước nhân vật bằng [CharacterView]: dáng nữ dùng hình thật
-/// bộ girlSet1 ([CharacterOutfit.girlSet1]: thân + tóc + váy, không
-/// mắt/miệng/giày) qua `AssetImage` mặc định — PR #18 đã merge nên
-/// không còn lớp tạm ở đây; dáng nam chưa có hình thật nên vẫn dùng
-/// lớp tạm xám ([placeholderLayerLoader]) và có nhãn "Hình tạm".
-/// Test bơm loader tạm qua [OnboardingScreen.previewLoader] để
-/// golden cũ vẫn dùng lớp tạm xám (không cần file hình thật ở local).
-/// Nhân vật xem trước thở/chớp mắt + bấm vào nhảy lên lấp lánh, đổi
-/// màu tóc/váy thì nảy 'pop' (xem [CharacterBounce]); trứng là PNG
-/// thật (PR #21) lắc lư nhẹ chờ nở. Cổng [AnimationGate] tắt mọi
-/// hiệu ứng lặp khi chạy test để `pumpAndSettle` dừng được.
-///
-/// Bố cục ngang: cột trái là xem trước, cột phải là lựa chọn của
-/// bước (cuộn được để vừa màn 640x320); bước chọn trứng ẩn cột xem
-/// trước để đủ chỗ cho 3 thẻ trứng.
+/// Xem trước nhân vật bằng [KidSprite] (ảnh toàn thân thật, thở/chớp
+/// mắt), bọc [CharacterBounce] để bấm vào nhảy lên và đổi lựa chọn thì
+/// nảy 'pop'; trứng là PNG thật (PR #21) lắc lư nhẹ chờ nở. Cổng
+/// [AnimationGate] tắt mọi hiệu ứng lặp khi chạy test để
+/// `pumpAndSettle` dừng được.
 ///
 /// Bố cục ngang: cột trái là xem trước, cột phải là lựa chọn của
 /// bước (cuộn được để vừa màn 640x320); bước chọn trứng ẩn cột xem
