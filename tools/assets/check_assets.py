@@ -30,6 +30,7 @@ import re
 import struct
 import sys
 import zlib
+from itertools import accumulate
 
 # --- Hợp đồng cố định (khớp docs/ASSETS.md) -------------------------------
 
@@ -121,6 +122,11 @@ IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".svg"}
 # chừng này mới nhân màu không bị ám màu).
 GRAY_TOLERANCE = 8
 
+def _add8(x: int, y: int) -> int:
+    """Cộng hai byte theo modulo 256 (dùng cho bộ lọc Up)."""
+    return (x + y) & 0xFF
+
+
 PNG_SIG = b"\x89PNG\r\n\x1a\n"
 JPEG_SOI = b"\xff\xd8\xff"
 
@@ -141,10 +147,13 @@ class Checker:
     # -- PNG (chỉ dùng thư viện chuẩn) ------------------------------------
 
     def _read_png(self, path: pathlib.Path, where: str):
-        """Đọc PNG, trả (rộng, cao, loại màu, bytes RGBA đã giải nén).
+        """Đọc PNG, trả (rộng, cao, loại màu, dữ liệu thô đã inflate).
 
         Chỉ hỗ trợ PNG 8-bit không interlaced, loại màu 4 (xám+alpha)
-        hoặc 6 (RGBA). Các trường hợp khác báo lỗi rõ ràng.
+        hoặc 6 (RGBA). Các trường hợp khác báo lỗi rõ ràng. Chưa gỡ
+        bộ lọc từng dòng ở đây (xem ``_scan_rows`` / ``_unfilter``):
+        phần lớn ảnh chỉ cần nhìn vài pixel, giải đủ cả ảnh rất chậm
+        trong Python thuần.
         """
         data = path.read_bytes()
         if not data.startswith(PNG_SIG):
@@ -190,30 +199,53 @@ class Checker:
             raw = zlib.decompress(bytes(idat))
         except zlib.error:
             raise CheckError(f"{where}: không giải nén được dữ liệu IDAT")
-        bpp = 2 if color_type == 4 else 4
+        return width, height, color_type, raw
+
+    def _check_rows(self, raw, width: int, height: int, bpp: int,
+                    where: str) -> None:
+        """Mỗi dòng phải đủ dữ liệu và có loại lọc hợp lệ (0-4)."""
+        row_len = 1 + width * bpp
+        for y in range(height):
+            if y * row_len + row_len > len(raw):
+                raise CheckError(f"{where}: dữ liệu ảnh ngắn hơn khai báo")
+            if raw[y * row_len] > 4:
+                raise CheckError(
+                    f"{where}: loại lọc PNG lạ ({raw[y * row_len]})"
+                )
+
+    def _unfilter(self, raw, width: int, height: int, bpp: int,
+                  where: str) -> bytes:
+        """Gỡ bộ lọc mọi dòng, trả bytes pixel (chậm: chỉ dùng khi cần).
+
+        Mỗi kênh được lọc độc lập (hàng xóm cách đúng ``bpp`` byte)
+        nên Sub/Up chạy bằng slicing và cộng dồn ở tốc độ C; chỉ
+        Average và Paeth mới phải lặp từng byte.
+        """
+        self._check_rows(raw, width, height, bpp, where)
         stride = width * bpp
         pixels = bytearray(width * height * bpp)
         prev = bytearray(stride)
         offset = 0
         for y in range(height):
-            if offset + 1 + stride > len(raw):
-                raise CheckError(f"{where}: dữ liệu ảnh ngắn hơn khai báo")
             ftype = raw[offset]
             line = bytearray(raw[offset + 1:offset + 1 + stride])
             offset += 1 + stride
             if ftype == 0:
                 pass
             elif ftype == 1:
-                for i in range(bpp, stride):
-                    line[i] = (line[i] + line[i - bpp]) & 0xFF
+                # Sub: cộng dồn theo từng kênh (cách nhau bpp byte).
+                for c in range(bpp):
+                    line[c::bpp] = bytes(
+                        v & 0xFF for v in accumulate(line[c::bpp])
+                    )
             elif ftype == 2:
-                for i in range(stride):
-                    line[i] = (line[i] + prev[i]) & 0xFF
+                # Up: cộng với dòng trước, từng byte nhưng qua map (C).
+                line = bytearray(map(_add8, line, prev))
             elif ftype == 3:
                 for i in range(stride):
                     left = line[i - bpp] if i >= bpp else 0
                     line[i] = (line[i] + (left + prev[i]) // 2) & 0xFF
-            elif ftype == 4:
+            else:
                 for i in range(stride):
                     a = line[i - bpp] if i >= bpp else 0
                     b = prev[i]
@@ -224,16 +256,55 @@ class Checker:
                         b if pb <= pc else c
                     )
                     line[i] = (line[i] + pred) & 0xFF
-            else:
-                raise CheckError(f"{where}: loại lọc PNG lạ ({ftype})")
             pixels[y * stride:(y + 1) * stride] = line
             prev = line
-        return width, height, color_type, bytes(pixels)
+        return bytes(pixels)
+
+    def _quick_transparent_edge(self, raw, width: int, height: int,
+                                bpp: int) -> bool:
+        """True nếu dòng đầu hoặc cột đầu có pixel alpha < 255.
+
+        Chỉ giải đúng chỗ cần: dòng đầu (trước đó chưa có dòng nào nên
+        giải rẻ) và cột đầu (pixel x = 0 không có hàng xóm trái, nên
+        giá trị chỉ phụ thuộc cột đầu của dòng trên). Gặp một pixel
+        trong suốt ở viền là đủ chứng minh cả hai điều kiện "có pixel
+        trong suốt" và "có pixel trong suốt ở viền", khỏi giải cả ảnh.
+        Trả False nghĩa là chưa kết luận (phải giải đủ).
+        """
+        row_len = 1 + width * bpp
+        alpha_at = bpp - 1
+        # Dòng đầu: giải đủ một dòng, prev toàn 0.
+        first = self._unfilter(
+            raw[:row_len], width, 1, bpp, ""
+        )
+        if min(first[alpha_at::bpp]) < 255:
+            return True
+        up = first[alpha_at]  # alpha cột đầu của dòng trước
+        for y in range(1, height):
+            base = y * row_len
+            ftype = raw[base]
+            v = raw[base + 1 + alpha_at]
+            if ftype == 0:
+                up = v
+            elif ftype == 1:
+                up = v  # Sub: hàng xóm trái = 0
+            elif ftype == 2:
+                up = (v + up) & 0xFF
+            elif ftype == 3:
+                up = (v + up // 2) & 0xFF
+            else:
+                up = (v + up) & 0xFF  # Paeth: a = c = 0 nên đoán = b
+            if up < 255:
+                return True
+        return False
 
     def _check_png(self, entry: dict, path: pathlib.Path) -> None:
         where = entry["file"]
         try:
-            width, height, color_type, pixels = self._read_png(path, where)
+            width, height, color_type, raw = self._read_png(path, where)
+            bpp = 2 if color_type == 4 else 4
+            # Kiểm dòng/lọc cho cả ảnh trước (giữ nguyên lỗi như cũ).
+            self._check_rows(raw, width, height, bpp, where)
         except CheckError as exc:
             self.fail(where, str(exc).removeprefix(f"{where}: "))
             return
@@ -246,35 +317,39 @@ class Checker:
                 f"sai kích thước khung: {width}x{height}, "
                 f"loại {entry['kind']} phải là {frame[0]}x{frame[1]}",
             )
-        bpp = 2 if color_type == 4 else 4
         alpha_at = bpp - 1
-        # Kênh alpha tách riêng bằng slicing (tốc độ C): pixel thứ i có
-        # alpha ở alphas[i].
-        alphas = pixels[alpha_at::bpp]
+        pixels = None  # chỉ giải đủ cả ảnh khi thật sự cần
 
         # Ít nhất một pixel trong suốt (ảnh không được là nền đặc) và
         # ít nhất một pixel trong suốt ở viền (lớp phải nằm trong khung,
-        # không chạm mép an toàn).
-        if min(alphas) == 255:
-            self.fail(where, "PNG không có pixel trong suốt nào (nền đặc)")
-            return
-        border = (
-            alphas[:width]
-            + alphas[(height - 1) * width:]
-            + alphas[::width]
-            + alphas[width - 1::width]
-        )
-        if min(border) == 255:
-            self.fail(
-                where,
-                "PNG không có pixel trong suốt ở viền — hình chạm mép "
-                "khung, xem lại mép an toàn trong assets/templates/",
+        # không chạm mép an toàn). Đường nhanh: ảnh thường có góc trong
+        # suốt nên dòng đầu/cột đầu đã đủ; không thì giải đủ rồi kiểm.
+        if not self._quick_transparent_edge(raw, width, height, bpp):
+            pixels = self._unfilter(raw, width, height, bpp, where)
+            alphas = pixels[alpha_at::bpp]
+            if min(alphas) == 255:
+                self.fail(where, "PNG không có pixel trong suốt nào (nền đặc)")
+                return
+            border = (
+                alphas[:width]
+                + alphas[(height - 1) * width:]
+                + alphas[::width]
+                + alphas[width - 1::width]
             )
-            return
+            if min(border) == 255:
+                self.fail(
+                    where,
+                    "PNG không có pixel trong suốt ở viền — hình chạm mép "
+                    "khung, xem lại mép an toàn trong assets/templates/",
+                )
+                return
         # Lớp đổi màu phải tô xám (app nhân màu lên lớp xám). Loại màu 4
         # (xám+alpha) mặc nhiên thỏa; loại màu 6 kiểm từng pixel còn
-        # thấy được (alpha > 0).
+        # thấy được (alpha > 0). Chỉ lớp recolorable mới tốn công này.
         if entry.get("recolorable") and color_type == 6:
+            if pixels is None:
+                pixels = self._unfilter(raw, width, height, bpp, where)
+            alphas = pixels[3::4]
             reds = pixels[0::4]
             greens = pixels[1::4]
             blues = pixels[2::4]
