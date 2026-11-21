@@ -21,7 +21,7 @@ TimoKid là app Android giúp bé lớp 2 ôn thi Olympic Toán TIMO bằng các
 
 ## Năm định hướng
 
-1. **Câu hỏi là khuôn sinh câu, không phải danh sách cố định.** Với 25 câu mỗi ngày, một bộ 267 câu sẽ hết sau khoảng 11 ngày. App sinh câu mới từ 48 dạng bài có tham số và theo dõi bé theo dạng bài.
+1. **Câu hỏi là khuôn sinh câu, không phải danh sách cố định.** Với 25 câu mỗi ngày, một bộ 267 câu sẽ hết sau khoảng 11 ngày. App sinh câu mới từ 84 dạng bài có tham số và theo dõi bé theo dạng bài.
 2. **Đề 25 câu chia 5 chặng.** Mỗi chặng 5 câu ở một khu của thị trấn, xong chặng có thưởng nhỏ, bé nghỉ giữa chừng rồi làm tiếp được.
 3. **Thưởng cho nỗ lực và tiến bộ.** Không có hộp quà may rủi, không quảng cáo. Pet không ốm hay buồn khi bé nghỉ. Sai không bị trừ xu hay mất đồ.
 4. **Nội dung thêm được mà không cần cài lại app.** Đồ mới, pet mới và câu hỏi mới là các gói nội dung đẩy lên từ web admin.
@@ -33,8 +33,8 @@ Lần đầu mở app, bé đi qua một câu chuyện ngắn thay vì màn đă
 
 ### Lần đầu mở app
 
-1. Bé tạo nhân vật: chọn giới tính, màu da, kiểu và màu tóc, mắt, miệng, rồi đặt tên.
-2. Bé chọn một trong ba quả trứng: Chó Tinh Anh, Mèo Mũm Mĩm hoặc Thỏ Bánh Bao. Trứng nở sau khi bé làm xong chặng toán đầu tiên.
+1. Bé tạo nhân vật (màn mở đầu, 4 bước cho cả nam và nữ): giới tính, bộ đồ (3 bộ mỗi dáng), đặt tên, rồi chọn một trong ba quả trứng.
+2. Ba quả trứng: Chó Tinh Anh, Mèo Mũm Mĩm hoặc Thỏ Bánh Bao. Trứng nở sau khi bé làm xong chặng toán đầu tiên.
 3. Bé vào căn phòng của mình. Đây là màn chính, cửa phòng dẫn ra thị trấn.
 
 ### Mỗi ngày
@@ -52,7 +52,7 @@ App theo dõi bé theo dạng bài, ví dụ "bài cái cân" hay "đếm hình 
 ### Ngân hàng câu hỏi
 
 - 5 mảng: Tư duy lôgic, Số học / Đại số, Lý thuyết số, Hình học, Tổ hợp.
-- 48 dạng bài (mỗi `form` trong `gen.py` là một dạng). Mỗi dạng hỗ trợ từ 1 đến 3 mức trong Dễ, Vừa, Khó; 17 dạng đủ cả 3 mức. Bộ 267 câu đã soạn (`tools/question_bank/questions.json`) là mẫu của các dạng này.
+- 84 dạng bài trong app (`allQuestionGenerators` ở `app/lib/features/questions/question_registry.dart`): lôgic 18, số học 15, lý thuyết số 17, hình học 17, tổ hợp 17. Gồm 48 dạng chuyển từ `gen.py` (mỗi `form` là một dạng), 24 dạng bổ sung theo đề vòng loại TIMO lớp 2 (`gen_timo2.py`, xem `tools/question_bank/TIMO2_FORMS.md`) và 12 dạng đợt 3 ưu tiên Hình học (`tools/question_bank/TIMO3_FORMS.md`). Mỗi dạng hỗ trợ từ 1 đến 3 mức trong Dễ, Vừa, Khó. Bộ 267 câu đã soạn (`tools/question_bank/questions.json`) chỉ là mẫu của 48 dạng gốc, không phải toàn bộ dạng của app.
 - Mỗi dạng là một khuôn: đề tiếng Việt, đề tiếng Anh, từ khóa song ngữ, gợi ý, lời giải từng bước, và công thức tính đáp án. App thay số, tên và hình để ra câu mới. Đáp án luôn do code tính.
 - Câu phụ huynh nạp từ web admin là câu cố định, được gắn mảng và mức để trộn vào đề.
 
@@ -86,15 +86,14 @@ Bé có một nhân vật, một pet và một căn phòng. Mọi thứ mới đ
 ### Nhân vật
 
 - Hai dáng riêng cho nam và nữ. Mỗi món quần áo có hai phiên bản, bản đầu ưu tiên đủ đồ cho dáng nữ.
-- Các lớp ghép chồng: thân, mắt, miệng, tóc sau, tóc trước, áo, quần hoặc váy, giày, phụ kiện đầu, phụ kiện tay.
-- Màu da, tóc, mắt, miệng chọn từ bảng màu. App tự tô màu, họa sĩ không cần vẽ từng màu.
-- Quần áo cũng được nhân bản bằng đổi màu và phủ họa tiết (chấm bi, kẻ sọc, hoa).
+- **Hiện trạng (21/11): nhân vật là ảnh toàn thân**, không còn ghép chồng lớp. Mỗi dáng có 3 bộ đồ, mỗi bộ 2 dáng (đứng nghỉ, vẫy tay) + khung đi bộ; mắt nhắm là miếng vá chớp mắt; phụ kiện đầu (mũ, nơ/kẹp), kính, giày trắng là lớp phủ; balo là biến thể ảnh toàn thân. Chi tiết: `docs/ASSETS.md` mục "Nhân vật toàn thân (hiện hành)", code `app/lib/features/character/kid_*.dart`.
+- ~~Các lớp ghép chồng (thân, mắt, miệng, tóc, áo, giày…); màu da/tóc/mắt/miệng chọn từ bảng màu; quần áo đổi màu bằng xám nhân màu~~ — thiết kế ban đầu, đã bỏ (hệ `CharacterView` giờ là legacy). Bé không còn chọn màu da/tóc/mắt/miệng.
 - Bé tự đặt tên nhân vật, app không có tên đặt sẵn.
 
 ### Pet
 
 - Bé chọn một trong ba quả trứng: Chó Tinh Anh, Mèo Mũm Mĩm hoặc Thỏ Bánh Bao. Trứng nở sau chặng toán đầu tiên.
-- Ba giai đoạn: mới nở, nhỡ, lớn. Pet lên giai đoạn nhỡ khi bé thành thạo 10 dạng bài, lên lớn khi thành thạo 30 dạng.
+- Ba giai đoạn sau khi nở: mới nở, nhỡ, lớn. Pet lớn theo số ngày bé xong trọn đề ngày (đủ 5 chặng): mới nở 0–2 ngày, nhỡ 3–7 ngày, lớn từ 8 ngày (`app/lib/features/room/pet_growth.dart`). Cỡ pet so với nhân vật: trứng 30%, mới nở 40%, nhỡ 58%, lớn 72%. (Thiết kế đầu dùng "thành thạo 10/30 dạng bài" — đã đổi.)
 - Bé cho pet ăn và chơi bằng đồ mua ở cửa hàng. Pet phản ứng vui khi được chăm, không có trạng thái đói, ốm hay buồn.
 - Hai loài còn lại mua bằng kim cương.
 
@@ -140,7 +139,7 @@ App có 12 màn hình, tất cả nằm ngang và tự co giãn cho điện tho�
 | --- | --- |
 | Cài đặt lần đầu | Bố đăng nhập, chọn hoặc tạo hồ sơ bé, chọn lớp |
 | Chọn hồ sơ | Chọn bé nào đang chơi (chỉ hiện khi có từ 2 bé) |
-| Tạo nhân vật | Chọn giới tính, da, tóc, mắt, miệng, màu sắc, đặt tên |
+| Tạo nhân vật | Chọn giới tính, bộ đồ, đặt tên (bước 1–3 của 4; bước 4 là chọn trứng) |
 | Chọn trứng | Chọn 1 trong 3 quả trứng |
 | Phòng của bé | Màn chính: nhân vật, pet, nội thất, hộp thư, cửa ra thị trấn |
 | Thị trấn | Bản đồ 5 khu, cư dân đang chờ, tiến độ đề ngày, tòa nhà còn khóa |
@@ -207,6 +206,8 @@ Cách cấu hình cụ thể của Neon Auth và Data API sẽ được kiểm t
 
 ## Hướng dẫn vẽ cho họa sĩ
 
+> **Cập nhật 21/11:** phần "Quy cách file" và "Thứ tự lớp" dưới đây mô tả hệ nhân vật ghép lớp (legacy). Nhân vật hiện tại là ảnh toàn thân — xem `docs/ASSETS.md` mục "Nhân vật toàn thân (hiện hành)"; khung 1024 x 1536 vẫn giữ.
+
 Mọi lớp của nhân vật được vẽ trên cùng một khung hình và xuất thành file riêng, để app chồng lên nhau là khớp mà không cần căn chỉnh. Phong cách chuẩn là tông pastel mềm, viền trắng kiểu sticker, theo các tấm phác ý tưởng hiện có (nhân vật nữ, pet, trứng, căn phòng). Các tấm này vẽ bằng AI. Từ 18/11/2026 chủ dự án chốt dùng chúng làm nguồn hình chính: tách nền, cắt từng lớp và món, sửa lỗi theo bảng trong `assets/concept/README.md`; món thiếu hoặc hỏng thì vẽ bổ sung cùng phong cách (PLAN điểm (k)). Họa sĩ có thể thay dần bằng hình vẽ tay theo cùng quy cách dưới đây.
 
 ### Quy cách file
@@ -242,7 +243,7 @@ Mọi lớp của nhân vật được vẽ trên cùng một khung hình và xu
 | Nội thất, thức ăn pet, đồ chơi, nơ, kẹp tóc, túi | 20 đến 30 món | Claude vẽ theo phong cách mẫu, họa sĩ duyệt |
 | Nền phòng, nền thị trấn, 5 cư dân | Bản đầu dùng hình tạm | Claude vẽ tạm, thay sau |
 
-Ba loài pet thêm 9 hình pet và 3 quả trứng. Cách giảm tải: bản đầu chỉ cần 3 quả trứng và giai đoạn mới nở của cả ba loài; giai đoạn nhỡ, lớn và dáng nam vẽ dần sau.
+Ba loài pet thêm 9 hình pet và 3 quả trứng. Cách giảm tải đã đề ra: bản đầu chỉ cần 3 quả trứng và giai đoạn mới nở. Hiện trạng: cả 12 hình pet (3 trứng + 3 loài × 3 giai đoạn) và dáng nam đã có.
 
 ## Lộ trình
 

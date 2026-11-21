@@ -66,6 +66,11 @@ Rect món vẽ sẵn trong nền (để đối chiếu — lớp rời phủ kh�
 
 ## 4. Dấu chân trên sàn (cho PR (G) — vùng đi được = đa giác sàn trừ các dấu chân này)
 
+*Ghi chú (đã làm trong code, PR #34): PR (G) đã xong — dấu chân dưới đây là
+`roomObstacleFootprints`, vùng đi được tính ở
+`app/lib/features/room/room_walk.dart` (xem `docs/ASSETS.md` mục "Đi lại
+trong Phòng (G)").*
+
 - Giường: (155,645)–(760,700).
 - Bàn học: (1070,645)–(1470,790).
 - Tủ quần áo: (1460,645)–(1600,880).
@@ -74,6 +79,9 @@ Rect món vẽ sẵn trong nền (để đối chiếu — lớp rời phủ kh�
 - Tủ đầu giường: (30,700)–(260,800).
 
 ## 5. Ghế ở bàn học (cho PR (G) — tương tác ngồi ghế)
+
+*Ghi chú: các hằng `roomChairRect`/`roomChairSeat` đã có trong
+`room_assets.dart`; tương tác ngồi ghế CHƯA làm (PR (G) chỉ làm đi lại).*
 
 - Rect ghế: x 970–1240, y 490–790.
 - Lưng ghế: x 970–1120, y 490–620.

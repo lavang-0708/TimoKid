@@ -151,6 +151,14 @@ Bảng chiều cao hiển thị đề xuất (chung mọi loài; chiều cao bé
   (trứng < mới nở < nhỡ < trưởng thành), chưa duyệt riêng.
 - Test kiểm thứ tự + giá trị nhỡ 58% thêm ở **giai đoạn code (E)**.
 
+**Ghi chú (đã làm trong code):** bảng đề xuất 33/43/58/69% ở trên KHÔNG
+được dùng nguyên. Code (`app/lib/features/room/pet_growth.dart`,
+`petHeightRatio`) chốt **trứng 30%, mới nở 40%, nhỡ 58%, trưởng thành 72%**
+của nhân vật cao 360 px; nhỡ 58% giữ đúng như chủ dự án đã duyệt. Pet lớn
+theo số ngày bé xong trọn đề ngày (mới nở 0–2, nhỡ 3–7, lớn từ 8). Bảng
+hiện hành nằm ở `docs/ASSETS.md` mục "Thang cỡ pet"; test thứ tự cỡ + nhỡ
+= 208,8 px ở `app/test/features/room/room_walk_test.dart`.
+
 ## Việc còn lại cho giai đoạn code (E)
 
 - Entry manifest cho 7 file trên (loại file mới `girl_full_*` +
@@ -165,6 +173,13 @@ Bảng chiều cao hiển thị đề xuất (chung mọi loài; chiều cao bé
   mới nở < nhỡ < trưởng thành, nhỡ = 209 px / 58%).
 - Test neo: chân nhân vật, pet, đồ nằm trong vùng sàn/mặt phẳng đã
   khai báo. Tràn 608×248 + 640×320. Full suite xanh. Mở PR.
+
+**Ghi chú (đã làm trong code, PR #34):** entry manifest đã thêm (loại
+`character_full`, `character_patch`). Không sửa `CharacterView` mà viết
+widget mới `KidSprite` (`app/lib/features/character/kid_sprite.dart`) dùng
+ảnh toàn thân + patch mắt nhắm theo rect từng ảnh (`kid_assets.dart`,
+`kidEyePatch`); không còn `_eyeCenter`. `CharacterView` chỉ còn là legacy.
+Thang cỡ pet: xem ghi chú ở trên.
 
 ---
 
@@ -430,6 +445,10 @@ bộ viền ngoài; đếm bằng code số pixel alpha = 0 trong vùng thân.
   bảng patch ở mục "Sửa lỗi cắt nền").
 - Thang cỡ pet + test neo + tràn 608×248 + 640×320 + full suite
   xanh (như mục việc còn lại của lô 1).
+
+**Ghi chú (đã làm trong code):** như lô 1 — `KidSprite` + `kidEyePatch`
+(bé trai: patch chung cho 3 ảnh nghỉ, patch riêng cho mỗi ảnh vẫy); không
+chỉnh `_eyeCenter`.
 - **Không cần làm lại patch mắt nhắm bé gái** (nghi ngờ `_hsv` đã
   kiểm lại, không đúng — xem mục "Bài học keying riêng của lô 2" trên).
 
@@ -567,6 +586,16 @@ Mốc ảnh toàn thân để căn: gái tâm mắt (388,562)/(619,559), miệng
   giày thay thế là món đổi giày gốc.
 - Thang cỡ pet + test neo + tràn 608×248 + 640×320 + full suite
   xanh (như mục việc còn lại của lô 1/2).
+
+**Ghi chú (đã làm trong code, quyết định khác dự kiến):** phụ kiện vẽ bằng
+`KidSprite` (không phải `CharacterView`). Mũ/nơ-kẹp (`kidHeadAccessories`),
+kính (`kidGlassesAsset`) và giày trắng (`kidWhiteShoesAsset`) là lớp phủ
+cùng khung. **Balo KHÔNG vẽ chồng**: dùng biến thể ảnh toàn thân
+`..._backpack` (xem mục "fix3 giai đoạn 2 — balo") qua `kidFullAsset(...,
+backpack: true)`. Lựa chọn lưu bằng `KidLookService` (`kid_head_accessory`,
+`kid_glasses`, `kid_white_shoes`, `kid_backpack`) và đổi trong Tủ đồ ở
+màn Phòng (`room_screen.dart`). Hiện trạng đầy đủ: `docs/ASSETS.md` mục
+"Nhân vật toàn thân (hiện hành)".
 
 ## Sửa kính lô 3 — xoá hình chữ nhật trong tròng phải (đẩy sau fix2, 21/11)
 
@@ -802,3 +831,10 @@ trong báo cáo lô 4; mắt-y 556,9–566,2; mắt-x 576–724.]
 - 02 dr mắt-x nhảy 33–75 px giữa c→d: nếu cổng G yêu cầu ≤20 px cho cả
   dr thì xem lại riêng.
 - Kiểm lại mốc miệng bé trai (508,720) trước khi dùng.
+
+**Ghi chú (đã làm trong code, PR #34):** quyết định ở mục phụ kiện — khung
+đi bộ thật CHỈ dùng khi bé không đeo kính/giày trắng/balo/phụ kiện đầu
+(`_hasWalkFrames` trong `kid_sprite.dart`); đang đeo món nào thì khi đi dùng
+ảnh đứng + nhún bước. Khi hiện khung đi bộ thì không chớp mắt và không vẽ
+lớp phủ, nên không cần neo lại theo mắt-x từng khung. Đi lại trong Phòng đã
+làm ở `app/lib/features/room/room_walk.dart` (`kidWalkFrames` chọn `dr`/`ur`).

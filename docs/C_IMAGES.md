@@ -81,6 +81,15 @@ chỉnh theo ảnh nếu lệch.
 | D5 | ↙ | (1400,480) → (1250,570) → (1100,650) → (900,750) → (700,850) | Công viên khỏi hồ, xuống ngã tư dưới |
 | D6 | ↘ | (1150,680) → (1300,760) → (1500,850) → (1600,900) | Dưới hồ |
 
+> **Ghi chú (đã làm trong code, PR #34 — sau khi nhật ký này viết):** app
+> KHÔNG dùng 6 đoạn D1–D6 dưới đây nữa. Đường nền `town_v3.png` chỉ có hai
+> đường chéo cắt nhau ở ngã tư lớn nên code dùng hai đoạn **C1**
+> (700,459)→(1600,904) và **C2** (770,810)→(1560,416), nửa rộng vùng đường
+> 60 px, người lệch vỉa hè 46 px; xe/người chạy theo `car1Route`,
+> `car2Route`, `walker1Route`, `walker2Route` trong
+> `app/lib/features/town/town_roads.dart` (xem `docs/ASSETS.md` mục
+> "Đường đi C1/C2"). Bảng và đoạn "vòng sửa PR #31" bên dưới là lịch sử.
+
 Ngã giao: D1×D2 tại (880,70); D3×D4 tại (720,450); D4×D5 tại
 (1100,650); D5×D6 tại (1300,760). Các đoạn cụt ở mép khung (thị trấn còn
 nối ra ngoài khung); đường đi giai đoạn 2 chạy tới-lui trên các đoạn này:
@@ -144,6 +153,8 @@ vẫn giữ lại sau khi thu nhỏ — vẫn dưới 5%.
 
 ### Hướng, khung bước chân và neo chân (giai đoạn 2 lưu ý)
 
+- *(Ghi chú đã làm trong code: nay `dr` chạy ↘ trên C1 và `ur` chạy ↗ trên
+  C2 theo bảng hướng trong `town_roads.dart`; D1–D6 đã bỏ.)*
 - `dr` = xuống-phải (↘): chạy trên D2, D4, D6. `ur` = lên-phải (↗): chạy
   ngược chiều D1, D3, D5. Hai hướng còn lại app lật ngang: lật `dr` → ↙,
   lật `ur` → ↖. Đã ghép thử xe/người lên nền thật: góc 3/4 trùng hướng

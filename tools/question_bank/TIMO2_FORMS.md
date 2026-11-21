@@ -52,7 +52,7 @@ Mỗi câu đều có:
 
 ## Đã đưa vào app
 
-24 dạng điền số đã được chuyển sang Dart trong `app/lib/features/questions/generators/timo2_generators.dart` và đăng ký trong `question_registry.dart`. App hiện có 72 dạng: logic 16, arith 13, number 16, geo 11, comb 16.
+24 dạng điền số đã được chuyển sang Dart trong `app/lib/features/questions/generators/timo2_generators.dart` và đăng ký trong `question_registry.dart`. Sau đợt này app có 72 dạng (logic 16, arith 13, number 16, geo 11, comb 16); đợt 3 thêm 12 dạng nên **hiện app có 84 dạng** (logic 18, arith 15, number 17, geo 17, comb 17) — xem `TIMO3_FORMS.md` và `generatorCountByTopic` trong `question_registry.dart`.
 
 Ba dạng chỉ có trắc nghiệm vẫn chỉ nằm trong `questions_timo2.json`: weekday_rel, order3 và signs. Trong app, phần `cyclepattern` chỉ dùng biến thể "đếm hình". Tên dạng trong Dart:
 - `seq_grow` → `logic.seqgrow`
