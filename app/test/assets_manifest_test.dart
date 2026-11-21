@@ -24,8 +24,8 @@ void main() {
       0,
       reason: 'check_assets.py báo lỗi:\n${result.stdout}\n${result.stderr}',
     );
-    // Giải mã PNG bằng Python thuần: >150 ảnh toàn thân mất ~40 giây.
-  }, timeout: const Timeout(Duration(minutes: 4)));
+    // Script chỉ giải lọc phần cần thiết của PNG nên chạy chừng 1-2 giây.
+  }, timeout: const Timeout(Duration(minutes: 2)));
 }
 
 Directory findRepoRoot() {
