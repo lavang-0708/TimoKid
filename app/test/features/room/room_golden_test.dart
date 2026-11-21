@@ -164,7 +164,7 @@ void main() {
       ]) {
         await precacheImage(AssetImage(path), context);
       }
-      // Nền + nội thất PNG v2 (A1): nạp trước để ảnh chụp golden
+      // Nền + nội thất PNG v3b (D): nạp trước để ảnh chụp golden
       // không trắng trơn (cùng lý do như trứng/pet).
       for (final path in [
         roomBackgroundAsset,

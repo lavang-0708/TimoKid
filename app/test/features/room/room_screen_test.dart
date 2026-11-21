@@ -287,33 +287,21 @@ void main() {
     await completeOnboardingGirl();
     await pumpRoom(tester);
 
-    await tester.tap(find.byKey(const Key('room-furniture-day-co')));
+    await tester.tap(find.byKey(const Key('room-furniture-gau-bong')));
     await tester.pump();
-    expect(find.text('Dây cờ bay bay, phòng xinh quá!'), findsOneWidget);
+    expect(find.text('Gấu bông ôm thích lắm!'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('room-furniture-den-sao')));
     await tester.pump();
     expect(find.text('Đèn sao sáng rồi, đọc sách thôi!'), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('room-furniture-khung-anh')));
-    await tester.pump();
-    expect(find.text('Khung ảnh này ai tặng nhỉ?'), findsOneWidget);
-
     await tester.tap(find.byKey(const Key('room-furniture-chau-cay')));
     await tester.pump();
     expect(find.text('Cây lớn nhanh nhé!'), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('room-furniture-goi')));
-    await tester.pump();
-    expect(find.text('Gối êm quá, ngủ ngon lắm!'), findsOneWidget);
-
-    await tester.tap(find.byKey(const Key('room-furniture-gau-bong')));
-    await tester.pump();
-    expect(find.text('Gấu bông ôm thích lắm!'), findsOneWidget);
-
     await tester.tap(find.byKey(const Key('room-furniture-coc-sao')));
     await tester.pump();
-    expect(find.text('Cốc sao uống sữa ngon lắm!'), findsOneWidget);
+    expect(find.text('Cốc bút đựng bút chì gọn quá!'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('room-furniture-binh-hoa')));
     await tester.pump();
@@ -361,7 +349,7 @@ void main() {
     );
   });
 
-  testWidgets('nền + nội thất ở Phòng là PNG thật (A1), không còn SVG', (
+  testWidgets('nền + nội thất ở Phòng là PNG thật v3b, không còn SVG', (
     tester,
   ) async {
     await completeOnboardingGirl();
@@ -373,16 +361,13 @@ void main() {
         .whereType<AssetImage>()
         .map((p) => p.assetName)
         .toList();
-    expect(assetNames, contains('assets/images/backgrounds/room_v2.png'));
+    expect(assetNames, contains('assets/images/backgrounds/room_v3.png'));
     for (final name in [
-      'goi',
-      'coc_sao',
-      'binh_hoa',
-      'chau_cay',
-      'khung_anh',
-      'gau_bong',
-      'den_sao',
-      'day_co',
+      'gau_bong_v3',
+      'den_sao_v3',
+      'chau_cay_v3',
+      'binh_hoa_v3',
+      'coc_sao_v3',
     ]) {
       expect(assetNames, contains('assets/images/furniture/$name.png'));
     }

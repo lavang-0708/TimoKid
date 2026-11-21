@@ -223,6 +223,10 @@ void main() {
         'cloud_02',
         'cloud_03',
         'car_01_dr',
+        // Xe 2 ở t = 0 chạy lên-phải (tuyến C2 (856,783)→(1536,443))
+        // nên lớp hiện là `car_02_ur`, không phải `car_02_dr` như
+        // thời đường D (sửa 7afc275 đổi D1–D6 thành C1/C2 nhưng
+        // không cập nhật danh sách này).
         'car_02_ur',
         'person_01_ur_a',
         'person_02_dr_a',

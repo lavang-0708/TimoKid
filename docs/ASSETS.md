@@ -557,3 +557,91 @@ bảng hướng mặt — ai "sửa" map theo tên file thì test đỏ.
 - Test golden phải nạp trước nền + 17 lớp động bằng `runAsync` +
   `precacheImage` (mẫu `room_golden_test.dart` / A1) — không có
   bước này thì ảnh chụp thiếu nền/lớp động.
+
+## Phòng v3b (D, 21/11)
+
+Chủ dự án đã duyệt phòng v3b ngày 21/11 ~01:31: phòng LIỀN MỘT ẢNH
+như phòng 3D thật, cùng phối cảnh 1 điểm tụ, cùng nguồn sáng (nắng
+từ cửa sổ lớn), bóng đổ xuống sàn; đồ rời nhỏ chỉ đặt ở mặt phẳng
+đã có trong ảnh, vẽ đúng góc nhìn của mặt đó. Nền + 5 món vẽ mới
+bằng AI theo `docs/DESIGN.md`, `source` trong manifest ghi
+"Muse vẽ AI 21/11 theo DESIGN.md". Chi tiết từng món (vị trí, điểm
+neo, tỉ lệ, rect món trong nền) xem `docs/D_IMAGES.md`.
+
+- **Nền** `app/assets/images/backgrounds/room_v3.png`: PNG 1600x900
+  RGB, **694.028 byte** (ảnh gốc 2048x1152 resize về 1600x900,
+  lượng tử hóa 256 màu + dithering Floyd–Steinberg — cùng cách làm
+  PR #26 và PR (C)). Giường + gối + gấu, đèn sao, bàn học + cốc +
+  bình hoa, kệ sách, tủ quần áo, thảm tròn, chậu cây, cửa sổ +
+  bóng nắng trên sàn gỗ còn nguyên, không cắt cụt.
+- **Đồ rời** `app/assets/images/furniture/<tên>_v3.png`: PNG trong
+  suốt 512x512, `kind: furniture`, `status: ready`, tỉ lệ bán trong
+  suốt 0,00% cả 5 món. KHÔNG cắt từ nền (viền mềm/phát sáng/tương
+  phản thấp nên cắt không sạch) — vẽ riêng rồi đặt đúng vị trí để
+  phủ khít món vẽ sẵn trong nền (món vẽ sẵn đóng vai trò nền, không
+  lộ ra gây hình đôi). Đã ghép thử cả 5 món lên nền ở đúng vị trí
+  và xem bằng mắt: không hình đôi, món nằm đúng mặt phẳng
+  (giường/bàn/sàn), đúng phối cảnh, không nổi, không lệch.
+
+| Món | Vị trí đặt (cỡ) | Điểm neo (đáy) | Tỉ lệ |
+|---|---|---|---|
+| Gấu bông | (296,343) 239 | (415,550) | 0,466 |
+| Đèn sao | (49,408) 196 | (150,580) | 0,383 |
+| Chậu cây | (678,378) 358 | (842,686) | 0,70 |
+| Bình hoa | (1162,273) 283 | (1305,510) | 0,553 |
+| Cốc bút | (1027,378) 161 | (1099,515) | 0,315 |
+
+- **Cách vẽ cảnh** (`app/lib/features/room/room_screen.dart`):
+  cảnh chiếm toàn bộ bề rộng, tỉ lệ 16:9 cố định (`AspectRatio`
+  + `LayoutBuilder`), nền vẽ `BoxFit.fill` — KHÔNG dùng `cover`
+  như bản v2 vì `cover` cắt nền làm lệch vị trí khung 1600x900.
+  Mọi tọa độ trong `room_assets.dart` theo khung nền 1600x900.
+- **Bóng đổ**: PNG đồ rời không nướng bóng; app vẽ ellipse mờ đen
+  20% ngay dưới điểm neo đáy của mỗi món (rộng 85% bề ngang món,
+  cao 10% bề ngang, mép trên ở neo − 0,3×cao bóng — cùng quy tắc
+  A1), vẽ theo chân y: bình hoa, cốc bút, gấu bông, đèn sao, chậu
+  cây, rồi nhân vật + pet (chân y = 810, gần nhất).
+- **Sàn** (đa giác, nơi nhân vật + pet đứng, khung 1600x900):
+  (0,795), (400,645), (1200,645), (1600,795), (1600,900), (0,900).
+  Mặt giường y≈540–560 (x 155–760, gấu neo y = 550); mặt tủ đầu
+  giường y≈580 (x 30–260, đèn neo y = 580); mặt bàn học y≈490–515
+  (x 1070–1470, bình neo y = 510, cốc neo y = 515).
+- **Dấu chân trên sàn** (cho PR (G) — vùng đi được = đa giác sàn
+  trừ các dấu chân này): giường (155,645)-(760,700); bàn học
+  (1070,645)-(1470,790); tủ quần áo (1460,645)-(1600,880); tủ đầu
+  giường (30,700)-(260,800). Kệ sách gắn tường nên không có dấu
+  chân riêng (hình chiếu xuống sàn trùng dấu chân bàn học).
+- **Ghế ở bàn học** (cho PR (G) — tương tác ngồi ghế): rect ghế
+  (970,490)-(1240,790); mặt ghế (1000,615)-(1210,660), tâm
+  ≈ (1105,640).
+- **Mốc tỉ lệ** (đo từ ảnh thật, khung 1600x900): mặt trước giường
+  cao 160 px; tủ quần áo y 70–880; bàn học cao 300 px; tủ đầu
+  giường x 30–260, mặt y≈580, đáy y≈795; kệ sách x 1150–1470,
+  y 40–640; cửa sổ x 590–1080, y 100–450; lò sưởi x 640–930,
+  y 490–600; thảm tròn ellipse x 430–1060, y 700–875 (tâm
+  ≈ (745,787)); rèm trái x ≈460–580, rèm phải x ≈1080–1180,
+  y 60–460; kệ mây x 60–220, y 200–300; khung ảnh x 230–310,
+  y 180–320; đèn mây trần x 730–870, y 0–55.
+- **Nhân vật + pet**: nhân vật cao 360 px trong khung nền (chân tại
+  (630,810), hộp 284x425, chân ở 91,1% chiều cao hộp — ~2,25 lần
+  mặt trước giường, đúng cỡ so với giường/tủ/cửa sổ); pet chân tại
+  (420,810), hộp vuông 140 px (thân pet cao ~120 px). Cả hai đứng
+  trên thảm, trước giường, có bóng đổ. Art nhân vật/pet hiện tại
+  là tạm (nữ bộ girl thật PR #18, nam lớp tạm xám, pet PNG thật
+  PR #21) — (E)/(F) thay sau.
+- **Kiểm chứng bằng code** (bài học PR #31 — xem `docs/D_IMAGES.md`
+  mục 8): mọi điểm neo/đa giác/dấu chân đã kiểm bằng code trên ảnh
+  nền thật (mẫu màu pixel + alpha bbox PNG riêng), không tin mắt.
+  Đã sửa: 3 món thiếu 2 px ở đáy (gấu/đèn/bình dời xuống 2 px);
+  thảm tròn khai báo sai (đúng x 430–1060, y 700–875); rèm trái/
+  phải khai báo sai (trái x ≈460–580, phải x ≈1080–1180); rect
+  hiển thị đèn/cốc lệch 1–3 px (đèn x[86,209], cốc x[1058,1138]
+  y[404,514]). Test `app/test/features/room/room_anchors_test.dart`
+  khóa lại: điểm neo trên mặt phẳng đúng, rect hiển thị phủ khít
+  món trong nền (dung sai 2 px), chân nhân vật/pet trên sàn, dấu
+  chân chạm sàn.
+- **Manifest**: thêm 6 mục v3b (nền + 5 món) → 107 mục;
+  `check_assets.py` xanh. File + mục manifest v2 (`room_v2.png` +
+  8 món, không dùng nữa) GIỮ NGUYÊN như tiền lệ `town_v2.png`
+  (xóa mục khi file còn sẽ làm check fail); Claude có thể `git rm`
+  file + mục v2 sau (xem "Việc còn lại" trong PR (D)).
