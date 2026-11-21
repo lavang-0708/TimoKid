@@ -100,8 +100,13 @@ void main() {
   /// `room_golden_test.dart` / A1): không có bước này thì ảnh chụp
   /// golden thiếu nền (test đầu chạy khi ảnh chưa kịp về — bắt bằng
   /// mắt ở golden `town_800x360` A2).
+  ///
+  /// Nạp TRƯỚC khi vào Thị trấn (dùng context của màn đang mở), để khi
+  /// màn Thị trấn dựng thì mọi ảnh đã có sẵn trong cache và vẽ ngay ở
+  /// khung đầu. Nạp sau khi màn đã dựng thì ảnh về không đều giữa các
+  /// lần chạy, golden lúc có lúc thiếu cây/mây (lỗi CI PR #31).
   Future<void> precacheTownImages(WidgetTester tester) async {
-    final context = tester.element(find.byKey(const Key('town-screen')));
+    final context = tester.element(find.byType(Scaffold).first);
     await tester.runAsync(() async {
       await precacheImage(const AssetImage(townBackgroundAsset), context);
       for (final path in townLayerAssets) {
@@ -118,10 +123,10 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await pumpApp(tester);
+    await precacheTownImages(tester);
     // Từ T2-04 app mở vào Phòng; sang Thị trấn bằng nút ở Phòng.
     await tester.tap(find.byKey(const Key('room-town-button')));
     await tester.pumpAndSettle();
-    await precacheTownImages(tester);
 
     await expectLater(
       find.byKey(const Key('town-screen')),
@@ -136,10 +141,10 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await pumpApp(tester);
+    await precacheTownImages(tester);
     // Từ T2-04 app mở vào Phòng; sang Thị trấn bằng nút ở Phòng.
     await tester.tap(find.byKey(const Key('room-town-button')));
     await tester.pumpAndSettle();
-    await precacheTownImages(tester);
 
     await expectLater(
       find.byKey(const Key('town-screen')),
