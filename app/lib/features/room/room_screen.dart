@@ -92,6 +92,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   String? _headAccessory;
   bool _glasses = false;
   bool _whiteShoes = false;
+  bool _backpack = false;
   bool _kidWalkingUp = false;
   PetStage _petStage = PetStage.newborn;
   int _petDays = 0;
@@ -146,6 +147,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       final accessory = await looks.headAccessory(childId);
       final glasses = await looks.glasses(childId);
       final whiteShoes = await looks.whiteShoes(childId);
+      final backpack = await looks.backpack(childId);
       final growth = PetGrowthService(db: db);
       final petDays = await growth.doneDays(childId);
       final petStage = hatched ? petStageForDays(petDays) : PetStage.egg;
@@ -161,6 +163,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
         _headAccessory = accessory;
         _glasses = glasses;
         _whiteShoes = whiteShoes;
+        _backpack = backpack;
         _petDays = petDays;
         _petStage = petStage;
         _profile = profile;
@@ -361,6 +364,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                               headAccessory: id,
                               glasses: _glasses,
                               whiteShoes: _whiteShoes,
+                              backpack: _backpack,
                               animationsEnabled: false,
                             ),
                           ),
@@ -379,6 +383,17 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                           await looks.setGlasses(childId, on);
                           if (!mounted) return;
                           setState(() => _glasses = on);
+                          setSheet(() {});
+                        },
+                      ),
+                      FilterChip(
+                        key: const Key('room-wardrobe-backpack'),
+                        label: const Text('Balo'),
+                        selected: _backpack,
+                        onSelected: (on) async {
+                          await looks.setBackpack(childId, on);
+                          if (!mounted) return;
+                          setState(() => _backpack = on);
                           setSheet(() {});
                         },
                       ),
@@ -736,6 +751,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                           headAccessory: _headAccessory,
                           glasses: _glasses,
                           whiteShoes: _whiteShoes,
+                          backpack: _backpack,
                           waving: _kidWaving,
                           walking: _kidWalking,
                           walkingUp: _kidWalkingUp,

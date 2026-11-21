@@ -18,6 +18,7 @@ class KidLookService {
   static const String headAccessoryKey = 'kid_head_accessory';
   static const String glassesKey = 'kid_glasses';
   static const String whiteShoesKey = 'kid_white_shoes';
+  static const String backpackKey = 'kid_backpack';
 
   Future<bool> _flag(String childId, String key) async =>
       await db.settingsDao.getValue(childId: childId, key: key) == 'true';
@@ -29,6 +30,11 @@ class KidLookService {
   Future<bool> glasses(String childId) => _flag(childId, glassesKey);
   Future<void> setGlasses(String childId, bool on) =>
       _setFlag(childId, glassesKey, on);
+
+  /// Đeo balo không.
+  Future<bool> backpack(String childId) => _flag(childId, backpackKey);
+  Future<void> setBackpack(String childId, bool on) =>
+      _setFlag(childId, backpackKey, on);
 
   /// Đi giày trắng (thay giày màu của bộ đồ) không.
   Future<bool> whiteShoes(String childId) => _flag(childId, whiteShoesKey);

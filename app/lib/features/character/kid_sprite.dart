@@ -27,6 +27,7 @@ class KidSprite extends StatefulWidget {
     this.headAccessory,
     this.glasses = false,
     this.whiteShoes = false,
+    this.backpack = false,
     this.waving = false,
     this.walkingUp = false,
     this.walking = false,
@@ -47,6 +48,9 @@ class KidSprite extends StatefulWidget {
   /// Đeo kính tròn / đi giày trắng (lớp phủ cùng khung).
   final bool glasses;
   final bool whiteShoes;
+
+  /// Đeo balo: đổi sang ảnh toàn thân có balo (không phải lớp phủ).
+  final bool backpack;
 
   final bool waving;
 
@@ -74,6 +78,7 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
   bool get _hasWalkFrames =>
       !widget.glasses &&
       !widget.whiteShoes &&
+      !widget.backpack &&
       widget.headAccessory == null &&
       kidWalkFrames(widget.gender, widget.outfit, up: false) != null;
 
@@ -140,7 +145,7 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
     // Khung đi bộ thật chỉ dùng khi không đeo lớp phủ nào (lớp phủ vẽ
     // theo dáng đứng, đặt lên khung đi bộ sẽ lệch); còn lại nhún bước
     // bằng ảnh đứng.
-    final walkFrames = (widget.walking && overlays.isEmpty && _on)
+    final walkFrames = (widget.walking && _hasWalkFrames && _on)
         ? kidWalkFrames(gender, outfit, up: widget.walkingUp)
         : null;
 
@@ -177,8 +182,16 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
               else
                 Positioned.fill(
                   child: _frameImage(
-                    kidFullAsset(gender, outfit, wave: wave),
-                    Key('kid-full-$gender-$outfit${wave ? '-wave' : ''}'),
+                    kidFullAsset(
+                      gender,
+                      outfit,
+                      wave: wave,
+                      backpack: widget.backpack,
+                    ),
+                    Key(
+                      'kid-full-$gender-$outfit${wave ? '-wave' : ''}'
+                      '${widget.backpack ? '-backpack' : ''}',
+                    ),
                   ),
                 ),
               if (_blink != null && walkFrames == null)

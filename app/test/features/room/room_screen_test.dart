@@ -256,9 +256,15 @@ void main() {
       await db.settingsDao.getValue(childId: childId, key: 'kid_glasses'),
       'true',
     );
+    await tester.tap(find.byKey(const Key('room-wardrobe-backpack')));
+    await tester.pumpAndSettle();
+    expect(
+      await db.settingsDao.getValue(childId: childId, key: 'kid_backpack'),
+      'true',
+    );
     await tester.tapAt(const Offset(400, 20));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('kid-full-girl-3')), findsOneWidget);
+    expect(find.byKey(const Key('kid-full-girl-3-backpack')), findsOneWidget);
     expect(
       find.byKey(const Key('kid-overlay-girl_glasses_01.png')),
       findsOneWidget,
@@ -351,6 +357,13 @@ void main() {
     }
     final mid = tester.getRect(find.byKey(const Key('room-character')));
     expect(mid.center.dx, lessThan(start.center.dx));
+    // Bé gái có khung đi bộ thật (lô 4): bộ 2, đi xuống/ngang → `dr`.
+    expect(
+      (tester.widget<Image>(find.byKey(const Key('kid-walk-frame'))).image
+              as AssetImage)
+          .assetName,
+      startsWith('assets/images/character/girl/girl_full_02_walk_dr_'),
+    );
     expect(
       tester.widget<KidSprite>(find.byKey(const Key('room-character'))),
       isA<KidSprite>()

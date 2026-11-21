@@ -65,6 +65,7 @@ class _TownScreenState extends ConsumerState<TownScreen> {
   String? _headAccessory;
   bool _glasses = false;
   bool _whiteShoes = false;
+  bool _backpack = false;
 
   @override
   void initState() {
@@ -105,6 +106,7 @@ class _TownScreenState extends ConsumerState<TownScreen> {
       final accessory = await looks.headAccessory(childId);
       final glasses = await looks.glasses(childId);
       final whiteShoes = await looks.whiteShoes(childId);
+      final backpack = await looks.backpack(childId);
       if (!mounted) return;
       setState(() {
         _statuses = statuses;
@@ -114,6 +116,7 @@ class _TownScreenState extends ConsumerState<TownScreen> {
         _headAccessory = accessory;
         _glasses = glasses;
         _whiteShoes = whiteShoes;
+        _backpack = backpack;
         _loading = false;
         _error = null;
       });
@@ -238,6 +241,7 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                                 headAccessory: _headAccessory,
                                 glasses: _glasses,
                                 whiteShoes: _whiteShoes,
+                                backpack: _backpack,
                               ),
                             ),
                           ),

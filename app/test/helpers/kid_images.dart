@@ -10,6 +10,8 @@ List<String> kidImagePaths() => <String>[
     for (var n = 1; n <= 3; n++) ...[
       kidFullAsset(g, n),
       kidFullAsset(g, n, wave: true),
+      kidFullAsset(g, n, backpack: true),
+      kidFullAsset(g, n, wave: true, backpack: true),
       kidEyePatch(g, n).asset,
       kidEyePatch(g, n, wave: true).asset,
     ],

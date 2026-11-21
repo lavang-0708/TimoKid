@@ -65,11 +65,17 @@ int kidOutfitNumber(String? dress) {
   return (n >= 1 && n <= 3) ? n : 1;
 }
 
-/// Đường dẫn ảnh toàn thân.
-String kidFullAsset(String gender, int outfit, {bool wave = false}) {
+/// Đường dẫn ảnh toàn thân. [backpack] = biến thể đeo balo (Muse vẽ
+/// cả người đeo balo vì balo lớp rời không khớp người).
+String kidFullAsset(
+  String gender,
+  int outfit, {
+  bool wave = false,
+  bool backpack = false,
+}) {
   final g = kidGender(gender);
   return 'assets/images/character/$g/${g}_full_0$outfit'
-      '${wave ? '_wave' : ''}.png';
+      '${wave ? '_wave' : ''}${backpack ? '_backpack' : ''}.png';
 }
 
 /// Miếng vá mắt nhắm: đường dẫn + rect trong khung 1024x1536.
@@ -116,9 +122,8 @@ String? kidHeadAccessoryAsset(String gender, String? accessory) {
   return 'assets/images/character/$g/${entry.$2}.png';
 }
 
-/// Dáng đã có khung đi bộ (lô 4 của Muse). Bé gái đang vẽ: chưa có
-/// thì [KidSprite] nhún bước bằng ảnh đứng.
-const Set<String> kidGendersWithWalkFrames = <String>{'boy'};
+/// Dáng đã có khung đi bộ (lô 4 của Muse): cả bé gái và bé trai.
+const Set<String> kidGendersWithWalkFrames = <String>{'boy', 'girl'};
 
 /// 4 khung đi bộ (a–d) của một bộ đồ; [up] = đi lên (xa dần, `ur`),
 /// ngược lại đi xuống/ngang (`dr`). Hướng phải; app lật ngang khi đi
