@@ -1,11 +1,11 @@
-/// Bản đồ Thị trấn phong cách v2 (A2): nền + lớp động + vùng bấm.
+/// Bản đồ Thị trấn phong cách v3b (C): nền + lớp động + vùng bấm.
 ///
-/// Nền `town_v2.png` (1600x900, isometric) vẽ đủ 6 công trình; 5 khu
+/// Nền `town_v3.png` (1600x900, isometric) vẽ đủ 6 công trình; 5 khu
 /// toán là vùng bấm đặt đúng hình chữ nhật công trình (xem
 /// [townAreas] trong `town_assets.dart`), nhà hồng là nút về Phòng.
-/// 10 lớp động (mây, xe, đài phun nước, cây, người đi bộ) là PNG
-/// trong suốt 512x512 đặt theo tỉ lệ khung nền, chuyển động bằng
-/// Flutter animation.
+/// 17 lớp động (mây, xe, cây, người đi bộ) là PNG trong suốt
+/// 512x512 đặt theo tỉ lệ khung nền, chuyển động bằng Flutter
+/// animation.
 ///
 /// Tọa độ lớp động và vùng bấm đều tính theo tỉ lệ khung nền
 /// 1600x900 (x theo chiều rộng, y theo chiều cao): bản đồ hiển thị
@@ -13,6 +13,16 @@
 /// dù màn to hay nhỏ. Ảnh nền vẽ bằng `BoxFit.fill` trong hộp đó
 /// (không `cover` như màn Phòng — `cover` cắt nền sẽ làm lệch vùng
 /// bấm).
+///
+/// Xe chạy GIỮA làn, người đi trên vỉa hè (lệch tâm đường 25 px),
+/// theo các tuyến khai báo trong `town_roads.dart` (đoạn đường
+/// D1–D6, nửa rộng vùng đường 50 px). Xe/người chọn biến thể lớp
+/// (dr/ur) + lật ngang theo hướng di chuyển (xem `town_roads.dart`
+/// — `ur` của xe là xe nhìn từ sau, đầu xe ↖). Lớp động vẽ theo
+/// thứ tự chiều sâu: càng ở dưới màn hình (y chân lớn) càng vẽ sau
+/// (che lớp ở trên). Xe/người có bóng đổ ellipse mềm do app vẽ
+/// dưới chân (mẫu `_SoftShadow` ở màn Phòng); PNG lớp động không
+/// có bóng sẵn.
 ///
 /// Chuyển động chỉ chạy khi cổng [AnimationGate] bật (máy thật);
 /// khi chạy test thì mọi lớp đứng yên ở vị trí ban đầu để
@@ -28,6 +38,7 @@ import '../../core/animation/animation_gate.dart';
 import '../../core/database/models.dart';
 import '../../core/widgets/press_bounce.dart';
 import 'town_assets.dart';
+import 'town_roads.dart';
 
 /// Bản đồ Thị trấn: nền + lớp động + vùng bấm 5 khu + nhà hồng.
 ///
@@ -60,6 +71,7 @@ class _CloudSpec {
     required this.rightward,
     required this.speed,
     required this.phase,
+    required this.opacity,
   });
 
   /// Đường dẫn asset PNG của mây.
@@ -79,137 +91,161 @@ class _CloudSpec {
 
   /// Vị trí ban đầu 0..1 (cũng là vị trí khi cổng tắt).
   final double phase;
+
+  /// Độ mờ của mây (1.0 = đặc; vòng sửa PR #31: mây nhỏ + mờ hơn,
+  /// chỉ ở dải trời).
+  final double opacity;
 }
 
 const List<_CloudSpec> _clouds = [
+  // Vòng sửa PR #31 (21/11): mây cũ to + thấp (mép dưới tới y ≈ 150–
+  // 210 khung nền) đè lều Hội chợ và cỏ. Mây mới CHỈ ở dải trời
+  // y < 120: mép dưới phần mây nhìn thấy = top*900 +
+  // (đáy alpha/512)*width*1600 — đo từ PNG thật (cloud_01 alpha
+  // y 117–394, cloud_02 y 156–356, cloud_03 y 100–411):
+  // mây 1: 0 + 0,770*0,09*1600 ≈ 111; mây 2: 18 + 0,695*0,085*1600
+  // ≈ 112; mây 3: 0 + 0,803*0,07*1600 ≈ 90 — đều < 120. Nhãn dán ở
+  // cuối vùng bấm (y ≥ 250) nên mây không bao giờ chạm nhãn.
   _CloudSpec(
     asset: 'assets/images/town/cloud_01.png',
     top: 0.00,
-    width: 0.12,
+    width: 0.09,
     rightward: true,
     speed: 1.0,
     phase: 0.0,
+    opacity: 0.75,
   ),
   _CloudSpec(
     asset: 'assets/images/town/cloud_02.png',
-    top: 0.04,
-    width: 0.13,
+    top: 0.02,
+    width: 0.085,
     rightward: false,
     speed: 0.7,
     phase: 0.3,
+    opacity: 0.75,
   ),
   _CloudSpec(
     asset: 'assets/images/town/cloud_03.png',
-    top: 0.08,
-    width: 0.11,
+    top: 0.00,
+    width: 0.07,
     rightward: true,
     speed: 1.3,
     phase: 0.6,
+    opacity: 0.75,
   ),
 ];
 
-/// Xe/người đi dọc đường/vỉa hè: từ điểm đầu tới điểm cuối (tọa độ
-/// tỉ lệ so với khung bản đồ), rồi lặp lại từ đầu (hai đầu ngoài
-/// khung nên lúc quay lại không thấy).
-class _PathSpec {
-  const _PathSpec({
-    required this.asset,
-    required this.start,
-    required this.end,
+/// Xe/người chạy tới-lui trên một tuyến đường ([TownRoute]).
+class _RouteActor {
+  const _RouteActor({
+    required this.model,
+    required this.isCar,
+    required this.route,
     required this.width,
+    required this.anchorRow,
     required this.speed,
     required this.phase,
-    this.bob = false,
+    required this.sidewalk,
   });
 
-  /// Đường dẫn asset PNG.
-  final String asset;
+  /// Mẫu xe/người: `car_01`, `car_02`, `person_01`, `person_02`.
+  final String model;
 
-  /// Điểm đầu (x tỉ lệ rộng, y tỉ lệ cao) và điểm cuối của đường đi.
-  final Offset start;
-  final Offset end;
+  /// true = xe (chạy giữa làn), false = người (đi trên vỉa hè).
+  final bool isCar;
+
+  /// Tuyến đường (xem `town_roads.dart`).
+  final TownRoute route;
 
   /// Bề rộng hộp (hộp vuông), tỉ lệ chiều rộng bản đồ.
   final double width;
 
-  /// Tốc độ: số vòng trên một chu kỳ bộ điều khiển.
+  /// Hàng đáy (chân/bánh xe) trong khung ảnh 512: xe 390, người
+  /// 470 (đo từ PNG thật, xem `docs/C_IMAGES.md`).
+  final double anchorRow;
+
+  /// Tốc độ: số vòng ping-pong trên một chu kỳ bộ điều khiển.
   final double speed;
 
   /// Vị trí ban đầu 0..1 (cũng là vị trí khi cổng tắt).
   final double phase;
 
-  /// true = người đi bộ: nhún nhẹ theo nhịp bước.
-  final bool bob;
+  /// true = người đi bộ: lệch 25 px sang vỉa hè phía nam đường.
+  final bool sidewalk;
 }
 
-// Xe chạy theo đường trong nền (đường dưới từ trái sang phải, đường
-// trên từ phải sang trái; mặt xe quay theo hướng chạy).
-const List<_PathSpec> _vehicles = [
-  _PathSpec(
-    asset: 'assets/images/town/car_01.png',
-    start: Offset(-0.10, 0.95),
-    end: Offset(1.05, 0.63),
-    width: 0.075,
+// Xe chạy giữa làn (xe hồng trên C1, xe xanh nhạt trên C2, hai
+// đường chéo cắt nhau ở ngã tư lớn); người đi trên vỉa hè phía nam
+// (bé gái dọc C2, bé trai dọc C1). Pha chọn sao cho ở t = 0 cả 4 đều ở giữa đường, hướng ↘/↗
+// (xe 1 ↘, xe 2 ↘, người 1 ↗, người 2 ↙ — xem test hướng).
+// (Không `const`: tuyến đường tính tổng dài bằng code nên không
+// phải biểu thức hằng.)
+final List<_RouteActor> _actors = [
+  _RouteActor(
+    model: 'car_01',
+    isCar: true,
+    route: car1Route,
+    width: 0.105,
+    anchorRow: 390,
     speed: 1.0,
-    phase: 0.0,
+    phase: 0.31,
+    sidewalk: false,
   ),
-  _PathSpec(
-    asset: 'assets/images/town/car_02.png',
-    start: Offset(1.10, 0.24),
-    end: Offset(-0.08, 0.48),
-    width: 0.075,
-    speed: 1.2,
-    phase: 0.45,
+  _RouteActor(
+    model: 'car_02',
+    isCar: true,
+    route: car2Route,
+    width: 0.105,
+    anchorRow: 390,
+    speed: 1.0,
+    phase: 0.27,
+    sidewalk: false,
+  ),
+  _RouteActor(
+    model: 'person_01',
+    isCar: false,
+    route: walker1Route,
+    width: 0.04,
+    anchorRow: 470,
+    speed: 1.0,
+    phase: 0.27,
+    sidewalk: true,
+  ),
+  _RouteActor(
+    model: 'person_02',
+    isCar: false,
+    route: walker2Route,
+    width: 0.04,
+    anchorRow: 470,
+    speed: 1.0,
+    phase: 0.16,
+    sidewalk: true,
   ),
 ];
 
-// Người đi bộ dọc vỉa hè (bé gái đường dưới, bé trai đường trên).
-const List<_PathSpec> _walkers = [
-  _PathSpec(
-    asset: 'assets/images/town/person_01.png',
-    start: Offset(-0.06, 0.98),
-    end: Offset(1.04, 0.67),
-    width: 0.04,
-    speed: 1.0,
-    phase: 0.0,
-    bob: true,
-  ),
-  _PathSpec(
-    asset: 'assets/images/town/person_02.png',
-    start: Offset(1.04, 0.29),
-    end: Offset(-0.06, 0.52),
-    width: 0.04,
-    speed: 0.85,
-    phase: 0.55,
-    bob: true,
-  ),
-];
-
-/// Đài phun nước ở giữa công viên (hộp vuông, tỉ lệ chiều rộng bản
-/// đồ): nước phun nhấp nhô (scale + opacity theo chu kỳ 1,8 giây).
-const double _fountainLeft = 0.655;
-const double _fountainTop = 0.33;
-const double _fountainWidth = 0.13;
-
-/// Cây đung đưa nhẹ: xoay ±2° quanh gốc thân.
+/// Cây đung đưa nhẹ: xoay ±2° quanh gốc thân. Neo theo chân cây
+/// (tọa độ khung nền 1600x900) + hàng đáy trong khung ảnh 512
+/// (đo từ PNG thật: cây xanh 484, cây anh đào 469).
 class _TreeSpec {
   const _TreeSpec({
     required this.asset,
-    required this.left,
-    required this.top,
+    required this.feet,
     required this.width,
+    required this.anchorRow,
     required this.phase,
   });
 
   /// Đường dẫn asset PNG của cây.
   final String asset;
 
-  /// Góc trên-trái của hộp cây, tỉ lệ khung bản đồ.
-  final double left;
-  final double top;
+  /// Chân cây (gốc thân), tọa độ px theo khung nền 1600x900.
+  final Offset feet;
 
   /// Bề rộng hộp cây (hộp vuông), tỉ lệ chiều rộng bản đồ.
   final double width;
+
+  /// Hàng đáy (gốc thân) trong khung ảnh 512.
+  final double anchorRow;
 
   /// Pha đung đưa 0..1 (hai cây lệch pha nhau).
   final double phase;
@@ -218,16 +254,23 @@ class _TreeSpec {
 const List<_TreeSpec> _trees = [
   _TreeSpec(
     asset: 'assets/images/town/tree_01.png',
-    left: 0.75,
-    top: 0.77,
-    width: 0.10,
+    // Cây xanh ở góc cỏ trên-trái, đè khít cây vẽ sẵn (gốc thân ở
+    // (130, 230)) — vòng sửa PR #31: chân cũ (72, 200) đặt trên
+    // mép lối đi sáng màu, không bóng đổ nên nhìn như nổi trên vỉa
+    // hè; chân mới đúng gốc cây vẽ sẵn, trên cỏ, có bóng đổ neo
+    // đúng chân (xem _treeLayer).
+    feet: Offset(130, 230),
+    width: 0.08,
+    anchorRow: 484,
     phase: 0.0,
   ),
   _TreeSpec(
     asset: 'assets/images/town/tree_02.png',
-    left: 0.83,
-    top: 0.27,
-    width: 0.10,
+    // Cây anh đào ở dải cỏ đáy, giữa đường D5 và mép dưới —
+    // không chồng công trình, không chặn đường xe/người.
+    feet: Offset(1000, 865),
+    width: 0.09,
+    anchorRow: 469,
     phase: 0.5,
   ),
 ];
@@ -236,7 +279,6 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
   AnimationController? _cloudsController;
   AnimationController? _carsController;
   AnimationController? _peopleController;
-  AnimationController? _fountainController;
   AnimationController? _treesController;
 
   @override
@@ -258,10 +300,6 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(seconds: 24),
     )..repeat();
-    _fountainController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    )..repeat();
     _treesController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 4),
@@ -273,7 +311,6 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
     _cloudsController?.dispose();
     _carsController?.dispose();
     _peopleController?.dispose();
-    _fountainController?.dispose();
     _treesController?.dispose();
     super.dispose();
   }
@@ -281,7 +318,6 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
   double get _cloudT => _cloudsController?.value ?? 0;
   double get _carT => _carsController?.value ?? 0;
   double get _peopleT => _peopleController?.value ?? 0;
-  double get _fountainT => _fountainController?.value ?? 0;
   double get _treeT => _treesController?.value ?? 0;
 
   @override
@@ -316,7 +352,6 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
       _cloudsController,
       _carsController,
       _peopleController,
-      _fountainController,
       _treesController,
     ];
     if (controllers.every((c) => c == null)) return buildMap();
@@ -328,43 +363,23 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
     );
   }
 
-  /// 10 lớp động, vẽ theo thứ tự dưới lên trên: cây + đài phun ở
-  /// mặt đất, xe + người trên đường, mây trên trời.
+  /// 17 lớp động, vẽ theo thứ tự dưới lên trên: lớp mặt đất (cây,
+  /// xe, người) sắp theo chiều sâu — càng ở dưới màn hình (y chân
+  /// lớn) càng vẽ sau, che lớp ở trên — rồi mây trên trời.
   List<Widget> _dynamicLayers(double w, double h) {
+    final ground = <_GroundLayer>[];
+    for (final tree in _trees) {
+      ground.add(_GroundLayer(tree.feet.dy, _treeLayer(tree, w, h)));
+    }
+    for (final actor in _actors) {
+      final state = _routeState(actor, actor.isCar ? _carT : _peopleT);
+      ground.add(
+        _GroundLayer(state.point.dy, _routeWidget(actor, state, w, h)),
+      );
+    }
+    ground.sort((a, b) => a.feetY.compareTo(b.feetY));
     return [
-      for (final tree in _trees)
-        Positioned(
-          key: Key('town-layer-${_keyOf(tree.asset)}'),
-          left: w * tree.left,
-          top: h * tree.top,
-          width: w * tree.width,
-          height: w * tree.width,
-          child: Transform.rotate(
-            alignment: Alignment.bottomCenter,
-            angle: 0.035 * math.sin(2 * math.pi * (_treeT + tree.phase)),
-            child: Image.asset(tree.asset, fit: BoxFit.contain),
-          ),
-        ),
-      Positioned(
-        key: const Key('town-layer-fountain'),
-        left: w * _fountainLeft,
-        top: h * _fountainTop,
-        width: w * _fountainWidth,
-        height: w * _fountainWidth,
-        child: Opacity(
-          opacity:
-              0.94 + 0.06 * (0.5 + 0.5 * math.sin(2 * math.pi * _fountainT)),
-          child: Transform.scale(
-            scale: 1 + 0.04 * math.sin(2 * math.pi * _fountainT),
-            child: Image.asset(
-              'assets/images/town/fountain.png',
-              fit: BoxFit.contain,
-            ),
-          ),
-        ),
-      ),
-      for (final car in _vehicles) _pathLayer(car, _carT, w, h),
-      for (final person in _walkers) _pathLayer(person, _peopleT, w, h),
+      for (final layer in ground) layer.widget,
       for (final cloud in _clouds)
         Positioned(
           key: Key('town-layer-${_keyOf(cloud.asset)}'),
@@ -372,7 +387,11 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
           top: h * cloud.top,
           width: w * cloud.width,
           height: w * cloud.width,
-          child: Image.asset(cloud.asset, fit: BoxFit.contain),
+          child: Image.asset(
+            cloud.asset,
+            fit: BoxFit.contain,
+            opacity: AlwaysStoppedAnimation(cloud.opacity),
+          ),
         ),
     ];
   }
@@ -383,23 +402,109 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
     return cloud.rightward ? -0.16 + p * 1.20 : 1.04 - p * 1.20;
   }
 
-  /// Một lớp chạy dọc đường (xe/người) ở vị trí hiện tại.
-  Widget _pathLayer(_PathSpec spec, double t, double w, double h) {
-    final p = (t * spec.speed + spec.phase) % 1.0;
-    final cx = spec.start.dx + (spec.end.dx - spec.start.dx) * p;
-    var cy = spec.start.dy + (spec.end.dy - spec.start.dy) * p;
-    if (spec.bob) {
-      // Nhún nhẹ theo nhịp bước: lên xuống ~0,6% chiều cao bản đồ.
-      cy -= 0.006 * (math.sin(2 * math.pi * t * 20).abs());
+  /// Trạng thái hiện tại của một xe/người trên tuyến: vị trí chân,
+  /// hướng di chuyển, lớp ảnh đã chọn (biến thể + lật), quãng đường
+  /// đã đi (để tính khung bước chân).
+  _RouteState _routeState(_RouteActor actor, double t) {
+    final progress = (t * actor.speed + actor.phase) % 1.0;
+    final distance = pingPongProgress(progress) * actor.route.totalLength;
+    final forward = pingPongForward(progress);
+    final sample = actor.route.sample(distance, forward);
+    var point = sample.point;
+    if (actor.sidewalk) {
+      point = sidewalkPoint(point, sample.legUnit);
     }
-    final size = w * spec.width;
+    final choice = actor.isCar
+        ? carSpriteFor(actor.model, sample.direction)
+        : personSpriteFor(actor.model, sample.direction, walkFrameB(distance));
+    return _RouteState(
+      point: point,
+      direction: sample.direction,
+      choice: choice,
+      distance: distance,
+    );
+  }
+
+  /// Một xe/người ở vị trí hiện tại: hộp vuông neo chân tại [state],
+  /// bóng đổ mềm dưới chân, ảnh lật ngang nếu cần; người đi bộ nhún
+  /// nhẹ theo nhịp bước (chỉ ảnh nhún, bóng ở yên dưới chân).
+  Widget _routeWidget(
+    _RouteActor actor,
+    _RouteState state,
+    double w,
+    double h,
+  ) {
+    final size = w * actor.width;
+    final anchorX = state.point.dx / townFrameWidth * w;
+    final anchorY = state.point.dy / townFrameHeight * h;
+    // Mép đáy (chân/bánh xe) nằm ở anchorRow/512 chiều cao hộp.
+    final bottom = size * actor.anchorRow / 512;
+    final shadowHeight = size * 0.10;
+    Widget sprite = Image.asset(state.choice.asset, fit: BoxFit.contain);
+    if (state.choice.flipHorizontal) {
+      sprite = Transform.flip(flipX: true, child: sprite);
+    }
+    if (!actor.isCar) {
+      // Nhún nhẹ theo nhịp bước: lên xuống ~0,6% chiều cao bản đồ,
+      // về 0 đúng lúc đổi khung bước chân (mỗi 30 px đường đã đi).
+      final bob = 0.006 * h * math.sin(math.pi * state.distance / 30).abs();
+      sprite = Transform.translate(offset: Offset(0, -bob), child: sprite);
+    }
     return Positioned(
-      key: Key('town-layer-${_keyOf(spec.asset)}'),
-      left: (cx - spec.width / 2) * w,
-      top: cy * h - size / 2,
+      key: Key('town-layer-${_keyOf(state.choice.asset)}'),
+      left: anchorX - size / 2,
+      top: anchorY - bottom,
       width: size,
       height: size,
-      child: Image.asset(spec.asset, fit: BoxFit.contain),
+      child: Stack(
+        children: [
+          Positioned(
+            left: size * 0.075,
+            top: bottom - shadowHeight * 0.3,
+            width: size * 0.85,
+            height: shadowHeight,
+            child: const _SoftShadow(),
+          ),
+          Positioned.fill(child: sprite),
+        ],
+      ),
+    );
+  }
+
+  /// Một cây ở vị trí chân cây: hộp vuông neo gốc thân tại [tree.feet],
+  /// đung đưa ±2° quanh gốc, bóng đổ mềm neo đúng chân (mẫu xe/người
+  /// — cây cũ không có bóng nên nhìn như nổi).
+  Widget _treeLayer(_TreeSpec tree, double w, double h) {
+    final size = w * tree.width;
+    final feetX = tree.feet.dx / townFrameWidth * w;
+    final feetY = tree.feet.dy / townFrameHeight * h;
+    // Mép đáy (gốc thân) nằm ở anchorRow/512 chiều cao hộp.
+    final bottom = size * tree.anchorRow / 512;
+    final shadowHeight = size * 0.10;
+    return Positioned(
+      key: Key('town-layer-${_keyOf(tree.asset)}'),
+      left: feetX - size / 2,
+      top: feetY - bottom,
+      width: size,
+      height: size,
+      child: Stack(
+        children: [
+          Positioned(
+            left: size * 0.075,
+            top: bottom - shadowHeight * 0.3,
+            width: size * 0.85,
+            height: shadowHeight,
+            child: const _SoftShadow(),
+          ),
+          Positioned.fill(
+            child: Transform.rotate(
+              alignment: Alignment.bottomCenter,
+              angle: 0.035 * math.sin(2 * math.pi * (_treeT + tree.phase)),
+              child: Image.asset(tree.asset, fit: BoxFit.contain),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -471,8 +576,66 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
     ];
   }
 
-  /// Tên file không đuôi (vd `car_01`) để đặt khóa widget cho test.
+  /// Tên file không đuôi (vd `car_01_dr`) để đặt khóa widget cho test.
   static String _keyOf(String asset) => asset.split('/').last.split('.').first;
+}
+
+/// Một lớp mặt đất + y chân của nó (để sắp theo chiều sâu).
+class _GroundLayer {
+  const _GroundLayer(this.feetY, this.widget);
+
+  /// y chân (tọa độ khung nền 1600x900): càng lớn càng gần người
+  /// xem, vẽ sau (che lớp có y chân nhỏ hơn).
+  final double feetY;
+
+  final Widget widget;
+}
+
+/// Trạng thái hiện tại của một xe/người trên tuyến.
+class _RouteState {
+  const _RouteState({
+    required this.point,
+    required this.direction,
+    required this.choice,
+    required this.distance,
+  });
+
+  /// Vị trí chân (đã lệch vỉa hè nếu là người), tọa độ khung nền.
+  final Offset point;
+
+  /// Hướng di chuyển tại điểm đó.
+  final TownTravelDirection direction;
+
+  /// Lớp ảnh đã chọn (biến thể + lật ngang).
+  final TownSpriteChoice choice;
+
+  /// Quãng đường đã đi từ đầu tuyến (px khung nền).
+  final double distance;
+}
+
+/// Bóng đổ mềm dưới chân xe/người (mẫu màn Phòng): ellipse đen
+/// 20%, viền mờ dần (làm mờ bằng MaskFilter để bóng loang đều theo
+/// ellipse, không bị viền cứng). PNG lớp động không có bóng sẵn.
+class _SoftShadow extends StatelessWidget {
+  const _SoftShadow();
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(painter: _SoftShadowPainter());
+  }
+}
+
+class _SoftShadowPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.20)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+    canvas.drawOval(Offset.zero & size, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 /// Nhãn dán trên công trình: tên khu + nhãn trạng thái chặng hôm nay.

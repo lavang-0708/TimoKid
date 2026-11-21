@@ -146,7 +146,7 @@ void main() {
     }
   }
 
-  /// Nạp trước nền + 10 lớp động vào ImageCache (mẫu
+  /// Nạp trước nền + 17 lớp động vào ImageCache (mẫu
   /// `room_golden_test.dart` / A1): codec giải mã chỉ chạy trong
   /// async thật (`runAsync`), fake async của `pump` không lái được
   /// nó — không có bước này thì ảnh chụp golden thiếu nền/lớp động
