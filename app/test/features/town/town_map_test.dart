@@ -56,7 +56,7 @@ void main() {
       'cloud_02',
       'cloud_03',
       'car_01_dr',
-      'car_02_dr',
+      'car_02_ur',
       'person_01_ur_a',
       'person_02_dr_a',
       'tree_01',
@@ -72,7 +72,7 @@ void main() {
     // hiện ra tại một thời điểm).
     for (final layer in [
       'car_01_ur',
-      'car_02_ur',
+      'car_02_dr',
       'person_01_dr_a',
       'person_01_dr_b',
       'person_01_ur_b',

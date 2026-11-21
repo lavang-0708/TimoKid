@@ -28,10 +28,10 @@ const double townFrameWidth = 1600;
 const double townFrameHeight = 900;
 
 /// Nửa rộng vùng đường (mặt đường + vỉa hè), px theo khung nền.
-const double townRoadHalfWidth = 50;
+const double townRoadHalfWidth = 60;
 
 /// Người đi bộ lệch khỏi tâm đường (lên vỉa hè), px theo khung nền.
-const double townSidewalkOffset = 25;
+const double townSidewalkOffset = 46;
 
 /// Một đoạn đường: polyline theo hướng đường isometric, tâm đường +
 /// nửa rộng vùng đường (xem `docs/C_IMAGES.md`).
@@ -62,68 +62,13 @@ class TownRoadSegment {
 /// đường). D2 mới uốn theo đường nhựa thật: qua phải tháp Con số,
 /// giữa lều và vòng quay Hội chợ, ra mép phải ở y ≈ 430.
 const List<TownRoadSegment> townRoads = [
-  TownRoadSegment(
-    name: 'D1',
-    points: [
-      Offset(865, 125),
-      Offset(600, 210),
-      Offset(300, 360),
-      Offset(0, 480),
-    ],
-  ),
-  TownRoadSegment(
-    name: 'D2',
-    points: [
-      Offset(865, 125),
-      Offset(994, 180),
-      Offset(1077, 210),
-      Offset(1221, 270),
-      Offset(1320, 320),
-      Offset(1385, 340),
-      Offset(1420, 360),
-      Offset(1434, 380),
-      Offset(1532, 400),
-      Offset(1600, 430),
-    ],
-  ),
-  TownRoadSegment(
-    name: 'D3',
-    points: [
-      Offset(720, 450),
-      Offset(550, 560),
-      Offset(250, 710),
-      Offset(0, 830),
-    ],
-  ),
-  TownRoadSegment(
-    name: 'D4',
-    points: [
-      Offset(720, 450),
-      Offset(880, 550),
-      Offset(1090, 650),
-      Offset(1400, 800),
-      Offset(1500, 850),
-    ],
-  ),
-  TownRoadSegment(
-    name: 'D5',
-    points: [
-      Offset(1400, 480),
-      Offset(1250, 570),
-      Offset(1100, 650),
-      Offset(900, 750),
-      Offset(700, 850),
-    ],
-  ),
-  TownRoadSegment(
-    name: 'D6',
-    points: [
-      Offset(1150, 680),
-      Offset(1300, 760),
-      Offset(1500, 850),
-      Offset(1600, 900),
-    ],
-  ),
+  // C1: đường chéo xuống-phải, từ giữa Tiệm bánh/Tháp qua ngã tư lớn
+  // (1090, 650) ra mép phải dưới. Tâm đường đo từ mặt nhựa của
+  // town_v3.png (nửa rộng mặt nhựa ~32 px, cộng vỉa hè ~28 px).
+  TownRoadSegment(name: 'C1', points: [Offset(700, 459), Offset(1600, 904)]),
+  // C2: đường chéo lên-phải, từ ngã ba dưới (770, 810) qua ngã tư lớn
+  // lên mép phải giữa.
+  TownRoadSegment(name: 'C2', points: [Offset(770, 810), Offset(1560, 416)]),
 ];
 
 double _distanceToSegment(Offset p, Offset a, Offset b) {
@@ -410,22 +355,12 @@ bool pingPongForward(double progress) {
   return (progress % 1.0) < 0.5;
 }
 
-/// Tuyến xe 1 (xe hồng): D1 ngược + D2 xuôi — đường trên, qua ngã
-/// giao (865, 125). Tới-lui giữa 2 mép khung.
+/// Tuyến xe 1 (xe hồng): làn phía nam của C1, tới-lui giữa (774, 511)
+/// và (1524, 882). Đã đối chiếu từng điểm (mỗi 5 px) với mặt nhựa của
+/// town_v3.png: chỉ lệch ở vạch qua đường của ngã tư.
 final TownRoute car1Route = TownRoute(const [
-  Offset(0, 480),
-  Offset(300, 360),
-  Offset(600, 210),
-  Offset(865, 125),
-  Offset(994, 180),
-  Offset(1077, 210),
-  Offset(1221, 270),
-  Offset(1320, 320),
-  Offset(1385, 340),
-  Offset(1420, 360),
-  Offset(1434, 380),
-  Offset(1532, 400),
-  Offset(1600, 430),
+  Offset(774, 511),
+  Offset(1524, 882),
 ]);
 
 /// Vùng chân công trình (footprint KHÍT, chỉ thân/khối chính — KHÔNG
@@ -499,34 +434,22 @@ bool routeHitsBuilding(TownRoute route, {required bool sidewalk}) {
   return false;
 }
 
-/// Tuyến xe 2 (xe xanh nhạt): D3 ngược + D4 xuôi — đường dưới, qua
-/// ngã giao (720, 450). Tới-lui giữa mép trái và (1500, 850).
+/// Tuyến xe 2 (xe xanh nhạt): làn phía nam của C2, tới-lui giữa
+/// (856, 783) và (1536, 443).
 final TownRoute car2Route = TownRoute(const [
-  Offset(0, 830),
-  Offset(250, 710),
-  Offset(550, 560),
-  Offset(720, 450),
-  Offset(880, 550),
-  Offset(1090, 650),
-  Offset(1400, 800),
-  Offset(1500, 850),
+  Offset(856, 783),
+  Offset(1536, 443),
 ]);
 
-/// Tuyến người 1 (bé gái): dọc vỉa hè D3, từ mép trái tới ngã giao
-/// (720, 450), tới-lui.
+/// Tuyến người 1 (bé gái): theo tâm C2, vẽ lệch xuống vỉa hè phía nam
+/// ([townSidewalkOffset]).
 final TownRoute walker1Route = TownRoute(const [
-  Offset(0, 830),
-  Offset(250, 710),
-  Offset(550, 560),
-  Offset(720, 450),
+  Offset(820, 785),
+  Offset(1250, 570),
 ]);
 
-/// Tuyến người 2 (bé trai): dọc vỉa hè D5, từ (1400, 480) xuống
-/// (700, 850), tới-lui.
+/// Tuyến người 2 (bé trai): theo tâm C1, vẽ lệch xuống vỉa hè phía nam.
 final TownRoute walker2Route = TownRoute(const [
-  Offset(1400, 480),
-  Offset(1250, 570),
-  Offset(1100, 650),
-  Offset(900, 750),
-  Offset(700, 850),
+  Offset(1150, 681),
+  Offset(1540, 874),
 ]);

@@ -223,7 +223,7 @@ void main() {
         'cloud_02',
         'cloud_03',
         'car_01_dr',
-        'car_02_dr',
+        'car_02_ur',
         'person_01_ur_a',
         'person_02_dr_a',
         'tree_01',

@@ -174,9 +174,9 @@ class _RouteActor {
   final bool sidewalk;
 }
 
-// Xe chạy giữa làn (xe hồng tuyến trên D1+D2, xe xanh nhạt tuyến
-// dưới D3+D4); người đi trên vỉa hè (bé gái dọc D3, bé trai dọc
-// D5). Pha chọn sao cho ở t = 0 cả 4 đều ở giữa đường, hướng ↘/↗
+// Xe chạy giữa làn (xe hồng trên C1, xe xanh nhạt trên C2, hai
+// đường chéo cắt nhau ở ngã tư lớn); người đi trên vỉa hè phía nam
+// (bé gái dọc C2, bé trai dọc C1). Pha chọn sao cho ở t = 0 cả 4 đều ở giữa đường, hướng ↘/↗
 // (xe 1 ↘, xe 2 ↘, người 1 ↗, người 2 ↙ — xem test hướng).
 // (Không `const`: tuyến đường tính tổng dài bằng code nên không
 // phải biểu thức hằng.)

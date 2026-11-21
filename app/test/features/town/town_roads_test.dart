@@ -80,49 +80,51 @@ void main() {
         );
       }
 
-      expectPoint(car1Route.sample(0, true).point, const Offset(0, 480));
+      expectPoint(car1Route.sample(0, true).point, const Offset(774, 511));
       expectPoint(
         car1Route.sample(car1Route.totalLength, true).point,
-        const Offset(1600, 430),
+        const Offset(1524, 882),
       );
-      expectPoint(car2Route.sample(0, true).point, const Offset(0, 830));
+      expectPoint(car2Route.sample(0, true).point, const Offset(856, 783));
       expectPoint(
         car2Route.sample(car2Route.totalLength, true).point,
-        const Offset(1500, 850),
+        const Offset(1536, 443),
       );
-      expectPoint(walker1Route.sample(0, true).point, const Offset(0, 830));
+      expectPoint(walker1Route.sample(0, true).point, const Offset(820, 785));
       expectPoint(
         walker1Route.sample(walker1Route.totalLength, true).point,
-        const Offset(720, 450),
+        const Offset(1250, 570),
       );
-      expectPoint(walker2Route.sample(0, true).point, const Offset(1400, 480));
+      expectPoint(walker2Route.sample(0, true).point, const Offset(1150, 681));
       expectPoint(
         walker2Route.sample(walker2Route.totalLength, true).point,
-        const Offset(700, 850),
+        const Offset(1540, 874),
       );
     });
 
     test('hướng di chuyển đúng theo đoạn đường đang đi', () {
-      // Tuyến xe 1 bắt đầu bằng D1 ngược (đi lên-phải) và kết thúc
-      // bằng D2 xuôi (đi xuống-phải); đi ngược lại thì ngược hướng.
-      expect(car1Route.sample(0, true).direction, TownTravelDirection.upRight);
+      // Xe 1 chạy trên C1 (đường chéo xuống-phải): xuôi thì ↘,
+      // ngược thì ↖. Xe 2 chạy trên C2: xuôi ↗, ngược ↙.
       expect(
-        car1Route.sample(car1Route.totalLength, true).direction,
+        car1Route.sample(0, true).direction,
         TownTravelDirection.downRight,
       );
       expect(
-        car1Route.sample(0, false).direction,
+        car1Route.sample(400, true).direction,
+        TownTravelDirection.downRight,
+      );
+      expect(
+        car1Route.sample(400, false).direction,
+        TownTravelDirection.upLeft,
+      );
+      expect(car2Route.sample(0, true).direction, TownTravelDirection.upRight);
+      expect(
+        car2Route.sample(300, false).direction,
         TownTravelDirection.downLeft,
-      );
-      // Giữa D2 (cách đầu tuyến ~1050 px: ~937 px hết D1 + 113 px
-      // vào D2) thì hướng ↘.
-      expect(
-        car1Route.sample(1050, true).direction,
-        TownTravelDirection.downRight,
       );
     });
 
-    test('điểm vỉa hè lệch 25 px sang phía nam đường', () {
+    test('điểm vỉa hè lệch townSidewalkOffset px sang phía nam đường', () {
       for (final direction in TownTravelDirection.values) {
         final unit = directionUnit(direction);
         final point = const Offset(800, 450);
