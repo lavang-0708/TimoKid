@@ -1,10 +1,16 @@
 /// Màn Cửa hàng (T2-06): bé tiêu xu mua quần áo và phụ kiện.
 ///
 /// Giao diện kiểu game như Phòng/Thị trấn: nút Trở về tròn + thanh
-/// chỉ số (xu, kim cương) ở hàng đầu, hai nút nhóm hàng (Quần áo,
-/// Phụ kiện) dạng viên thuốc to, lưới thẻ món (cuộn dọc khi màn thấp).
-/// Mỗi thẻ: hình nhân vật cắt theo món, tên, giá kèm xu, nút "Mua"
-/// (đủ xu), "Còn thiếu N xu" (mờ, không bấm được) hoặc "Đã có ✓".
+/// chỉ số (xu, kim cương) ở hàng đầu, bốn nút nhóm hàng (Quần áo,
+/// Phụ kiện, Đồ cho pet, Nội thất) dạng viên thuốc to, lưới thẻ món
+/// (cuộn dọc khi màn thấp).
+/// Mỗi thẻ: hình nhân vật cắt theo món (đồ pet/nội thất: ảnh món), tên,
+/// giá kèm xu (hoặc kim cương với bộ đồ cao cấp), nút "Mua" (đủ tiền),
+/// "Còn thiếu N xu" (mờ, không bấm được) hoặc "Đã có ✓". Thức ăn pet
+/// mua nhiều lần nên không có "Đã có" mà hiện nhãn "Có N".
+/// Nội thất còn ẩn ([furnitureShopArtReady] = false) thì tab hiện thẻ
+/// "Sắp có hàng mới!". Mở bằng `/shop?tab=pet` (từ nút Cho ăn/Chơi
+/// của Phòng khi chưa có đồ) thì vào thẳng tab đó.
 /// Bấm Mua → hộp xác nhận to ("Mua"/"Thôi") → mua xong có băng
 /// "Mua xong!" nảy lên rồi tự tắt.
 ///
@@ -32,7 +38,16 @@ import 'shop_catalog.dart';
 import 'shop_service.dart';
 
 class ShopScreen extends ConsumerStatefulWidget {
-  const ShopScreen({super.key});
+  /// [furnitureReady] / [premiumOutfitsReady] mặc định theo cờ const;
+  /// chỉ đặt khác để test nhánh bật cờ.
+  const ShopScreen({
+    super.key,
+    this.furnitureReady = furnitureShopArtReady,
+    this.premiumOutfitsReady = premiumOutfitsArtReady,
+  });
+
+  final bool furnitureReady;
+  final bool premiumOutfitsReady;
 
   static const String route = '/shop';
 
@@ -49,7 +64,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
   int _xu = 0;
   int _gems = 0;
   Set<String> _owned = const {};
+  Map<String, int> _foodCounts = const {};
   ShopCategory _category = ShopCategory.outfits;
+  bool _tabFromRoute = false;
   bool _buying = false;
   String? _boughtName;
   int _boughtCount = 0;
@@ -62,12 +79,31 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_tabFromRoute) return;
+    _tabFromRoute = true;
+    // `/shop?tab=pet`: vào thẳng nhóm hàng đó (không có router thì bỏ qua).
+    String? tab;
+    try {
+      tab = GoRouterState.of(context).uri.queryParameters['tab'];
+    } catch (_) {}
+    for (final c in ShopCategory.values) {
+      if (c.key == tab) _category = c;
+    }
+  }
+
+  @override
   void dispose() {
     _bannerTimer?.cancel();
     super.dispose();
   }
 
-  ShopService get _service => ShopService(db: ref.read(databaseProvider));
+  ShopService get _service => ShopService(
+    db: ref.read(databaseProvider),
+    furnitureReady: widget.furnitureReady,
+    premiumOutfitsReady: widget.premiumOutfitsReady,
+  );
 
   Future<void> _refresh() async {
     try {
@@ -78,13 +114,18 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       // Máy cài trước bản có cửa hàng: giữ đồ đang mặc (idempotent).
       await service.grandfather(childId);
       final owned = await service.owned(childId);
+      final foodCounts = await service.foodCounts(childId);
       final balances = await service.balances(childId);
       if (!mounted) return;
       setState(() {
         _childId = childId;
         _gender = kidGender(profile?.gender ?? 'girl');
-        _outfit = kidOutfitNumber(profile?.dress);
+        _outfit = kidOutfitNumber(
+          profile?.dress,
+          premiumReady: widget.premiumOutfitsReady,
+        );
         _owned = owned;
+        _foodCounts = foodCounts;
         _xu = balances[Currency.xu] ?? 0;
         _gems = balances[Currency.gem] ?? 0;
         _loading = false;
@@ -132,7 +173,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
           SnackBar(
             content: Text(
               result == BuyResult.insufficient
-                  ? 'Chưa đủ xu rồi, làm thêm bài nhé!'
+                  ? (item.usesGems
+                        ? 'Chưa đủ kim cương rồi, cố gắng thêm nhé!'
+                        : 'Chưa đủ xu rồi, làm thêm bài nhé!')
                   : 'Bé đã có món này rồi!',
             ),
           ),
@@ -174,7 +217,11 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       );
     }
     final items = [
-      for (final i in shopItemsFor(_gender))
+      for (final i in shopItemsFor(
+        _gender,
+        furnitureReady: widget.furnitureReady,
+        premiumOutfitsReady: widget.premiumOutfitsReady,
+      ))
         if (i.category == _category) i,
     ];
     return Scaffold(
@@ -272,7 +319,53 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     );
   }
 
+  Widget _comingSoon() {
+    return Center(
+      child: Container(
+        key: const Key('shop-furniture-coming-soon'),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0xFFD0BFF0), width: 3),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.weekend_rounded, size: 44, color: Color(0xFF8E6FD8)),
+            SizedBox(width: 12),
+            Flexible(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Sắp có hàng mới!',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      color: gameInk,
+                    ),
+                  ),
+                  Text(
+                    'Đồ trang trí cho Phòng đang được vẽ, bé đợi nhé.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: gameInk,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _grid(List<ShopItem> items) {
+    final soon = _category == ShopCategory.furniture && !widget.furnitureReady;
     return Container(
       decoration: BoxDecoration(
         color: const Color(0x99FFFFFF),
@@ -281,30 +374,35 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: SingleChildScrollView(
-          key: const Key('shop-grid'),
-          padding: const EdgeInsets.all(8),
-          child: SizedBox(
-            width: double.infinity,
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                for (final item in items)
-                  _ItemCard(
-                    key: Key('shop-item-${item.id}'),
-                    item: item,
-                    gender: _gender,
-                    outfit: _outfit,
-                    owned: _owned.contains(item.id),
-                    xu: _xu,
-                    onBuy: () => _onBuyTap(item),
+        child: soon
+            ? _comingSoon()
+            : SingleChildScrollView(
+                key: const Key('shop-grid'),
+                padding: const EdgeInsets.all(8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: [
+                      for (final item in items)
+                        _ItemCard(
+                          key: Key('shop-item-${item.id}'),
+                          item: item,
+                          gender: _gender,
+                          outfit: _outfit,
+                          owned: !item.consumable && _owned.contains(item.id),
+                          count: item.consumable
+                              ? (_foodCounts[item.id] ?? 0)
+                              : null,
+                          balance: item.usesGems ? _gems : _xu,
+                          onBuy: () => _onBuyTap(item),
+                        ),
+                    ],
                   ),
-              ],
-            ),
-          ),
-        ),
+                ),
+              ),
       ),
     );
   }
@@ -325,13 +423,29 @@ class _TabPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icon = category == ShopCategory.outfits
-        ? Image.asset('$uiArt/ui_icon_clothes.png', width: 30, height: 30)
-        : Icon(
-            Icons.auto_awesome_rounded,
-            size: 24,
-            color: selected ? gameInk : const Color(0xFF8E6FD8),
-          );
+    final iconColor = selected ? gameInk : const Color(0xFF8E6FD8);
+    final icon = switch (category) {
+      ShopCategory.outfits => Image.asset(
+        '$uiArt/ui_icon_clothes.png',
+        width: 30,
+        height: 30,
+      ),
+      ShopCategory.pet => Image.asset(
+        '$uiArt/ui_icon_pet_items.png',
+        width: 30,
+        height: 30,
+      ),
+      ShopCategory.accessories => Icon(
+        Icons.auto_awesome_rounded,
+        size: 24,
+        color: iconColor,
+      ),
+      ShopCategory.furniture => Icon(
+        Icons.weekend_rounded,
+        size: 26,
+        color: iconColor,
+      ),
+    };
     return PressBounce(
       child: GestureDetector(
         onTap: onTap,
@@ -409,10 +523,23 @@ class ShopItemArt extends StatelessWidget {
     ShopItemKind.glasses => const Alignment(0, -0.85),
     ShopItemKind.backpack => const Alignment(0, -0.35),
     ShopItemKind.whiteShoes => const Alignment(0, 1),
+    _ => Alignment.center,
   };
 
   @override
   Widget build(BuildContext context) {
+    final itemAsset = item.asset;
+    if (itemAsset != null) {
+      // Đồ pet / nội thất: ảnh món 512x512 trong suốt, không cắt.
+      return Padding(
+        padding: const EdgeInsets.all(2),
+        child: Image.asset(
+          itemAsset,
+          fit: BoxFit.contain,
+          errorBuilder: (_, _, _) => const SizedBox.shrink(),
+        ),
+      );
+    }
     final n = item.outfit ?? outfit;
     final base = kidFullAsset(
       gender,
@@ -452,11 +579,11 @@ class ShopItemArt extends StatelessWidget {
   }
 }
 
-/// Giá kèm biểu tượng xu.
+/// Giá kèm biểu tượng xu (hoặc kim cương với bộ đồ cao cấp).
 class _Price extends StatelessWidget {
-  const _Price(this.xu, {this.size = 16});
+  const _Price(this.item, {this.size = 16});
 
-  final int xu;
+  final ShopItem item;
   final double size;
 
   @override
@@ -464,10 +591,14 @@ class _Price extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Image.asset('$uiArt/ui_coin.png', width: size + 6, height: size + 6),
+        Image.asset(
+          item.usesGems ? '$uiArt/ui_gem.png' : '$uiArt/ui_coin.png',
+          width: size + 6,
+          height: size + 6,
+        ),
         const SizedBox(width: 3),
         Text(
-          '$xu',
+          '${item.price}',
           style: TextStyle(
             fontSize: size,
             fontWeight: FontWeight.w900,
@@ -553,15 +684,21 @@ class _ItemCard extends StatelessWidget {
     required this.gender,
     required this.outfit,
     required this.owned,
-    required this.xu,
+    required this.balance,
     required this.onBuy,
+    this.count,
   });
 
   final ShopItem item;
   final String gender;
   final int outfit;
   final bool owned;
-  final int xu;
+
+  /// Số đang có của món dùng-một-lần (thức ăn); null với món một-lần.
+  final int? count;
+
+  /// Số dư đúng loại tiền của món (xu hoặc kim cương).
+  final int balance;
   final VoidCallback onBuy;
 
   static const double width = 136;
@@ -569,7 +706,7 @@ class _ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final missing = item.priceXu - xu;
+    final missing = item.price - balance;
     final Widget action;
     if (owned) {
       action = Container(
@@ -596,7 +733,9 @@ class _ItemCard extends StatelessWidget {
     } else if (missing > 0) {
       action = _CandyButton(
         key: Key('shop-buy-${item.id}'),
-        text: 'Còn thiếu $missing xu',
+        text: item.usesGems
+            ? 'Còn thiếu $missing kim cương'
+            : 'Còn thiếu $missing xu',
         fontSize: 14,
         onPressed: null,
       );
@@ -625,10 +764,44 @@ class _ItemCard extends StatelessWidget {
                 Expanded(
                   child: SizedBox(
                     width: double.infinity,
-                    child: ShopItemArt(
-                      item: item,
-                      gender: gender,
-                      outfit: outfit,
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: ShopItemArt(
+                            item: item,
+                            gender: gender,
+                            outfit: outfit,
+                          ),
+                        ),
+                        if (count != null)
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Container(
+                              key: Key('shop-count-${item.id}'),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFE08A),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Text(
+                                'Có $count',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w900,
+                                  color: gameInk,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ),
@@ -648,7 +821,7 @@ class _ItemCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 22, child: _Price(item.priceXu)),
+                SizedBox(height: 22, child: _Price(item)),
                 const SizedBox(height: 2),
                 action,
               ],
@@ -713,7 +886,7 @@ class _ConfirmDialog extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Center(child: _Price(item.priceXu, size: 20)),
+                      Center(child: _Price(item, size: 20)),
                       const SizedBox(height: 8),
                       Row(
                         children: [

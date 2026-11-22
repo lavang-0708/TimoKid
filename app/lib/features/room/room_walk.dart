@@ -82,12 +82,14 @@ double roomWalkDistanceAt(
 }
 
 /// Chỗ đứng có hợp lệ không: trong sàn, không đè dấu chân đồ đạc.
-bool roomWalkable(Offset p) {
+/// [extra] = dấu chân thêm (nội thất mua ở Cửa hàng, T2-06b), cũng
+/// phình [roomWalkMargin] như dấu chân có sẵn.
+bool roomWalkable(Offset p, {List<Rect> extra = const []}) {
   // Dung sai 0,01: nội suy số thực (lerp) có thể lệch 1e-13 khỏi mép.
   if (p.dy < roomWalkMinY - 0.01 || p.dy > roomWalkMaxY + 0.01) return false;
   if (p.dx < roomWalkMargin || p.dx > 1600 - roomWalkMargin) return false;
   if (!roomPointInFloor(p.translate(0, -roomWalkMargin))) return false;
-  for (final r in roomObstacleFootprints.values) {
+  for (final r in [...roomObstacleFootprints.values, ...extra]) {
     if (r.inflate(roomWalkMargin).contains(p)) return false;
   }
   return true;
@@ -95,24 +97,24 @@ bool roomWalkable(Offset p) {
 
 /// Điểm sàn để đi tới khi bé chạm [tap]: chính chỗ chạm nếu đứng được,
 /// không thì dò xuống dần (rồi dò ngang) tới chỗ đứng được gần nhất.
-Offset roomWalkTarget(Offset tap) {
+Offset roomWalkTarget(Offset tap, {List<Rect> extra = const []}) {
   final start = Offset(
     tap.dx.clamp(roomWalkMargin + 1, 1600 - roomWalkMargin - 1),
     tap.dy.clamp(roomWalkMinY, roomWalkMaxY),
   );
-  if (roomWalkable(start)) return start;
+  if (roomWalkable(start, extra: extra)) return start;
   // Dò xuống (phía trước đồ đạc) trước — tự nhiên nhất khi chạm vào
   // giường/bàn: bé đi tới đứng trước món đó.
   for (var y = start.dy; y <= roomWalkMaxY; y += 4) {
     final p = Offset(start.dx, y);
-    if (roomWalkable(p)) return p;
+    if (roomWalkable(p, extra: extra)) return p;
   }
   // Dò ngang hai phía ở hàng thấp nhất có thể.
   for (var d = 4.0; d < 1600; d += 4) {
     for (final x in [start.dx - d, start.dx + d]) {
       for (var y = start.dy; y <= roomWalkMaxY; y += 8) {
         final p = Offset(x, y);
-        if (roomWalkable(p)) return p;
+        if (roomWalkable(p, extra: extra)) return p;
       }
     }
   }
@@ -149,9 +151,11 @@ bool _segmentHitsRect(Offset a, Offset b, Rect r) {
 /// Đoạn [a]→[b] có đi qua chỗ không đứng được không. Vùng sàn (đa
 /// giác sàn, dải y, dải x) là hình lồi nên chỉ cần hai đầu mút đứng
 /// được; còn lại kiểm giao chính xác với từng dấu chân đồ đạc.
-bool _segmentBlocked(Offset a, Offset b) {
-  if (!roomWalkable(a) || !roomWalkable(b)) return true;
-  for (final r in roomObstacleFootprints.values) {
+bool _segmentBlocked(Offset a, Offset b, List<Rect> extra) {
+  if (!roomWalkable(a, extra: extra) || !roomWalkable(b, extra: extra)) {
+    return true;
+  }
+  for (final r in [...roomObstacleFootprints.values, ...extra]) {
     if (_segmentHitsRect(a, b, r.inflate(roomWalkMargin))) return true;
   }
   return false;
@@ -159,14 +163,18 @@ bool _segmentBlocked(Offset a, Offset b) {
 
 /// Các điểm đi qua từ [from] tới [to] (không gồm [from]). Đi thẳng nếu
 /// không vướng; vướng thì vòng xuống trước đồ đạc.
-List<Offset> roomWalkPath(Offset from, Offset to) {
-  if (!_segmentBlocked(from, to)) return <Offset>[to];
+List<Offset> roomWalkPath(
+  Offset from,
+  Offset to, {
+  List<Rect> extra = const [],
+}) {
+  if (!_segmentBlocked(from, to, extra)) return <Offset>[to];
   for (var y = math.max(from.dy, to.dy); y <= roomWalkMaxY; y += 6) {
     final a = Offset(from.dx, y);
     final b = Offset(to.dx, y);
-    if (_segmentBlocked(from, a)) continue;
-    if (_segmentBlocked(a, b)) continue;
-    if (_segmentBlocked(b, to)) continue;
+    if (_segmentBlocked(from, a, extra)) continue;
+    if (_segmentBlocked(a, b, extra)) continue;
+    if (_segmentBlocked(b, to, extra)) continue;
     return <Offset>[if (a != from) a, b, to];
   }
   return <Offset>[to];
@@ -178,11 +186,18 @@ double roomDepthScale(double feetY) =>
 
 /// Chỗ pet đứng khi theo bé: sau lưng bé (ngược hướng mặt), cách
 /// ~150 px; không đứng được thì thử phía trước, rồi về chỗ gần nhất.
-Offset roomPetFollowSpot(Offset kidFeet, {required bool kidFacingLeft}) {
+Offset roomPetFollowSpot(
+  Offset kidFeet, {
+  required bool kidFacingLeft,
+  List<Rect> extra = const [],
+}) {
   final back = kidFacingLeft ? 150.0 : -150.0;
   for (final dx in [back, -back]) {
     final p = Offset(kidFeet.dx + dx, kidFeet.dy + 6);
-    if (roomWalkable(p)) return p;
+    if (roomWalkable(p, extra: extra)) return p;
   }
-  return roomWalkTarget(Offset(kidFeet.dx + back, kidFeet.dy + 6));
+  return roomWalkTarget(
+    Offset(kidFeet.dx + back, kidFeet.dy + 6),
+    extra: extra,
+  );
 }

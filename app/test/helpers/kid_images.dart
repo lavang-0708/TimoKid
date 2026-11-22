@@ -29,6 +29,15 @@ List<String> kidImagePaths() => <String>[
   for (final s in ['dog', 'cat', 'rabbit'])
     for (final st in ['egg', 'newborn', 'teen', 'adult'])
       'assets/images/pets/${s}_$st.png',
+  for (final id in [
+    'pet_food_bone',
+    'pet_food_fish',
+    'pet_food_carrot',
+    'pet_toy_ball',
+    'pet_toy_yarn',
+    'pet_toy_plush',
+  ])
+    'assets/images/items/$id.png',
   ...uiImagePaths,
 ];
 

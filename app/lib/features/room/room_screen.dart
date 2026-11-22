@@ -1,5 +1,13 @@
 /// Màn Phòng — màn chính từ bản 0.2 (T2-04), nền v3b từ (D).
 ///
+/// T2-06b: khi đã mở khóa và pet đã nở, hai nút tròn "Cho ăn" / "Chơi"
+/// ở góc dưới trái: chọn thức ăn/đồ chơi đã có → món hiện trước pet,
+/// pet vui (nhảy + tim), thức ăn bị ăn (co nhỏ dần) / đồ chơi nảy lăn
+/// rồi pet chạy tới chơi. Chỉ để vui, KHÔNG có đói/ốm/buồn. Chưa có
+/// món nào thì nút mở thẳng tab "Đồ cho pet" của Cửa hàng. Nội thất đã
+/// mua (khi `furnitureShopArtReady`) vẽ ở ô cố định `roomShopFurniture`,
+/// xếp theo chân y cùng nhân vật/pet và chặn đường đi như đồ có sẵn.
+///
 /// Nền phòng, nhân vật, pet, nội thất đặt đúng vị trí khung 1600x900;
 /// 2 nút ở cột phải: Tủ đồ, Cửa hàng. Nút Trở về tròn ở góc trên trái
 /// về Thị trấn (PR (B), xem [RoundBackButton]) thay cho nút chữ
@@ -74,7 +82,12 @@ class RoomScreen extends ConsumerStatefulWidget {
   const RoomScreen({
     super.key,
     this.cleanBackground = roomCleanBackgroundReady,
+    this.furnitureArtReady = furnitureShopArtReady,
   });
+
+  /// Vẽ nội thất mua ở Cửa hàng; mặc định theo [furnitureShopArtReady],
+  /// chỉ đặt khác để test nhánh bật cờ.
+  final bool furnitureArtReady;
 
   /// true = dùng `room_v3_clean.png` + vẽ lại 5 PNG nội thất rời;
   /// false = nền `room_v3.png` đã có sẵn 5 món, chỉ đặt vùng chạm.
@@ -109,6 +122,13 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   bool _kidWalkingUp = false;
   PetStage _petStage = PetStage.newborn;
   int _petDays = 0;
+  Map<String, int> _foodCounts = const {};
+  Set<String> _ownedToys = const {};
+  Set<String> _ownedFurniture = const {};
+  String? _petMenu; // 'food' | 'toy': bảng chọn đang mở
+  bool _petBusy = false;
+  _PetProp? _prop;
+  late final AnimationController _propCtl = AnimationController(vsync: this);
 
   // (G) Đi lại trong phòng: chân nhân vật/pet theo khung 1600x900.
   Offset _kidFeet = roomCharacterFeet;
@@ -136,6 +156,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     _waveTimer?.cancel();
     _kidMove.dispose();
     _petMove.dispose();
+    _propCtl.dispose();
     super.dispose();
   }
 
@@ -161,6 +182,9 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       final glasses = await looks.glasses(childId);
       final whiteShoes = await looks.whiteShoes(childId);
       final backpack = await looks.backpack(childId);
+      final shop = ShopService(db: db);
+      final ownedItems = await shop.owned(childId);
+      final foodCounts = await shop.foodCounts(childId);
       final growth = PetGrowthService(db: db);
       final petDays = await growth.doneDays(childId);
       final petStage = hatched ? petStageForDays(petDays) : PetStage.egg;
@@ -177,6 +201,15 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
         _glasses = glasses;
         _whiteShoes = whiteShoes;
         _backpack = backpack;
+        _foodCounts = foodCounts;
+        _ownedToys = {
+          for (final id in petToys.keys)
+            if (ownedItems.contains(id)) id,
+        };
+        _ownedFurniture = {
+          for (final id in shopFurniture.keys)
+            if (ownedItems.contains(id)) id,
+        };
         _petDays = petDays;
         _petStage = petStage;
         _profile = profile;
@@ -355,7 +388,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                     Text(
                       lockedItemId == null
                           ? label
-                          : '$label\n${_priceOf(gender, lockedItemId)} xu',
+                          : '$label\n${_priceText(gender, lockedItemId)}',
                       maxLines: 3,
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontSize: 13),
@@ -385,7 +418,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
             return ActionChip(
               key: key,
               avatar: _wardrobeLock(itemId),
-              label: Text('$label · ${_priceOf(gender, itemId)} xu'),
+              label: Text('$label · ${_priceText(gender, itemId)}'),
               onPressed: () => _openShopFromWardrobe(sheetContext),
             );
           }
@@ -405,16 +438,17 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        for (var n = 1; n <= 3; n++)
+                        for (var n = 1; n <= kidOutfitLimit(); n++)
                           choice(
                             key: Key('room-wardrobe-outfit-$n'),
                             selected: n == outfit,
                             lockedItemId:
-                                owned.contains(kidOutfitIds[gender]![n - 1])
+                                owned.contains(kidAllOutfitIds[gender]![n - 1])
                                 ? null
-                                : kidOutfitIds[gender]![n - 1],
+                                : kidAllOutfitIds[gender]![n - 1],
                             label:
-                                kidOutfitNames[kidOutfitIds[gender]![n - 1]]!,
+                                kidOutfitNames[kidAllOutfitIds[gender]![n -
+                                    1]]!,
                             onTap: () async {
                               final updated = await looks.setOutfit(
                                 childId,
@@ -534,8 +568,11 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     child: const Icon(Icons.lock_rounded, size: 13, color: Colors.white),
   );
 
-  int _priceOf(String gender, String itemId) =>
-      shopItemById(gender, itemId)?.priceXu ?? 0;
+  String _priceText(String gender, String itemId) {
+    final item = shopItemById(gender, itemId);
+    if (item == null) return '';
+    return item.usesGems ? '${item.price} kim cương' : '${item.price} xu';
+  }
 
   /// Bấm món chưa mua trong Tủ đồ: đóng bảng, mở Cửa hàng ("Mua ở
   /// Cửa hàng").
@@ -545,8 +582,11 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   }
 
   /// Sang Cửa hàng, quay lại thì tải lại số dư (mua xong xu giảm).
-  Future<void> _openShop() async {
-    await context.push(ShopScreen.route);
+  /// [tab] (vd `pet`) mở thẳng nhóm hàng đó (`/shop?tab=pet`).
+  Future<void> _openShop({String? tab}) async {
+    await context.push(
+      tab == null ? ShopScreen.route : '${ShopScreen.route}?tab=$tab',
+    );
     if (mounted) _refresh();
   }
 
@@ -561,17 +601,187 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     });
   }
 
+  /// Nội thất mua đang vẽ trong phòng (rỗng khi cờ hình còn tắt).
+  List<RoomFurniture> get _shopFurniture => widget.furnitureArtReady
+      ? [
+          for (final f in roomShopFurniture)
+            if (_ownedFurniture.contains(roomShopFurnitureId(f))) f,
+        ]
+      : const <RoomFurniture>[];
+
+  /// Dấu chân nội thất mua trên sàn (chặn đường đi như đồ có sẵn).
+  List<Rect> get _extraObstacles => [
+    for (final f in _shopFurniture)
+      if (f.footprint != null) f.footprint!,
+  ];
+
+  bool get _petInteractive =>
+      _unlocked && _hatched && _eggSpecies != null && !_loading;
+
+  /// Nút Cho ăn: chưa có thức ăn thì mở Cửa hàng ở tab Đồ cho pet,
+  /// có rồi thì mở/đóng bảng chọn thức ăn.
+  void _onFeedButton() {
+    if (_petBusy) return;
+    final any = _foodCounts.values.any((n) => n > 0);
+    if (!any) {
+      _openShop(tab: ShopCategory.pet.key);
+      return;
+    }
+    setState(() => _petMenu = _petMenu == 'food' ? null : 'food');
+  }
+
+  /// Nút Chơi: như [_onFeedButton] nhưng với đồ chơi.
+  void _onPlayButton() {
+    if (_petBusy) return;
+    if (_ownedToys.isEmpty) {
+      _openShop(tab: ShopCategory.pet.key);
+      return;
+    }
+    setState(() => _petMenu = _petMenu == 'toy' ? null : 'toy');
+  }
+
+  /// Cho pet ăn [foodId]: trừ một phần (transaction trong
+  /// [ShopService.consumeFood]), thức ăn hiện trước pet, pet nhảy vui +
+  /// thả tim rồi thức ăn co nhỏ dần như đang nhai và biến mất.
+  Future<void> _feed(String foodId) async {
+    final childId = _childId;
+    if (childId == null || _petBusy) return;
+    setState(() {
+      _petMenu = null;
+      _petBusy = true;
+    });
+    final shop = ShopService(db: ref.read(databaseProvider));
+    final ok = await shop.consumeFood(childId, foodId);
+    final counts = await shop.foodCounts(childId);
+    if (!mounted) return;
+    if (!ok) {
+      setState(() {
+        _foodCounts = counts;
+        _petBusy = false;
+      });
+      return;
+    }
+    final dir = _petFacingLeft ? -1.0 : 1.0;
+    final box = petBoxSize(_petStage) * roomDepthScale(_petFeet.dy);
+    final at = Offset(
+      (_petFeet.dx + dir * box * 0.6).clamp(30.0, roomFrameWidth - 30),
+      _petFeet.dy + 4,
+    );
+    setState(() {
+      _foodCounts = counts;
+      _prop = _PetProp(
+        isToy: false,
+        id: foodId,
+        asset: petFoods[foodId]!.$2,
+        start: at,
+        rest: at,
+        dir: dir,
+      );
+    });
+    _showBubble('Ngon quá! Cảm ơn bé!');
+    _propCtl.duration = const Duration(milliseconds: 2000);
+    var cheered = false;
+    void tick() {
+      if (!cheered && _propCtl.value >= 0.5 && mounted) {
+        cheered = true;
+        setState(() => _petBounce++);
+      }
+    }
+
+    _propCtl.addListener(tick);
+    try {
+      await _propCtl.forward(from: 0).orCancel;
+    } on TickerCanceled {
+      return;
+    } finally {
+      _propCtl.removeListener(tick);
+    }
+    if (!mounted) return;
+    setState(() {
+      _prop = null;
+      _petBusy = false;
+    });
+  }
+
+  /// Chơi với [toyId]: đồ chơi hiện cạnh pet, nảy/lăn ra chỗ trống, pet
+  /// chạy tới chơi (nhảy vui + tim) rồi đồ chơi mờ dần.
+  Future<void> _play(String toyId) async {
+    if (_childId == null || _petBusy) return;
+    setState(() {
+      _petMenu = null;
+      _petBusy = true;
+    });
+    final extra = _extraObstacles;
+    var dir = _petFacingLeft ? -1.0 : 1.0;
+    if (_petFeet.dx + dir * 230 < 150 || _petFeet.dx + dir * 230 > 1450) {
+      dir = -dir;
+    }
+    final rest = roomWalkTarget(
+      Offset(_petFeet.dx + dir * 230, _petFeet.dy),
+      extra: extra,
+    );
+    final start = Offset(_petFeet.dx + dir * 70, _petFeet.dy - 4);
+    final spot = roomWalkTarget(
+      Offset(rest.dx - dir * 70, rest.dy),
+      extra: extra,
+    );
+    setState(() {
+      _prop = _PetProp(
+        isToy: true,
+        id: toyId,
+        asset: petToys[toyId]!.$2,
+        start: start,
+        rest: rest,
+        dir: dir,
+      );
+    });
+    _showBubble('Chơi nào! ${petHappyLines[_eggSpecies] ?? 'Vui quá!'}');
+    // Pet chạy tới chỗ đồ chơi trong lúc đồ chơi nảy/lăn.
+    _walk(isKid: false, path: roomWalkPath(_petFeet, spot, extra: extra));
+    _propCtl.duration = const Duration(milliseconds: 3600);
+    var cheered = false;
+    void tick() {
+      if (!cheered && _propCtl.value >= 0.6 && mounted) {
+        cheered = true;
+        setState(() {
+          _petBounce++;
+          _petFacingLeft = rest.dx < _petFeet.dx;
+        });
+      }
+    }
+
+    _propCtl.addListener(tick);
+    try {
+      await _propCtl.forward(from: 0).orCancel;
+    } on TickerCanceled {
+      return;
+    } finally {
+      _propCtl.removeListener(tick);
+    }
+    if (!mounted) return;
+    setState(() {
+      _prop = null;
+      _petBusy = false;
+    });
+  }
+
   /// (G) Bé chạm vào sàn: nhân vật đi tới đó, pet đi theo sau lưng.
   void _onFloorTap(Offset frame) {
-    final target = roomWalkTarget(frame);
-    final path = roomWalkPath(_kidFeet, target);
+    if (_petMenu != null) setState(() => _petMenu = null);
+    final extra = _extraObstacles;
+    final target = roomWalkTarget(frame, extra: extra);
+    final path = roomWalkPath(_kidFeet, target, extra: extra);
     _walk(isKid: true, path: path);
     if (_eggSpecies != null && _hatched) {
       final facingLeft = target.dx < _kidFeet.dx;
-      final spot = roomPetFollowSpot(target, kidFacingLeft: facingLeft);
+      final spot = roomPetFollowSpot(
+        target,
+        kidFacingLeft: facingLeft,
+        extra: extra,
+      );
       Timer(const Duration(milliseconds: 350), () {
         if (!mounted) return;
-        _walk(isKid: false, path: roomWalkPath(_petFeet, spot));
+        _walk(isKid: false, path: roomWalkPath(_petFeet, spot, extra: extra));
       });
     }
   }
@@ -794,6 +1004,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
               ),
             ),
           ),
+          if (_petInteractive) _petControls(),
           // Nhắc khóa ở dưới thanh chỉ số (không che sàn để bé chạm đi).
           if (!_unlocked)
             Positioned(
@@ -835,6 +1046,103 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  /// Hai nút tròn Cho ăn / Chơi ở góc dưới trái + bảng chọn món đã có.
+  Widget _petControls() {
+    final menu = _petMenu;
+    final entries = <(String, String, String, int?)>[
+      if (menu == 'food')
+        for (final e in petFoods.entries)
+          if ((_foodCounts[e.key] ?? 0) > 0)
+            (e.key, e.value.$1, e.value.$2, _foodCounts[e.key]),
+      if (menu == 'toy')
+        for (final e in petToys.entries)
+          if (_ownedToys.contains(e.key)) (e.key, e.value.$1, e.value.$2, null),
+    ];
+    return Positioned(
+      left: 8,
+      bottom: 6,
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (entries.isNotEmpty)
+              Container(
+                key: const Key('room-pet-menu'),
+                margin: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xF2FFFFFF),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFD0BFF0), width: 2),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (final e in entries)
+                      PressBounce(
+                        child: GestureDetector(
+                          key: Key(
+                            'room-pet-${menu == 'food' ? 'food' : 'toy'}-${e.$1}',
+                          ),
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () =>
+                              menu == 'food' ? _feed(e.$1) : _play(e.$1),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(
+                                  e.$3,
+                                  width: 44,
+                                  height: 44,
+                                  fit: BoxFit.contain,
+                                  semanticLabel: e.$2,
+                                ),
+                                Text(
+                                  e.$4 == null ? e.$2 : '${e.$2} ×${e.$4}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    color: gameInk,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GameRoundButton(
+                  key: const Key('room-pet-feed-button'),
+                  icon: Icons.restaurant_rounded,
+                  color: const Color(0xFFFF9E5E),
+                  label: 'Cho ăn',
+                  onPressed: _onFeedButton,
+                ),
+                const SizedBox(width: 8),
+                GameRoundButton(
+                  key: const Key('room-pet-play-button'),
+                  icon: Icons.sports_baseball_rounded,
+                  color: const Color(0xFF5DB7F0),
+                  label: 'Chơi',
+                  onPressed: _onPlayButton,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -889,7 +1197,44 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
           final kidBoxW = kidBoxH * kidFrameWidth / kidFrameHeight;
           final petScale = roomDepthScale(_petFeet.dy);
           final petBox = petBoxSize(_petStage) * petScale;
+          final shopFurniture = _shopFurniture;
           final actors = <(double, List<Widget>)>[
+            // Nội thất mua đặt trên sàn: xếp theo chân y như nhân vật/pet.
+            for (final f in shopFurniture)
+              if (!f.wall)
+                (
+                  f.anchor.dy,
+                  [
+                    frameShadow(f.anchor, f.placeSize),
+                    Positioned(
+                      left: fx(f.placeX),
+                      top: fy(f.placeY),
+                      width: fx(f.placeSize),
+                      height: fy(f.placeSize),
+                      child: _RoomItemSlot(
+                        item: f,
+                        showImage: true,
+                        onTap: () => _showBubble(f.reaction),
+                      ),
+                    ),
+                  ],
+                ),
+            if (_prop case final prop?)
+              (
+                // Thức ăn ngay trước pet; đồ chơi theo chỗ nó nằm.
+                prop.rest.dy + 2,
+                [
+                  Positioned.fill(
+                    child: _PetPropLayer(
+                      prop: prop,
+                      animation: _propCtl,
+                      frameW: w,
+                      frameH: h,
+                      scale: roomDepthScale(prop.rest.dy),
+                    ),
+                  ),
+                ],
+              ),
             if (profile != null)
               (
                 _kidFeet.dy,
@@ -1000,6 +1345,20 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                       onTap: () => _showBubble(item.reaction),
                     ),
                   ),
+              // Món gắn tường (dưới nhân vật/pet).
+              for (final f in shopFurniture)
+                if (f.wall)
+                  Positioned(
+                    left: fx(f.placeX),
+                    top: fy(f.placeY),
+                    width: fx(f.placeSize),
+                    height: fy(f.placeSize),
+                    child: _RoomItemSlot(
+                      item: f,
+                      showImage: true,
+                      onTap: () => _showBubble(f.reaction),
+                    ),
+                  ),
               for (final actor in actors) ...actor.$2,
               if (_bubbleText != null)
                 Positioned(
@@ -1090,7 +1449,12 @@ class _RoomItemSlotState extends State<_RoomItemSlot>
         fit: StackFit.expand,
         children: [
           if (widget.showImage)
-            Image.asset(widget.item.asset, fit: BoxFit.fill),
+            Image.asset(
+              widget.item.asset,
+              fit: BoxFit.fill,
+              // Hình nội thất mua có thể chưa về: bỏ trống thay vì lỗi.
+              errorBuilder: (_, _, _) => const SizedBox.shrink(),
+            ),
           AnimatedBuilder(
             animation: _pop,
             builder: (context, _) {
@@ -1227,6 +1591,136 @@ class _PetSlot extends StatelessWidget {
       key: Key(hatched ? 'room-pet' : 'room-egg'),
       onTap: onTap,
       child: shown,
+    );
+  }
+}
+
+/// Món đang hiện trước pet khi cho ăn / chơi (T2-06b).
+class _PetProp {
+  const _PetProp({
+    required this.isToy,
+    required this.id,
+    required this.asset,
+    required this.start,
+    required this.rest,
+    required this.dir,
+  });
+
+  final bool isToy;
+  final String id;
+  final String asset;
+
+  /// Chỗ xuất hiện và chỗ nằm yên (chân món, khung 1600x900). Thức ăn
+  /// đứng yên ở [rest] (= [start]).
+  final Offset start;
+  final Offset rest;
+
+  /// Hướng đồ chơi lăn: 1 = sang phải, -1 = sang trái.
+  final double dir;
+}
+
+/// Vẽ món cho ăn / chơi theo tiến độ [animation] (0..1):
+/// - thức ăn: phồng lên (0–0.15), nhấp nhô chờ (–0.5), rồi co nhỏ dần
+///   như bị nhai (–0.95) và biến mất;
+/// - đồ chơi: nảy 2 nhịp + lăn từ [_PetProp.start] ra [_PetProp.rest]
+///   (0–0.3), nằm yên rồi nảy nhẹ lúc pet tới chơi (0.6–0.88), mờ dần.
+/// Khóa `room-pet-prop-food` / `room-pet-prop-toy`.
+class _PetPropLayer extends StatelessWidget {
+  const _PetPropLayer({
+    required this.prop,
+    required this.animation,
+    required this.frameW,
+    required this.frameH,
+    required this.scale,
+  });
+
+  final _PetProp prop;
+  final Animation<double> animation;
+  final double frameW;
+  final double frameH;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: AnimatedBuilder(
+        animation: animation,
+        builder: (context, _) {
+          final t = animation.value;
+          var pos = prop.rest;
+          var lift = 0.0; // px khung, dương = lên
+          var size = (prop.isToy ? 84.0 : 72.0) * scale;
+          var angle = 0.0;
+          var opacity = 1.0;
+          var squash = 1.0;
+          if (prop.isToy) {
+            if (t < 0.3) {
+              final a = t / 0.3;
+              final e = Curves.easeOut.transform(a);
+              pos = Offset.lerp(prop.start, prop.rest, e)!;
+              lift = 70 * (1 - a) * math.sin(a * math.pi * 2).abs();
+              if (prop.id != 'pet_toy_plush') {
+                angle = prop.dir * e * math.pi * 3;
+              } else {
+                angle = 0.4 * math.sin(a * math.pi * 4);
+              }
+            } else if (t >= 0.6 && t < 0.88) {
+              lift = 16 * math.sin((t - 0.6) / 0.28 * math.pi * 4).abs();
+              angle = 0.25 * math.sin((t - 0.6) / 0.28 * math.pi * 6);
+            }
+            if (t > 0.88) opacity = (1 - (t - 0.88) / 0.12).clamp(0.0, 1.0);
+          } else {
+            if (t < 0.15) {
+              squash = Curves.easeOutBack.transform(t / 0.15);
+            } else if (t < 0.5) {
+              lift = 5 * math.sin((t - 0.15) / 0.35 * math.pi * 3).abs();
+            } else {
+              final e = ((t - 0.5) / 0.45).clamp(0.0, 1.0);
+              // Nhai: co lại dần, mỗi miếng cắn rung nhẹ.
+              squash =
+                  (1 - Curves.easeIn.transform(e)) *
+                  (1 + 0.10 * math.sin(e * math.pi * 6));
+            }
+          }
+          size *= squash.clamp(0.0, 1.6);
+          if (size < 1) return const SizedBox.shrink();
+          double fx(double x) => x / roomFrameWidth * frameW;
+          double fy(double y) => y / roomFrameHeight * frameH;
+          final shadowW = size * 0.9;
+          return Opacity(
+            opacity: opacity,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  left: fx(pos.dx - shadowW / 2),
+                  top: fy(pos.dy - 4),
+                  width: fx(shadowW),
+                  height: fy(size * 0.14),
+                  child: const _SoftShadow(),
+                ),
+                Positioned(
+                  left: fx(pos.dx - size / 2),
+                  top: fy(pos.dy - size * 0.9 - lift),
+                  width: fx(size),
+                  height: fy(size),
+                  child: Transform.rotate(
+                    key: Key(
+                      prop.isToy ? 'room-pet-prop-toy' : 'room-pet-prop-food',
+                    ),
+                    angle: angle,
+                    child: Image.asset(
+                      prop.asset,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

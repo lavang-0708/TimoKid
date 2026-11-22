@@ -20,6 +20,7 @@ import 'package:timokid/features/character/kid_assets.dart';
 import 'package:timokid/features/onboarding/onboarding_model.dart';
 import 'package:timokid/features/onboarding/onboarding_service.dart';
 import 'package:timokid/features/shop/shop_screen.dart';
+import 'package:timokid/features/shop/shop_service.dart';
 
 import '../../goldens/shop_golden_data.dart';
 import '../../helpers/kid_images.dart';
@@ -28,6 +29,7 @@ void _restoreGoldens() {
   const goldens = {
     'test/goldens/shop_outfits_800x360.png': shopOutfitsBase64,
     'test/goldens/shop_accessories_800x360.png': shopAccessoriesBase64,
+    'test/goldens/shop_pet_800x360.png': shopPetBase64,
   };
   for (final entry in goldens.entries) {
     File(entry.key).writeAsBytesSync(base64Decode(entry.value));
@@ -135,6 +137,30 @@ void main() {
     await expectLater(
       find.byKey(const Key('shop-screen')),
       matchesGoldenFile('../../goldens/shop_accessories_800x360.png'),
+    );
+  });
+
+  testWidgets('Cửa hàng 800x360: Đồ cho pet (55 xu, có sẵn 2 xương)', (
+    tester,
+  ) async {
+    // Mua xương 2 lần từ 20 xu rồi cộng thêm cho đủ 55 xu còn lại.
+    await db.walletDao.addEntry(
+      childId: childId,
+      currency: Currency.xu,
+      amount: 20,
+      reason: 'test',
+    );
+    final shop = ShopService(db: db);
+    for (var i = 0; i < 2; i++) {
+      await shop.buy(childId: childId, gender: 'girl', itemId: 'pet_food_bone');
+    }
+    await pumpShop(tester, 55);
+    await tester.tap(find.byKey(const Key('shop-tab-pet')));
+    await tester.pumpAndSettle();
+    await precacheImages(tester);
+    await expectLater(
+      find.byKey(const Key('shop-screen')),
+      matchesGoldenFile('../../goldens/shop_pet_800x360.png'),
     );
   });
 }
