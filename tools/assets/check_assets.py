@@ -59,6 +59,7 @@ KINDS = {
     "background",
     "icon",
     "town_layer",
+    "town_building",
     "ui",
 }
 FORMS = {"girl", "boy", "any"}
@@ -110,7 +111,11 @@ NAME_PATTERNS = {
     "town_layer": re.compile(r"^[a-z0-9_]+\.png$"),
     # Hình giao diện kiểu game (lô 6, 21/11): nút, icon, biển, logo,
     # nền màn chờ/mở đầu; mỗi hình một cỡ riêng nên không kiểm khung.
-    "ui": re.compile(r"^ui_[a-z0-9_]+\.png$"),
+    # Công trình thêm lên bản đồ Thị trấn (lô 11: Đấu trường), mỗi
+    # tòa một cỡ nên không kiểm khung.
+    "town_building": re.compile(r"^[a-z0-9_]+_building\.png$"),
+    # Huy chương Đấu trường (lô 11) cũng thuộc loại ui.
+    "ui": re.compile(r"^(ui|medal)_[a-z0-9_]+\.png$"),
 }
 
 # Thư mục con cho từng loại (tính từ app/assets/images/); icon không
@@ -126,6 +131,7 @@ KIND_DIRS = {
     "icon": None,
     "town_layer": "town",
     "ui": "ui",
+    "town_building": "town",
 }
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".svg"}

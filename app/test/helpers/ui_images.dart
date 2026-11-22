@@ -24,6 +24,13 @@ const List<String> uiImagePaths = <String>[
   'assets/images/ui/ui_icon_clothes.png',
   'assets/images/ui/ui_icon_pet_items.png',
   'assets/images/backgrounds/shop_bg.png',
+  'assets/images/town/arena_building.png',
+  'assets/images/backgrounds/arena_bg.png',
+  'assets/images/ui/medal_gold.png',
+  'assets/images/ui/medal_silver.png',
+  'assets/images/ui/medal_bronze.png',
+  'assets/images/ui/medal_participant.png',
+  'assets/images/items/gem_chest.png',
 ];
 
 /// Nạp sẵn mọi ảnh giao diện rồi vẽ lại một khung.
