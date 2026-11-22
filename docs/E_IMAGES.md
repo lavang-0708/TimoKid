@@ -1043,3 +1043,28 @@ chấp nhận được (Claude duyệt 22/11 ~13:24). Đẩy 1 lần: `7d313e94`
 **Sửa D_IMAGES.md (nợ):** mép trái tủ quần áo x≈1360 (không phải 1460–1600);
 kệ x≈1150–1360; bàn kết thúc x≈1360 (không phải 1470); bình hoa đặt trên
 bàn học, không phải trên kệ phải.
+
+> **Sửa lỗi chó mới nở (22/11, sau PR #49):** ảnh đứng `dog_newborn.png` đã duyệt là chó
+> ĐÃ RA KHỎI VỎ, nhưng 6 khung `dog_newborn_walk_a..d/happy/sit` của lô 8B lại vẽ chó ngồi
+> TRONG VỎ. Đã vẽ lại cả 6 khung không vỏ, khớp đúng ảnh đứng (chó vàng, tai cụp, mũi đen,
+> lưỡi thè, mắt nâu to), cùng cỡ: walk bbox y 41–440 (d: 42–440), happy y 10–400,
+> sit y 30–440; chân y walk/sit 440, happy 400 (nhấc 40 px); đầu lệch 1 px trong chu kỳ đi.
+> 6/6 file 512×512, semi 0 px, magenta 0 px, 256 màu. Sit cao 410 px (khung cũ trong vỏ
+> cao 392 px) vì không còn vỏ bó dáng; lỗ alpha kín duy nhất 224 px là khe hở trong vòng
+> đuôi cuộn của sit (x 117–132, y 345–364), nền thật nhìn xuyên qua, không phải lỗ thân.
+> Mèo và thỏ newborn không sửa (ảnh đứng của chúng cũng trong vỏ nên khớp).
+> Ghi chú: khung chuyển động có viền trắng sticker mỏng như cả 48 khung 8B còn lại
+> (ảnh đứng không có viền); happy khi nhảy tai hất lên theo quán tính, lúc đứng tai vẫn cụp.
+
+Số liệu 6 file mới (thay thế 6 file cũ trên nhánh, cùng tên):
+
+| file | byte | bbox (x0,x1,y0,y1) | chân y | đầu y | SHA-256 (12 ký tự đầu) |
+|---|---|---|---|---|---|
+| dog_newborn_walk_a.png | 114405 | 52, 460, 41, 440 | 440 | 41 | d97994993bc0 |
+| dog_newborn_walk_b.png | 114348 | 50, 463, 41, 440 | 440 | 41 | 661f16900256 |
+| dog_newborn_walk_c.png | 114009 | 53, 460, 41, 440 | 440 | 41 | ff2a27e91ecf |
+| dog_newborn_walk_d.png | 115893 | 43, 469, 42, 440 | 440 | 42 | 4800f9c08b56 |
+| dog_newborn_happy.png | 102433 | 91, 422, 10, 400 | 400 | 10 | 243430091f4a |
+| dog_newborn_sit.png | 126182 | 59, 453, 30, 440 | 440 | 30 | 964f7cfa9cb5 |
+
+Đẩy 1 lần đè lên 6 file cũ: commit 13554bfa, .b64 916.364 B, đầu nhánh 13554bfa; 6/6 blob SHA đối chiếu khớp trên nhánh và khác blob cũ (chứng minh đã đè đúng file mới). ĐƯỢC DUYỆT 22/11 ~14:08 (Claude), các nốt nhỏ chấp nhận hết.
