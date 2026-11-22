@@ -2,13 +2,20 @@
 /// cho máy cài trước bản có cửa hàng.
 ///
 /// Mua = MỘT transaction: dòng âm trong `wallet_ledger` (lý do
-/// `shop_buy`, `refId` = mã món) + dòng `inventory`. Kiểm tra đã có
-/// món và đủ xu nằm trong cùng transaction nên không mua trùng, số dư
-/// không bao giờ âm, và lỗi giữa chừng thì không có gì được ghi.
+/// `shop_buy`, `refId` = mã món, loại tiền theo món: xu hoặc kim
+/// cương) + dòng `inventory`. Kiểm tra đã có món và đủ tiền nằm trong
+/// cùng transaction nên không mua trùng, số dư không bao giờ âm, và lỗi
+/// giữa chừng thì không có gì được ghi.
+///
+/// Thức ăn pet là món DÙNG-MỘT-LẦN (T2-06b): mua nhiều lần, số lượng
+/// lưu bằng bộ đếm trong `settings` (khóa [petFoodCountKey], riêng từng
+/// bé) — không đụng bảng `inventory` (unique child+item chỉ cho một
+/// dòng/món) nên không tăng schema. Mua = trừ ví + tăng bộ đếm trong
+/// cùng một transaction; cho ăn ([consumeFood]) = giảm bộ đếm trong một
+/// transaction, không bao giờ xuống dưới 0.
 library;
 
 import '../../core/database/app_database.dart';
-import '../../core/database/tables.dart';
 import '../character/kid_assets.dart';
 import '../character/kid_look_service.dart';
 import '../onboarding/onboarding_service.dart';
@@ -38,13 +45,25 @@ class InventorySource {
   static const grandfather = 'grandfather';
 }
 
-/// Lý do dòng trừ xu trong `wallet_ledger`.
+/// Lý do dòng trừ tiền trong `wallet_ledger`.
 const String shopBuyReason = 'shop_buy';
 
+/// Khóa `settings` (theo bé) giữ số thức ăn đang có của món [foodId].
+String petFoodCountKey(String foodId) => 'pet_food_count.$foodId';
+
 class ShopService {
-  ShopService({required this.db, this.afterLedgerWrite});
+  ShopService({
+    required this.db,
+    this.afterLedgerWrite,
+    this.furnitureReady = furnitureShopArtReady,
+    this.premiumOutfitsReady = premiumOutfitsArtReady,
+  });
 
   final AppDatabase db;
+
+  /// Cờ hình nội thất / bộ cao cấp; mặc định theo cờ const, chỉ test đổi.
+  final bool furnitureReady;
+  final bool premiumOutfitsReady;
 
   /// Chỉ test: chạy ngay sau khi ghi `wallet_ledger`, trước khi ghi
   /// `inventory` — ném lỗi ở đây để kiểm transaction hoàn tác cả hai.
@@ -70,36 +89,81 @@ class ShopService {
   Future<bool> isOwned(String childId, String itemId) =>
       db.inventoryDao.has(childId, itemId);
 
+  /// Số thức ăn [foodId] bé đang có (0 nếu chưa mua).
+  Future<int> foodCount(String childId, String foodId) async {
+    final raw = await db.settingsDao.getValue(
+      childId: childId,
+      key: petFoodCountKey(foodId),
+    );
+    final n = int.tryParse(raw ?? '') ?? 0;
+    return n < 0 ? 0 : n;
+  }
+
+  /// Số lượng của cả 3 thức ăn (mã → số).
+  Future<Map<String, int>> foodCounts(String childId) async => {
+    for (final id in petFoods.keys) id: await foodCount(childId, id),
+  };
+
+  /// Cho ăn: giảm một phần thức ăn. Trả false (không đổi gì) nếu bé
+  /// không còn; số lượng không bao giờ âm.
+  Future<bool> consumeFood(String childId, String foodId) async {
+    if (!petFoods.containsKey(foodId)) return false;
+    return db.transaction(() async {
+      final n = await foodCount(childId, foodId);
+      if (n <= 0) return false;
+      await db.settingsDao.setValue(
+        childId: childId,
+        key: petFoodCountKey(foodId),
+        value: '${n - 1}',
+      );
+      return true;
+    });
+  }
+
   /// Mua một món theo [itemId] (xem [shopItemsFor]) cho bé có dáng [gender].
+  /// Thức ăn mua được nhiều lần (cộng bộ đếm); món khác chỉ mua một lần.
   Future<BuyResult> buy({
     required String childId,
     required String gender,
     required String itemId,
   }) async {
-    final item = shopItemById(gender, itemId);
+    final item = shopItemById(
+      gender,
+      itemId,
+      furnitureReady: furnitureReady,
+      premiumOutfitsReady: premiumOutfitsReady,
+    );
     if (item == null) return BuyResult.unknownItem;
     return db.transaction(() async {
-      if (await db.inventoryDao.has(childId, itemId)) {
+      if (!item.consumable && await db.inventoryDao.has(childId, itemId)) {
         return BuyResult.alreadyOwned;
       }
       final balance = await db.walletDao.balance(
         childId: childId,
-        currency: Currency.xu,
+        currency: item.currency,
       );
-      if (balance < item.priceXu) return BuyResult.insufficient;
+      if (balance < item.price) return BuyResult.insufficient;
       await db.walletDao.addEntry(
         childId: childId,
-        currency: Currency.xu,
-        amount: -item.priceXu,
+        currency: item.currency,
+        amount: -item.price,
         reason: shopBuyReason,
         refId: itemId,
       );
       await afterLedgerWrite?.call();
-      await db.inventoryDao.grant(
-        childId: childId,
-        itemId: itemId,
-        source: InventorySource.shop,
-      );
+      if (item.consumable) {
+        await db.settingsDao.setValue(
+          childId: childId,
+          key: petFoodCountKey(itemId),
+          value: '${await foodCount(childId, itemId) + 1}',
+        );
+      } else {
+        await db.inventoryDao.grant(
+          childId: childId,
+          itemId: itemId,
+          source: InventorySource.shop,
+        );
+      }
       return BuyResult.bought;
     });
   }
@@ -108,7 +172,7 @@ class ShopService {
   Future<void> grantStarter(String childId, String? dress, String gender) =>
       db.inventoryDao.grant(
         childId: childId,
-        itemId: kidOutfitIds[kidGender(gender)]![kidOutfitNumber(dress) - 1],
+        itemId: kidAllOutfitIds[kidGender(gender)]![kidOutfitNumber(dress) - 1],
         source: InventorySource.starter,
       );
 
@@ -122,7 +186,7 @@ class ShopService {
     final gender = kidGender(profile.gender);
     final looks = KidLookService(db: db);
     final worn = <String>[
-      kidOutfitIds[gender]![kidOutfitNumber(profile.dress) - 1],
+      kidAllOutfitIds[gender]![kidOutfitNumber(profile.dress) - 1],
       if (await looks.headAccessory(childId) case final head?) headItemId(head),
       if (await looks.glasses(childId)) glassesItemId,
       if (await looks.whiteShoes(childId)) whiteShoesItemId,

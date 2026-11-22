@@ -63,6 +63,7 @@ import 'package:timokid/core/database/app_database.dart';
 import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/core/database/models.dart';
 import 'package:timokid/core/router/app_router.dart';
+import 'package:timokid/core/theme/app_theme.dart';
 import 'package:timokid/core/time/clock.dart';
 import 'package:timokid/features/building/building_screen.dart';
 import 'package:timokid/features/character/placeholder_layers.dart';
@@ -75,6 +76,7 @@ import 'package:timokid/features/onboarding/hatch_screen.dart';
 import 'package:timokid/features/onboarding/onboarding_model.dart';
 import 'package:timokid/features/onboarding/onboarding_service.dart';
 import 'package:timokid/features/shop/shop_screen.dart';
+import 'package:timokid/features/shop/shop_service.dart';
 import 'package:timokid/features/stage_result/stage_result_screen.dart';
 import 'package:timokid/features/town/town_screen.dart';
 import 'package:timokid/main.dart';
@@ -1101,6 +1103,56 @@ void main() {
       expect(find.byKey(const Key('room-screen')), findsOneWidget);
     });
 
+    for (final size in const [
+      Size(608, 248),
+      Size(640, 320),
+      Size(800, 360),
+      Size(1280, 800),
+    ]) {
+      testWidgets(
+        'Phòng: nút Cho ăn/Chơi + bảng chọn món + hiệu ứng không tràn '
+        '(${size.width.toInt()}x${size.height.toInt()}, T2-06b)',
+        (tester) async {
+          await createSetAndMarkDone();
+          final shop = ShopService(db: db);
+          await db.walletDao.addEntry(
+            childId: childId,
+            currency: 'xu',
+            amount: 200,
+            reason: 'test',
+          );
+          for (final id in [
+            'pet_food_bone',
+            'pet_food_fish',
+            'pet_food_carrot',
+            'pet_toy_ball',
+            'pet_toy_yarn',
+            'pet_toy_plush',
+          ]) {
+            await shop.buy(childId: childId, gender: 'girl', itemId: id);
+          }
+          await pumpRoom(tester, size);
+          _checkNoError(tester, 'Phòng có nút pet');
+          expect(find.byKey(const Key('room-pet-feed-button')), findsOneWidget);
+          await tester.tap(find.byKey(const Key('room-pet-feed-button')));
+          await tester.pumpAndSettle();
+          _checkNoError(tester, 'bảng thức ăn');
+          expect(find.byKey(const Key('room-pet-menu')), findsOneWidget);
+          await tester.tap(
+            find.byKey(const Key('room-pet-food-pet_food_bone')),
+          );
+          await tester.pumpAndSettle();
+          _checkNoError(tester, 'sau khi cho ăn');
+          await tester.tap(find.byKey(const Key('room-pet-play-button')));
+          await tester.pumpAndSettle();
+          _checkNoError(tester, 'bảng đồ chơi');
+          await tester.tap(find.byKey(const Key('room-pet-toy-pet_toy_ball')));
+          await tester.pumpAndSettle();
+          _checkNoError(tester, 'sau khi chơi');
+        },
+      );
+    }
+
     testWidgets('Phòng khóa ở 640x320 không tràn', (tester) async {
       await pumpRoom(tester, const Size(640, 320));
       _checkNoError(tester, 'Phòng khóa 640x320');
@@ -1178,6 +1230,20 @@ void main() {
           await tester.tap(find.byKey(const Key('shop-tab-accessories')));
           await tester.pumpAndSettle();
           _checkNoError(tester, 'Cửa hàng Phụ kiện');
+          await tester.tap(find.byKey(const Key('shop-tab-pet')));
+          await tester.pumpAndSettle();
+          _checkNoError(tester, 'Cửa hàng Đồ cho pet');
+          expect(
+            find.byKey(const Key('shop-item-pet_food_bone')),
+            findsOneWidget,
+          );
+          await tester.tap(find.byKey(const Key('shop-tab-furniture')));
+          await tester.pumpAndSettle();
+          _checkNoError(tester, 'Cửa hàng Nội thất (sắp có hàng)');
+          expect(
+            find.byKey(const Key('shop-furniture-coming-soon')),
+            findsOneWidget,
+          );
           await tester.tap(find.byKey(const Key('shop-tab-outfits')));
           await tester.pumpAndSettle();
 
@@ -1191,6 +1257,88 @@ void main() {
           expect(find.byKey(const Key('shop-bought-banner')), findsOneWidget);
           await tester.pump(const Duration(seconds: 2));
           _checkNoError(tester, 'băng Mua xong! tắt');
+        });
+      }
+    }
+  });
+
+  group('Cửa hàng bật cờ hình (nội thất + bộ cao cấp) không tràn', () {
+    for (final size in const [
+      Size(608, 248),
+      Size(640, 320),
+      Size(800, 360),
+      Size(1280, 800),
+    ]) {
+      for (final gender in const ['girl', 'boy']) {
+        testWidgets('${size.width.toInt()}x${size.height.toInt()} $gender', (
+          tester,
+        ) async {
+          tester.view.physicalSize = size;
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(() {
+            tester.view.resetPhysicalSize();
+            tester.view.resetDevicePixelRatio();
+          });
+          final db = AppDatabase(executor: NativeDatabase.memory());
+          addTearDown(db.close);
+          final childId = await db.ensureSeeded();
+          await OnboardingService(db: db).completeOnboarding(
+            childId: childId,
+            profile: CharacterProfile.defaults().copyWith(
+              gender: gender,
+              dress: gender == 'boy' ? 'boy_outfit_01' : 'girl_top_01',
+              name: 'An',
+            ),
+            eggSpecies: 'dog',
+          );
+          await db.walletDao.addEntry(
+            childId: childId,
+            currency: 'xu',
+            amount: 160,
+            reason: 'test',
+          );
+          await db.walletDao.addEntry(
+            childId: childId,
+            currency: 'gem',
+            amount: 12345,
+            reason: 'test',
+          );
+          final router = GoRouter(
+            initialLocation: ShopScreen.route,
+            routes: [
+              GoRoute(
+                path: ShopScreen.route,
+                builder: (context, state) => const ShopScreen(
+                  furnitureReady: true,
+                  premiumOutfitsReady: true,
+                ),
+              ),
+            ],
+          );
+          await tester.pumpWidget(
+            ProviderScope(
+              overrides: [databaseProvider.overrideWithValue(db)],
+              child: MaterialApp.router(
+                theme: AppTheme.light,
+                routerConfig: router,
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+          _checkNoError(tester, 'Quần áo 7 bộ');
+          for (final tab in ['accessories', 'pet', 'furniture']) {
+            await tester.tap(find.byKey(Key('shop-tab-$tab')));
+            await tester.pumpAndSettle();
+            _checkNoError(tester, 'tab $tab');
+          }
+          expect(find.byKey(const Key('shop-item-noi_leu')), findsOneWidget);
+          final leu = find.byKey(const Key('shop-buy-noi_nha_pet'));
+          await _tapVisible(tester, leu);
+          _checkNoError(tester, 'hộp xác nhận nội thất');
+          await tester.tap(find.byKey(const Key('shop-confirm-buy')));
+          await tester.pumpAndSettle();
+          _checkNoError(tester, 'sau khi mua nội thất');
+          await tester.pump(const Duration(seconds: 2));
         });
       }
     }
