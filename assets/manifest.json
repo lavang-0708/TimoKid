@@ -4398,6 +4398,21 @@
       "status": "ready",
       "name_vi": "Thỏ trưởng thành — ngồi",
       "source": "Muse vẽ AI 22/11 (lô 8B pet chuyển động)"
+    },
+    {
+      "id": "room_v3_clean",
+      "file": "app/assets/images/backgrounds/room_v3_clean.png",
+      "kind": "background",
+      "form": "any",
+      "layer": null,
+      "recolorable": false,
+      "line": false,
+      "set": null,
+      "price_xu": null,
+      "price_gem": null,
+      "status": "ready",
+      "name_vi": "Nền phòng sạch (không gấu, đèn, bình hoa, cốc bút)",
+      "source": "Muse vẽ AI 22/11 (lô 8C)"
     }
   ]
 }

@@ -970,22 +970,36 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
               // bóng + món vẽ sẵn nên không vẽ thêm.
               if (clean)
                 for (final item in itemsByFeet)
-                  frameShadow(item.anchor, item.placeSize),
+                  if (!item.inCleanBackground)
+                    frameShadow(item.anchor, item.placeSize),
               // 5 món nội thất (theo chân y): nền sạch thì vẽ PNG rời;
               // nền cũ thì chỉ đặt vùng chạm vô hình đúng chỗ món vẽ
               // sẵn trong nền (không vẽ PNG rời → không hình đôi).
               for (final item in itemsByFeet)
-                Positioned(
-                  left: fx(clean ? item.placeX : item.bakedRect.left),
-                  top: fy(clean ? item.placeY : item.bakedRect.top),
-                  width: fx(clean ? item.placeSize : item.bakedRect.width),
-                  height: fy(clean ? item.placeSize : item.bakedRect.height),
-                  child: _RoomItemSlot(
-                    item: item,
-                    showImage: clean,
-                    onTap: () => _showBubble(item.reaction),
+                if (clean && !item.inCleanBackground)
+                  Positioned(
+                    left: fx(item.placeX),
+                    top: fy(item.placeY),
+                    width: fx(item.placeSize),
+                    height: fy(item.placeSize),
+                    child: _RoomItemSlot(
+                      item: item,
+                      showImage: true,
+                      onTap: () => _showBubble(item.reaction),
+                    ),
+                  )
+                else
+                  Positioned(
+                    left: fx(item.bakedRect.left),
+                    top: fy(item.bakedRect.top),
+                    width: fx(item.bakedRect.width),
+                    height: fy(item.bakedRect.height),
+                    child: _RoomItemSlot(
+                      item: item,
+                      showImage: false,
+                      onTap: () => _showBubble(item.reaction),
+                    ),
                   ),
-                ),
               for (final actor in actors) ...actor.$2,
               if (_bubbleText != null)
                 Positioned(
