@@ -1244,3 +1244,92 @@ local (SHA-256 khớp) — đối chiếu blob SHA trên nhánh bị chặn (b�
 minh, giống `arena_bg.png.b64` lô 11), Claude kiểm lại bằng git. Chưa decode
 (chờ Claude decode).
 
+### Lô 9 — Bộ 05: váy dạ hội / vest dạ hội (20 file, 22/11/2026)
+
+Bộ 05 lộng lẫy HƠN bộ 04 (váy xòe đi chơi / sơ mi nơ + quần yếm) nhưng KÉM bộ
+06 (váy công chúa có vương miện / hoàng tử có áo choàng) và bộ 07 (nữ hoàng
+tiên / hiệp sĩ hoàng gia, đồ hiếm). Mỗi dáng 10 file, khung 1024×1536, PNG
+trong suốt, alpha sạch (semi 0, magenta 0 px), quantize 256 màu MAXCOVERAGE +
+Floyd–Steinberg, chân y=1428 (bbox y1=1429, đúng hàng chân bộ 01), vào
+`app/assets/images/character/girl/` (10 file gái) và
+`app/assets/images/character/boy/` (10 file trai). Tổng PNG 9.659.446 B
+(~12,61 MB .b64 — nặng hơn bộ 04 rõ rệt, xem lưu ý chia lần đẩy dưới).
+Full = MỘT ảnh toàn thân hoàn chỉnh (không cắt lớp), wave = biến thể toàn thân
+tay vẫy, khung đi = khung thật 2 hướng × 4 khung. Phong cách v3b.
+
+| File | Byte | Chân y | Tâm mắt |
+|---|---|---|---|
+| girl_full_05.png | 581.037 | 1428 | (492,1; 562,2) |
+| girl_full_05_wave.png | 654.387 | 1428 | (490,7; 560,5) |
+| girl_full_05_walk_dr_a.png | 588.292 | 1428 | gần (712,0; 559,6) |
+| girl_full_05_walk_dr_b.png | 598.031 | 1428 | (568,0; 561,2) |
+| girl_full_05_walk_dr_c.png | 617.008 | 1428 | gần (713,1; 573,7) |
+| girl_full_05_walk_dr_d.png | 587.070 | 1428 | gần (696,4; 576,8) |
+| girl_full_05_walk_ur_a.png | 558.672 | 1428 | gần (700,8; 556,3) |
+| girl_full_05_walk_ur_b.png | 581.208 | 1428 | — (detector không bắt được mắt) |
+| girl_full_05_walk_ur_c.png | 598.570 | 1428 | gần (703,7; 563,1) |
+| girl_full_05_walk_ur_d.png | 564.698 | 1428 | gần (718,8; 560,1) |
+| boy_full_05.png | 325.924 | 1428 | (505,1; 629,0) |
+| boy_full_05_wave.png | 360.067 | 1428 | (503,8; 630,8) |
+| boy_full_05_walk_dr_a.png | 368.567 | 1428 | (504,6; 629,4) |
+| boy_full_05_walk_dr_b.png | 356.224 | 1428 | (510,6; 623,1) |
+| boy_full_05_walk_dr_c.png | 348.384 | 1428 | (527,5; 625,6) |
+| boy_full_05_walk_dr_d.png | 370.411 | 1428 | (523,3; 624,5) |
+| boy_full_05_walk_ur_a.png | 326.785 | 1428 | (704,5; 622,3) |
+| boy_full_05_walk_ur_b.png | 351.742 | 1428 | (690,7; 629,0) |
+| boy_full_05_walk_ur_c.png | 374.462 | 1428 | (692,8; 628,6) |
+| boy_full_05_walk_ur_d.png | 344.771 | 1428 | (675,7; 629,5) |
+
+Gái 05: váy dạ hội dài màu đỏ hồng đậm (burgundy/rose), xòe vừa–rộng, nơ eo
+lớn, ren viền chân váy, đính đá/ánh sao nhẹ, tay phồng, giày búp bê đỏ quai
+chéo — KHÔNG vương miện, KHÔNG cánh (đó là bộ 06–07). Trai 05: vest dạ hội
+navy — áo vest + sơ mi trắng + nơ cổ navy + quần tây navy + giày da đen —
+KHÔNG áo choàng (bộ 06), KHÔNG giáp (bộ 07). Mốc đo (so với bộ 01: tâm mắt
+gái (491,0; 560,5), miệng (519,2; 651,2); trai (504,1; 627,8), miệng
+(512,5; 713,5)): **cổng mắt ±3 px so với 01 full — 4/4 ĐẠT**: mắt full gái
+**(492,1; 562,2)** lệch 01 **(+1,1; +1,7)**; mắt wave gái **(490,7; 560,5)**
+lệch 01 full **(−0,3; 0,0)** (lệch 01 wave (−2,4; −1,0) cũng ĐẠT); mắt full
+trai **(505,1; 629,0)** lệch 01 **(+1,0; +1,2)**; mắt wave trai
+**(503,8; 630,8)** lệch 01 full **(−0,3; +3,0), ĐẠT (đúng biên)** — 01 wave
+của chính nó đã lệch 01 full ~−10 px theo y, nên quy ước (như bộ 04) là khớp
+01 full, vì miếng mắt nhắm đăng ký theo 01 full. Miệng full gái (517,0; 648,7)
+lệch (−2,2; −2,5); miệng full trai (516,4; 715,9) lệch (+3,9; +2,4) — blob
+miệng nhỏ, chỉ tham chiếu. Đỉnh đầu gái y=146, trai y=150 (01: 142). Khung đi:
+gái hcy dr 346–356, ur 355–366; trai hcy dr 344–361, ur 357–385 — đầu lệch
+trong chu kỳ ≤10 px, trong dải dao động của chính bộ 01. Kiểm chứng chức
+năng miếng mắt nhắm: **0 px tròng mắt xanh của full/wave gái 05 nằm ngoài
+vùng lid của 01** (sclera + iris + lash dilate 11 px) — miếng 01 che kín.
+
+**Bài học detector (bộ 05):** detector mắt rung theo palette — cùng một hình
+học, đo ở lần 1 (trước khử magenta sâu) cả 4 ảnh đứng/vẫy đều ĐẠT, đo ở lần 2
+(sau khử + quantize lại) thì 3/4 VƯỢT (tới 5,6 px); đo trên layers (trước
+quantize) cả 4 đều ĐẠT. CAL bù độ dịch detector bằng ky rescale quanh chân +
+ox trong layers (girl full +2 px ky×0,9936, girl wave −5 px, boy full +2 px
+ky×0,9954, boy wave 0/1,0 — lần thử ky×1,0038 vọt tới −6,0 nên hoàn lại).
+Kết quả trên file final giao: 4/4 ĐẠT cổng ±3. **Sửa lỗi key 5 khung đi
+trai (dr_c, dr_d, ur_a, ur_b, ur_c):** detector mắt nâu bị tóc nâu + đường
+chia cửa sổ x=640 làm nhiễu (bắt blob cổ/áo ở y thô ~941) → ky kẹp 1,03, đầu
+cao hơn ~55 px (top 103 so với 01 ~160). Sửa bằng `eye_override()` trong
+`fix9.py`: phát hiện lại tròng mắt thật trên ảnh thô (blob nâu toàn ảnh, w/h
+40–120, y 600–860); sau đó dr_c/dr_d dịch thêm +25/+20 px (OVERRIDE_DX) cho
+hcx/bbox về giữa chu kỳ. Kỹ thuật chung: như bộ 04 (key dist ≥ 20, closing
+3×3, closing dọc 31×1 cầu nối cổ, edge-recovery ≤3 px, KHÔNG dùng
+`binary_fill_holes`; khử viền magenta stack ring-decon + fix9c/fix9d +
+recolor, trước và sau quantize; viền còn lại là tông hồng-rose của tóc/váy
+thật, magenta = 0 px).
+
+**QUY TẮC MẮT NHẮM (Claude chốt 22/11 ~16:15):** app dùng **CHUNG miếng mắt
+nhắm của bộ 01 cho mọi bộ** — vị trí mắt ở ảnh đứng VÀ ảnh vẫy phải trùng bộ
+01 trong **±3 px**. Câu "miếng mắt nhắm làm theo từng ảnh" trong các bản nháp
+cũ HẾT HIỆU LỰC.
+
+ĐƯỢC DUYỆT KIỂU 22/11 ~17:26 (Claude): cả 20 file; wave trai đúng biên
+±3 px chấp nhận. Đẩy 3 lần, **chia theo byte, TRỘN gái+trai mỗi lần ~4,3 MB
+.b64** (8 file gái ≈ 6,2 MB .b64, vượt trần ~5 MB/lần — KHÔNG gom 8 gái vào
+1 lần): `fd6e838d` (7 file, 4,28 MB), `508f03ad` (7 file, 4,28 MB),
+`4daa14f1` (6 file, 4,05 MB); đầu nhánh sau đẩy `4daa14f1`. 20/20 .b64 giải
+mã đúng từng byte PNG gốc trong vòng khứ hồi local (SHA-256 khớp) — đối chiếu
+blob SHA trên nhánh bị chặn (bảo vệ mã xác minh, giống bộ 04 và
+`arena_bg.png.b64` lô 11), Claude kiểm lại bằng git. Chưa decode (chờ Claude
+decode).
+
