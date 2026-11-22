@@ -38,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen>
       WidgetsBinding.instance.addPostFrameCallback((_) => _go());
       return;
     }
-    _c.forward().whenComplete(_go);
+    // Chưa chạy hoạt ảnh ngay: chờ khung hình ngang thật (xem [build]).
     // Nạp trước ảnh nền Phòng/Thị trấn trong lúc chờ để vào màn sau mượt.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -62,10 +62,32 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose();
   }
 
+  /// Đã bắt đầu đếm 1,8 giây chưa.
+  bool _started = false;
+
   @override
   Widget build(BuildContext context) {
+    // Máy tính bảng (góp ý 22/11, ảnh chụp): lúc mở app, khung hình đầu
+    // còn kích thước DỌC trong khi màn đã xoay NGANG — màn chờ vẽ theo
+    // khung dọc nên chỉ phủ một phần, phần còn lại trắng. Chưa ngang thì
+    // chỉ phủ màu nền; khi kích thước ngang về mới vẽ logo và bắt đầu
+    // đếm giờ.
+    final size = MediaQuery.sizeOf(context);
+    final landscape = size.width >= size.height;
+    if (landscape && !_started && AnimationGate.enabled) {
+      _started = true;
+      _c.forward().whenComplete(_go);
+    }
+    if (!landscape) {
+      return const ColoredBox(
+        key: Key('splash-screen'),
+        color: Color(0xFFFFE3F0),
+        child: SizedBox.expand(),
+      );
+    }
     return Scaffold(
       key: const Key('splash-screen'),
+      backgroundColor: const Color(0xFFFFE3F0),
       body: Container(
         decoration: const BoxDecoration(
           color: Color(0xFFFFE3F0),
