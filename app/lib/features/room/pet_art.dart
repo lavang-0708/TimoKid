@@ -1,5 +1,6 @@
-/// Cờ + đường dẫn cho hình Muse sắp vẽ cho pet (chưa có file nên
-/// mặc định `false`: app dùng hiệu ứng vẽ bằng code).
+/// Cờ + đường dẫn cho hình Muse vẽ cho pet. Cả hai cờ đã bật từ
+/// 22/11 (lô 8A trứng nứt, lô 8B khung đi/vui/ngồi); tắt cờ thì app
+/// quay về hiệu ứng vẽ bằng code.
 ///
 /// Khi Muse giao hình, chỉ cần thêm PNG vào `assets/images/pets/`
 /// (kèm dòng manifest) rồi đổi cờ tương ứng thành `true`; không phải
@@ -21,7 +22,17 @@ import 'pet_growth.dart';
 const bool eggCrackArtReady = true;
 
 /// Đã có hình đi/vui/ngồi của pet (Muse) chưa.
-const bool petMotionArtReady = false;
+const bool petMotionArtReady = true;
+
+/// Bộ khung chưa dùng được dù cờ đã bật: chó mới nở lô 8B vẽ ngồi
+/// trong vỏ trứng, khác ảnh đứng `dog_newborn.png` (đã ra khỏi vỏ) —
+/// đổi qua lại sẽ nhảy hình. Chờ Muse vẽ lại thì xoá khỏi đây.
+const Set<String> petMotionArtPending = {'dog_newborn'};
+
+/// Pet [species] ở [stage] có dùng khung đi/vui/ngồi thật không.
+bool petHasMotionArt(String species, PetStage stage) =>
+    petMotionArtReady &&
+    !petMotionArtPending.contains('${species}_${stage.name}');
 
 /// Trứng nứt bước [step] (1–3).
 String eggCrackAsset(String species, int step) =>
