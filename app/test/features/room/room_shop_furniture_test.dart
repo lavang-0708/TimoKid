@@ -62,6 +62,7 @@ void main() {
           );
         }
       }
+      // Đèn (bậu cửa sổ), tranh (tường): không chặn đường.
       expect(roomShopFurniture.where((f) => f.wall), hasLength(2));
     });
 
@@ -75,7 +76,7 @@ void main() {
       // Từ chỗ mặc định tới chỗ khác của sàn vẫn có đường.
       final path = roomWalkPath(
         roomCharacterFeet,
-        const Offset(1000, 760),
+        const Offset(760, 740),
         extra: extra,
       );
       var at = roomCharacterFeet;
@@ -83,7 +84,7 @@ void main() {
         expect(roomWalkable(p, extra: extra), isTrue, reason: '$p');
         at = p;
       }
-      expect(at, const Offset(1000, 760));
+      expect(at, const Offset(760, 740));
     });
   });
 
@@ -234,9 +235,9 @@ void main() {
         closeTo(floor.left + house.placeX / roomFrameWidth * floor.width, 0.5),
       );
 
-      await tester.tap(find.byKey(const Key('room-furniture-noi_tranh')));
+      await tester.tap(find.byKey(const Key('room-furniture-noi_nha_pet')));
       await tester.pump();
-      expect(find.text('Cầu vồng đẹp quá!'), findsOneWidget);
+      expect(find.text('Nhà của pet ấm áp quá!'), findsOneWidget);
       await tester.pump(const Duration(seconds: 2));
       expect(find.byKey(const Key('room-reaction-bubble')), findsNothing);
     });
@@ -247,7 +248,7 @@ void main() {
       await pumpRoom(tester, ready: true);
       final floor = tester.getRect(find.byKey(const Key('room-floor')));
       final fp = roomShopFurniture
-          .firstWhere((f) => f.key == 'room-furniture-noi_be_ca')
+          .firstWhere((f) => f.key == 'room-furniture-noi_nha_pet')
           .footprint!;
       Offset toScreen(Offset f) => Offset(
         floor.left + f.dx / roomFrameWidth * floor.width,

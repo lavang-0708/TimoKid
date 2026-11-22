@@ -1239,11 +1239,8 @@ void main() {
           );
           await tester.tap(find.byKey(const Key('shop-tab-furniture')));
           await tester.pumpAndSettle();
-          _checkNoError(tester, 'Cửa hàng Nội thất (sắp có hàng)');
-          expect(
-            find.byKey(const Key('shop-furniture-coming-soon')),
-            findsOneWidget,
-          );
+          _checkNoError(tester, 'Cửa hàng Nội thất');
+          expect(find.byKey(const Key('shop-item-noi_be_ca')), findsOneWidget);
           await tester.tap(find.byKey(const Key('shop-tab-outfits')));
           await tester.pumpAndSettle();
 

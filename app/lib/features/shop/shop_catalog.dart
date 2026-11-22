@@ -21,7 +21,7 @@ export '../character/kid_assets.dart' show premiumOutfitsArtReady;
 /// `assets/images/furniture/`) chưa. `false`: tab Nội thất chỉ hiện thẻ
 /// "Sắp có hàng mới!", Phòng không vẽ nội thất mua. `true`: bán được và
 /// Phòng vẽ món đã mua ở ô cố định (`roomShopFurniture`).
-const bool furnitureShopArtReady = false;
+const bool furnitureShopArtReady = true;
 
 /// Giá (xu).
 const int outfitPriceXu = 80;

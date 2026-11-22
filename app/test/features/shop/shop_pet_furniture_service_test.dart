@@ -155,20 +155,23 @@ void main() {
   });
 
   group('nội thất sau cờ hình', () {
-    test(
-      'cờ const đang tắt: không có trong danh mục, không mua được',
-      () async {
-        expect(furnitureShopArtReady, isFalse);
-        expect(
-          shopItemsFor('girl')
-              .where((i) => i.category == ShopCategory.furniture),
-          isEmpty,
-        );
-        await give(500);
-        expect(await buy('noi_be_ca'), BuyResult.unknownItem);
-        expect(await shop.xuBalance(childId), 500);
-      },
-    );
+    test('cờ const đã bật (Muse lô 10): 8 món có trong danh mục', () async {
+      expect(furnitureShopArtReady, isTrue);
+      expect(
+        shopItemsFor('girl').where((i) => i.category == ShopCategory.furniture),
+        hasLength(8),
+      );
+    });
+
+    test('tắt cờ: không có trong danh mục, không mua được', () async {
+      final off = ShopService(db: db, furnitureReady: false);
+      await give(500);
+      expect(
+        await off.buy(childId: childId, gender: 'girl', itemId: 'noi_be_ca'),
+        BuyResult.unknownItem,
+      );
+      expect(await off.xuBalance(childId), 500);
+    });
 
     test('bật cờ: 8 món đúng giá, mua một lần', () async {
       final on = ShopService(db: db, furnitureReady: true);
