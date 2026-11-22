@@ -1068,3 +1068,96 @@ Số liệu 6 file mới (thay thế 6 file cũ trên nhánh, cùng tên):
 | dog_newborn_sit.png | 126182 | 59, 453, 30, 440 | 440 | 30 | 964f7cfa9cb5 |
 
 Đẩy 1 lần đè lên 6 file cũ: commit 13554bfa, .b64 916.364 B, đầu nhánh 13554bfa; 6/6 blob SHA đối chiếu khớp trên nhánh và khác blob cũ (chứng minh đã đè đúng file mới). ĐƯỢC DUYỆT 22/11 ~14:08 (Claude), các nốt nhỏ chấp nhận hết.
+
+### Lô 10 — Nội thất cửa hàng (8 file, 22/11/2026)
+
+8 món vào `app/assets/images/furniture/`, 512×512, PNG trong suốt, alpha
+sạch (semi 0, magenta 0 px), quantize 256 màu MAXCOVERAGE + Floyd–Steinberg,
+đáy chuẩn y=440 cho cả 8 món (lệch 0 px). Tổng PNG 412.631 B (~551 KB .b64).
+
+| File | Byte | bbox (x0, x1, y0, y1) | Đáy y | SHA-256 |
+|---|---|---|---|---|
+| noi_be_ca.png | 67.158 | 110, 403, 121, 440 | 440 | 6cbecc45c2b1 |
+| noi_den_trang.png | 26.985 | 138, 374, 141, 440 | 440 | 89b9e3c712a5 |
+| noi_ke_sach.png | 78.048 | 85, 427, 81, 440 | 440 | 9b58c057e33b |
+| noi_ghe_luoi.png | 42.295 | 121, 392, 212, 440 | 440 | f4f9d128c79c |
+| noi_nha_pet.png | 54.374 | 98, 415, 141, 440 | 440 | 997f74ced65f |
+| noi_cay_cao.png | 49.344 | 124, 389, 61, 440 | 440 | 968aff79e6e8 |
+| noi_leu.png | 53.352 | 82, 431, 102, 440 | 440 | d870d9285c41 |
+| noi_tranh.png | 41.975 | 116, 396, 141, 440 | 440 | fcbbdf2a3533 |
+
+Vị trí đặt thử trên `room_v3_clean.png` 1600×900 (app chỉnh lại khi đưa
+vào): bể cá đầu phải bàn học, chân (1330, 500), scale 0,42, hiển thị 124×135;
+đèn trăng mặt tủ đầu giường, chân (130, 590), scale 0,35, 83×106; kệ sách sàn
+trước-trái, chân (320, 830), scale 0,55, 189×199; ghế lười sàn góc
+trước-trái, chân (160, 845), scale 0,55, 150×127; nhà pet sàn trước bàn học,
+chân (1200, 800), scale 0,55, 176×166; cây cao sàn phải cửa sổ, chân
+(950, 795), scale 0,60, 160×229; lều sàn góc trước-phải, chân (1450, 850),
+scale 0,75, 263×255; tranh tường sau trái cửa sổ, góc trái-trên (290, 180),
+scale 0,50, 141×151. Không món nào đè vùng bé đứng (x≈420–630, y≈700–810).
+
+Phát hiện về hàng đáy: đồ rời (D) hiện có **không có một hàng đáy chung** —
+gấu bông 444, đèn sao 449, bình hoa 429, cốc bút 433, chậu cây 440 (trải
+429–449). Lô 10 chuẩn hoá về trung vị y=440 (= chậu cây, = chuẩn pet lô 8B).
+Kỹ thuật: lớp xoá magenta nhạt m3 CHỈ áp trong 3 px quanh nền magenta thật
+— áp toàn cục đã ăn mất chi tiết hồng nhạt sâu trong thân (viền kính bể cá
+765 px lỗ, ngói mái nhà pet 1.628 px lỗ). Nốt nhỏ đã soi: viền trên bể cá ánh
+hồng oải hương (màu gốc ảnh sinh ra, magenta đo = 0 px); nền trắng tranh cầu
+vồng có vân giấy lốm đốm nhẹ; đèn trăng có mặt cười + sao nổi (máy tự thêm,
+dễ thương, đúng brief đèn ngủ); trong ảnh ghép phòng, cây cao chạm nhẹ mép
+trái ghế bàn học và ghế lười chạm nhẹ mép trái kệ sách (chồng lấn do vị trí
+đặt trong ảnh ghép, không phải lỗi file); khe 299 px ở cây cao là khe nhìn
+xuyên thật giữa các cành. Đẩy 1 lần: commit `817ec712`; 8/8 blob SHA đối
+chiếu khớp trên nhánh. ĐƯỢC DUYỆT 22/11 ~15:20 (Claude): cả 8 món, các nốt
+nhỏ chấp nhận hết. Chưa decode (chờ Claude decode; code app đã có sẵn chỗ
+— PR #52 đã merge trên main).
+
+### Lô 11 — Đấu trường (7 file, 22/11/2026)
+
+Phong cách v3b, sáng trên-trái, không chữ, không bóng nền. Tổng PNG
+1.093.691 B (~1,46 MB .b64).
+
+| File | Byte | Khung / bbox | Đích trong app |
+|---|---|---|---|
+| arena_building.png | 257.355 | 1024×640, bbox 122, 902, 42, 600, chân y=600, SHA-256 `a5d394c8fbda` | `app/assets/images/town/arena_building.png` |
+| arena_bg.png | 641.627 | 1600×900 RGB đục, 256 màu, SHA-256 `e798fa537d1d` | `app/assets/images/backgrounds/arena_bg.png` |
+| medal_gold.png | 22.857 | 256×256, bbox 38, 218, 23, 232, chân y=232, SHA-256 `7f55b8dbbb0e` | `app/assets/images/ui/medal_gold.png` |
+| medal_silver.png | 25.431 | 256×256, bbox 38, 218, 24, 232, chân y=232, SHA-256 `c50ac39c233b` | `app/assets/images/ui/medal_silver.png` |
+| medal_bronze.png | 23.543 | 256×256, bbox 38, 218, 23, 232, chân y=232, SHA-256 `45e7dddfcc86` | `app/assets/images/ui/medal_bronze.png` |
+| medal_participant.png | 19.671 | 256×256, bbox 44, 213, 23, 232, chân y=232, SHA-256 `64a39a85fb18` | `app/assets/images/ui/medal_participant.png` |
+| gem_chest.png | 103.694 | 512×512, bbox 67, 445, 41, 440, chân y=440, SHA-256 `9c961ac94e07` | `app/assets/images/items/gem_chest.png` |
+
+Đấu trường: oval 2 tầng vòm, mái vòm giữa, cờ tam giác + dây cờ, pastel
+đào/kem. Đặt trên bản đồ thị trấn tại tâm chân (1060, 872), scale 0,2305,
+hiển thị 180×129 (x 970–1149, y 743–871), bãi cỏ dưới đường C1 góc
+dưới-phải, cách mép đường ~7 px, không đè 6 tòa, không chặn C1/C2. Vòm nhìn
+xuyên (1.522 px lỗ kín là các vòm, cỏ lộ qua — đúng thiết kế). Nền phòng
+thi: bảng lớn TRỐNG hoàn toàn, dây cờ tam giác, bàn ghế học sinh 2 bên, bục
+thi có cúp vàng bên trái, thảm tròn giữa, giữa trống sáng để app đặt câu hỏi
+(lum giữa 187,5 vs biên 173,0); quantize MEDIANCUT (MAXCOVERAGE chỉ cấp 57
+màu cho mảng tường, khối vuông thấy rõ; MEDIANCUT 160 màu tường, khớp
+`room_v3_clean` 156 màu). Huy chương: vàng/ruy băng đỏ, bạc/xanh dương,
+đồng/xanh lá (đều có ngôi sao), tham gia = ngôi sao xanh nhạt + tim hồng,
+ruy băng xanh dương nhạt — phân biệt rõ với bạc; không chữ/số. Rương kim
+cương: rương gỗ mở nắp, đầy kim cương hồng/xanh/tím, ánh sáng từ trong
+rương, 4 viên rời ở chân.
+
+Đường đích lô 11 do Muse chọn theo quy ước sẵn có (town/ chứa đồ đặt lên
+bản đồ như fountain/tree, backgrounds/ chứa cảnh nền, ui/ chứa icon thưởng,
+items/ chứa đồ cửa hàng) — Claude xác nhận khi nối code đấu trường (decode
+đổi tên được nếu cần khác). Kỹ thuật: m2/m3 chỉ áp trong 3 px quanh magenta
+thật (m2 toàn cục ăn mặt dưới viên đá rời — tím sẫm (166,3,138), trùng luật
+m2); `finish()` xoá nốt magenta chói còn lại (r>170, g<90, b>140). Đẩy 1
+lần: commit `9feba87e`; 6/7 blob SHA đối chiếu khớp trên nhánh —
+`arena_bg.png.b64` (855.504 B) không tải lại được để đối chiếu (bảo vệ mã
+xác minh, giống `room_v3.png` trên main), đã kiểm bằng vòng khứ hồi local:
+.b64 giải mã đúng từng byte PNG gốc (SHA-256 `e798fa53…`), 1 dòng base64;
+Claude kiểm lại bằng git. ĐƯỢC DUYỆT 22/11 ~15:20 (Claude): cả 7 file;
+quyết 2 điểm — (1) đấu trường hiển thị 180×129 chấp nhận (nhỏ nhất trong 6
+tòa: lâu đài 390×150, lều 300×195, tiệm bánh 220×200, nhà hồng 235×130,
+vườn 330×125; bãi trống duy nhất là dải dưới C1 — muốn to hơn phải bố trí
+lại bản đồ, app tự phóng to hợp lý khi đặt); (2) gem_chest chấp nhận như
+hiện tại (~155 px hồng sẫm ở chân 4 viên đá rời — mặt dưới đá cùng họ màu
+với magenta, xoá thêm sẽ ăn mất đá). Chưa decode (chờ Claude decode; code
+đấu trường đang làm).
+
