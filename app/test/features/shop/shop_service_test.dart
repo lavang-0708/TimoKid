@@ -42,13 +42,13 @@ void main() {
 
   group('danh mục', () {
     test(
-      'mỗi dáng có bộ đồ để mua (3 cơ bản + bộ 04–06) + 5 phụ kiện đúng giá',
+      'mỗi dáng có bộ đồ để mua (3 cơ bản + bộ 04–07) + 5 phụ kiện đúng giá',
       () {
         for (final g in ['girl', 'boy']) {
           final items = shopItemsFor(g);
           expect(
             items.where((i) => i.category == ShopCategory.outfits),
-            hasLength(6),
+            hasLength(7),
           );
           expect(
             items.firstWhere((i) => i.id == glassesItemId).priceXu,
@@ -62,7 +62,7 @@ void main() {
             items
                 .where((i) => i.kind == ShopItemKind.outfit)
                 .map((i) => i.priceXu),
-            [80, 80, 80, 150, 300, 600],
+            [80, 80, 80, 150, 300, 600, 0],
           );
         }
       },
