@@ -1,4 +1,5 @@
-/// Database Drift của TimoKid: 7 bảng bản 0.1 + `inventory` (T2-06), schema v2.
+/// Database Drift của TimoKid: 7 bảng bản 0.1 + `inventory` (T2-06) +
+/// `arena_attempts` (T2-10), schema v3.
 ///
 /// Mở file `timokid.sqlite` trong thư mục tài liệu của app trên máy thật
 /// (qua `drift_flutter`). Test truyền executor riêng
@@ -41,6 +42,7 @@ const defaultRewardsJson =
     WalletLedger,
     Settings,
     Inventory,
+    ArenaAttempts,
   ],
   daos: [
     ChildrenDao,
@@ -51,6 +53,7 @@ const defaultRewardsJson =
     WalletDao,
     SettingsDao,
     InventoryDao,
+    ArenaAttemptsDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -65,7 +68,7 @@ class AppDatabase extends _$AppDatabase {
   Clock clock;
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -84,6 +87,10 @@ class AppDatabase extends _$AppDatabase {
       // v1 → v2 (T2-06): thêm bảng `inventory`; mọi dữ liệu cũ giữ nguyên.
       if (from < 2) {
         await migrator.createTable(inventory);
+      }
+      // v2 → v3 (T2-10): thêm bảng `arena_attempts` (Đấu trường).
+      if (from < 3) {
+        await migrator.createTable(arenaAttempts);
       }
     },
   );

@@ -98,3 +98,15 @@ class InventoryDaoManager {
   $$InventoryTableTableManager get inventory =>
       $$InventoryTableTableManager(_db.attachedDatabase, _db.inventory);
 }
+
+mixin _$ArenaAttemptsDaoMixin on DatabaseAccessor<AppDatabase> {
+  $ArenaAttemptsTable get arenaAttempts => attachedDatabase.arenaAttempts;
+  ArenaAttemptsDaoManager get managers => ArenaAttemptsDaoManager(this);
+}
+
+class ArenaAttemptsDaoManager {
+  final _$ArenaAttemptsDaoMixin _db;
+  ArenaAttemptsDaoManager(this._db);
+  $$ArenaAttemptsTableTableManager get arenaAttempts =>
+      $$ArenaAttemptsTableTableManager(_db.attachedDatabase, _db.arenaAttempts);
+}

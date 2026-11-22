@@ -1,6 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/arena/arena_exam_screen.dart';
+import '../../features/arena/arena_lobby_screen.dart';
+import '../../features/arena/arena_result_screen.dart';
+import '../../features/arena/arena_service.dart';
 import '../../features/character/character_view.dart';
 import '../../features/building/building_screen.dart';
 import '../../features/math/math_screen.dart';
@@ -89,6 +93,19 @@ class AppRouter {
           path: MathScreen.route,
           builder: (context, state) =>
               MathScreen(args: state.extra as MathScreenArgs?),
+        ),
+        GoRoute(
+          path: ArenaLobbyScreen.route,
+          builder: (context, state) => const ArenaLobbyScreen(),
+        ),
+        GoRoute(
+          path: ArenaExamScreen.route,
+          builder: (context, state) => const ArenaExamScreen(),
+        ),
+        GoRoute(
+          path: ArenaResultScreen.route,
+          builder: (context, state) =>
+              ArenaResultScreen(result: state.extra as ArenaResult?),
         ),
         GoRoute(
           path: StageResultScreen.route,

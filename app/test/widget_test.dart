@@ -58,7 +58,12 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('town-screen')), findsOneWidget);
 
-      await tester.tap(find.byKey(const Key('town-stage-0-button')));
+      // Bấm lệch tâm sang phải: nhãn nút "Đấu trường" (T2-10) ở font
+      // test rộng phủ tới tâm công trình.
+      await tester.tapAt(
+        tester.getCenter(find.byKey(const Key('town-stage-0-button'))) +
+            const Offset(40, 0),
+      );
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('building-screen')), findsOneWidget);
       expect(find.text('Lâu đài Lôgic'), findsOneWidget);
