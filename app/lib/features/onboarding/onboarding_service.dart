@@ -87,7 +87,7 @@ class OnboardingService {
       await _db.inventoryDao.grant(
         childId: childId,
         itemId:
-            kidOutfitIds[kidGender(
+            kidAllOutfitIds[kidGender(
               trimmed.gender,
             )]![kidOutfitNumber(trimmed.dress) - 1],
         source: 'starter',

@@ -24,13 +24,53 @@ const double kidBodyHeight = 1287;
 /// Tỉ lệ vị trí chân theo chiều cao khung (0..1).
 const double kidFeetFraction = kidFeetY / kidFrameHeight;
 
-/// Mã bộ đồ theo dáng, đúng thứ tự bộ 1–3.
+/// Đã có hình 4 bộ đồ cao cấp 04–07 mỗi dáng (Muse đang vẽ) chưa.
+/// `false`: Cửa hàng ẩn các bộ này, mã 04–07 đọc từ hồ sơ coi như bộ 1,
+/// Tủ đồ chỉ liệt kê 3 bộ đầu. `true`: bán được (xu hoặc kim cương, xem
+/// `shop_catalog.dart`) và mặc được. Bật cờ khi PNG đã vào
+/// `assets/images/character/<dáng>/` (kèm dòng manifest).
+const bool premiumOutfitsArtReady = false;
+
+/// Số bộ đồ cơ bản (bộ 1–3: chọn ở mở đầu / mua 80 xu) và tổng số bộ
+/// kể cả cao cấp (04–07).
+const int kidBasicOutfitCount = 3;
+const int kidTotalOutfitCount = 7;
+
+/// Số bộ đồ dùng được hiện giờ: 7 khi [premiumOutfitsArtReady], không
+/// thì 3.
+int kidOutfitLimit({bool premiumReady = premiumOutfitsArtReady}) =>
+    premiumReady ? kidTotalOutfitCount : kidBasicOutfitCount;
+
+/// Mã bộ đồ CƠ BẢN theo dáng, đúng thứ tự bộ 1–3 (3 lựa chọn ở mở
+/// đầu). Đủ 7 bộ xem [kidAllOutfitIds].
 const Map<String, List<String>> kidOutfitIds = <String, List<String>>{
   'girl': <String>['girl_top_01', 'girl_top_02', 'girl_top_03'],
   'boy': <String>['boy_outfit_01', 'boy_outfit_02', 'boy_outfit_03'],
 };
 
-/// Tên hiển thị của từng bộ đồ.
+/// Mã đủ 7 bộ theo dáng, thứ tự bộ 1–7 (04–07 là bộ cao cấp).
+const Map<String, List<String>> kidAllOutfitIds = <String, List<String>>{
+  'girl': <String>[
+    'girl_top_01',
+    'girl_top_02',
+    'girl_top_03',
+    'girl_top_04',
+    'girl_top_05',
+    'girl_top_06',
+    'girl_top_07',
+  ],
+  'boy': <String>[
+    'boy_outfit_01',
+    'boy_outfit_02',
+    'boy_outfit_03',
+    'boy_outfit_04',
+    'boy_outfit_05',
+    'boy_outfit_06',
+    'boy_outfit_07',
+  ],
+};
+
+/// Tên hiển thị của từng bộ đồ (cả 7 bộ mỗi dáng).
 const Map<String, String> kidOutfitNames = <String, String>{
   'girl_top_01': 'Váy hồng',
   'girl_top_02': 'Váy tím',
@@ -38,6 +78,14 @@ const Map<String, String> kidOutfitNames = <String, String>{
   'boy_outfit_01': 'Áo xanh, quần short',
   'boy_outfit_02': 'Áo hoodie xanh lá',
   'boy_outfit_03': 'Áo đỏ, quần jean',
+  'girl_top_04': 'Váy xòe',
+  'girl_top_05': 'Váy dạ hội',
+  'girl_top_06': 'Váy công chúa',
+  'girl_top_07': 'Váy nữ hoàng tiên',
+  'boy_outfit_04': 'Sơ mi nơ',
+  'boy_outfit_05': 'Vest dạ hội',
+  'boy_outfit_06': 'Hoàng tử',
+  'boy_outfit_07': 'Hiệp sĩ hoàng gia',
 };
 
 /// Phụ kiện đầu theo dáng: mã → (tên hiển thị, tên file không đuôi).
@@ -56,13 +104,17 @@ const Map<String, Map<String, (String, String)>> kidHeadAccessories =
 /// Dáng hợp lệ: `boy` hoặc `girl` (giá trị lạ coi như `girl`).
 String kidGender(String gender) => gender == 'boy' ? 'boy' : 'girl';
 
-/// Số bộ đồ 1–3 từ mã đã lưu (`girl_top_02` → 2). Null, mã lạ hoặc
-/// số ngoài 1–3 thì về bộ 1 (máy cũ lưu `dress: null` = bộ đồ gốc).
-int kidOutfitNumber(String? dress) {
+/// Số bộ đồ từ mã đã lưu (`girl_top_02` → 2). Null, mã lạ hoặc số
+/// ngoài 1–[kidOutfitLimit] thì về bộ 1 (máy cũ lưu `dress: null` = bộ
+/// đồ gốc; bộ cao cấp 04–07 chưa có hình thì coi như bộ 1).
+int kidOutfitNumber(
+  String? dress, {
+  bool premiumReady = premiumOutfitsArtReady,
+}) {
   if (dress == null) return 1;
   final match = RegExp(r'(\d+)$').firstMatch(dress);
   final n = match == null ? 1 : int.parse(match.group(1)!);
-  return (n >= 1 && n <= 3) ? n : 1;
+  return (n >= 1 && n <= kidOutfitLimit(premiumReady: premiumReady)) ? n : 1;
 }
 
 /// Đường dẫn ảnh toàn thân. [backpack] = biến thể đeo balo (Muse vẽ
@@ -107,9 +159,11 @@ KidEyePatch kidEyePatch(String gender, int outfit, {bool wave = false}) {
     2: Rect.fromLTWH(280, 502, 441, 243),
     3: Rect.fromLTWH(295, 495, 432, 250),
   };
+  // Bộ cao cấp 04–07 dùng lại miếng vá của bộ 1 (giả định đầu vẽ cùng vị trí).
+  final patchOutfit = rects.containsKey(outfit) ? outfit : 1;
   return KidEyePatch(
-    'assets/images/character/boy/boy_eyes_closed_patch_0${outfit}_wave.png',
-    rects[outfit]!,
+    'assets/images/character/boy/boy_eyes_closed_patch_0${patchOutfit}_wave.png',
+    rects[patchOutfit]!,
   );
 }
 
@@ -122,15 +176,20 @@ String? kidHeadAccessoryAsset(String gender, String? accessory) {
   return 'assets/images/character/$g/${entry.$2}.png';
 }
 
-/// Dáng đã có khung đi bộ (lô 4 của Muse): cả bé gái và bé trai.
-const Set<String> kidGendersWithWalkFrames = <String>{'boy', 'girl'};
+/// Bộ đồ đã có khung đi bộ (lô 4 của Muse) theo dáng: bộ 1–3. Bộ cao
+/// cấp 04–07 chưa có khung đi bộ (thêm số bộ vào đây khi Muse vẽ) nên
+/// nhân vật mặc chúng đi bằng ảnh đứng nhún bước.
+const Map<String, Set<int>> kidOutfitsWithWalkFrames = <String, Set<int>>{
+  'boy': <int>{1, 2, 3},
+  'girl': <int>{1, 2, 3},
+};
 
 /// 4 khung đi bộ (a–d) của một bộ đồ; [up] = đi lên (xa dần, `ur`),
 /// ngược lại đi xuống/ngang (`dr`). Hướng phải; app lật ngang khi đi
-/// sang trái. Null nếu dáng chưa có khung đi bộ.
+/// sang trái. Null nếu bộ đồ chưa có khung đi bộ.
 List<String>? kidWalkFrames(String gender, int outfit, {required bool up}) {
   final g = kidGender(gender);
-  if (!kidGendersWithWalkFrames.contains(g)) return null;
+  if (!(kidOutfitsWithWalkFrames[g]?.contains(outfit) ?? false)) return null;
   final dir = up ? 'ur' : 'dr';
   return <String>[
     for (final f in const ['a', 'b', 'c', 'd'])

@@ -57,14 +57,16 @@ class KidLookService {
         value: accessory ?? 'none',
       );
 
-  /// Đổi bộ đồ (1–3) trong hồ sơ đã lưu; trả hồ sơ mới.
+  /// Đổi bộ đồ (1–3, hoặc 1–7 khi đã có hình bộ cao cấp) trong hồ sơ đã lưu; trả hồ sơ mới.
   Future<CharacterProfile> setOutfit(
     String childId,
     CharacterProfile profile,
     int outfit,
   ) async {
-    final ids = kidOutfitIds[kidGender(profile.gender)]!;
-    final updated = profile.copyWith(dress: ids[outfit.clamp(1, 3) - 1]);
+    final ids = kidAllOutfitIds[kidGender(profile.gender)]!;
+    final updated = profile.copyWith(
+      dress: ids[outfit.clamp(1, kidOutfitLimit()) - 1],
+    );
     await db.settingsDao.setValue(
       childId: childId,
       key: OnboardingService.profileKey,

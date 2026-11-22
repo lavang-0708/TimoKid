@@ -49,6 +49,8 @@ class RoomFurniture {
     required this.anchor,
     required this.bakedRect,
     this.inCleanBackground = false,
+    this.footprint,
+    this.wall = false,
   });
 
   /// Khóa widget của món (để test tìm).
@@ -84,6 +86,15 @@ class RoomFurniture {
   /// gấu, đèn, bình hoa, cốc bút; chậu cây giữ nguyên) — khi đó không
   /// vẽ PNG rời mà vẫn dùng vùng chạm [bakedRect].
   final bool inCleanBackground;
+
+  /// Dấu chân trên sàn (khung 1600x900) của nội thất mua ở Cửa hàng:
+  /// vùng đi được trừ hình chữ nhật này (cùng cơ chế
+  /// [roomObstacleFootprints]). Null với món gắn tường.
+  final Rect? footprint;
+
+  /// Món gắn tường (không bóng đổ, không chặn đường đi, vẽ dưới
+  /// nhân vật/pet).
+  final bool wall;
 }
 
 /// Nội thất v3b (5 món, đặt khớp món vẽ sẵn trong nền).
@@ -145,6 +156,123 @@ const List<RoomFurniture> roomFurniture = [
     bakedRect: Rect.fromLTRB(1076, 441, 1144, 523),
   ),
 ];
+
+/// Nội thất MUA Ở CỬA HÀNG (T2-06b), khóa món = mã trong
+/// `shopFurniture` (`shop_catalog.dart`), hình
+/// `assets/images/furniture/<mã>.png` (512x512). CHỈ vẽ khi
+/// `furnitureShopArtReady` (Muse đang vẽ hình).
+///
+/// Ô đặt TẠM, đo bằng mắt trên `room_v3_clean.png` — dễ chỉnh: mỗi món
+/// chỉ cần sửa [RoomFurniture.placeX]/[placeY]/[placeSize] (góc trên-trái
+/// + cỡ ảnh 512x512), [RoomFurniture.anchor] (điểm đáy: bóng đổ + thứ tự
+/// vẽ theo chân y so với nhân vật/pet) và [RoomFurniture.footprint]
+/// (dải đáy chặn đường đi). Khi hình thật về, nhìn lại và chỉnh các số
+/// này; test `room_shop_furniture_test.dart` chỉ khóa các ràng buộc
+/// (trong khung, dấu chân nằm trên sàn, không chặn chỗ đứng mặc định).
+const List<RoomFurniture> roomShopFurniture = [
+  RoomFurniture(
+    key: 'room-furniture-noi_nha_pet',
+    asset: 'assets/images/furniture/noi_nha_pet.png',
+    label: 'Nhà cho pet',
+    reaction: 'Nhà của pet ấm áp quá!',
+    placeX: 55,
+    placeY: 667,
+    placeSize: 240,
+    anchor: Offset(175, 878),
+    bakedRect: Rect.zero,
+    footprint: Rect.fromLTRB(95, 852, 255, 878),
+  ),
+  RoomFurniture(
+    key: 'room-furniture-noi_ke_sach',
+    asset: 'assets/images/furniture/noi_ke_sach.png',
+    label: 'Kệ sách',
+    reaction: 'Nhiều sách hay quá!',
+    placeX: 270,
+    placeY: 604,
+    placeSize: 200,
+    anchor: Offset(370, 780),
+    bakedRect: Rect.zero,
+    footprint: Rect.fromLTRB(310, 756, 430, 780),
+  ),
+  RoomFurniture(
+    key: 'room-furniture-noi_be_ca',
+    asset: 'assets/images/furniture/noi_be_ca.png',
+    label: 'Bể cá',
+    reaction: 'Cá bơi lội vui quá!',
+    placeX: 425,
+    placeY: 702,
+    placeSize: 190,
+    anchor: Offset(520, 870),
+    bakedRect: Rect.zero,
+    footprint: Rect.fromLTRB(470, 848, 570, 870),
+  ),
+  RoomFurniture(
+    key: 'room-furniture-noi_cay_cao',
+    asset: 'assets/images/furniture/noi_cay_cao.png',
+    label: 'Chậu cây lá to',
+    reaction: 'Cây lá to xanh mướt!',
+    placeX: 790,
+    placeY: 656,
+    placeSize: 220,
+    anchor: Offset(900, 850),
+    bakedRect: Rect.zero,
+    footprint: Rect.fromLTRB(860, 828, 940, 850),
+  ),
+  RoomFurniture(
+    key: 'room-furniture-noi_ghe_luoi',
+    asset: 'assets/images/furniture/noi_ghe_luoi.png',
+    label: 'Ghế lười',
+    reaction: 'Ghế lười êm ơi là êm!',
+    placeX: 1010,
+    placeY: 709,
+    placeSize: 200,
+    anchor: Offset(1110, 885),
+    bakedRect: Rect.zero,
+    footprint: Rect.fromLTRB(1040, 862, 1180, 885),
+  ),
+  RoomFurniture(
+    key: 'room-furniture-noi_leu',
+    asset: 'assets/images/furniture/noi_leu.png',
+    label: 'Lều đồ chơi',
+    reaction: 'Chui vào lều chơi nào!',
+    placeX: 1255,
+    placeY: 602,
+    placeSize: 320,
+    anchor: Offset(1415, 884),
+    bakedRect: Rect.zero,
+    footprint: Rect.fromLTRB(1325, 856, 1505, 884),
+  ),
+  // Món gắn tường (không bóng, không chặn đường). Đặt thấp (y >= 330) để
+  // không bị thanh chỉ số che / cắt trên màn thấp (608x248 cắt ~250 px trên).
+  RoomFurniture(
+    key: 'room-furniture-noi_den_trang',
+    asset: 'assets/images/furniture/noi_den_trang.png',
+    label: 'Đèn mặt trăng',
+    reaction: 'Đèn mặt trăng sáng dịu ghê!',
+    placeX: 45,
+    placeY: 330,
+    placeSize: 105,
+    anchor: Offset(97, 435),
+    bakedRect: Rect.zero,
+    wall: true,
+  ),
+  RoomFurniture(
+    key: 'room-furniture-noi_tranh',
+    asset: 'assets/images/furniture/noi_tranh.png',
+    label: 'Tranh cầu vồng',
+    reaction: 'Cầu vồng đẹp quá!',
+    placeX: 350,
+    placeY: 405,
+    placeSize: 100,
+    anchor: Offset(400, 505),
+    bakedRect: Rect.zero,
+    wall: true,
+  ),
+];
+
+/// Mã món cửa hàng của một ô nội thất mua (khóa `room-furniture-<mã>`).
+String roomShopFurnitureId(RoomFurniture f) =>
+    f.key.substring('room-furniture-'.length);
 
 /// Câu pet vui khi bé chơi với pet (đã mở khóa).
 const Map<String, String> petHappyLines = <String, String>{
