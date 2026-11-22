@@ -37,9 +37,9 @@ const int kidBasicOutfitCount = 3;
 const int kidTotalOutfitCount = 7;
 
 /// Số bộ cao cấp đã có hình, tính lần lượt từ bộ 04 (Muse vẽ theo thứ
-/// tự 04 → 07). 22/11: bộ 04, 05 hai dáng (lô 9, đủ đứng, vẫy, 8 khung
-/// đi).
-const int kidPremiumOutfitsDrawn = 2;
+/// tự 04 → 07). 22/11: bộ 04, 05, 06 hai dáng (lô 9, đủ đứng, vẫy, 8
+/// khung đi).
+const int kidPremiumOutfitsDrawn = 3;
 
 /// Số bộ đồ dùng được hiện giờ: 7 khi [premiumOutfitsArtReady] (đủ 4
 /// bộ cao cấp), không thì 3 bộ cơ bản + [kidPremiumOutfitsDrawn].
@@ -186,8 +186,8 @@ String? kidHeadAccessoryAsset(String gender, String? accessory) {
 /// cấp 04–07 chưa có khung đi bộ (thêm số bộ vào đây khi Muse vẽ) nên
 /// nhân vật mặc chúng đi bằng ảnh đứng nhún bước.
 const Map<String, Set<int>> kidOutfitsWithWalkFrames = <String, Set<int>>{
-  'boy': <int>{1, 2, 3, 4, 5},
-  'girl': <int>{1, 2, 3, 4, 5},
+  'boy': <int>{1, 2, 3, 4, 5, 6},
+  'girl': <int>{1, 2, 3, 4, 5, 6},
 };
 
 /// 4 khung đi bộ (a–d) của một bộ đồ; [up] = đi lên (xa dần, `ur`),

@@ -220,13 +220,14 @@ void main() {
     },
   );
 
-  testWidgets('cờ tắt: Quần áo có 3 bộ cơ bản + bộ 04, 05 đã có hình', (
+  testWidgets('cờ tắt: Quần áo có 3 bộ cơ bản + bộ 04–06 đã có hình', (
     tester,
   ) async {
     await pumpShop(tester);
     expect(find.byKey(const Key('shop-item-girl_top_04')), findsOneWidget);
     expect(find.byKey(const Key('shop-item-girl_top_05')), findsOneWidget);
-    expect(find.byKey(const Key('shop-item-girl_top_06')), findsNothing);
+    expect(find.byKey(const Key('shop-item-girl_top_06')), findsOneWidget);
+    expect(find.byKey(const Key('shop-item-girl_top_07')), findsNothing);
     expect(find.byKey(const Key('shop-item-girl_top_07')), findsNothing);
   });
 }
