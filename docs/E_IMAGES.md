@@ -1333,3 +1333,175 @@ blob SHA trên nhánh bị chặn (bảo vệ mã xác minh, giống bộ 04 và
 `arena_bg.png.b64` lô 11), Claude kiểm lại bằng git. Chưa decode (chờ Claude
 decode).
 
+
+### Lô 9 — Bộ 06: váy công chúa có vương miện nhỏ / hoàng tử có áo choàng (20 file, 22/11/2026)
+
+Bộ 06 lộng lẫy HƠN bộ 05 (váy dạ hội đỏ / vest dạ hội navy) nhưng KÉM bộ 07
+(nữ hoàng tiên có cánh + hiệp sĩ hoàng gia, đồ hiếm). Mỗi bộ là MỘT ảnh toàn thân
+hoàn chỉnh 1024×1536 (cách mới, không cắt lớp), wave là biến thể toàn thân tay vẫy,
+khung đi là khung thật 2 hướng × 4 khung. Phong cách v3b.
+
+- Bé gái — váy công chúa hồng xòe rộng, lấp lánh, nơ eo lớn, vương miện vàng NHỎ
+  (không phải vương miện lớn/đồ nữ hoàng — đó là bộ 07), KHÔNG cánh. Giày ballet hồng.
+- Bé trai — hoàng tử: áo vest xanh hoàng gia nút vàng + sơ mi trắng + nơ cổ navy +
+  quần tây navy + giày da đen + ÁO CHOÀNG đỏ nhung (khuy vàng). KHÔNG giáp (bộ 07).
+
+## Cách làm
+
+Vẽ từng ảnh toàn thân bằng AI trên nền magenta đặc, có ảnh bộ 01 làm tham chiếu khuôn
+mặt/dáng đầu và ảnh 06 đứng làm chuẩn trang phục cho khung đi; tách nền + chuẩn hoá +
+quantize bằng code (numpy + scipy + PIL), đúng quy trình bộ 04–05 (`key6.py` /
+`fix6.py` trong `lot9-06/work/`):
+
+- Key: nền = median góc; fg = dist ≥ 20; closing 3×3; chỉ giữ component > 20.000 px;
+  closing dọc 31×1 cầu nối cổ; edge-recovery mọc tối đa 3 px vào dải dist 10–40.
+  KHÔNG dùng `binary_fill_holes`.
+- Chuẩn hoá: scale theo chiều cao bbox 1287, chân 1429, ky squash căn mắt/đầu, ox căn
+  mắt/đầu; quantize MAXCOVERAGE 256 màu + Floyd–Steinberg, giữ alpha; fill RGB trong
+  suốt bằng màu opaque gần nhất TRƯỚC khi quantize.
+- Khử viền magenta (stack bộ 04): ring-decon d<45; fix9c inpaint d<130 toàn ảnh;
+  fix9d inpaint d<170 trong vành 5 px; recolor magenta đậm (R>200,G<110,B>180);
+  rim-recolor vành ngoài 3 px — cả trước và sau quantize. Viền còn lại là tông
+  hồng-rose của tóc/váy thật (như bộ 04–05 đã chấp nhận), magenta đo = 0 px cả 20 file.
+- **Vẽ lại wave gái:** wave v1 đầu ngửa cao (ky = 0,9472, đỉnh đầu y = 210 so với full
+  141 — lệch 69 px, đổi full↔wave sẽ thấy thu nhỏ). Vẽ lại lấy ảnh full 06 làm tham
+  chiếu tỉ lệ + wave 01 làm dáng: wave mới ky = 0,9947, đỉnh 148 (full 147).
+- **Sửa lỗi key 7 khung đi trai (trừ dr_b):** detector mắt nâu bị tóc nâu + đường chia
+  cửa sổ x = 640 làm nhiễu (bắt blob cổ/áo ở y thô 841–964) → ky kẹp 1,03, đầu cao
+  hơn ~55 px. Sửa bằng `eye_override()` trong `fix6.py` (như bộ 05): phát hiện lại
+  tròng mắt thật trên ảnh thô (blob nâu toàn ảnh, w/h 40–120, y 600–860): dr_a/dr_c/dr_d
+  dùng trung bình 2 mắt thật (dr_a (698,8; 741,3), dr_c (767,8; 726,0),
+  dr_d (785,5; 722,5)); ur_a–d dùng 1 mắt gần (phải nhất) → ox theo tâm bbox (như bộ 04).
+- **Hiệu chuẩn mắt CAL (vòng fix6 run1–run2, theo cổng ±3 px của Claude):**
+  gái full đo trên layers (trước quantize) là (−0,1; −1,5) ĐẠT, nhưng đo trên final
+  đã quantize là (−4,9; −6,3) — dither Floyd–Steinberg làm vỡ tròng mắt thành mảnh,
+  detector (chỉ bắt blob lớn nhất) đọc lệch dù hình học không đổi (đúng bài học bộ 05).
+  CAL bù độ dịch detector bằng ky rescale quanh chân + ox trong layers:
+  vòng 1 (dx +5, ky×0,9927) đo được (+5,0; +4,6) — VỌT (detector vỡ mảnh khác sau
+  quantize lại); vòng 2 (dx +3, ky×0,9954, nửa mức sửa) đo được (+2,1; +1,0) ĐẠT.
+  Trai không CAL, wave gái không CAL (chỉ là artefact đo lường, xem mốc dưới).
+  Kết quả trên file final giao: **4/4 ĐẠT cổng ±3** (xem mốc dưới).
+- **Quy tắc miếng mắt nhắm (Claude chốt 22/11 ~16:15): app dùng CHUNG miếng mắt nhắm
+  của bộ 01 cho mọi bộ** — mắt đứng VÀ vẫy phải trùng bộ 01 trong ±3 px. Sửa lại
+  câu cũ trong dự thảo bộ 05 ("miếng mắt nhắm riêng cho từng ảnh"): từ bộ 05 trở đi
+  KHÔNG làm miếng riêng, dùng miếng 01.
+
+## File (20 PNG, khung 1024×1536, PNG trong suốt, đã lượng tử)
+
+Đường đích `app/assets/images/character/girl/` (10 file gái) và
+`app/assets/images/character/boy/` (10 file trai). Tỉ lệ bán trong suốt
+(0 < alpha < 255) đo bằng code, tất cả **0**. Mỗi file < 1 MB.
+
+| File | Vai trò | Cỡ (byte) | Chân y | Tâm mắt |
+| --- | --- | --- | --- | --- |
+| `girl_full_06.png` | Váy công chúa, đứng | 569.578 | 1428 | (493,1; 561,5) |
+| `girl_full_06_wave.png` | Váy công chúa, tay phải vẫy | 574.860 | 1428 | gần (584,6; 563,4) * |
+| `girl_full_06_walk_dr_a.png` | Đi xuống-phải, khung a | 570.905 | 1428 | gần (723,0; 556,6) |
+| `girl_full_06_walk_dr_b.png` | Đi xuống-phải, khung b | 566.584 | 1428 | gần (725,3; 542,6) |
+| `girl_full_06_walk_dr_c.png` | Đi xuống-phải, khung c | 567.510 | 1428 | gần (729,6; 530,2) † |
+| `girl_full_06_walk_dr_d.png` | Đi xuống-phải, khung d | 537.150 | 1428 | gần (691,8; 577,7) |
+| `girl_full_06_walk_ur_a.png` | Đi lên-phải, khung a | 539.568 | 1428 | gần (704,3; 559,4) |
+| `girl_full_06_walk_ur_b.png` | Đi lên-phải, khung b | 529.469 | 1428 | gần (712,8; 543,6) |
+| `girl_full_06_walk_ur_c.png` | Đi lên-phải, khung c | 523.782 | 1428 | gần (702,6; 558,5) |
+| `girl_full_06_walk_ur_d.png` | Đi lên-phải, khung d | 554.871 | 1428 | gần (702,9; 544,0) |
+| `boy_full_06.png` | Hoàng tử + áo choàng, đứng | 428.241 | 1428 | (505,0; 629,8) |
+| `boy_full_06_wave.png` | Hoàng tử, vẫy | 454.574 | 1428 | (504,1; 628,8) |
+| `boy_full_06_walk_dr_a.png` | Đi xuống-phải, khung a | 437.772 | 1428 | (504,5; 629,4) |
+| `boy_full_06_walk_dr_b.png` | Đi xuống-phải, khung b | 436.413 | 1428 | (505,3; 627,0) |
+| `boy_full_06_walk_dr_c.png` | Đi xuống-phải, khung c | 411.891 | 1428 | (504,5; 631,2) |
+| `boy_full_06_walk_dr_d.png` | Đi xuống-phải, khung d | 375.988 | 1428 | (502,9; 623,1) |
+| `boy_full_06_walk_ur_a.png` | Đi lên-phải, khung a | 422.729 | 1428 | (560,5; 629,6) |
+| `boy_full_06_walk_ur_b.png` | Đi lên-phải, khung b | 416.872 | 1428 | (570,0; 636,4) |
+| `boy_full_06_walk_ur_c.png` | Đi lên-phải, khung c | 423.685 | 1428 | (610,0; 633,5) |
+| `boy_full_06_walk_ur_d.png` | Đi lên-phải, khung d | 417.654 | 1428 | (580,6; 637,8) |
+
+\* wave gái: detector chuẩn chỉ bắt được mắt phải (mắt trái vỡ thành mảnh < 25 px);
+hợp nhất 2 mảnh mắt trái (401,0; 556,3) + mắt phải cho tâm mắt (492,8; 559,9),
+lệch 01 full (+1,8; −0,6) ĐẠT — xem mốc dưới.
+† dr_c: blob phải nhất là mảnh lash 97 px; tròng mắt thật ở (715,3; 574,0).
+"Mắt gần" ở khung đi gái = blob tròng mắt xanh phải nhất (mắt nhìn nghiêng); ở khung
+đi trai eye-mid là trung bình 2 blob bắt được — neo đáng tin cho khung đi trai là
+hcx200/hcy (xem mốc dưới).
+
+## Mốc khung đo được (khung 1024×1536, đo bằng code từ ảnh thật)
+
+### Bé gái (so với bộ 01: tâm mắt (491,0; 560,5), miệng (519,2; 651,2))
+
+- Tâm mắt full 06 **(493,1; 561,5)** — lệch 01 **(+2,1; +1,0) px, ĐẠT cổng ±3**.
+  Miệng theo detector (566,0; 702,4) là bắt nhầm nơ ngực (blob 756 px) — overlay cho
+  thấy miệng trùng 01 trong ~3 px; detector miệng nhiễu, chỉ tham chiếu.
+  Đỉnh đầu y = 147 (01: 142). Bbox full (87, 147, 936, 1429).
+- Tâm mắt wave 06: detector chuẩn chỉ bắt mắt phải (584,6; 563,4); hợp nhất mảnh
+  mắt trái cho **(492,8; 559,9)** — lệch 01 full **(+1,8; −0,6), ĐẠT**; lệch 01
+  wave (493,1; 561,5) là (−0,3; −1,6) cũng ĐẠT. Đỉnh đầu y = 148.
+- Khung đi: mắt gần dr x 692–730 (01: 697–736), ur x 703–713 (01: ~711–728);
+  mắt gần y dr 530–578, ur 544–559 (dao động do mảnh detector, soi strip thấy đầu
+  thẳng hàng); top dr 147–157, ur 151–160. Đầu lệch trong chu kỳ theo mắt y ≤ 7 px,
+  trong dải dao động của chính bộ 01.
+- Kiểm chứng chức năng miếng mắt nhắm (cả 2 dáng — bộ 05 chỉ test gái): **0 px**
+  tròng mắt xanh của full/wave 06 nằm ngoài vùng lid của 01 (sclera + iris + lash
+  dilate 11 px) — miếng 01 che kín mắt gái. (Phương pháp hợp nhất cụm mảnh iris đã
+  thử và LOẠI: blob xanh ở góc mắt ngoài/lash làm nhiễu — không dùng làm cổng.)
+
+### Bé trai (so với bộ 01: tâm mắt (504,1; 627,8), miệng (512,5; 713,5))
+
+- Tâm mắt full 06 **(505,0; 629,8)** — lệch 01 **(+0,9; +2,0) px, ĐẠT cổng ±3**.
+  Miệng full 06 (540,8; 711,9) — detector bắt nhầm má hồng/nơ, overlay thấy miệng
+  trùng ~3 px. Đỉnh đầu y = 151 (01: 142). Bbox full (153, 151, 856, 1429).
+- Tâm mắt wave 06 **(504,1; 628,8)** — lệch 01 full **(0,0; +1,0), ĐẠT**. Lưu ý:
+  01 wave của chính nó đã lệch 01 full ~−10,6 px theo y (617,2 so với 627,8) — quy
+  ước (như bộ 04–05) là khớp 01 full, vì miếng mắt nhắm đăng ký theo 01 full.
+- Khung đi: eye-mid dr 502,9–505,3 (01 dr 514–538), ur 560,5–610,0 (01 ur 678–699);
+  x ur lệch trái do OVERRIDE_1 (ox theo tâm bbox gồm cả áo choàng phồng) — soi strip
+  thấy đầu thẳng hàng, không phải lỗi vị trí. hcx200 dr 384–420, ur 424–457;
+  hcy dr 344–356, ur 348–361; top dr 156–181, ur 163–184. Eye-mid y dr 623–631,
+  ur 630–638 — đầu lệch ≤ 8 px/chu kỳ, trong dải dao động của chính bộ 01.
+- Kiểm chứng chức năng miếng mắt nhắm: full 6 px, wave 27 px tròng mắt nâu nằm
+  ngoài vùng lid của 01 — cùng bậc với control bộ 05 (wave trai 15 px), là ria
+  tóc/lash sát vùng, không phải mắt lộ — miếng 01 che kín về chức năng.
+
+## Kiểm chứng (soi bằng mắt trên nền tối (60,60,80) + nền phòng v3b)
+
+Ảnh ghép `work/composites/`: (a) gái 06 full + wave cạnh gái 01 full;
+(b) trai 06 full + wave cạnh trai 01 full; (c) dải đi dr + ur mỗi dáng;
+(d) gái 06 + trai 06 full ở cỡ app trong phòng v3b.
+
+- Mặt/mắt gái 06 và trai 06 trùng 01 (đã soi cạnh nhau, overlay 50/50).
+- Váy công chúa rõ ràng sang hơn 05 (xòe rộng, lấp lánh, nơ lớn, vương miện nhỏ)
+  và chưa tới mức nữ hoàng (không cánh, vương miện nhỏ); chân vẫn thấy rõ, chạm
+  y = 1429. Hoàng tử có áo choàng đỏ nhung đúng dáng, không giáp; áo choàng không
+  nuốt tay/chân.
+- Chân luân phiên khung đi rõ: a/c tiếp đất đối nhau, b/d bước giữa (cả 4 strip);
+  mặt các khung đi cùng góc nghiêng, không khung nào nghiêng hẳn (bài học dr_d bộ 04).
+- Trong phòng v3b ở cỡ app (cao 360 px, chân (630, 810)): tỉ lệ tự nhiên, chân
+  chạm sàn, không thấy viền lạ.
+- Không lỗ alpha lạ, không mép thẳng, không tàn dư magenta (magenta = 0 px cả
+  20 file theo test R>200,G<80,B>200; semi = 0; 256 màu).
+
+### Điểm chưa chắc — nói thẳng
+
+- **Gái full CAL 2 vòng mới đạt:** vòng 1 vọt (+5,0; +4,6), vòng 2 nửa mức mới về
+  (+2,1; +1,0). Detector rung ±5 px giữa các lần quantize — cổng ±3 đo trên final
+  là cổng của detector, không phải của hình học thật (layers đọc (−0,1; −1,5)).
+  Bằng chứng chức năng là lid-zone = 0 px ngoài vùng, không phụ thuộc detector.
+  Nếu Claude soi overlay thấy mắt gái full lệch thì đó là nhiễu detector — nhưng
+  đây vẫn là điểm yếu nhất của bộ, cần Claude quyết.
+- **Boy wave lid-zone 27 px ngoài vùng** (full 6 px; control bộ 05 wave trai 15 px):
+  là ria tóc/lash sát vùng lid, không phải mắt lộ; miếng 01 vẫn che kín về chức năng.
+- Viền tóc/váy còn ánh hồng rất nhạt ở một số mép (tông rose của tóc/váy thật,
+  như bộ 04–05 đã chấp nhận); ở cỡ app 360 px không thấy.
+- Áo choàng trai chạm mép khung trái ở dr_b/c/d (bbox x0 = 0) — chỉ là áo choàng
+  phồng tới biên khung, thân không bị cắt; áo choàng phồng mạnh ở boy dr_d và ur_b
+  (đọc như chuyển động, không phải lỗi).
+
+## Việc còn lại cho giai đoạn code (E)
+
+- Entry manifest cho 20 file trên + cập nhật `source` thành "Muse vẽ AI 22/11
+  theo DESIGN.md".
+- Dùng CHUNG miếng mắt nhắm của bộ 01 cho cả full/wave 06 (quy tắc Claude chốt
+  22/11) — KHÔNG làm miếng riêng. `_eyeCenter` riêng theo nhân vật đã có
+  (gái y ≈ 559, trai y ≈ 626).
+- Test neo: chân nhân vật trong vùng sàn đã khai báo; khung đi 2 hướng × 4 khung
+  theo đúng thứ tự a→b→c→d. Mở PR sau khi Claude duyệt kiểu.
+
+ĐƯỢC DUYỆT KIỂU 22/11 ~18:22 (Claude): cả 20 file; khung đi gái giữ nguyên, áo choàng trai chạm mép khung chấp nhận, wave trai 27 px Claude ghép thử miếng mắt khi decode. Đẩy 3 lần (7+7+6, mỗi lần 4,51/4,54/3,96 MB .b64): `54573bf` (7 file), `e45cee55` (7 file), `952ddf07` (6 file); đầu nhánh sau đẩy `952ddf07`. Lần 1 bị gián đoạn do service restart giữa chừng, Claude kiểm bằng git thấy đã lên nhánh (commit `54573bf`) nên không đẩy lại. 20/20 .b64 giải mã đúng từng byte PNG gốc trong vòng khứ hồi local (SHA-256 khớp) — đối chiếu blob SHA trên nhánh bị chặn (bảo vệ mã xác minh, giống bộ 04/05), Claude kiểm lại bằng git khi decode. SHA-256 (12 ký tự đầu): gái full `c767fef86338`, wave `4405dc38c012`, dr_a `7e6965897b13`, dr_b `6666c86231d1`, dr_c `0ede4a247944`, dr_d `fec3e215cc9e`, ur_a `1c08da6b4b98`, ur_b `17a81e5e58fa`, ur_c `59362e6455e3`, ur_d `11d08982c332`; trai full `4726f90b7139`, wave `09df5dfd9a1b`, dr_a `89aeda46d7a7`, dr_b `56b06fe43017`, dr_c `d859ecc9c89a`, dr_d `721293d59338`, ur_a `081d82c91b4a`, ur_b `dedea01488e4`, ur_c `28fdd66d780a`, ur_d `b32f070b7d63`. Chưa decode (chờ Claude decode).
