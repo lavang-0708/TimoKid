@@ -106,7 +106,11 @@ void main() {
       expect(item.bakedRect.left <= item.anchor.dx, isTrue);
       expect(item.anchor.dx <= item.bakedRect.right, isTrue);
     }
-    expect(roomCleanBackgroundReady, isFalse);
+    // Lô 8C: đã có nền sạch; chỉ chậu cây còn vẽ trong nền sạch.
+    expect(roomCleanBackgroundReady, isTrue);
+    expect(roomFurniture.where((f) => f.inCleanBackground).map((f) => f.key), [
+      'room-furniture-chau-cay',
+    ]);
     expect(
       roomCleanBackgroundAsset,
       'assets/images/backgrounds/room_v3_clean.png',

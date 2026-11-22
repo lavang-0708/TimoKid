@@ -23,7 +23,7 @@ const String roomCleanBackgroundAsset =
 /// rời đè lên (tránh hình đôi) mà chỉ đặt vùng chạm vô hình đúng chỗ
 /// món trong nền ([RoomFurniture.bakedRect]). `true`: dùng nền sạch
 /// và vẽ lại 5 PNG rời như thiết kế ban đầu.
-const bool roomCleanBackgroundReady = false;
+const bool roomCleanBackgroundReady = true;
 
 /// Khung nền 1600x900 — mọi tọa độ trong file này theo khung đó.
 const double roomFrameWidth = 1600;
@@ -48,6 +48,7 @@ class RoomFurniture {
     required this.placeSize,
     required this.anchor,
     required this.bakedRect,
+    this.inCleanBackground = false,
   });
 
   /// Khóa widget của món (để test tìm).
@@ -78,6 +79,11 @@ class RoomFurniture {
   /// bằng PIL trên ảnh thật 22/11). Khi [roomCleanBackgroundReady]
   /// còn `false` đây là vùng chạm vô hình của món.
   final Rect bakedRect;
+
+  /// Món vẫn còn vẽ trong nền sạch `room_v3_clean.png` (lô 8C chỉ xoá
+  /// gấu, đèn, bình hoa, cốc bút; chậu cây giữ nguyên) — khi đó không
+  /// vẽ PNG rời mà vẫn dùng vùng chạm [bakedRect].
+  final bool inCleanBackground;
 }
 
 /// Nội thất v3b (5 món, đặt khớp món vẽ sẵn trong nền).
@@ -114,6 +120,7 @@ const List<RoomFurniture> roomFurniture = [
     placeSize: 358,
     anchor: Offset(842, 686),
     bakedRect: Rect.fromLTRB(783, 538, 902, 684),
+    inCleanBackground: true,
   ),
   RoomFurniture(
     key: 'room-furniture-binh-hoa',

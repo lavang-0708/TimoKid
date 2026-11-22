@@ -681,14 +681,11 @@ void main() {
     expect(find.byType(SvgPicture), findsNothing);
   });
 
-  testWidgets('có nền sạch (cờ bật): dùng room_v3_clean + vẽ lại 5 PNG rời', (
+  testWidgets('có nền sạch (lô 8C): dùng room_v3_clean + vẽ lại 4 PNG rời', (
     tester,
   ) async {
     await completeOnboardingGirl();
     await pumpRoom(tester, clean: true);
-    // Chưa có file room_v3_clean.png trong repo nên ảnh nền báo lỗi
-    // nạp; bỏ qua ngoại lệ đó, chỉ kiểm cây widget.
-    tester.takeException();
 
     final assetNames = tester
         .widgetList<Image>(find.byType(Image))
@@ -704,12 +701,16 @@ void main() {
     for (final name in [
       'gau_bong_v3',
       'den_sao_v3',
-      'chau_cay_v3',
       'binh_hoa_v3',
       'coc_sao_v3',
     ]) {
       expect(assetNames, contains('assets/images/furniture/$name.png'));
     }
+    // Chậu cây vẫn vẽ trong nền sạch: không vẽ PNG rời (tránh hình đôi).
+    expect(
+      assetNames,
+      isNot(contains('assets/images/furniture/chau_cay_v3.png')),
+    );
   });
 
   testWidgets('chạm món trong nền: bong bóng + nháy sao pop rồi tắt', (
