@@ -47,4 +47,28 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('next-screen')), findsOneWidget);
   });
+
+  testWidgets(
+    'khung đầu còn cỡ dọc (máy tính bảng): chỉ phủ màu, chưa đếm giờ',
+    (tester) async {
+      AnimationGate.enabled = true;
+      addTearDown(() => AnimationGate.enabled = false);
+      tester.view.physicalSize = const Size(1200, 1920);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router()));
+      await tester.pump();
+      expect(find.byKey(const Key('splash-title')), findsNothing);
+      await tester.pump(const Duration(seconds: 3));
+      expect(find.byKey(const Key('next-screen')), findsNothing);
+
+      // Màn xoay ngang xong: hiện logo rồi đếm 1,8 giây như thường.
+      tester.view.physicalSize = const Size(1920, 1200);
+      await tester.pump();
+      expect(find.byKey(const Key('splash-title')), findsOneWidget);
+      await tester.pump(const Duration(milliseconds: 2000));
+      await tester.pump();
+      expect(find.byKey(const Key('next-screen')), findsOneWidget);
+    },
+  );
 }

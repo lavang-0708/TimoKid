@@ -26,16 +26,6 @@ Future<void> main() async {
   final showOnboarding = !await OnboardingService(db: db).isCompleted();
   final showHatch =
       !showOnboarding && await EggService(db: db).isHatchPending(childId);
-  // App chỉ chạy màn hình ngang (bản 0.1 trở đi).
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-  ]);
-  // Ẩn thanh trạng thái, giữ thanh điều hướng dưới.
-  await SystemChrome.setEnabledSystemUIMode(
-    SystemUiMode.manual,
-    overlays: [SystemUiOverlay.bottom],
-  );
   runApp(
     ProviderScope(
       overrides: [databaseProvider.overrideWithValue(db)],
@@ -48,6 +38,21 @@ Future<void> main() async {
       ),
     ),
   );
+  // App chỉ chạy màn ngang (đã khóa sẵn trong AndroidManifest:
+  // sensorLandscape). Gọi SAU khung hình đầu: trên máy tính bảng, gọi
+  // trước runApp làm cửa sổ đổi cỡ đúng lúc vẽ màn chờ → khung đầu vẽ
+  // theo cỡ dọc cũ, nửa màn trắng (góp ý 22/11).
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    // Ẩn thanh trạng thái, giữ thanh điều hướng dưới.
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: [SystemUiOverlay.bottom],
+    );
+  });
 }
 
 class TimoKidApp extends StatelessWidget {
