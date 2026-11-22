@@ -967,3 +967,31 @@ nền trắng (ở cỡ app không thấy).
 đầu nhánh `f03322ae`. 8/9 blob SHA đối chiếu khớp trên nhánh; shop_bg không tải lại
 được (giới hạn tool với file ≳400 KB) — một mình trong commit `f03322ae`,
 blob SHA local `d4976e65f25f`, SHA-256 local `aa1f6210f75d`.
+
+### Lô 8 nhóm (B) — Pet chuyển động (54 file, 22/11/2026)
+
+Mỗi loài dog/cat/rabbit × 3 giai đoạn newborn/teen/adult × 6 file
+(`{loài}_{giai đoạn}_walk_a..d.png`, `_happy.png`, `_sit.png`) → 54 file vào
+`app/assets/images/pets/`, 512×512, PNG trong suốt, alpha sạch (semi 0,0000,
+0 px magenta), quantize 256 màu MAXCOVERAGE + Floyd–Steinberg. Vẽ từ 9 ảnh
+giai đoạn lô 5 đã duyệt (giữ đúng nhận dạng pet v2); walk nhìn nghiêng 3/4
+quay PHẢI, chân luân phiên rõ, đầu lệch ≤2 px trong chu kỳ (chuẩn ≤5 px);
+walk/sit chân y=440 (thỏ newborn 438 như bản gốc đã duyệt); happy chân rời
+đất 40 px (y=400, thỏ newborn 398); newborn cả 6 khung vẫn trong mảnh vỏ.
+Đo bằng code ĐẠT hết; soi bằng mắt trên nền tối + trắng + xám + phòng v3b
+cạnh bé gái (tỉ lệ 40/58/72%). Tổng PNG 5.034.330 B (~6,71 MB .b64).
+Nốt nhỏ đã soi: chu kỳ đi newborn chỉ đọc qua đuôi/móng/độ nghiêng (vẫn
+trong vỏ nên chân không rõ như teen/adult); sit dog_adult/cat_adult co nhẹ
+(scale 0,753/0,778 so với walk ~0,76/0,82) để vừa khung; happy nhấc 40 px,
+ở cỡ app là cú nảy nhẹ; cat newborn walk_a mặt hơi xoay về trước; hoa ở
+chân thỏ adult chạm đất trong khung đi (đúng thiết kế đã duyệt). Kỹ thuật:
+vẽ 9 tấm sheet 3×2 rồi cắt bằng code; lỗi đã sửa — bỏ `binary_fill_holes`
+(lấp khe chân làm magenta lọt vào thân ~2.400 px ở dog_adult walk_b/c),
+inset cắt tấm tăng 12→20 px (dải phân cách trắng rộng 16 px, rò 2 px vào
+đỉnh ô hàng 2). Đẩy 7 lần (8+8+8+8+8+8+6): `7dfb5e08` (chó newborn 6 + teen
+walk_a/b), `86ac7b07` (chó teen walk_c/d + happy/sit + adult walk),
+`254746c7` (chó adult happy/sit + mèo newborn 6), `d448b62a` (mèo teen 6 +
+adult walk_a/b), `58e3a7a5` (mèo adult walk_c/d + happy/sit + thỏ newborn
+walk), `aefdbc1b` (thỏ newborn happy/sit + teen 6), `9b1686d5` (thỏ adult 6);
+đầu nhánh `9b1686d5`; 54/54 blob SHA đối chiếu khớp trên nhánh. ĐƯỢC DUYỆT
+22/11 ~12:42 (Claude): cả 54 file, các nốt nhỏ đều chấp nhận, giữ nguyên.
