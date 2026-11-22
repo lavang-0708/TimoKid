@@ -995,3 +995,51 @@ adult walk_a/b), `58e3a7a5` (mèo adult walk_c/d + happy/sit + thỏ newborn
 walk), `aefdbc1b` (thỏ newborn happy/sit + teen 6), `9b1686d5` (thỏ adult 6);
 đầu nhánh `9b1686d5`; 54/54 blob SHA đối chiếu khớp trên nhánh. ĐƯỢC DUYỆT
 22/11 ~12:42 (Claude): cả 54 file, các nốt nhỏ đều chấp nhận, giữ nguyên.
+
+### Lô 8 nhóm (A) — Vỡ trứng từ từ (15 file, 22/11/2026)
+
+Mỗi loài dog/cat/rabbit × 5 file, 512×512, vào `app/assets/images/pets/`:
+`{loài}_egg_crack_1.png` (1 vết nứt nhỏ), `{loài}_egg_crack_2.png` (nứt lan
++ 1 mảnh vỏ bong), `{loài}_egg_crack_3.png` (nứt khắp, nắp hé thấy lông/tai),
+`{loài}_shell_bottom.png` (nửa vỏ dưới rỗng), `{loài}_shell_top.png` (nắp trên rời).
+Làm bằng cách sửa trực tiếp từ ảnh trứng gốc lô 5 (không vẽ lại): đường cắt
+răng cưa ±14 px — chó y≈165, mèo y≈285, thỏ y≈290; nắp crack_3 nâng 16 px +
+xoay 4°, khe tối + dải lông cắt từ đỉnh đầu newborn (chó lông vàng + tai cụp,
+mèo lông cam + tai cam, thỏ lông trắng + tai dài trắng/hồng); 2 mảnh vỏ có
+viền tối trong 12 px + viền cắt tối 2 px; quantize 256 màu bằng palette trứng gốc.
+Kiểm chứng: crack_1/2 silhouette lệch 0 px so với trứng gốc; bottom+top ghép
+lại đúng mặt nạ vỏ (chó 100%, mèo 99,97%, thỏ 99,99%). App: crossfade
+crack_1→2→3 (cùng khung, cùng vị trí), rồi tách nắp trên bay đi, để lại bát vỏ
+rỗng. Nốt: nắp thỏ thưa (vành 3 răng, đầu thỏ chiếm giữa nắp); nắp chó khuyết
+nhỏ góc dưới-trái (chỗ tai gắn); vệt xanh nhạt đáy thỏ là vệt gốc lô 5.
+Kích thước: chó 81.169/85.483/100.865/53.144/22.844 B; mèo 92.672/95.601/
+105.200/33.987/29.150 B; thỏ 69.206/72.623/79.094/34.326/10.866 B.
+Đẩy 2 lần (8+7 file): `00db1263` (5 chó + cat crack_1/2/3), `634f1875`
+(cat shell_bottom/top + 5 thỏ); đầu nhánh sau đẩy `634f1875`; 15/15 blob SHA
+đối chiếu khớp trên nhánh. ĐƯỢC DUYỆT 22/11 ~02:45 (Claude): cả 15 file,
+nắp thỏ giữ như hiện tại, 2 nốt nhỏ còn lại bỏ qua; ĐÃ DECODE + BẬT trong app
+(PR #48, Claude báo 22/11 ~12:42). (Mục doc này lên muộn — lần đẩy doc đầu
+tiên bị service restart gián đoạn, lần đẩy lại thẻ duyệt hết hạn ~03:44 —
+nên gộp chung với mục doc nhóm (C) trong 1 lần đẩy.)
+
+### Lô 8 nhóm (C) — room_v3_clean.png (1 file, 22/11/2026)
+
+Nền phòng sạch 1600×900, PNG đục, 256 màu, 772.906 byte, SHA-256
+`937716bc4ae884f4f16e0a9d028c7ab3a6f6363887ace84d6d2bb73307f188ee` →
+`app/assets/images/backgrounds/room_v3_clean.png`. Y hệt `room_v3.png`
+(694.028 byte, SHA-256 `a838c756…e41f40`), chỉ xoá 4 đồ rời bằng inpainting
+theo mặt phẳng (Laplace có barrier, 1 px, Neumann) + lấp gradient dọc cho đầu
+giường/tường kem + bóng sách trên bàn: gấu bông x[329,475) y[435,563)
+(18.688 px); đèn sao x[42,223) y[428,613) (33.485 px); bình hoa x[1238,1363)
+y[390,527) + cánh trái + bóng bình (17.709 px, giữ lại đầu phải cuốn sách
+dưới); cốc bút x[1075,1151) y[432,523) (6.916 px). Tổng mask 76.798 px;
+**diff ngoài 4 vùng xoá = 0 px**; chỉ quantize lại trong vùng mask bằng
+palette gốc + Floyd–Steinberg. Đã soi 2× từng vùng + toàn cảnh + ảnh ghép
+đặt lại 4 đồ rời (mỗi món 1 lớp, hết đè 2 lớp). Lưu ý nhỏ: vùng cốc còn mờ
+viền hình chữ nhật ở 2×; vùng bình còn vệt sáng tròn rất mờ ở 2× — cả 2 đều
+chấp nhận được (Claude duyệt 22/11 ~13:24). Đẩy 1 lần: `7d313e94`
+(.b64 1.030.544 B, blob SHA local `eba185cb…`; file ~1 MB nên không đọc lại
+được từ nhánh để đối chiếu — Claude kiểm bằng git khi decode).
+**Sửa D_IMAGES.md (nợ):** mép trái tủ quần áo x≈1360 (không phải 1460–1600);
+kệ x≈1150–1360; bàn kết thúc x≈1360 (không phải 1470); bình hoa đặt trên
+bàn học, không phải trên kệ phải.
