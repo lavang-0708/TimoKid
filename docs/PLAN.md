@@ -238,6 +238,11 @@ Kết quả của bản 0.2 là bé tạo nhân vật, ấp trứng, có phòng 
 - **Làm:** như T1-14. Dữ liệu từ bản 0.1 (xu, bậc, sổ ôn tập) phải được giữ khi cài đè bản 0.2.
 - **Nghiệm thu:** cài đè trên máy thật không mất dữ liệu; test migration cơ sở dữ liệu từ schema 0.1.
 
+### T2-10 Đấu trường TIMO
+
+- **Làm:** màn thi thử đúng định dạng vòng Chọn TIMO thật: 25 câu điền số, 5 phần x 5 câu (Tư duy logic, Số học, Lý thuyết số, Hình học, Tổ hợp), 4 điểm/câu, 100 điểm, 90 phút, sai không trừ điểm; câu dựng từ ngân hàng theo bậc của bé, tăng dần trong phần. Không báo đúng/sai khi thi; nộp xong chỉ hiện số câu đúng, điểm, số đúng từng phần và huy chương (Vàng từ 21 câu đúng, Bạc từ 16, Đồng từ 11, còn lại Tham gia). Thưởng kim cương cho bài đầu tiên mỗi ngày (Vàng 5, Bạc 3, Đồng 2, Tham gia 1). Lưu từng bài vào bảng `arena_attempts` (schema v3). Lối vào từ Thị trấn (khu trên bản đồ + nút HUD).
+- **Nghiệm thu:** unit test dựng đề (25 câu, 5 phần đúng thứ tự, không lặp dạng, độ khó tăng, đáp án hợp lệ), chấm điểm, ngưỡng huy chương, thưởng một lần mỗi ngày; widget test luồng thi (trả lời, chuyển câu, nộp có xác nhận, hết giờ tự nộp, bỏ thi), kết quả không lộ đúng/sai; migration v2→v3 giữ dữ liệu; không tràn màn ở 608x248, 640x320, 800x360, 1280x800; golden sảnh/thi/kết quả 800x360. Khi họa sĩ giao ảnh thì đặt `arenaArtReady = true`.
+
 ## Bản 0.3: đồng bộ và web admin
 
 Kết quả của bản 0.3 là chủ dự án xem được tiến độ của từng bé và gửi thư, quà từ một trang web, còn app vẫn chạy được khi không có mạng. Toàn bộ nằm trong gói miễn phí của Neon và Cloudflare. Trước khi làm, Muse đọc tài liệu hiện hành của Neon Auth và Data API và viết một trang thiết kế ngắn `docs/SYNC.md` để Claude duyệt.

@@ -38,6 +38,7 @@ import '../../core/animation/animation_gate.dart';
 import '../../core/database/models.dart';
 import '../../core/widgets/game_ui.dart';
 import '../../core/widgets/press_bounce.dart';
+import '../arena/arena_config.dart';
 import 'town_assets.dart';
 import 'town_roads.dart';
 
@@ -52,11 +53,15 @@ class TownMap extends StatefulWidget {
     required this.statuses,
     required this.onAreaTap,
     required this.onRoomTap,
+    this.onArenaTap,
   });
 
   final List<String> statuses;
   final ValueChanged<int> onAreaTap;
   final VoidCallback onRoomTap;
+
+  /// Bấm khu Đấu trường (T2-10); null thì không hiện khu này.
+  final VoidCallback? onArenaTap;
 
   @override
   State<TownMap> createState() => _TownMapState();
@@ -333,6 +338,17 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
           Positioned.fill(
             child: Image.asset(townBackgroundAsset, fit: BoxFit.fill),
           ),
+          // Đấu trường (T2-10): ảnh công trình vẽ trên nền, dưới lớp
+          // động. Chỉ khi họa sĩ vẽ xong (cờ [arenaArtReady]); hình
+          // chữ nhật `arenaTown*` được chỉnh lại khi ảnh về.
+          if (arenaArtReady && widget.onArenaTap != null)
+            Positioned(
+              left: w * arenaTownLeft / townFrameWidth,
+              top: h * arenaTownTop / townFrameHeight,
+              width: w * arenaTownWidth / townFrameWidth,
+              height: h * arenaTownHeight / townFrameHeight,
+              child: Image.asset(arenaBuildingAsset, fit: BoxFit.contain),
+            ),
           ..._dynamicLayers(w, h),
           ..._tapZones(w, h),
           ..._signs(w, h),
@@ -539,7 +555,23 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
     // chữ đầy đủ; bản đồ nhỏ hơn co tối đa còn 60% để vừa 608x248
     // mà không tràn — chữ nhỏ ở cỡ này chỉ để test, máy thật dùng
     // cỡ đầy đủ).
+    final onArenaTap = widget.onArenaTap;
     return [
+      if (onArenaTap != null)
+        Positioned(
+          left: w * arenaTownLeft / townFrameWidth,
+          top: h * arenaTownTop / townFrameHeight,
+          width: w * arenaTownWidth / townFrameWidth,
+          height: h * arenaTownHeight / townFrameHeight,
+          child: PressBounce(
+            child: GestureDetector(
+              key: const Key('town-arena'),
+              behavior: HitTestBehavior.opaque,
+              onTap: onArenaTap,
+              child: const SizedBox.expand(),
+            ),
+          ),
+        ),
       for (var i = 0; i < townAreas.length; i++)
         Positioned(
           left: w * townAreas[i].building.left,
@@ -634,6 +666,25 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
         widget.onRoomTap,
         const Key('town-room-sign'),
       ),
+      if (widget.onArenaTap != null)
+        Positioned(
+          left: arenaTownSignX / townFrameWidth * w - 150 * scale,
+          width: 300 * scale,
+          top: arenaTownSignY / townFrameHeight * h - 60 * scale,
+          height: 60 * scale,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: GestureDetector(
+              key: const Key('town-arena-sign'),
+              onTap: widget.onArenaTap,
+              child: GameSign(
+                text: 'Đấu trường',
+                scale: scale,
+                color: const Color(0xFFE0A93B),
+              ),
+            ),
+          ),
+        ),
     ];
   }
 

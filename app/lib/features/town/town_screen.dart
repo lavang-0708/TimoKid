@@ -6,6 +6,7 @@ import '../../core/database/database_provider.dart';
 import '../../core/database/models.dart';
 import '../../core/database/tables.dart';
 import '../../core/widgets/game_ui.dart';
+import '../arena/arena_lobby_screen.dart';
 import '../building/building_screen.dart';
 import '../character/character_bounce.dart';
 import '../daily_set/daily_set_config.dart';
@@ -159,6 +160,7 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                 extra: BuildingScreenArgs(stageIndex: i),
               ),
               onRoomTap: () => context.go(RoomScreen.route),
+              onArenaTap: () => context.go(ArenaLobbyScreen.route),
             ),
           ),
           Positioned(
@@ -172,14 +174,32 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GameRoundButton(
-                      key: const Key('town-room-button'),
-                      icon: Icons.home_rounded,
-                      image: '$uiArt/ui_icon_room.png',
-                      color: const Color(0xFFFFA65C),
-                      label: 'Phòng',
-                      tooltip: 'Về Phòng',
-                      onPressed: () => context.go(RoomScreen.route),
+                    // Cột nút tròn bên trái: Phòng, rồi Đấu trường (T2-10,
+                    // lối vào thứ hai ngoài khu trên bản đồ). Xếp dọc để
+                    // nhãn "Đấu trường" không che tâm công trình Lâu đài.
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        GameRoundButton(
+                          key: const Key('town-room-button'),
+                          icon: Icons.home_rounded,
+                          image: '$uiArt/ui_icon_room.png',
+                          color: const Color(0xFFFFA65C),
+                          label: 'Phòng',
+                          tooltip: 'Về Phòng',
+                          onPressed: () => context.go(RoomScreen.route),
+                        ),
+                        const SizedBox(height: 4),
+                        GameRoundButton(
+                          key: const Key('town-arena-button'),
+                          icon: Icons.emoji_events,
+                          color: const Color(0xFFF0A23B),
+                          label: 'Đấu trường',
+                          tooltip: 'Đấu trường TIMO',
+                          onPressed: () => context.go(ArenaLobbyScreen.route),
+                        ),
+                      ],
                     ),
                     // Chỉ số dồn sang phải để không che Lâu đài ở góc trái.
                     const SizedBox(width: 8),

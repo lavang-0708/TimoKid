@@ -514,9 +514,9 @@ class _MathScreenState extends ConsumerState<MathScreen>
 
 /// Màu viền dưới đậm của nút nổi: mặc định (nút đào), đúng (xanh),
 /// sai (đỏ).
-const Color _raisedPeachBottom = Color(0xFFF0B48C);
-const Color _raisedGreenBottom = Color(0xFF2E7D32);
-const Color _raisedRedBottom = Color(0xFFC62828);
+const Color raisedPeachBottom = Color(0xFFF0B48C);
+const Color raisedGreenBottom = Color(0xFF2E7D32);
+const Color raisedRedBottom = Color(0xFFC62828);
 
 /// Họa tiết nền nhẹ theo mảng (PLAN điểm (m)): lát ô SVG trắng mờ
 /// trên nền pastel.
@@ -1316,9 +1316,10 @@ class _PetMascot extends StatelessWidget {
 }
 
 /// Nút kiểu nổi (PLAN điểm (m)): viền dưới đậm, nhấn thì lún xuống
-/// 4 dp (hiệu ứng 90 ms, không chặn thao tác).
-class _RaisedButton extends StatefulWidget {
-  const _RaisedButton({
+/// 4 dp (hiệu ứng 90 ms, không chặn thao tác). Công khai để màn thi
+/// Đấu trường (T2-10) dùng lại cùng kiểu nút đáp án.
+class RaisedAnswerButton extends StatefulWidget {
+  const RaisedAnswerButton({
     super.key,
     required this.height,
     required this.bottomColor,
@@ -1336,10 +1337,10 @@ class _RaisedButton extends StatefulWidget {
   final Widget child;
 
   @override
-  State<_RaisedButton> createState() => _RaisedButtonState();
+  State<RaisedAnswerButton> createState() => _RaisedAnswerButtonState();
 }
 
-class _RaisedButtonState extends State<_RaisedButton> {
+class _RaisedAnswerButtonState extends State<RaisedAnswerButton> {
   bool _pressed = false;
 
   @override
@@ -1437,7 +1438,7 @@ class _ChoiceAnswers extends StatelessWidget {
       final en = question.choiceTextsEn[i];
       final bilingual = en != vi;
       return Expanded(
-        child: _RaisedButton(
+        child: RaisedAnswerButton(
           key: Key('choice-$i'),
           height: buttonHeight,
           bottomColor: bottom,
@@ -1512,14 +1513,14 @@ class _ChoiceAnswers extends StatelessWidget {
   (Color?, Color) _choiceColors(int displayIndex) {
     if (session.state == QuestionState.correct &&
         displayIndex == question.correctDisplayIndex) {
-      return (Colors.green.shade300, _raisedGreenBottom);
+      return (Colors.green.shade300, raisedGreenBottom);
     }
     if (session.selectedDisplayIndex == displayIndex &&
         (session.state == QuestionState.hint ||
             session.state == QuestionState.solution)) {
-      return (Colors.red.shade200, _raisedRedBottom);
+      return (Colors.red.shade200, raisedRedBottom);
     }
-    return (null, _raisedPeachBottom);
+    return (null, raisedPeachBottom);
   }
 }
 
@@ -1720,9 +1721,9 @@ class _PadKey extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final icon = this.icon;
-    return _RaisedButton(
+    return RaisedAnswerButton(
       height: height,
-      bottomColor: _raisedPeachBottom,
+      bottomColor: raisedPeachBottom,
       backgroundColor: null,
       enabled: enabled,
       onPressed: onPressed,

@@ -338,3 +338,43 @@ class Settings extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// Mỗi bài thi Đấu trường đã nộp (T2-10, schema v3): ngày thi, số câu
+/// đúng, điểm, huy chương, thời gian làm, kim cương đã thưởng. Bài bỏ
+/// dở (thoát giữa chừng) không được lưu. Không lưu đáp án từng câu:
+/// bé và phụ huynh chỉ cần kết quả (yêu cầu chủ dự án).
+class ArenaAttempts extends Table {
+  TextColumn get id => text()();
+
+  TextColumn get childId => text()();
+
+  /// Ngày thi, dạng `YYYY-MM-DD` theo giờ Việt Nam.
+  TextColumn get date => text()();
+
+  /// Vòng thi: `heat` (vòng Chọn 25 câu) hoặc `final` (Chung kết).
+  TextColumn get mode => text().withDefault(const Constant('heat'))();
+
+  /// Số câu đúng.
+  IntColumn get correctCount => integer()();
+
+  /// Điểm (đúng x điểm mỗi câu).
+  IntColumn get score => integer()();
+
+  /// Huy chương: `gold`, `silver`, `bronze`, `participant`.
+  TextColumn get medal => text()();
+
+  /// Thời gian làm bài, giây.
+  IntColumn get durationSec => integer()();
+
+  /// Kim cương thưởng cho bài này (0 nếu hôm đó đã nhận thưởng).
+  IntColumn get gemsAwarded => integer().withDefault(const Constant(0))();
+
+  DateTimeColumn get createdAt => dateTime()();
+
+  DateTimeColumn get updatedAt => dateTime()();
+
+  BoolColumn get synced => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

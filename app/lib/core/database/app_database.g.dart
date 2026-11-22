@@ -4856,6 +4856,726 @@ class InventoryCompanion extends UpdateCompanion<InventoryData> {
   }
 }
 
+class $ArenaAttemptsTable extends ArenaAttempts
+    with TableInfo<$ArenaAttemptsTable, ArenaAttempt> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ArenaAttemptsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _childIdMeta = const VerificationMeta(
+    'childId',
+  );
+  @override
+  late final GeneratedColumn<String> childId = GeneratedColumn<String>(
+    'child_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<String> date = GeneratedColumn<String>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _modeMeta = const VerificationMeta('mode');
+  @override
+  late final GeneratedColumn<String> mode = GeneratedColumn<String>(
+    'mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('heat'),
+  );
+  static const VerificationMeta _correctCountMeta = const VerificationMeta(
+    'correctCount',
+  );
+  @override
+  late final GeneratedColumn<int> correctCount = GeneratedColumn<int>(
+    'correct_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _scoreMeta = const VerificationMeta('score');
+  @override
+  late final GeneratedColumn<int> score = GeneratedColumn<int>(
+    'score',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _medalMeta = const VerificationMeta('medal');
+  @override
+  late final GeneratedColumn<String> medal = GeneratedColumn<String>(
+    'medal',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _durationSecMeta = const VerificationMeta(
+    'durationSec',
+  );
+  @override
+  late final GeneratedColumn<int> durationSec = GeneratedColumn<int>(
+    'duration_sec',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _gemsAwardedMeta = const VerificationMeta(
+    'gemsAwarded',
+  );
+  @override
+  late final GeneratedColumn<int> gemsAwarded = GeneratedColumn<int>(
+    'gems_awarded',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    childId,
+    date,
+    mode,
+    correctCount,
+    score,
+    medal,
+    durationSec,
+    gemsAwarded,
+    createdAt,
+    updatedAt,
+    synced,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'arena_attempts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ArenaAttempt> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('child_id')) {
+      context.handle(
+        _childIdMeta,
+        childId.isAcceptableOrUnknown(data['child_id']!, _childIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_childIdMeta);
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('mode')) {
+      context.handle(
+        _modeMeta,
+        mode.isAcceptableOrUnknown(data['mode']!, _modeMeta),
+      );
+    }
+    if (data.containsKey('correct_count')) {
+      context.handle(
+        _correctCountMeta,
+        correctCount.isAcceptableOrUnknown(
+          data['correct_count']!,
+          _correctCountMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_correctCountMeta);
+    }
+    if (data.containsKey('score')) {
+      context.handle(
+        _scoreMeta,
+        score.isAcceptableOrUnknown(data['score']!, _scoreMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_scoreMeta);
+    }
+    if (data.containsKey('medal')) {
+      context.handle(
+        _medalMeta,
+        medal.isAcceptableOrUnknown(data['medal']!, _medalMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_medalMeta);
+    }
+    if (data.containsKey('duration_sec')) {
+      context.handle(
+        _durationSecMeta,
+        durationSec.isAcceptableOrUnknown(
+          data['duration_sec']!,
+          _durationSecMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_durationSecMeta);
+    }
+    if (data.containsKey('gems_awarded')) {
+      context.handle(
+        _gemsAwardedMeta,
+        gemsAwarded.isAcceptableOrUnknown(
+          data['gems_awarded']!,
+          _gemsAwardedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ArenaAttempt map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ArenaAttempt(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      childId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}child_id'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}date'],
+      )!,
+      mode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mode'],
+      )!,
+      correctCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}correct_count'],
+      )!,
+      score: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}score'],
+      )!,
+      medal: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}medal'],
+      )!,
+      durationSec: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}duration_sec'],
+      )!,
+      gemsAwarded: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}gems_awarded'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
+    );
+  }
+
+  @override
+  $ArenaAttemptsTable createAlias(String alias) {
+    return $ArenaAttemptsTable(attachedDatabase, alias);
+  }
+}
+
+class ArenaAttempt extends DataClass implements Insertable<ArenaAttempt> {
+  final String id;
+  final String childId;
+
+  /// Ngày thi, dạng `YYYY-MM-DD` theo giờ Việt Nam.
+  final String date;
+
+  /// Vòng thi: `heat` (vòng Chọn 25 câu) hoặc `final` (Chung kết).
+  final String mode;
+
+  /// Số câu đúng.
+  final int correctCount;
+
+  /// Điểm (đúng x điểm mỗi câu).
+  final int score;
+
+  /// Huy chương: `gold`, `silver`, `bronze`, `participant`.
+  final String medal;
+
+  /// Thời gian làm bài, giây.
+  final int durationSec;
+
+  /// Kim cương thưởng cho bài này (0 nếu hôm đó đã nhận thưởng).
+  final int gemsAwarded;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final bool synced;
+  const ArenaAttempt({
+    required this.id,
+    required this.childId,
+    required this.date,
+    required this.mode,
+    required this.correctCount,
+    required this.score,
+    required this.medal,
+    required this.durationSec,
+    required this.gemsAwarded,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.synced,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['child_id'] = Variable<String>(childId);
+    map['date'] = Variable<String>(date);
+    map['mode'] = Variable<String>(mode);
+    map['correct_count'] = Variable<int>(correctCount);
+    map['score'] = Variable<int>(score);
+    map['medal'] = Variable<String>(medal);
+    map['duration_sec'] = Variable<int>(durationSec);
+    map['gems_awarded'] = Variable<int>(gemsAwarded);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
+    return map;
+  }
+
+  ArenaAttemptsCompanion toCompanion(bool nullToAbsent) {
+    return ArenaAttemptsCompanion(
+      id: Value(id),
+      childId: Value(childId),
+      date: Value(date),
+      mode: Value(mode),
+      correctCount: Value(correctCount),
+      score: Value(score),
+      medal: Value(medal),
+      durationSec: Value(durationSec),
+      gemsAwarded: Value(gemsAwarded),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      synced: Value(synced),
+    );
+  }
+
+  factory ArenaAttempt.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ArenaAttempt(
+      id: serializer.fromJson<String>(json['id']),
+      childId: serializer.fromJson<String>(json['childId']),
+      date: serializer.fromJson<String>(json['date']),
+      mode: serializer.fromJson<String>(json['mode']),
+      correctCount: serializer.fromJson<int>(json['correctCount']),
+      score: serializer.fromJson<int>(json['score']),
+      medal: serializer.fromJson<String>(json['medal']),
+      durationSec: serializer.fromJson<int>(json['durationSec']),
+      gemsAwarded: serializer.fromJson<int>(json['gemsAwarded']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'childId': serializer.toJson<String>(childId),
+      'date': serializer.toJson<String>(date),
+      'mode': serializer.toJson<String>(mode),
+      'correctCount': serializer.toJson<int>(correctCount),
+      'score': serializer.toJson<int>(score),
+      'medal': serializer.toJson<String>(medal),
+      'durationSec': serializer.toJson<int>(durationSec),
+      'gemsAwarded': serializer.toJson<int>(gemsAwarded),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
+    };
+  }
+
+  ArenaAttempt copyWith({
+    String? id,
+    String? childId,
+    String? date,
+    String? mode,
+    int? correctCount,
+    int? score,
+    String? medal,
+    int? durationSec,
+    int? gemsAwarded,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    bool? synced,
+  }) => ArenaAttempt(
+    id: id ?? this.id,
+    childId: childId ?? this.childId,
+    date: date ?? this.date,
+    mode: mode ?? this.mode,
+    correctCount: correctCount ?? this.correctCount,
+    score: score ?? this.score,
+    medal: medal ?? this.medal,
+    durationSec: durationSec ?? this.durationSec,
+    gemsAwarded: gemsAwarded ?? this.gemsAwarded,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
+  );
+  ArenaAttempt copyWithCompanion(ArenaAttemptsCompanion data) {
+    return ArenaAttempt(
+      id: data.id.present ? data.id.value : this.id,
+      childId: data.childId.present ? data.childId.value : this.childId,
+      date: data.date.present ? data.date.value : this.date,
+      mode: data.mode.present ? data.mode.value : this.mode,
+      correctCount: data.correctCount.present
+          ? data.correctCount.value
+          : this.correctCount,
+      score: data.score.present ? data.score.value : this.score,
+      medal: data.medal.present ? data.medal.value : this.medal,
+      durationSec: data.durationSec.present
+          ? data.durationSec.value
+          : this.durationSec,
+      gemsAwarded: data.gemsAwarded.present
+          ? data.gemsAwarded.value
+          : this.gemsAwarded,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ArenaAttempt(')
+          ..write('id: $id, ')
+          ..write('childId: $childId, ')
+          ..write('date: $date, ')
+          ..write('mode: $mode, ')
+          ..write('correctCount: $correctCount, ')
+          ..write('score: $score, ')
+          ..write('medal: $medal, ')
+          ..write('durationSec: $durationSec, ')
+          ..write('gemsAwarded: $gemsAwarded, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    childId,
+    date,
+    mode,
+    correctCount,
+    score,
+    medal,
+    durationSec,
+    gemsAwarded,
+    createdAt,
+    updatedAt,
+    synced,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ArenaAttempt &&
+          other.id == this.id &&
+          other.childId == this.childId &&
+          other.date == this.date &&
+          other.mode == this.mode &&
+          other.correctCount == this.correctCount &&
+          other.score == this.score &&
+          other.medal == this.medal &&
+          other.durationSec == this.durationSec &&
+          other.gemsAwarded == this.gemsAwarded &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
+}
+
+class ArenaAttemptsCompanion extends UpdateCompanion<ArenaAttempt> {
+  final Value<String> id;
+  final Value<String> childId;
+  final Value<String> date;
+  final Value<String> mode;
+  final Value<int> correctCount;
+  final Value<int> score;
+  final Value<String> medal;
+  final Value<int> durationSec;
+  final Value<int> gemsAwarded;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<bool> synced;
+  final Value<int> rowid;
+  const ArenaAttemptsCompanion({
+    this.id = const Value.absent(),
+    this.childId = const Value.absent(),
+    this.date = const Value.absent(),
+    this.mode = const Value.absent(),
+    this.correctCount = const Value.absent(),
+    this.score = const Value.absent(),
+    this.medal = const Value.absent(),
+    this.durationSec = const Value.absent(),
+    this.gemsAwarded = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ArenaAttemptsCompanion.insert({
+    required String id,
+    required String childId,
+    required String date,
+    this.mode = const Value.absent(),
+    required int correctCount,
+    required int score,
+    required String medal,
+    required int durationSec,
+    this.gemsAwarded = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.synced = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       childId = Value(childId),
+       date = Value(date),
+       correctCount = Value(correctCount),
+       score = Value(score),
+       medal = Value(medal),
+       durationSec = Value(durationSec),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<ArenaAttempt> custom({
+    Expression<String>? id,
+    Expression<String>? childId,
+    Expression<String>? date,
+    Expression<String>? mode,
+    Expression<int>? correctCount,
+    Expression<int>? score,
+    Expression<String>? medal,
+    Expression<int>? durationSec,
+    Expression<int>? gemsAwarded,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (childId != null) 'child_id': childId,
+      if (date != null) 'date': date,
+      if (mode != null) 'mode': mode,
+      if (correctCount != null) 'correct_count': correctCount,
+      if (score != null) 'score': score,
+      if (medal != null) 'medal': medal,
+      if (durationSec != null) 'duration_sec': durationSec,
+      if (gemsAwarded != null) 'gems_awarded': gemsAwarded,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ArenaAttemptsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? childId,
+    Value<String>? date,
+    Value<String>? mode,
+    Value<int>? correctCount,
+    Value<int>? score,
+    Value<String>? medal,
+    Value<int>? durationSec,
+    Value<int>? gemsAwarded,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<bool>? synced,
+    Value<int>? rowid,
+  }) {
+    return ArenaAttemptsCompanion(
+      id: id ?? this.id,
+      childId: childId ?? this.childId,
+      date: date ?? this.date,
+      mode: mode ?? this.mode,
+      correctCount: correctCount ?? this.correctCount,
+      score: score ?? this.score,
+      medal: medal ?? this.medal,
+      durationSec: durationSec ?? this.durationSec,
+      gemsAwarded: gemsAwarded ?? this.gemsAwarded,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (childId.present) {
+      map['child_id'] = Variable<String>(childId.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<String>(date.value);
+    }
+    if (mode.present) {
+      map['mode'] = Variable<String>(mode.value);
+    }
+    if (correctCount.present) {
+      map['correct_count'] = Variable<int>(correctCount.value);
+    }
+    if (score.present) {
+      map['score'] = Variable<int>(score.value);
+    }
+    if (medal.present) {
+      map['medal'] = Variable<String>(medal.value);
+    }
+    if (durationSec.present) {
+      map['duration_sec'] = Variable<int>(durationSec.value);
+    }
+    if (gemsAwarded.present) {
+      map['gems_awarded'] = Variable<int>(gemsAwarded.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ArenaAttemptsCompanion(')
+          ..write('id: $id, ')
+          ..write('childId: $childId, ')
+          ..write('date: $date, ')
+          ..write('mode: $mode, ')
+          ..write('correctCount: $correctCount, ')
+          ..write('score: $score, ')
+          ..write('medal: $medal, ')
+          ..write('durationSec: $durationSec, ')
+          ..write('gemsAwarded: $gemsAwarded, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4867,6 +5587,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $WalletLedgerTable walletLedger = $WalletLedgerTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
   late final $InventoryTable inventory = $InventoryTable(this);
+  late final $ArenaAttemptsTable arenaAttempts = $ArenaAttemptsTable(this);
   late final ChildrenDao childrenDao = ChildrenDao(this as AppDatabase);
   late final AttemptsDao attemptsDao = AttemptsDao(this as AppDatabase);
   late final SkillProgressDao skillProgressDao = SkillProgressDao(
@@ -4879,6 +5600,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final WalletDao walletDao = WalletDao(this as AppDatabase);
   late final SettingsDao settingsDao = SettingsDao(this as AppDatabase);
   late final InventoryDao inventoryDao = InventoryDao(this as AppDatabase);
+  late final ArenaAttemptsDao arenaAttemptsDao = ArenaAttemptsDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4892,6 +5616,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     walletLedger,
     settings,
     inventory,
+    arenaAttempts,
   ];
 }
 
@@ -7289,6 +8014,354 @@ typedef $$InventoryTableProcessedTableManager =
       InventoryData,
       PrefetchHooks Function()
     >;
+typedef $$ArenaAttemptsTableCreateCompanionBuilder =
+    ArenaAttemptsCompanion Function({
+      required String id,
+      required String childId,
+      required String date,
+      Value<String> mode,
+      required int correctCount,
+      required int score,
+      required String medal,
+      required int durationSec,
+      Value<int> gemsAwarded,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<bool> synced,
+      Value<int> rowid,
+    });
+typedef $$ArenaAttemptsTableUpdateCompanionBuilder =
+    ArenaAttemptsCompanion Function({
+      Value<String> id,
+      Value<String> childId,
+      Value<String> date,
+      Value<String> mode,
+      Value<int> correctCount,
+      Value<int> score,
+      Value<String> medal,
+      Value<int> durationSec,
+      Value<int> gemsAwarded,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<bool> synced,
+      Value<int> rowid,
+    });
+
+class $$ArenaAttemptsTableFilterComposer
+    extends Composer<_$AppDatabase, $ArenaAttemptsTable> {
+  $$ArenaAttemptsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get childId => $composableBuilder(
+    column: $table.childId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mode => $composableBuilder(
+    column: $table.mode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get correctCount => $composableBuilder(
+    column: $table.correctCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get score => $composableBuilder(
+    column: $table.score,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get medal => $composableBuilder(
+    column: $table.medal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get durationSec => $composableBuilder(
+    column: $table.durationSec,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get gemsAwarded => $composableBuilder(
+    column: $table.gemsAwarded,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ArenaAttemptsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ArenaAttemptsTable> {
+  $$ArenaAttemptsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get childId => $composableBuilder(
+    column: $table.childId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mode => $composableBuilder(
+    column: $table.mode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get correctCount => $composableBuilder(
+    column: $table.correctCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get score => $composableBuilder(
+    column: $table.score,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get medal => $composableBuilder(
+    column: $table.medal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get durationSec => $composableBuilder(
+    column: $table.durationSec,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get gemsAwarded => $composableBuilder(
+    column: $table.gemsAwarded,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ArenaAttemptsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ArenaAttemptsTable> {
+  $$ArenaAttemptsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get childId =>
+      $composableBuilder(column: $table.childId, builder: (column) => column);
+
+  GeneratedColumn<String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<String> get mode =>
+      $composableBuilder(column: $table.mode, builder: (column) => column);
+
+  GeneratedColumn<int> get correctCount => $composableBuilder(
+    column: $table.correctCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get score =>
+      $composableBuilder(column: $table.score, builder: (column) => column);
+
+  GeneratedColumn<String> get medal =>
+      $composableBuilder(column: $table.medal, builder: (column) => column);
+
+  GeneratedColumn<int> get durationSec => $composableBuilder(
+    column: $table.durationSec,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get gemsAwarded => $composableBuilder(
+    column: $table.gemsAwarded,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+}
+
+class $$ArenaAttemptsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ArenaAttemptsTable,
+          ArenaAttempt,
+          $$ArenaAttemptsTableFilterComposer,
+          $$ArenaAttemptsTableOrderingComposer,
+          $$ArenaAttemptsTableAnnotationComposer,
+          $$ArenaAttemptsTableCreateCompanionBuilder,
+          $$ArenaAttemptsTableUpdateCompanionBuilder,
+          (
+            ArenaAttempt,
+            BaseReferences<_$AppDatabase, $ArenaAttemptsTable, ArenaAttempt>,
+          ),
+          ArenaAttempt,
+          PrefetchHooks Function()
+        > {
+  $$ArenaAttemptsTableTableManager(_$AppDatabase db, $ArenaAttemptsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ArenaAttemptsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ArenaAttemptsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ArenaAttemptsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> childId = const Value.absent(),
+                Value<String> date = const Value.absent(),
+                Value<String> mode = const Value.absent(),
+                Value<int> correctCount = const Value.absent(),
+                Value<int> score = const Value.absent(),
+                Value<String> medal = const Value.absent(),
+                Value<int> durationSec = const Value.absent(),
+                Value<int> gemsAwarded = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ArenaAttemptsCompanion(
+                id: id,
+                childId: childId,
+                date: date,
+                mode: mode,
+                correctCount: correctCount,
+                score: score,
+                medal: medal,
+                durationSec: durationSec,
+                gemsAwarded: gemsAwarded,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                synced: synced,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String childId,
+                required String date,
+                Value<String> mode = const Value.absent(),
+                required int correctCount,
+                required int score,
+                required String medal,
+                required int durationSec,
+                Value<int> gemsAwarded = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<bool> synced = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ArenaAttemptsCompanion.insert(
+                id: id,
+                childId: childId,
+                date: date,
+                mode: mode,
+                correctCount: correctCount,
+                score: score,
+                medal: medal,
+                durationSec: durationSec,
+                gemsAwarded: gemsAwarded,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                synced: synced,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ArenaAttemptsTable, ArenaAttempt>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ArenaAttemptsTable,
+                    ArenaAttempt
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ArenaAttemptsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ArenaAttemptsTable,
+      ArenaAttempt,
+      $$ArenaAttemptsTableFilterComposer,
+      $$ArenaAttemptsTableOrderingComposer,
+      $$ArenaAttemptsTableAnnotationComposer,
+      $$ArenaAttemptsTableCreateCompanionBuilder,
+      $$ArenaAttemptsTableUpdateCompanionBuilder,
+      (
+        ArenaAttempt,
+        BaseReferences<_$AppDatabase, $ArenaAttemptsTable, ArenaAttempt>,
+      ),
+      ArenaAttempt,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7309,4 +8382,6 @@ class $AppDatabaseManager {
       $$SettingsTableTableManager(_db, _db.settings);
   $$InventoryTableTableManager get inventory =>
       $$InventoryTableTableManager(_db, _db.inventory);
+  $$ArenaAttemptsTableTableManager get arenaAttempts =>
+      $$ArenaAttemptsTableTableManager(_db, _db.arenaAttempts);
 }

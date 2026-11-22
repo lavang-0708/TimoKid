@@ -676,3 +676,68 @@ class InventoryDao extends DatabaseAccessor<AppDatabase>
             ..orderBy([(t) => OrderingTerm.asc(t.acquiredAt)]))
           .get();
 }
+
+/// Bài thi Đấu trường đã nộp (T2-10). Chỉ thêm dòng; đọc để hiện điểm
+/// cao nhất và trạng thái hôm nay.
+@DriftAccessor(tables: [ArenaAttempts])
+class ArenaAttemptsDao extends DatabaseAccessor<AppDatabase>
+    with _$ArenaAttemptsDaoMixin {
+  ArenaAttemptsDao(super.db);
+
+  /// Ghi một bài thi đã nộp. Trả id dòng mới.
+  Future<String> record({
+    required String childId,
+    required String date,
+    required String mode,
+    required int correctCount,
+    required int score,
+    required String medal,
+    required int durationSec,
+    required int gemsAwarded,
+  }) async {
+    final now = db.clock.now();
+    final id = newId();
+    await into(db.arenaAttempts).insert(
+      ArenaAttemptsCompanion.insert(
+        id: id,
+        childId: childId,
+        date: date,
+        mode: Value(mode),
+        correctCount: correctCount,
+        score: score,
+        medal: medal,
+        durationSec: durationSec,
+        gemsAwarded: Value(gemsAwarded),
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+    return id;
+  }
+
+  /// Mọi bài đã nộp của bé, mới nhất trước.
+  Future<List<ArenaAttempt>> getAll(String childId) =>
+      (select(db.arenaAttempts)
+            ..where((t) => t.childId.equals(childId))
+            ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+          .get();
+
+  /// Số bài bé đã nộp trong ngày [date] (`YYYY-MM-DD`).
+  Future<int> countOnDate(String childId, String date) async {
+    final rows = await (select(
+      db.arenaAttempts,
+    )..where((t) => t.childId.equals(childId) & t.date.equals(date))).get();
+    return rows.length;
+  }
+
+  /// Bài điểm cao nhất của bé (hòa thì bài mới hơn); null nếu chưa thi.
+  Future<ArenaAttempt?> best(String childId) =>
+      (select(db.arenaAttempts)
+            ..where((t) => t.childId.equals(childId))
+            ..orderBy([
+              (t) => OrderingTerm.desc(t.score),
+              (t) => OrderingTerm.desc(t.createdAt),
+            ])
+            ..limit(1))
+          .getSingleOrNull();
+}
