@@ -24,10 +24,9 @@ const bool eggCrackArtReady = true;
 /// Đã có hình đi/vui/ngồi của pet (Muse) chưa.
 const bool petMotionArtReady = true;
 
-/// Bộ khung chưa dùng được dù cờ đã bật: chó mới nở lô 8B vẽ ngồi
-/// trong vỏ trứng, khác ảnh đứng `dog_newborn.png` (đã ra khỏi vỏ) —
-/// đổi qua lại sẽ nhảy hình. Chờ Muse vẽ lại thì xoá khỏi đây.
-const Set<String> petMotionArtPending = {'dog_newborn'};
+/// Bộ khung chưa dùng được dù cờ đã bật (đang chờ Muse vẽ lại).
+/// Trống từ 22/11: chó mới nở đã vẽ lại không vỏ, khớp ảnh đứng.
+const Set<String> petMotionArtPending = {};
 
 /// Pet [species] ở [stage] có dùng khung đi/vui/ngồi thật không.
 bool petHasMotionArt(String species, PetStage stage) =>
