@@ -72,8 +72,16 @@ jobs:
       - name: flutter test
         run: flutter test
 
+      # Số phiên bản theo tag: v0.0.18 → tên 0.0.18, mã 18 (= a*10000 +
+      # b*100 + c). Mã tăng dần qua từng bản để Android luôn nhận là bản
+      # mới khi cài đè (trước đây mọi bản đều mã 1).
       - name: flutter build apk --release
-        run: flutter build apk --release
+        run: |
+          name="${GITHUB_REF_NAME#v}"
+          IFS=. read -r a b c <<< "$name"
+          code=$(( a * 10000 + b * 100 + c ))
+          echo "Phiên bản $name, mã $code"
+          flutter build apk --release --build-name="$name" --build-number="$code"
 
       - name: Đổi tên APK theo tag
         run: cp build/app/outputs/flutter-apk/app-release.apk "build/TimoKid-${GITHUB_REF_NAME}.apk"
