@@ -198,8 +198,8 @@ void main() {
   test('khung pet Muse (lô 8B) đã bật, tên file đúng quy ước', () {
     expect(petMotionArtReady, isTrue);
     expect(petHasMotionArt('cat', PetStage.newborn), isTrue);
-    // Chó mới nở: khung lô 8B còn trong vỏ, chờ vẽ lại.
-    expect(petHasMotionArt('dog', PetStage.newborn), isFalse);
+    // Chó mới nở: Muse đã vẽ lại không vỏ (22/11), dùng khung thật.
+    expect(petHasMotionArt('dog', PetStage.newborn), isTrue);
     expect(petHasMotionArt('dog', PetStage.teen), isTrue);
     expect(petWalkAssets('cat', PetStage.teen), [
       'assets/images/pets/cat_teen_walk_a.png',
