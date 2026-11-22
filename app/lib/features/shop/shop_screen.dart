@@ -518,7 +518,7 @@ class ShopItemArt extends StatelessWidget {
 
   /// Cắt phần nào của ảnh toàn thân: đầu, thân trên hay chân.
   Alignment get _crop => switch (item.kind) {
-    ShopItemKind.outfit => const Alignment(0, -0.7),
+    ShopItemKind.outfit => Alignment.center,
     ShopItemKind.headAccessory ||
     ShopItemKind.glasses => const Alignment(0, -0.85),
     ShopItemKind.backpack => const Alignment(0, -0.35),
@@ -564,7 +564,9 @@ class ShopItemArt extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: FittedBox(
-        fit: BoxFit.cover,
+        // Bộ đồ: hiện cả người để thấy rõ váy/áo (bộ càng đắt càng lộng
+        // lẫy); phụ kiện: cắt vùng có món đồ.
+        fit: item.kind == ShopItemKind.outfit ? BoxFit.contain : BoxFit.cover,
         alignment: _crop,
         child: SizedBox(
           width: kidFrameWidth,
