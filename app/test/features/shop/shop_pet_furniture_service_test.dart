@@ -204,12 +204,14 @@ void main() {
   });
 
   group('bộ đồ cao cấp (xu hoặc kim cương)', () {
-    test('cờ const đang tắt: ẩn, mã 04–07 đọc như bộ 1', () async {
+    test('mới có hình bộ 04: bán 4 bộ, mã 05–07 đọc như bộ 1', () async {
       expect(premiumOutfitsArtReady, isFalse);
+      expect(kidPremiumOutfitsDrawn, 1);
       expect(
         shopItemsFor('girl').where((i) => i.category == ShopCategory.outfits),
-        hasLength(3),
+        hasLength(4),
       );
+      expect(kidOutfitNumber('girl_top_04'), 4);
       expect(kidOutfitNumber('girl_top_06'), 1);
       await give(1000);
       await give(100, currency: Currency.gem);
@@ -315,12 +317,12 @@ void main() {
       expect(kidOutfitNumber(null), 1);
     });
 
-    test('khung đi bộ chỉ có bộ 1–3; bộ 04–07 trả null', () {
+    test('khung đi bộ có bộ 1–4; bộ 05–07 trả null', () {
       for (final g in ['girl', 'boy']) {
-        for (var n = 1; n <= 3; n++) {
+        for (var n = 1; n <= 4; n++) {
           expect(kidWalkFrames(g, n, up: false), hasLength(4));
         }
-        for (var n = 4; n <= 7; n++) {
+        for (var n = 5; n <= 7; n++) {
           expect(kidWalkFrames(g, n, up: true), isNull);
         }
       }

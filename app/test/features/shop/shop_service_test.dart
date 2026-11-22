@@ -41,29 +41,32 @@ void main() {
           .length;
 
   group('danh mục', () {
-    test('mỗi dáng có 2 bộ đồ để mua + 5 phụ kiện đúng giá', () {
-      for (final g in ['girl', 'boy']) {
-        final items = shopItemsFor(g);
-        expect(
-          items.where((i) => i.category == ShopCategory.outfits),
-          hasLength(3),
-        );
-        expect(
-          items.firstWhere((i) => i.id == glassesItemId).priceXu,
-          glassesPriceXu,
-        );
-        expect(items.firstWhere((i) => i.id == 'head_hat').priceXu, 40);
-        expect(items.firstWhere((i) => i.id == 'head_bow').priceXu, 40);
-        expect(items.firstWhere((i) => i.id == whiteShoesItemId).priceXu, 30);
-        expect(items.firstWhere((i) => i.id == backpackItemId).priceXu, 60);
-        expect(
-          items
-              .where((i) => i.kind == ShopItemKind.outfit)
-              .map((i) => i.priceXu),
-          everyElement(80),
-        );
-      }
-    });
+    test(
+      'mỗi dáng có bộ đồ để mua (3 cơ bản + bộ 04) + 5 phụ kiện đúng giá',
+      () {
+        for (final g in ['girl', 'boy']) {
+          final items = shopItemsFor(g);
+          expect(
+            items.where((i) => i.category == ShopCategory.outfits),
+            hasLength(4),
+          );
+          expect(
+            items.firstWhere((i) => i.id == glassesItemId).priceXu,
+            glassesPriceXu,
+          );
+          expect(items.firstWhere((i) => i.id == 'head_hat').priceXu, 40);
+          expect(items.firstWhere((i) => i.id == 'head_bow').priceXu, 40);
+          expect(items.firstWhere((i) => i.id == whiteShoesItemId).priceXu, 30);
+          expect(items.firstWhere((i) => i.id == backpackItemId).priceXu, 60);
+          expect(
+            items
+                .where((i) => i.kind == ShopItemKind.outfit)
+                .map((i) => i.priceXu),
+            [80, 80, 80, 150],
+          );
+        }
+      },
+    );
 
     test('chỉ hiện món đúng dáng', () {
       expect(
