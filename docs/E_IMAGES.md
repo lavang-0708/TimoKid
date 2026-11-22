@@ -1161,3 +1161,86 @@ hiện tại (~155 px hồng sẫm ở chân 4 viên đá rời — mặt dướ
 với magenta, xoá thêm sẽ ăn mất đá). Chưa decode (chờ Claude decode; code
 đấu trường đang làm).
 
+### Lô 9 — Bộ 04: váy xòe đi chơi + sơ mi nơ/quần yếm (20 file, 22/11/2026)
+
+Bộ cao cấp đầu tiên (05–07 tăng dần độ lộng lẫy). Mỗi dáng 10 file, khung
+1024×1536, PNG trong suốt, alpha sạch (semi 0, magenta 0 px), quantize 256 màu
+MAXCOVERAGE + Floyd–Steinberg, chân y=1428 (bbox y1=1429, đúng hàng chân bộ 01),
+vào `app/assets/images/character/girl/` (10 file gái) và
+`app/assets/images/character/boy/` (10 file trai). Tổng PNG 8.512.914 B
+(~11,35 MB .b64). Full = MỘT ảnh toàn thân hoàn chỉnh (không cắt lớp), wave =
+biến thể toàn thân tay vẫy, khung đi = khung thật 2 hướng × 4 khung. Phong
+cách v3b.
+
+| File | Byte | Chân y | Tâm mắt |
+|---|---|---|---|
+| girl_full_04.png | 460.643 | 1428 | (491,6; 560,0) |
+| girl_full_04_wave.png | 445.760 | 1428 | (500,3; 547,1) |
+| girl_full_04_walk_dr_a.png | 451.334 | 1428 | gần (720,8; 573,4) |
+| girl_full_04_walk_dr_b.png | 437.806 | 1428 | gần (718,1; 577,5) |
+| girl_full_04_walk_dr_c.png | 432.351 | 1428 | gần (715,3; 569,1) |
+| girl_full_04_walk_dr_d.png | 440.884 | 1428 | gần (716,3; 564,6) |
+| girl_full_04_walk_ur_a.png | 440.136 | 1428 | gần (725,8; 529,7) |
+| girl_full_04_walk_ur_b.png | 419.228 | 1428 | gần (715,6; 531,3) |
+| girl_full_04_walk_ur_c.png | 442.381 | 1428 | gần (711,0; 519,0) |
+| girl_full_04_walk_ur_d.png | 414.206 | 1428 | gần (726,1; 567,5) |
+| boy_full_04.png | 406.116 | 1428 | (504,6; 628,5) |
+| boy_full_04_wave.png | 430.835 | 1428 | (503,2; 625,4) |
+| boy_full_04_walk_dr_a.png | 398.817 | 1428 | (505,6; 626,6) |
+| boy_full_04_walk_dr_b.png | 444.234 | 1428 | (524,8; 638,6) |
+| boy_full_04_walk_dr_c.png | 409.964 | 1428 | (520,2; 634,7) |
+| boy_full_04_walk_dr_d.png | 428.459 | 1428 | (530,2; 629,7) |
+| boy_full_04_walk_ur_a.png | 395.595 | 1428 | (681,1; 642,2) |
+| boy_full_04_walk_ur_b.png | 414.987 | 1428 | (689,3; 642,3) |
+| boy_full_04_walk_ur_c.png | 399.188 | 1428 | (692,8; 640,2) |
+| boy_full_04_walk_ur_d.png | 399.690 | 1428 | (685,1; 620,6) |
+
+Gái 04: váy lavender nhạt, cổ trắng, nơ eo, tay phồng, tất trắng, giày búp bê
+lavender — xòe vừa, KHÔNG lộng lẫy quá (đúng vị trí rẻ nhất trong 4 bộ).
+Trai 04: sơ mi trắng + nơ cổ navy + quần yếm denim xanh + giày nâu — không
+vest, không áo choàng (đó là bộ 05–06). Mốc đo (so với bộ 01: tâm mắt gái
+(491,0; 560,5), miệng (519,2; 651,2); trai (504,1; 627,8), miệng
+(512,5; 713,5)): mắt full gái **(491,6; 560,0)** lệch 01 **(+0,6; −0,5)**;
+miệng full gái (511,5; 642,2) lệch (−7,7; −9,0) — detector miệng rung ±5 px,
+soi bằng mắt thì 2 miệng trùng vị trí, cùng nụ cười. Mắt full trai
+**(504,6; 628,5)** lệch 01 **(+0,5; +0,7)**; miệng (+2,8; +1,3). Mắt wave
+gái (500,3; 547,1) lệch 01 wave (+7,2; −14,4) — mặt rộng hơn ~10 px; mắt wave
+trai (503,2; 625,4) lệch 01 wave (+0,0; +9,2) — nhưng 01 wave của chính nó đã
+lệch 01 full −11,6 px theo y, nên wave 04 thực ra GẦN 01 full hơn cả wave 01.
+Khung đi: đầu lệch ≤5 px trong mỗi chu kỳ 4 khung (gái dr hcy 343–350, ur
+364–372; trai dr 359–360, ur 382–383); chân luân phiên rõ (a/c tiếp đất đối
+nhau, b/d bước giữa).
+
+**Vẽ lại girl walk dr_d (22/11, theo yêu cầu Claude ~16:15):** bản cũ mặt
+nghiêng quá (near-eye x 696,8, lệch −26, mắt gần–xa cách ~40 px) + tóc bay
+ngược mạnh, đọc như chạy/xoay. Bản mới: mặt 3/4 như a/b/c, near-eye x 716,3
+(lệch −1,8 so với trung bình a/b/c), mắt 2 bên cân, tóc xõa yên, hcy 346,6
+(+0,5), top 161 (+0,3), 440.884 byte, SHA-256 `024bcd29c110…`. Nốt còn lại:
+near-eye y 564,6 thấp hơn trung bình a/b/c 8,7 px (detector rung ±7 px giữa
+các lần đo trên chính khung này, zoom mặt 2× cho thấy mắt vẫn ngang hàng
+a/b/c); tóc trái xòe rộng hơn (bbox x0=67 so với 91–102, face-band SSD 1.533
+nằm trong dải a/b/c 809–2.327 — mặt khớp, chỉ tóc rộng hơn, ở cỡ app ~5 px).
+Mắt gái ở dải đi ur đo thấp hơn 01 ur ~30 px (near-eye y 519–535) — soi bằng
+mắt thì mắt nhìn bình thường, đều nhau, nhiều khả năng detector bắt mép trên
+mắt/mi trên; viền tóc còn ánh hồng rất nhạt ở một số mép tóc khung đi
+(magenta đo = 0 px, tóc hồng thật) — ở cỡ app gần như không thấy.
+
+**QUY TẮC MẮT NHẮM (Claude chốt 22/11 ~16:15, áp cho 05–07):** app dùng
+**CHUNG miếng mắt nhắm của bộ 01 cho mọi bộ** — vị trí mắt ở ảnh đứng VÀ ảnh
+vẫy phải trùng bộ 01 trong **±3 px**. Bộ 04 wave gái (+7,2/−14,4) là ngoại lệ
+đã được chấp nhận (ở cỡ app ~2 px). Câu "miếng mắt nhắm làm theo từng ảnh"
+trong các bản nháp cũ HẾT HIỆU LỰC. Kỹ thuật: vẽ từng ảnh toàn thân bằng AI
+trên nền magenta đặc, có ảnh bộ 01 làm tham chiếu khuôn mặt/dáng đầu; tách nền
++ chuẩn hoá + quantize bằng code (key dist ≥ 20, closing 3×3, closing dọc 31×1
+cầu nối cổ, edge-recovery ≤3 px, KHÔNG dùng `binary_fill_holes`; khử viền
+magenta 4 vòng — viền magenta là dải fade quanh silhouette, vùng magenta trong
+tóc dày 20–60 px; khe tóc thật bị closing 31×1 lấp thì mở lại theo ảnh gốc).
+
+ĐƯỢC DUYỆT KIỂU 22/11 ~16:15 (Claude): cả hai dáng; chỉ sửa 1 khung dr_d,
+các nốt khác chấp nhận hết. Đẩy 3 lần (8+8+4 file, mỗi lần ≤3,97 MB .b64):
+`91d6a42b` (7 file), `98ece9c3` (7 file), `e415c8ae` (6 file); đầu nhánh sau
+đẩy `e415c8ae`. 20/20 .b64 giải mã đúng từng byte PNG gốc trong vòng khứ hồi
+local (SHA-256 khớp) — đối chiếu blob SHA trên nhánh bị chặn (bảo vệ mã xác
+minh, giống `arena_bg.png.b64` lô 11), Claude kiểm lại bằng git. Chưa decode
+(chờ Claude decode).
+
