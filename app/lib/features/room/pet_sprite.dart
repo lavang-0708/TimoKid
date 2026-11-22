@@ -94,7 +94,7 @@ class _PetSpriteState extends State<PetSprite> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 900),
     );
     _scheduleIdleAction();
-    if (petMotionArtReady) _precache();
+    if (petHasMotionArt(widget.species, widget.stage)) _precache();
   }
 
   void _precache() {
@@ -173,7 +173,7 @@ class _PetSpriteState extends State<PetSprite> with TickerProviderStateMixin {
   /// Chọn ảnh theo trạng thái (khung thật khi [petMotionArtReady]).
   String _asset({required bool sitting}) {
     final base = petAsset(widget.species, widget.stage);
-    if (!petMotionArtReady || !_on) return base;
+    if (!petHasMotionArt(widget.species, widget.stage) || !_on) return base;
     if (_happy!.isAnimating) return petHappyAsset(widget.species, widget.stage);
     if (sitting) return petSitAsset(widget.species, widget.stage);
     if (widget.walking) {
