@@ -509,7 +509,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('fake-arena')), findsOneWidget);
-      expect(arenaArtReady, isFalse);
+      expect(arenaArtReady, isTrue);
     });
   });
 }

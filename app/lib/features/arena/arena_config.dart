@@ -14,7 +14,7 @@ import '../../core/database/tables.dart';
 /// huy chương và khu tạm trên bản đồ Thị trấn; true thì dùng ảnh thật
 /// (`arena_bg.png`, `medal_*.png`, `gem_chest.png`, `arena_building.png`)
 /// khi họa sĩ vẽ xong và ảnh được thêm vào `assets/`.
-const bool arenaArtReady = false;
+const bool arenaArtReady = true;
 
 /// Ảnh nền màn Đấu trường (1600x900), chỉ dùng khi [arenaArtReady].
 const String arenaBackgroundAsset = 'assets/images/backgrounds/arena_bg.png';
@@ -24,7 +24,7 @@ const String arenaBackgroundAsset = 'assets/images/backgrounds/arena_bg.png';
 const String arenaBuildingAsset = 'assets/images/town/arena_building.png';
 
 /// Ảnh rương kim cương trên màn Kết quả, chỉ dùng khi [arenaArtReady].
-const String arenaGemChestAsset = 'assets/images/ui/gem_chest.png';
+const String arenaGemChestAsset = 'assets/images/items/gem_chest.png';
 
 /// Định dạng một vòng thi.
 class ArenaFormat {
@@ -147,14 +147,16 @@ ArenaMedal arenaMedalFor(int correct) {
 
 /// Khung bản đồ Thị trấn (1600x900): vị trí khu Đấu trường.
 ///
-/// Khu đất có ao ở góc dưới phải (x 1200–1590, y 490–770), chưa có công
-/// trình nào. Khi [arenaArtReady] là true, `arena_building.png` được vẽ
-/// đúng hình chữ nhật này; hình chữ nhật được chỉnh lại khi ảnh về.
-const double arenaTownLeft = 1250;
-const double arenaTownTop = 490;
-const double arenaTownWidth = 330;
-const double arenaTownHeight = 270;
+/// Khu đất có ao ở góc dưới phải, chưa có công trình nào. Hình chữ nhật
+/// là cả khung ảnh `arena_building.png` (1024x640, phần có hình
+/// x 122–903, y 42–601) thu còn tỉ lệ 0,365: tòa rộng ~285 px khung,
+/// đáy tòa ở y 755, mép phải tòa ~1520 để màn 16:10 (cắt hai bên)
+/// vẫn thấy trọn. Đã ghép thử trên `town_v3.png` (22/11).
+const double arenaTownLeft = 1190;
+const double arenaTownTop = 536;
+const double arenaTownWidth = 374;
+const double arenaTownHeight = 234;
 
 /// Điểm đặt biển "Đấu trường" (tâm đáy biển, khung 1600x900).
-const double arenaTownSignX = 1380;
-const double arenaTownSignY = 650;
+const double arenaTownSignX = 1378;
+const double arenaTownSignY = 740;

@@ -1,6 +1,6 @@
 /// Golden test Đấu trường (T2-10) ở 800x360: sảnh (đã có điểm cao nhất),
 /// màn thi (một câu đã trả lời) và màn kết quả (huy chương Bạc, +3).
-/// Nền vẽ bằng code, huy chương là icon cúp (cờ `arenaArtReady` tắt).
+/// Nền, huy chương, rương là hình Muse vẽ (cờ `arenaArtReady` bật, lô 11).
 library;
 
 import 'dart:convert';
@@ -11,6 +11,9 @@ import 'package:drift/native.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../helpers/ui_images.dart';
+
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:timokid/core/database/app_database.dart';
@@ -134,13 +137,8 @@ void main() {
   Future<void> precache(WidgetTester tester, Finder screen) async {
     final context = tester.element(screen);
     await tester.runAsync(() async {
-      for (final name in const [
-        'ui_gem',
-        'ui_coin',
-        'ui_btn_back',
-        'ui_sign_board',
-      ]) {
-        await precacheImage(AssetImage('assets/images/ui/$name.png'), context);
+      for (final path in uiImagePaths) {
+        await precacheImage(AssetImage(path), context);
       }
     });
     await tester.pump();
