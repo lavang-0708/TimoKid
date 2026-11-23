@@ -147,6 +147,33 @@ void main() {
     expect(await care.mealCount(childId), 2);
   });
 
+  test('tầng tháp: xp từng câu đúng ngay, thử lại cùng tầng cùng ngày chỉ một suất', () async {
+    Future<void> attempt(int floor) async {
+      final s = StageSession(
+        db: db,
+        childId: childId,
+        dailySetId: null,
+        stageIndex: -1,
+        questions: fiveQuestions(),
+        towerFloor: floor,
+      );
+      for (var i = 0; i < 5; i++) {
+        await answerOne(s, firstTry: true);
+        await s.next();
+      }
+    }
+
+    await attempt(1);
+    await attempt(1);
+    expect((await pets.active(childId))!.xp, 10);
+    expect(await care.mealCount(childId), 1);
+    await attempt(2);
+    expect(await care.mealCount(childId), 2);
+    clock.set(DateTime(2026, 11, 24, 8, 0));
+    await attempt(1);
+    expect(await care.mealCount(childId), 3);
+  });
+
   group('đấu trường', () {
     ArenaScore score(int correct) => ArenaScore(
       correct: correct,
