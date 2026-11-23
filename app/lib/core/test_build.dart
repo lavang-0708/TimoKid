@@ -1,3 +1,4 @@
+// Thăm dò CI integration trên main (không gộp).
 /// Cờ "bản thử" (compile-time): mở hết tính năng để chủ dự án thử,
 /// bản chính thức thì về như cũ.
 ///
