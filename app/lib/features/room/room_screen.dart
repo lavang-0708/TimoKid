@@ -64,6 +64,10 @@ import '../onboarding/egg_service.dart';
 import '../onboarding/onboarding_config.dart';
 import '../onboarding/onboarding_model.dart';
 import '../onboarding/onboarding_service.dart';
+import '../pet/pet_care_service.dart';
+import '../pet/pet_celebration.dart';
+import '../pet/pet_config.dart';
+import '../pet/pet_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
 import '../shop/shop_catalog.dart';
@@ -121,7 +125,13 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   bool _backpack = false;
   bool _kidWalkingUp = false;
   PetStage _petStage = PetStage.newborn;
-  int _petDays = 0;
+  int _petXp = 0;
+  PetMood? _mood; // null: chưa có pet / còn là trứng
+  int _meals = 0;
+  List<PetInfo> _pets = const [];
+  bool _canClaimEgg = false;
+  List<String> _claimSpecies = const [];
+  ({PetStage from, PetStage to, String species, String petId})? _celebration;
   Map<String, int> _foodCounts = const {};
   Set<String> _ownedToys = const {};
   Set<String> _ownedFurniture = const {};
@@ -166,8 +176,11 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       final childId = await db.ensureSeeded();
       final profile = await OnboardingService(db: db).loadProfile(childId);
       final eggs = EggService(db: db);
-      final eggSpecies = await eggs.selectedEgg(childId);
-      final hatched = await eggs.isHatched(childId);
+      final petService = PetService(db: db);
+      final care = PetCareService(db: db);
+      final activePet = await petService.active(childId);
+      final eggSpecies = activePet?.species;
+      final hatched = activePet?.hatched ?? false;
       final hatchPending = await eggs.isHatchPending(childId);
       final rewardService = RewardService(
         db: db,
@@ -185,15 +198,32 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       final shop = ShopService(db: db);
       final ownedItems = await shop.owned(childId);
       final foodCounts = await shop.foodCounts(childId);
-      final growth = PetGrowthService(db: db);
-      final petDays = await growth.doneDays(childId);
-      final petStage = hatched ? petStageForDays(petDays) : PetStage.egg;
-      final seen = await growth.seenStage(childId);
-      if (hatched && seen != petStage) {
-        await growth.markSeen(childId, petStage);
+      final petStage = activePet?.stage ?? PetStage.egg;
+      // Pet lớn lên từ lần bé thấy trước → màn ăn mừng (bấm "Tuyệt vời"
+      // mới ghi giai đoạn đã thấy). Giá trị lạ/trứng: ghi lặng lẽ.
+      final seen = activePet?.stageSeen;
+      ({PetStage from, PetStage to, String species, String petId})? celebration;
+      if (activePet != null && hatched && seen != petStage) {
+        if (seen != null &&
+            seen != PetStage.egg &&
+            seen.index < petStage.index) {
+          celebration = (
+            from: seen,
+            to: petStage,
+            species: activePet.species,
+            petId: activePet.id,
+          );
+        } else {
+          await petService.markStageSeen(activePet.id, petStage);
+        }
       }
-      final grewUp =
-          hatched && seen != null && seen != PetStage.egg && seen != petStage;
+      final mood = await care.mood(childId);
+      final meals = await care.mealCount(childId);
+      final allPets = await petService.pets(childId);
+      final canClaim = await petService.canClaimStarterEgg(childId);
+      final claimSpecies = canClaim
+          ? await petService.availableStarterSpecies(childId)
+          : const <String>[];
       if (!mounted) return;
       setState(() {
         _childId = childId;
@@ -210,8 +240,14 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
           for (final id in shopFurniture.keys)
             if (ownedItems.contains(id)) id,
         };
-        _petDays = petDays;
+        _petXp = activePet?.xp ?? 0;
         _petStage = petStage;
+        _mood = mood;
+        _meals = meals;
+        _pets = allPets;
+        _canClaimEgg = canClaim;
+        _claimSpecies = claimSpecies;
+        _celebration = celebration;
         _profile = profile;
         _eggSpecies = eggSpecies;
         _hatched = hatched;
@@ -224,11 +260,8 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
         _error = null;
       });
       _precacheKid();
-      if (grewUp && eggSpecies != null) {
-        _showBubble(
-          'Pet đã lớn thành ${petStageNames[petStage]}! Giỏi quá!',
-          seconds: 3,
-        );
+      if (mood == PetMood.happy && celebration == null) {
+        setState(() => _petBounce++);
       }
     } catch (e) {
       if (!mounted) return;
@@ -300,19 +333,14 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       );
       return;
     }
-    if (!_unlocked) {
-      _showBubble(petLockedLine);
-      return;
-    }
     setState(() => _petBounce++);
-    final next = petDaysToNextStage(_petDays);
-    _showBubble(
-      next == null
-          ? (petHappyLines[species] ?? 'Vui quá!')
-          : '${petHappyLines[species] ?? 'Vui quá!'} '
-                'Còn $next ngày học nữa tớ sẽ lớn!',
-      seconds: 2,
-    );
+    final happy = petHappyLines[species] ?? 'Vui quá!';
+    final next = petXpToNextStage(_petXp);
+    _showBubble(switch (_mood) {
+      PetMood.hungry => 'Tớ đói rồi, cho tớ ăn nhé!',
+      PetMood.sad => 'Chơi với tớ đi, tớ buồn quá!',
+      _ => next == null ? happy : '$happy Còn $next câu đúng nữa tớ sẽ lớn!',
+    }, seconds: 2);
   }
 
   /// Tủ đồ (E): chọn 1 trong 3 bộ đồ và phụ kiện đầu, xem trước ngay
@@ -615,14 +643,13 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       if (f.footprint != null) f.footprint!,
   ];
 
-  bool get _petInteractive =>
-      _unlocked && _hatched && _eggSpecies != null && !_loading;
+  bool get _petInteractive => _eggSpecies != null && !_loading;
 
-  /// Nút Cho ăn: chưa có thức ăn thì mở Cửa hàng ở tab Đồ cho pet,
-  /// có rồi thì mở/đóng bảng chọn thức ăn.
+  /// Nút Cho ăn: chưa có thức ăn/suất ăn nào thì mở Cửa hàng ở tab
+  /// Đồ cho pet (suất ăn nhận khi xong chặng), có rồi thì mở/đóng bảng chọn (suất ăn + thức ăn mua).
   void _onFeedButton() {
     if (_petBusy) return;
-    final any = _foodCounts.values.any((n) => n > 0);
+    final any = _meals > 0 || _foodCounts.values.any((n) => n > 0);
     if (!any) {
       _openShop(tab: ShopCategory.pet.key);
       return;
@@ -630,13 +657,9 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     setState(() => _petMenu = _petMenu == 'food' ? null : 'food');
   }
 
-  /// Nút Chơi: như [_onFeedButton] nhưng với đồ chơi.
+  /// Nút Chơi: bảng chọn luôn có "Vuốt ve" + đồ chơi đã mua.
   void _onPlayButton() {
     if (_petBusy) return;
-    if (_ownedToys.isEmpty) {
-      _openShop(tab: ShopCategory.pet.key);
-      return;
-    }
     setState(() => _petMenu = _petMenu == 'toy' ? null : 'toy');
   }
 
@@ -650,13 +673,16 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       _petMenu = null;
       _petBusy = true;
     });
-    final shop = ShopService(db: ref.read(databaseProvider));
-    final ok = await shop.consumeFood(childId, foodId);
-    final counts = await shop.foodCounts(childId);
+    final db = ref.read(databaseProvider);
+    final result = await PetCareService(db: db).feed(childId, foodId: foodId);
+    final counts = await ShopService(db: db).foodCounts(childId);
+    final meals = await PetCareService(db: db).mealCount(childId);
+    final mood = await PetCareService(db: db).mood(childId);
     if (!mounted) return;
-    if (!ok) {
+    if (result != CareResult.done) {
       setState(() {
         _foodCounts = counts;
+        _meals = meals;
         _petBusy = false;
       });
       return;
@@ -669,10 +695,14 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     );
     setState(() {
       _foodCounts = counts;
+      _meals = meals;
+      _mood = mood;
       _prop = _PetProp(
         isToy: false,
         id: foodId,
-        asset: petFoods[foodId]!.$2,
+        asset: foodId == petMealId
+            ? (petUiArtReady ? petMealAsset : null)
+            : petFoods[foodId]!.$2,
         start: at,
         rest: at,
         dir: dir,
@@ -705,10 +735,38 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
 
   /// Chơi với [toyId]: đồ chơi hiện cạnh pet, nảy/lăn ra chỗ trống, pet
   /// chạy tới chơi (nhảy vui + tim) rồi đồ chơi mờ dần.
-  Future<void> _play(String toyId) async {
-    if (_childId == null || _petBusy) return;
+  Future<void> _play(String? toyId) async {
+    final childId = _childId;
+    if (childId == null || _petBusy) return;
+    final db = ref.read(databaseProvider);
+    final care = PetCareService(db: db);
+    final result = await care.play(childId, toyId: toyId);
+    if (!mounted) return;
+    if (result != CareResult.done) {
+      setState(() => _petMenu = null);
+      _showBubble(
+        result == CareResult.needStage
+            ? petLockedLine
+            : 'Chưa chơi được, bé thử lại nhé!',
+        seconds: 2,
+      );
+      return;
+    }
+    final mood = await care.mood(childId);
+    if (!mounted) return;
+    if (toyId == null) {
+      // Vuốt ve: pet nhảy vui + tim, không cần món.
+      setState(() {
+        _petMenu = null;
+        _mood = mood;
+        _petBounce++;
+      });
+      _showBubble('Ngoan nào! ${petHappyLines[_eggSpecies] ?? 'Vui quá!'}');
+      return;
+    }
     setState(() {
       _petMenu = null;
+      _mood = mood;
       _petBusy = true;
     });
     final extra = _extraObstacles;
@@ -1005,6 +1063,19 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
             ),
           ),
           if (_petInteractive) _petControls(),
+          if (_celebration case final c?)
+            Positioned.fill(
+              child: PetGrowCelebration(
+                species: c.species,
+                from: c.from,
+                to: c.to,
+                onDone: () async {
+                  final db = ref.read(databaseProvider);
+                  await PetService(db: db).markStageSeen(c.petId, c.to);
+                  if (mounted) setState(() => _celebration = null);
+                },
+              ),
+            ),
           // Nhắc khóa ở dưới thanh chỉ số (không che sàn để bé chạm đi).
           if (!_unlocked)
             Positioned(
@@ -1050,17 +1121,25 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     );
   }
 
-  /// Hai nút tròn Cho ăn / Chơi ở góc dưới trái + bảng chọn món đã có.
+  /// Các nút chăm pet ở góc dưới trái: Cho ăn / Chơi (khi pet đã nở),
+  /// "Pet của bé" (khi có từ 2 pet), "Nhận trứng mới" (khi pet trưởng
+  /// thành) + bảng chọn món (suất ăn, thức ăn mua, đồ chơi, vuốt ve).
   Widget _petControls() {
     final menu = _petMenu;
-    final entries = <(String, String, String, int?)>[
-      if (menu == 'food')
+    // (mã, tên, ảnh hoặc null → icon, số lượng hoặc null)
+    final entries = <(String, String, String?, int?)>[
+      if (menu == 'food') ...[
+        if (_meals > 0)
+          (petMealId, petMealName, petUiArtReady ? petMealAsset : null, _meals),
         for (final e in petFoods.entries)
           if ((_foodCounts[e.key] ?? 0) > 0)
             (e.key, e.value.$1, e.value.$2, _foodCounts[e.key]),
-      if (menu == 'toy')
+      ],
+      if (menu == 'toy') ...[
+        (petPatId, 'Vuốt ve', null, null),
         for (final e in petToys.entries)
           if (_ownedToys.contains(e.key)) (e.key, e.value.$1, e.value.$2, null),
+      ],
     ];
     return Positioned(
       left: 8,
@@ -1088,23 +1167,43 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                       PressBounce(
                         child: GestureDetector(
                           key: Key(
-                            'room-pet-${menu == 'food' ? 'food' : 'toy'}-${e.$1}',
+                            e.$1 == petPatId
+                                ? 'room-pet-pat'
+                                : 'room-pet-${menu == 'food' ? 'food' : 'toy'}-${e.$1}',
                           ),
                           behavior: HitTestBehavior.opaque,
-                          onTap: () =>
-                              menu == 'food' ? _feed(e.$1) : _play(e.$1),
+                          onTap: () {
+                            if (menu == 'food') {
+                              _feed(e.$1);
+                            } else {
+                              _play(e.$1 == petPatId ? null : e.$1);
+                            }
+                          },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 4),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Image.asset(
-                                  e.$3,
-                                  width: 44,
-                                  height: 44,
-                                  fit: BoxFit.contain,
-                                  semanticLabel: e.$2,
-                                ),
+                                if (e.$3 != null)
+                                  Image.asset(
+                                    e.$3!,
+                                    width: 44,
+                                    height: 44,
+                                    fit: BoxFit.contain,
+                                    semanticLabel: e.$2,
+                                  )
+                                else
+                                  SizedBox(
+                                    width: 44,
+                                    height: 44,
+                                    child: Icon(
+                                      e.$1 == petPatId
+                                          ? Icons.back_hand_rounded
+                                          : Icons.rice_bowl_rounded,
+                                      size: 34,
+                                      color: const Color(0xFFFF9E5E),
+                                    ),
+                                  ),
                                 Text(
                                   e.$4 == null ? e.$2 : '${e.$2} ×${e.$4}',
                                   style: const TextStyle(
@@ -1124,27 +1223,204 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                GameRoundButton(
-                  key: const Key('room-pet-feed-button'),
-                  icon: Icons.restaurant_rounded,
-                  color: const Color(0xFFFF9E5E),
-                  label: 'Cho ăn',
-                  onPressed: _onFeedButton,
-                ),
-                const SizedBox(width: 8),
-                GameRoundButton(
-                  key: const Key('room-pet-play-button'),
-                  icon: Icons.sports_baseball_rounded,
-                  color: const Color(0xFF5DB7F0),
-                  label: 'Chơi',
-                  onPressed: _onPlayButton,
-                ),
+                if (_hatched) ...[
+                  GameRoundButton(
+                    key: const Key('room-pet-feed-button'),
+                    icon: Icons.restaurant_rounded,
+                    color: const Color(0xFFFF9E5E),
+                    label: 'Cho ăn',
+                    onPressed: _onFeedButton,
+                  ),
+                  const SizedBox(width: 8),
+                  GameRoundButton(
+                    key: const Key('room-pet-play-button'),
+                    icon: Icons.sports_baseball_rounded,
+                    color: const Color(0xFF5DB7F0),
+                    label: 'Chơi',
+                    onPressed: _onPlayButton,
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                if (_pets.length > 1)
+                  GameRoundButton(
+                    key: const Key('room-pets-button'),
+                    icon: Icons.pets_rounded,
+                    color: const Color(0xFF8E6FD8),
+                    label: 'Pet của bé',
+                    onPressed: _openPetPicker,
+                  ),
+                if (_canClaimEgg) ...[
+                  const SizedBox(width: 8),
+                  GameRoundButton(
+                    key: const Key('room-new-egg-button'),
+                    icon: Icons.egg_rounded,
+                    color: const Color(0xFFFFB84D),
+                    label: 'Nhận trứng mới',
+                    onPressed: _openNewEggPicker,
+                  ),
+                ],
               ],
             ),
           ],
         ),
       ),
     );
+  }
+
+  /// "Pet của bé": danh sách pet đã có, bấm để đổi pet đi theo.
+  Future<void> _openPetPicker() async {
+    final childId = _childId;
+    if (childId == null) return;
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              key: const Key('room-pet-picker'),
+              children: [
+                for (final p in _pets)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: InkWell(
+                      key: Key('room-pet-pick-${p.species}'),
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: () => Navigator.of(sheetContext).pop(p.id),
+                      child: Container(
+                        width: 120,
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: p.active
+                              ? const Color(0xFFEDE4FB)
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: p.active
+                                ? const Color(0xFF8E6FD8)
+                                : const Color(0xFFD9C2E8),
+                            width: p.active ? 3 : 1,
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              height: 56,
+                              child: Image.asset(
+                                p.hatched
+                                    ? petAsset(p.species, p.stage)
+                                    : (eggSpeciesAssets[p.species] ??
+                                          petEggAsset(p.species)),
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, _, _) => const Icon(
+                                  Icons.pets_rounded,
+                                  size: 48,
+                                  color: Color(0xFFB9A3E3),
+                                ),
+                              ),
+                            ),
+                            Text(
+                              petDisplayName(p.species),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            Text(
+                              p.active
+                                  ? 'Đang đi theo'
+                                  : petStageNames[p.stage]!,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    if (picked == null || !mounted) return;
+    await PetService(db: ref.read(databaseProvider)).setActive(childId, picked);
+    if (mounted) await _refresh();
+  }
+
+  /// "Nhận trứng mới": chọn 1 trong các loài khởi đầu chưa có.
+  Future<void> _openNewEggPicker() async {
+    final childId = _childId;
+    if (childId == null) return;
+    final species = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              key: const Key('room-new-egg-picker'),
+              children: [
+                for (final sp in _claimSpecies)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: InkWell(
+                      key: Key('room-new-egg-$sp'),
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: () => Navigator.of(sheetContext).pop(sp),
+                      child: Container(
+                        width: 120,
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFFD9C2E8)),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              height: 56,
+                              child: Image.asset(
+                                eggSpeciesAssets[sp] ?? petEggAsset(sp),
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            Text(
+                              petDisplayName(sp),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    if (species == null || !mounted) return;
+    final egg = await PetService(db: ref.read(databaseProvider))
+        .claimStarterEgg(childId, species);
+    if (!mounted) return;
+    await _refresh();
+    if (egg != null && mounted) {
+      _showBubble('Trứng mới! Xong một chặng là trứng nở nhé!', seconds: 3);
+    }
   }
 
   /// Khung cảnh phòng v3b: nền 1600x900 + 5 món đặt khớp món trong nền.
@@ -1270,6 +1546,14 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                 _petFeet.dy,
                 [
                   frameShadow(_petFeet, petBox * 0.7),
+                  if (_hatched && _mood != null)
+                    Positioned(
+                      left: fx(_petFeet.dx - 28),
+                      top: fy(_petFeet.dy - petBox * 440 / 512 - 44),
+                      width: fx(56),
+                      height: fy(56),
+                      child: _PetMoodBubble(mood: _mood!),
+                    ),
                   Positioned(
                     left: fx(_petFeet.dx - petBox / 2),
                     top: fy(_petFeet.dy - petBox * 440 / 512),
@@ -1580,7 +1864,7 @@ class _PetSlot extends StatelessWidget {
       );
     } else {
       Widget egg = Image.asset(
-        eggSpeciesAssets[species]!,
+        eggSpeciesAssets[species] ?? petEggAsset(species),
         fit: BoxFit.contain,
         gaplessPlayback: true,
       );
@@ -1591,6 +1875,44 @@ class _PetSlot extends StatelessWidget {
       key: Key(hatched ? 'room-pet' : 'room-egg'),
       onTap: onTap,
       child: shown,
+    );
+  }
+}
+
+/// Bong bóng tâm trạng trên đầu pet: đói / buồn / vui (tim). Chưa có
+/// hình Muse (`petUiArtReady` = false) thì vẽ bằng icon Material.
+class _PetMoodBubble extends StatelessWidget {
+  const _PetMoodBubble({required this.mood});
+
+  final PetMood mood;
+
+  @override
+  Widget build(BuildContext context) {
+    final (IconData icon, Color color) = switch (mood) {
+      PetMood.hungry => (Icons.restaurant_rounded, const Color(0xFFFF9E5E)),
+      PetMood.sad => (
+        Icons.sentiment_dissatisfied_rounded,
+        const Color(0xFF5DB7F0),
+      ),
+      PetMood.happy => (Icons.favorite_rounded, const Color(0xFFFF6B8A)),
+    };
+    return IgnorePointer(
+      child: FittedBox(
+        child: Container(
+          key: Key('room-pet-mood-${mood.name}'),
+          width: 56,
+          height: 56,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(color: color, width: 3),
+          ),
+          child: petUiArtReady
+              ? Image.asset(petEmoteAsset(mood.name), width: 40, height: 40)
+              : Icon(icon, size: 34, color: color),
+        ),
+      ),
     );
   }
 }
@@ -1608,7 +1930,9 @@ class _PetProp {
 
   final bool isToy;
   final String id;
-  final String asset;
+
+  /// Ảnh món; null (suất ăn khi `petUiArtReady` còn tắt) → icon vẽ code.
+  final String? asset;
 
   /// Chỗ xuất hiện và chỗ nằm yên (chân món, khung 1600x900). Thức ăn
   /// đứng yên ở [rest] (= [start]).
@@ -1709,11 +2033,18 @@ class _PetPropLayer extends StatelessWidget {
                       prop.isToy ? 'room-pet-prop-toy' : 'room-pet-prop-food',
                     ),
                     angle: angle,
-                    child: Image.asset(
-                      prop.asset,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                    ),
+                    child: prop.asset == null
+                        ? const FittedBox(
+                            child: Icon(
+                              Icons.rice_bowl_rounded,
+                              color: Color(0xFFFF9E5E),
+                            ),
+                          )
+                        : Image.asset(
+                            prop.asset!,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                          ),
                   ),
                 ),
               ],

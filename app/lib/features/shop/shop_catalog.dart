@@ -14,6 +14,7 @@ library;
 
 import '../../core/database/tables.dart';
 import '../character/kid_assets.dart';
+import '../pet/pet_config.dart';
 
 export '../character/kid_assets.dart' show premiumOutfitsArtReady;
 
@@ -53,6 +54,7 @@ enum ShopCategory {
   outfits('outfits', 'Quần áo'),
   accessories('accessories', 'Phụ kiện'),
   pet('pet', 'Đồ cho pet'),
+  pets('pets', 'Pet'),
   furniture('furniture', 'Nội thất');
 
   const ShopCategory(this.key, this.label);
@@ -72,6 +74,9 @@ enum ShopItemKind {
   petFood,
   petToy,
   furniture,
+
+  /// Trứng pet mua bằng kim cương (D).
+  petEgg,
 }
 
 class ShopItem {
@@ -85,7 +90,15 @@ class ShopItem {
     this.outfit,
     this.accessory,
     this.asset,
+    this.species,
+    this.rarity,
   });
+
+  /// Loài pet (chỉ với [ShopItemKind.petEgg]).
+  final String? species;
+
+  /// Độ hiếm (chỉ với [ShopItemKind.petEgg]).
+  final PetRarity? rarity;
 
   final String id;
   final ShopCategory category;
@@ -145,6 +158,25 @@ const Map<String, (String, int)> shopFurniture = <String, (String, int)>{
   'noi_leu': ('Lều đồ chơi', 200),
   'noi_tranh': ('Tranh cầu vồng', 70),
 };
+
+/// Mã món của trứng pet [species] (cũng là `refId` dòng trừ kim cương).
+String petEggItemId(String species) => 'pet_egg_$species';
+
+/// Trứng pet bán bằng kim cương (D): sóc 20, capybara 60, rồng con 150.
+/// Hiện cả loài chưa có hình để thẻ ghi "Sắp có"; mua được hay chưa do
+/// [isPetSpeciesBuyable] / `newPetArtReady` quyết định.
+List<ShopItem> shopPetEggItems() => [
+  for (final s in petShopSpecies)
+    ShopItem(
+      id: petEggItemId(s.species),
+      category: ShopCategory.pets,
+      kind: ShopItemKind.petEgg,
+      name: 'Trứng ${s.name}',
+      priceGems: s.priceGems,
+      species: s.species,
+      rarity: s.rarity,
+    ),
+];
 
 /// Ảnh nội thất mua được.
 String shopFurnitureAsset(String id) => 'assets/images/furniture/$id.png';

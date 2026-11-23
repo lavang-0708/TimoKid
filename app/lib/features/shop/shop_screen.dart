@@ -33,6 +33,8 @@ import '../../core/widgets/press_bounce.dart';
 import '../../core/widgets/round_back_button.dart';
 import '../character/kid_assets.dart';
 import '../onboarding/onboarding_service.dart';
+import '../pet/pet_config.dart';
+import '../pet/pet_service.dart';
 import '../room/room_screen.dart';
 import 'shop_catalog.dart';
 import 'shop_service.dart';
@@ -44,10 +46,15 @@ class ShopScreen extends ConsumerStatefulWidget {
     super.key,
     this.furnitureReady = furnitureShopArtReady,
     this.premiumOutfitsReady = premiumOutfitsArtReady,
+    this.petArtReady = newPetArtReady,
   });
 
   final bool furnitureReady;
   final bool premiumOutfitsReady;
+
+  /// Cờ hình từng loài pet mới (tab Pet); mặc định theo
+  /// [newPetArtReady], chỉ test đổi.
+  final Map<String, bool> petArtReady;
 
   static const String route = '/shop';
 
@@ -64,6 +71,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
   int _xu = 0;
   int _gems = 0;
   Set<String> _owned = const {};
+  Set<String> _ownedSpecies = const {};
   Map<String, int> _foodCounts = const {};
   ShopCategory _category = ShopCategory.outfits;
   bool _tabFromRoute = false;
@@ -103,6 +111,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     db: ref.read(databaseProvider),
     furnitureReady: widget.furnitureReady,
     premiumOutfitsReady: widget.premiumOutfitsReady,
+    petArtReady: widget.petArtReady,
   );
 
   Future<void> _refresh() async {
@@ -115,6 +124,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       await service.grandfather(childId);
       final owned = await service.owned(childId);
       final foodCounts = await service.foodCounts(childId);
+      final petsOwned = await PetService(db: db).pets(childId);
       final balances = await service.balances(childId);
       if (!mounted) return;
       setState(() {
@@ -125,6 +135,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
           premiumReady: widget.premiumOutfitsReady,
         );
         _owned = owned;
+        _ownedSpecies = {for (final p in petsOwned) p.species};
         _foodCounts = foodCounts;
         _xu = balances[Currency.xu] ?? 0;
         _gems = balances[Currency.gem] ?? 0;
@@ -159,11 +170,13 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     if (confirmed != true || !mounted) return;
     setState(() => _buying = true);
     try {
-      final result = await _service.buy(
-        childId: childId,
-        gender: _gender,
-        itemId: item.id,
-      );
+      final result = item.kind == ShopItemKind.petEgg
+          ? await _service.buyPetEgg(childId: childId, species: item.species!)
+          : await _service.buy(
+              childId: childId,
+              gender: _gender,
+              itemId: item.id,
+            );
       await _refresh();
       if (!mounted) return;
       if (result == BuyResult.bought) {
@@ -171,13 +184,14 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              result == BuyResult.insufficient
-                  ? (item.usesGems
-                        ? 'Chưa đủ kim cương rồi, cố gắng thêm nhé!'
-                        : 'Chưa đủ xu rồi, làm thêm bài nhé!')
-                  : 'Bé đã có món này rồi!',
-            ),
+            content: Text(switch (result) {
+              BuyResult.insufficient =>
+                item.usesGems
+                    ? 'Chưa đủ kim cương rồi, cố gắng thêm nhé!'
+                    : 'Chưa đủ xu rồi, làm thêm bài nhé!',
+              BuyResult.comingSoon => 'Pet này sắp có, bé đợi nhé!',
+              _ => 'Bé đã có món này rồi!',
+            }),
           ),
         );
       }
@@ -216,14 +230,16 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
         body: Center(child: Text('Không tải được Cửa hàng: $_error')),
       );
     }
-    final items = [
-      for (final i in shopItemsFor(
-        _gender,
-        furnitureReady: widget.furnitureReady,
-        premiumOutfitsReady: widget.premiumOutfitsReady,
-      ))
-        if (i.category == _category) i,
-    ];
+    final items = _category == ShopCategory.pets
+        ? shopPetEggItems()
+        : [
+            for (final i in shopItemsFor(
+              _gender,
+              furnitureReady: widget.furnitureReady,
+              premiumOutfitsReady: widget.premiumOutfitsReady,
+            ))
+              if (i.category == _category) i,
+          ];
     return Scaffold(
       key: const Key('shop-screen'),
       backgroundColor: const Color(0xFFE9DDF7),
@@ -392,7 +408,12 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           item: item,
                           gender: _gender,
                           outfit: _outfit,
-                          owned: !item.consumable && _owned.contains(item.id),
+                          owned: item.kind == ShopItemKind.petEgg
+                              ? _ownedSpecies.contains(item.species)
+                              : !item.consumable && _owned.contains(item.id),
+                          comingSoon:
+                              item.kind == ShopItemKind.petEgg &&
+                              !(widget.petArtReady[item.species] ?? false),
                           count: item.consumable
                               ? (_foodCounts[item.id] ?? 0)
                               : null,
@@ -435,6 +456,7 @@ class _TabPill extends StatelessWidget {
         width: 30,
         height: 30,
       ),
+      ShopCategory.pets => Icon(Icons.pets_rounded, size: 26, color: iconColor),
       ShopCategory.accessories => Icon(
         Icons.auto_awesome_rounded,
         size: 24,
@@ -528,6 +550,21 @@ class ShopItemArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (item.kind == ShopItemKind.petEgg) {
+      // Trứng pet mới: có hình thì hiện ảnh trứng, chưa có thì icon trứng
+      // vẽ bằng code.
+      final ready = newPetArtReady[item.species] ?? false;
+      return Padding(
+        padding: const EdgeInsets.all(6),
+        child: ready
+            ? Image.asset(
+                'assets/images/pets/${item.species}_egg.png',
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) => const _EggIcon(),
+              )
+            : const _EggIcon(),
+      );
+    }
     final itemAsset = item.asset;
     if (itemAsset != null) {
       // Đồ pet / nội thất: ảnh món 512x512 trong suốt, không cắt.
@@ -579,6 +616,15 @@ class ShopItemArt extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Trứng vẽ bằng code (khi chưa có hình Muse).
+class _EggIcon extends StatelessWidget {
+  const _EggIcon();
+
+  @override
+  Widget build(BuildContext context) =>
+      const FittedBox(child: Icon(Icons.egg_rounded, color: Color(0xFFB9A3E3)));
 }
 
 /// Giá kèm biểu tượng xu (hoặc kim cương với bộ đồ cao cấp).
@@ -689,7 +735,11 @@ class _ItemCard extends StatelessWidget {
     required this.balance,
     required this.onBuy,
     this.count,
+    this.comingSoon = false,
   });
+
+  /// Trứng pet chưa có hình: thẻ ghi "Sắp có", không mua được.
+  final bool comingSoon;
 
   final ShopItem item;
   final String gender;
@@ -710,7 +760,29 @@ class _ItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final missing = item.price - balance;
     final Widget action;
-    if (owned) {
+    if (comingSoon && !owned) {
+      action = Container(
+        key: Key('shop-soon-${item.id}'),
+        height: 44,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: const Color(0xFFEDE4FB),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0xFFB9A3E3), width: 2),
+        ),
+        child: const FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            'Sắp có',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w900,
+              color: Color(0xFF6D4FB8),
+            ),
+          ),
+        ),
+      );
+    } else if (owned) {
       action = Container(
         key: Key('shop-owned-${item.id}'),
         height: 44,
@@ -775,6 +847,38 @@ class _ItemCard extends StatelessWidget {
                             outfit: outfit,
                           ),
                         ),
+                        if (item.rarity != null)
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            child: Container(
+                              key: Key('shop-rarity-${item.id}'),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: switch (item.rarity!) {
+                                  PetRarity.common => const Color(0xFFD8F0DD),
+                                  PetRarity.rare => const Color(0xFFCDE4FF),
+                                  PetRarity.epic => const Color(0xFFF3D3FF),
+                                },
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Text(
+                                item.rarity!.label,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w900,
+                                  color: gameInk,
+                                ),
+                              ),
+                            ),
+                          ),
                         if (count != null)
                           Positioned(
                             right: 0,

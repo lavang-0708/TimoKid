@@ -94,15 +94,16 @@ void main() {
   });
 
   group('pet lớn', () {
-    test('giai đoạn theo số ngày xong đề', () {
-      expect(petStageForDays(0), PetStage.newborn);
-      expect(petStageForDays(2), PetStage.newborn);
-      expect(petStageForDays(3), PetStage.teen);
-      expect(petStageForDays(7), PetStage.teen);
-      expect(petStageForDays(8), PetStage.adult);
-      expect(petDaysToNextStage(1), 2);
-      expect(petDaysToNextStage(5), 3);
-      expect(petDaysToNextStage(9), isNull);
+    test('giai đoạn theo số câu đúng tích lũy (ngưỡng 80 / 250)', () {
+      expect(petStageForXp(0), PetStage.newborn);
+      expect(petStageForXp(79), PetStage.newborn);
+      expect(petStageForXp(80), PetStage.teen);
+      expect(petStageForXp(249), PetStage.teen);
+      expect(petStageForXp(250), PetStage.adult);
+      expect(petStageFor(xp: 999, hatched: false), PetStage.egg);
+      expect(petXpToNextStage(10), 70);
+      expect(petXpToNextStage(100), 150);
+      expect(petXpToNextStage(250), isNull);
     });
 
     test('cỡ pet tăng dần, nhỡ = 58% chiều cao bé (209 px)', () {

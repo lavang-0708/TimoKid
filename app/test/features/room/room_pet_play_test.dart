@@ -20,6 +20,8 @@ import 'package:timokid/features/ladder/ladder_service.dart';
 import 'package:timokid/features/onboarding/egg_service.dart';
 import 'package:timokid/features/onboarding/onboarding_model.dart';
 import 'package:timokid/features/onboarding/onboarding_service.dart';
+import 'package:timokid/features/pet/pet_care_service.dart';
+import 'package:timokid/features/room/room_assets.dart';
 import 'package:timokid/features/room/room_screen.dart';
 import 'package:timokid/features/shop/shop_screen.dart';
 import 'package:timokid/features/shop/shop_service.dart';
@@ -110,7 +112,7 @@ void main() {
       ),
     );
     if (animate) {
-      for (var i = 0; i < 20; i++) {
+      for (var i = 0; i < 60; i++) {
         await tester.pump(const Duration(milliseconds: 50));
       }
     } else {
@@ -140,10 +142,13 @@ void main() {
     expect(find.text('Chơi'), findsOneWidget);
   });
 
-  testWidgets('chưa mở khóa hoặc trứng chưa nở: không có nút', (tester) async {
+  testWidgets('chưa xong đề ngày: pet đã nở vẫn có nút Cho ăn / Chơi', (
+    tester,
+  ) async {
     await setUpPlayable(unlocked: false);
     await pumpRoom(tester);
-    expect(find.byKey(const Key('room-pet-feed-button')), findsNothing);
+    expect(find.byKey(const Key('room-pet-feed-button')), findsOneWidget);
+    expect(find.byKey(const Key('room-pet-play-button')), findsOneWidget);
   });
 
   testWidgets('trứng chưa nở (đã mở khóa): không có nút', (tester) async {
@@ -165,14 +170,57 @@ void main() {
     expect(find.byKey(const Key('shop-item-girl_top_02')), findsNothing);
   });
 
-  testWidgets('chưa có đồ chơi: Chơi mở Cửa hàng tab Đồ cho pet', (
+  testWidgets('chưa có đồ chơi: bảng Chơi chỉ có "Vuốt ve"', (tester) async {
+    await setUpPlayable();
+    await pumpRoom(tester);
+    await tester.tap(find.byKey(const Key('room-pet-play-button')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('room-pet-pat')), findsOneWidget);
+    expect(find.byKey(const Key('room-pet-toy-pet_toy_ball')), findsNothing);
+  });
+
+  testWidgets('vuốt ve: chưa xong chặng nào thì nhắc học trước', (
+    tester,
+  ) async {
+    await setUpPlayable(unlocked: false);
+    await pumpRoom(tester);
+    await tester.tap(find.byKey(const Key('room-pet-play-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('room-pet-pat')));
+    await tester.pumpAndSettle();
+    expect(find.text(petLockedLine), findsOneWidget);
+    expect(await PetCareService(db: db).playedToday(childId), isFalse);
+    await teardown(tester);
+  });
+
+  testWidgets('vuốt ve sau khi xong chặng: tính là chơi, pet vui', (
     tester,
   ) async {
     await setUpPlayable();
     await pumpRoom(tester);
     await tester.tap(find.byKey(const Key('room-pet-play-button')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('shop-item-pet_toy_ball')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('room-pet-pat')));
+    await tester.pumpAndSettle();
+    expect(await PetCareService(db: db).playedToday(childId), isTrue);
+    expect(find.byKey(const Key('room-pet-mood-sad')), findsNothing);
+    await teardown(tester);
+  });
+
+  testWidgets('suất ăn nhận khi học: cho ăn bằng suất ăn, pet hết đói', (
+    tester,
+  ) async {
+    await setUpPlayable();
+    await PetCareService(db: db).awardMeal(childId);
+    await pumpRoom(tester);
+    expect(find.byKey(const Key('room-pet-mood-hungry')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('room-pet-feed-button')));
+    await tester.pumpAndSettle();
+    expect(find.text('Suất ăn ×1'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('room-pet-food-meal')));
+    await tester.pumpAndSettle();
+    expect(await PetCareService(db: db).mealCount(childId), 0);
+    expect(find.byKey(const Key('room-pet-mood-sad')), findsOneWidget);
   });
 
   testWidgets('cho ăn (hiệu ứng bật): thức ăn hiện, pet vui + tim, thức ăn '

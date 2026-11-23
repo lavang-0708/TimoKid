@@ -16,9 +16,12 @@
 library;
 
 import '../../core/database/app_database.dart';
+import '../../core/database/tables.dart' show Currency;
 import '../character/kid_assets.dart';
 import '../character/kid_look_service.dart';
 import '../onboarding/onboarding_service.dart';
+import '../pet/pet_config.dart';
+import '../pet/pet_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
 import 'shop_catalog.dart';
@@ -36,6 +39,9 @@ enum BuyResult {
 
   /// Mã món không có trong danh mục của bé.
   unknownItem,
+
+  /// Loài pet chưa có hình (`newPetArtReady` false): chưa bán.
+  comingSoon,
 }
 
 /// Nguồn có món (cột `inventory.source`).
@@ -57,9 +63,14 @@ class ShopService {
     this.afterLedgerWrite,
     this.furnitureReady = furnitureShopArtReady,
     this.premiumOutfitsReady = premiumOutfitsArtReady,
+    this.petArtReady = newPetArtReady,
   });
 
   final AppDatabase db;
+
+  /// Cờ hình từng loài pet mới; mặc định theo [newPetArtReady], chỉ
+  /// test đổi.
+  final Map<String, bool> petArtReady;
 
   /// Cờ hình nội thất / bộ cao cấp; mặc định theo cờ const, chỉ test đổi.
   final bool furnitureReady;
@@ -107,7 +118,7 @@ class ShopService {
   /// Cho ăn: giảm một phần thức ăn. Trả false (không đổi gì) nếu bé
   /// không còn; số lượng không bao giờ âm.
   Future<bool> consumeFood(String childId, String foodId) async {
-    if (!petFoods.containsKey(foodId)) return false;
+    if (!petFoods.containsKey(foodId) && foodId != petMealId) return false;
     return db.transaction(() async {
       final n = await foodCount(childId, foodId);
       if (n <= 0) return false;
@@ -164,6 +175,46 @@ class ShopService {
           source: InventorySource.shop,
         );
       }
+      return BuyResult.bought;
+    });
+  }
+
+  /// Mua trứng pet [species] bằng kim cương (D). Một transaction: dòng
+  /// âm `wallet_ledger` (loại `gem`, `shop_buy`, refId = [petEggItemId])
+  /// + một pet-trứng mới. Mỗi loài mua một lần (đã có pet loài đó →
+  /// [BuyResult.alreadyOwned]); loài chưa có hình → [BuyResult.comingSoon]
+  /// và không ghi gì; không đủ kim cương → [BuyResult.insufficient]; số
+  /// dư không bao giờ âm. Trứng mua về đi theo bé ngay nếu bé chưa có
+  /// pet đi theo; còn không thì nằm trong "Pet của bé" để bé chọn đổi.
+  Future<BuyResult> buyPetEgg({
+    required String childId,
+    required String species,
+  }) async {
+    final info = petShopSpeciesById(species);
+    if (info == null) return BuyResult.unknownItem;
+    if (!(petArtReady[species] ?? false)) return BuyResult.comingSoon;
+    final pets = PetService(db: db);
+    return db.transaction(() async {
+      if (await pets.owns(childId, species)) return BuyResult.alreadyOwned;
+      final balance = await db.walletDao.balance(
+        childId: childId,
+        currency: Currency.gem,
+      );
+      if (balance < info.priceGems) return BuyResult.insufficient;
+      await db.walletDao.addEntry(
+        childId: childId,
+        currency: Currency.gem,
+        amount: -info.priceGems,
+        reason: shopBuyReason,
+        refId: petEggItemId(species),
+      );
+      await afterLedgerWrite?.call();
+      final noActive = await pets.active(childId) == null;
+      await pets.createEgg(
+        childId: childId,
+        species: species,
+        makeActive: noActive,
+      );
       return BuyResult.bought;
     });
   }

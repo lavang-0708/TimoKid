@@ -1,6 +1,18 @@
 # HANDOVER — TimoKid
 
-Cập nhật cuối: 23/11/2026 (tháp nhiều tầng + boss); trước đó 22/11/2026 (T2-06b: Đồ cho pet, Nội thất, bộ đồ cao cấp, nút Cho ăn/Chơi); trước đó 21/11/2026 (main `99a87cf` sau PR #34: nhân vật toàn thân + đi lại trong Phòng + pet lớn dần + Tủ đồ; PR #33 thêm 12 dạng bài; PR #32 (D) đã merge). Đọc mục "Hiện trạng sau PR #33/#34" ngay dưới trước; các dòng lịch sử phía sau giữ nguyên cách viết lúc đó.
+Cập nhật cuối: 23/11/2026 (tháp nhiều tầng + boss; Pet D: bảng pets, xp theo câu đúng, chăm pet); trước đó 22/11/2026 (T2-06b: Đồ cho pet, Nội thất, bộ đồ cao cấp, nút Cho ăn/Chơi); trước đó 21/11/2026 (main `99a87cf` sau PR #34: nhân vật toàn thân + đi lại trong Phòng + pet lớn dần + Tủ đồ; PR #33 thêm 12 dạng bài; PR #32 (D) đã merge). Đọc mục "Hiện trạng sau PR #33/#34" ngay dưới trước; các dòng lịch sử phía sau giữ nguyên cách viết lúc đó.
+
+## Pet D (23/11/2026, nhánh `feat/pet-care`, chờ review) — đọc trước mục dưới
+
+Chủ dự án ĐẢO quyết định cũ "không có đói/ốm/buồn" của pet (xem DECISIONS 23/11 mục D); các dòng bên dưới nói "không đói/ốm/buồn" hay "pet lớn theo số ngày xong đề (3/8 ngày)" là lịch sử. Hiện trạng:
+
+- **DB v4**: bảng `pets` (xem `app/lib/core/database/tables.dart`, `PetsDao`); migration v3→v4 chuyển pet cũ từ `settings` (`selected_egg`/`egg_hatched`), xp = ngày xong đề × 20 nhưng không thấp hơn ngưỡng giai đoạn cũ.
+- **Config một chỗ**: `app/lib/features/pet/pet_config.dart` (ngưỡng 80/250, giá trứng, cờ `petUiArtReady`, `newPetArtReady`).
+- **Service cho tính năng khác gọi**: `PetService.addXp(childId, amount)` (câu đúng ngay lần đầu; `StageSession` và `ArenaService.submit` đã gọi), `PetCareService.awardMeal(childId, refId:)` (xong chặng/tầng/đấu trường; `refId` chống nhận trùng, null = luôn nhận; chặng ngày + đấu trường đã gọi), `PetCareService.mood/fedToday/playedToday/feed/play/canPat/stagesDoneToday` (nhiệm vụ ngày "cho pet ăn", "chơi với pet" đọc `fedToday`/`playedToday`). Tầng tháp đi qua `StageSession` nên xp + suất ăn tự chạy tại HOOK trong `_finishStage` (refId `meal:tower:<mảng>:<tầng>:<ngày>`: thử lại cùng tầng trong ngày chỉ một suất).
+- **Pet lớn theo xp** (`pet_growth.dart`: `petStageForXp`, `petXpToNextStage`); `PetGrowthService`/`petStageForDays` đã bỏ.
+- **Phòng**: bong bóng đói/buồn/vui trên đầu pet; lớp phủ ăn mừng lớn lên (`features/pet/pet_celebration.dart`); nút "Pet của bé" (khi có ≥ 2 pet), "Nhận trứng mới" (khi pet đi theo trưởng thành); nút Cho ăn/Chơi hiện khi pet đã nở (suất ăn `meal` + thức ăn mua; "Vuốt ve" chỉ sau ≥ 1 chặng hôm nay).
+- **Cửa hàng**: tab "Pet" bán trứng sóc 20/capybara 60/rồng con 150 kim cương, "Sắp có" tới khi Muse giao hình lô 12 và cờ `newPetArtReady` bật.
+- **Chờ hình**: lô 12 (3 loài mới), lô 13 (`ui_emote_*`, `ui_pet_meal`, `ui_celebrate_burst`).
 
 ## Hiện trạng sau PR #33/#34 (đọc mục này trước — thay thế các dòng cũ bên dưới khi mâu thuẫn)
 

@@ -24,6 +24,8 @@ import 'package:timokid/features/ladder/ladder_service.dart';
 import 'package:timokid/features/onboarding/egg_service.dart';
 import 'package:timokid/features/onboarding/onboarding_model.dart';
 import 'package:timokid/features/onboarding/onboarding_service.dart';
+import 'package:timokid/features/pet/pet_care_service.dart';
+import 'package:timokid/features/pet/pet_config.dart';
 import 'package:timokid/features/room/coming_soon_screen.dart';
 import 'package:timokid/features/room/room_assets.dart';
 import 'package:timokid/features/room/room_screen.dart';
@@ -101,7 +103,7 @@ void main() {
     );
     if (!settle) {
       // Hiệu ứng lặp bật thì pumpAndSettle không dừng: bơm từng khung.
-      for (var i = 0; i < 20; i++) {
+      for (var i = 0; i < 60; i++) {
         await tester.pump(const Duration(milliseconds: 50));
       }
       return;
@@ -457,7 +459,7 @@ void main() {
     );
     final start = tester.getRect(find.byKey(const Key('room-character')));
     // Đi sang trái (chạm trước tủ đầu giường → vòng trước tủ).
-    await tester.tapAt(frameToScreen(const Offset(120, 860)));
+    await tester.tapAt(frameToScreen(const Offset(330, 860)));
     for (var i = 0; i < 4; i++) {
       await tester.pump(const Duration(milliseconds: 100));
     }
@@ -552,7 +554,7 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
-  testWidgets('chạm pet khi khóa thì nhắc xong đề ngày', (tester) async {
+  testWidgets('chạm pet đang đói thì pet đòi ăn', (tester) async {
     await completeOnboardingGirl();
     await hatchEgg();
     await pumpRoom(tester);
@@ -561,21 +563,29 @@ void main() {
     await tester.tap(find.byKey(const Key('room-pet')));
     await tester.pump();
 
-    expect(find.text('Chơi với tớ cần xong đề ngày đã nhé!'), findsOneWidget);
+    expect(find.text('Tớ đói rồi, cho tớ ăn nhé!'), findsOneWidget);
+    expect(find.byKey(const Key('room-pet-mood-hungry')), findsOneWidget);
   });
 
-  testWidgets('chạm pet khi mở thì pet vui', (tester) async {
+  testWidgets('chạm pet đã ăn + chơi thì pet vui, báo còn bao nhiêu câu', (
+    tester,
+  ) async {
     await completeOnboardingGirl();
     await hatchEgg();
     await markAllDone();
+    final care = PetCareService(db: db);
+    await care.awardMeal(childId);
+    await care.feed(childId, foodId: petMealId);
+    await care.play(childId);
     await pumpRoom(tester);
+    expect(find.byKey(const Key('room-pet-mood-happy')), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('room-pet')));
     await tester.pump();
 
     expect(find.textContaining('Gâu gâu! Chơi với tớ nhé!'), findsOneWidget);
-    // 1 ngày xong đề: còn 2 ngày nữa pet lớn.
-    expect(find.textContaining('Còn 2 ngày học nữa'), findsOneWidget);
+    // Mới nở 0 xp: còn 80 câu đúng nữa pet lớn.
+    expect(find.textContaining('Còn 80 câu đúng nữa'), findsOneWidget);
   });
 
   testWidgets('chạm nội thất thì hiện bong bóng', (tester) async {

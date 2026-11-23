@@ -70,10 +70,7 @@ void main() {
     final child = await db.childrenDao.getChild(childId);
     expect(child!.name, 'An');
 
-    expect(
-      await db.settingsDao.getValue(childId: childId, key: 'selected_egg'),
-      'cat',
-    );
+    expect((await db.petsDao.getActive(childId))?.species, 'cat');
     expect(await service.isCompleted(), isTrue);
   });
 

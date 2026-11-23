@@ -206,10 +206,7 @@ void main() {
     expect(profile!.name, 'An');
     expect(profile.gender, 'girl');
     expect(profile.dress, 'girl_top_02');
-    expect(
-      await db.settingsDao.getValue(childId: childId, key: 'selected_egg'),
-      'cat',
-    );
+    expect((await db.petsDao.getActive(childId))?.species, 'cat');
     final child = await db.childrenDao.getChild(childId);
     expect(child!.name, 'An');
   });
@@ -231,9 +228,6 @@ void main() {
     expect(profile!.gender, 'boy');
     expect(profile.name, 'Bình');
     expect(profile.dress, 'boy_outfit_03');
-    expect(
-      await db.settingsDao.getValue(childId: childId, key: 'selected_egg'),
-      'dog',
-    );
+    expect((await db.petsDao.getActive(childId))?.species, 'dog');
   });
 }

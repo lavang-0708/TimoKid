@@ -65,12 +65,22 @@ void main() {
     },
   );
 
-  test('trứng lạ đã lưu trong DB thì selectedEgg trả null', () async {
-    await db.settingsDao.setValue(
-      childId: childId,
-      key: EggService.selectedEggKey,
-      value: 'fox',
+  test(
+    'selectEgg đổi loài khi trứng chưa nở, không tạo trứng thứ hai',
+    () async {
+      await service.selectEgg(childId: childId, species: 'cat');
+      await service.selectEgg(childId: childId, species: 'dog');
+      final pets = await db.petsDao.getAll(childId);
+      expect(pets, hasLength(1));
+      expect(pets.single.species, 'dog');
+      expect(pets.single.active, isTrue);
+    },
+  );
+
+  test('loài không phải trứng khởi đầu thì báo lỗi', () async {
+    expect(
+      () => service.selectEgg(childId: childId, species: 'fox'),
+      throwsArgumentError,
     );
-    expect(await service.selectedEgg(childId), isNull);
   });
 }
