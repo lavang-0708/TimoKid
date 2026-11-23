@@ -53,6 +53,7 @@ import '../../core/animation/animation_gate.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/tables.dart';
 import '../../core/widgets/game_ui.dart';
+import '../../core/widgets/rarity_badge.dart';
 import '../../core/widgets/press_bounce.dart';
 import '../../core/widgets/round_back_button.dart';
 import '../character/character_bounce.dart';
@@ -542,9 +543,24 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                               setState(() => _profile = updated);
                               setSheet(() {});
                             },
-                            child: Image.asset(
-                              kidFullAsset(gender, n),
-                              fit: BoxFit.contain,
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: Image.asset(
+                                    kidFullAsset(gender, n),
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 0,
+                                  top: 0,
+                                  child: RarityBadge(
+                                    key: Key('room-wardrobe-rarity-$n'),
+                                    rarity: outfitRarityOf(n),
+                                    compact: true,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                       ],
@@ -1390,23 +1406,39 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            SizedBox(
-                              height: 56,
-                              child: DragonAura.wrapIf(
-                                p.species,
-                                Image.asset(
-                                  p.hatched
-                                      ? petAsset(p.species, p.stage)
-                                      : (eggSpeciesAssets[p.species] ??
-                                            petEggAsset(p.species)),
-                                  fit: BoxFit.contain,
-                                  errorBuilder: (_, _, _) => const Icon(
-                                    Icons.pets_rounded,
-                                    size: 48,
-                                    color: Color(0xFFB9A3E3),
+                            Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                SizedBox(
+                                  height: 56,
+                                  child: DragonAura.wrapIf(
+                                    p.species,
+                                    Image.asset(
+                                      p.hatched
+                                          ? petAsset(p.species, p.stage)
+                                          : (eggSpeciesAssets[p.species] ??
+                                                petEggAsset(p.species)),
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (_, _, _) => const Icon(
+                                        Icons.pets_rounded,
+                                        size: 48,
+                                        color: Color(0xFFB9A3E3),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
+                                Positioned(
+                                  left: -6,
+                                  top: -6,
+                                  child: RarityBadge(
+                                    key: Key('room-pet-rarity-${p.species}'),
+                                    rarity:
+                                        petShopSpeciesById(p.species)?.rarity ??
+                                        PetRarity.common,
+                                    compact: true,
+                                  ),
+                                ),
+                              ],
                             ),
                             Text(
                               petDisplayName(p.species),

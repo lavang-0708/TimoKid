@@ -236,7 +236,8 @@ void main() {
         expect(find.byKey(Key('shop-soon-pet_egg_$s')), findsOneWidget);
         expect(find.byKey(Key('shop-buy-pet_egg_$s')), findsNothing);
       }
-      expect(find.text('Thường'), findsOneWidget);
+      // Pet thường không có nhãn (chỉ Hiếm / Siêu hiếm lấp lánh, 24/11).
+      expect(find.text('Thường'), findsNothing);
       expect(find.text('Hiếm'), findsOneWidget);
       expect(find.text('Siêu hiếm'), findsOneWidget);
       expect(find.text('20'), findsOneWidget);
