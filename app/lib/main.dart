@@ -38,15 +38,11 @@ Future<void> main() async {
       ),
     ),
   );
-  // App chỉ chạy màn ngang (đã khóa sẵn trong AndroidManifest:
-  // sensorLandscape). Gọi SAU khung hình đầu: trên máy tính bảng, gọi
-  // trước runApp làm cửa sổ đổi cỡ đúng lúc vẽ màn chờ → khung đầu vẽ
-  // theo cỡ dọc cũ, nửa màn trắng (góp ý 22/11).
+  // App chỉ chạy màn ngang, khóa CỐ ĐỊNH trong AndroidManifest
+  // (`landscape`, chủ dự án chốt 24/11). Không gọi
+  // setPreferredOrientations nữa: lệnh đó đổi hướng yêu cầu của cửa sổ
+  // lúc đang vẽ màn chờ, trên máy tính bảng làm khung hình lệch.
   WidgetsBinding.instance.addPostFrameCallback((_) {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
     // Ẩn thanh trạng thái, giữ thanh điều hướng dưới.
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
