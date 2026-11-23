@@ -16,6 +16,8 @@ import 'arena_config.dart';
 import 'arena_exam_screen.dart';
 import 'arena_service.dart';
 import 'arena_widgets.dart';
+import 'league_service.dart';
+import 'league_widgets.dart';
 
 class ArenaLobbyScreen extends ConsumerStatefulWidget {
   const ArenaLobbyScreen({super.key});
@@ -28,6 +30,7 @@ class ArenaLobbyScreen extends ConsumerStatefulWidget {
 
 class _ArenaLobbyScreenState extends ConsumerState<ArenaLobbyScreen> {
   ArenaSummary? _summary;
+  LeagueWeek? _week;
   String? _error;
 
   @override
@@ -41,8 +44,26 @@ class _ArenaLobbyScreenState extends ConsumerState<ArenaLobbyScreen> {
       final db = ref.read(databaseProvider);
       final childId = await db.ensureSeeded();
       final summary = await ArenaService(db: db).summary(childId);
+      final league = LeagueService(db: db);
+      final week = await league.week(childId);
+      final chest = await league.pendingChest(childId);
       if (!mounted) return;
-      setState(() => _summary = summary);
+      setState(() {
+        _summary = summary;
+        _week = week;
+      });
+      if (chest != null) {
+        // Rương tuần trước: bé bấm mở, nhận một lần rồi tải lại số dư.
+        await showLeagueChestDialog(
+          context,
+          chest: chest,
+          onClaim: () => league.claimChest(childId, weekStart: chest.weekStart),
+        );
+        if (!mounted) return;
+        final fresh = await ArenaService(db: db).summary(childId);
+        if (!mounted) return;
+        setState(() => _summary = fresh);
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _error = '$e');
@@ -105,6 +126,7 @@ class _ArenaLobbyScreenState extends ConsumerState<ArenaLobbyScreen> {
                                 flex: 4,
                                 child: _StatusPanel(
                                   summary: summary,
+                                  week: _week,
                                   onStart: () =>
                                       context.go(ArenaExamScreen.route),
                                 ),
@@ -204,75 +226,86 @@ class _RulesCard extends StatelessWidget {
 
 /// Cột phải: điểm cao nhất, trạng thái hôm nay, nút bắt đầu.
 class _StatusPanel extends StatelessWidget {
-  const _StatusPanel({required this.summary, required this.onStart});
+  const _StatusPanel({
+    required this.summary,
+    required this.week,
+    required this.onStart,
+  });
 
   final ArenaSummary summary;
+  final LeagueWeek? week;
   final VoidCallback onStart;
 
   @override
   Widget build(BuildContext context) {
     final best = summary.bestScore;
     final bestMedal = summary.bestMedal;
-    return SingleChildScrollView(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: (MediaQuery.sizeOf(context).height - 90).clamp(
-            0.0,
-            double.infinity,
+    // Nút Bắt đầu ghim ở đáy để luôn thấy; thẻ phía trên cuộn được.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (week != null) ...[
+                  LeagueCard(week: week!),
+                  const SizedBox(height: 6),
+                ],
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0x99FFFFFF),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      if (bestMedal != null) ...[
+                        ArenaMedalBadge(medal: bestMedal, size: 44),
+                        const SizedBox(width: 8),
+                      ],
+                      Expanded(
+                        child: Text(
+                          best == null
+                              ? 'Bé chưa thi lần nào'
+                              : 'Điểm cao nhất: $best/${ArenaFormat.heat.maxScore}',
+                          key: const Key('arena-best-score'),
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: gameInk,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  summary.rewardedToday
+                      ? 'Hôm nay đã nhận thưởng, thi tiếp để luyện tập'
+                      : 'Hôm nay chưa nhận kim cương. Thi ngay nhé!',
+                  key: const Key('arena-today-status'),
+                  textAlign: TextAlign.center,
+                  style: gameOutlinedText(13),
+                ),
+              ],
+            ),
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: BoxDecoration(
-                color: const Color(0x99FFFFFF),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                children: [
-                  if (bestMedal != null) ...[
-                    ArenaMedalBadge(medal: bestMedal, size: 44),
-                    const SizedBox(width: 8),
-                  ],
-                  Expanded(
-                    child: Text(
-                      best == null
-                          ? 'Bé chưa thi lần nào'
-                          : 'Điểm cao nhất: $best/${ArenaFormat.heat.maxScore}',
-                      key: const Key('arena-best-score'),
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: gameInk,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              summary.rewardedToday
-                  ? 'Hôm nay đã nhận thưởng, thi tiếp để luyện tập'
-                  : 'Hôm nay chưa nhận kim cương. Thi ngay nhé!',
-              key: const Key('arena-today-status'),
-              textAlign: TextAlign.center,
-              style: gameOutlinedText(13),
-            ),
-            const SizedBox(height: 8),
-            ArenaCandyButton(
-              key: const Key('arena-start-button'),
-              text: 'Bắt đầu thi',
-              height: 52,
-              fontSize: 22,
-              onPressed: onStart,
-            ),
-          ],
+        const SizedBox(height: 6),
+        ArenaCandyButton(
+          key: const Key('arena-start-button'),
+          text: 'Bắt đầu thi',
+          height: 52,
+          fontSize: 22,
+          onPressed: onStart,
         ),
-      ),
+      ],
     );
   }
 }

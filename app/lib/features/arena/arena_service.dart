@@ -125,6 +125,11 @@ class ArenaService {
     });
   }
 
+  /// Hôm nay (giờ Việt Nam) bé đã nộp bài Đấu trường chưa. Dùng cho
+  /// nhiệm vụ ngày "làm đấu trường hôm nay".
+  Future<bool> didArenaToday(String childId) async =>
+      await _db.arenaAttemptsDao.countOnDate(childId, _db.clock.today()) > 0;
+
   /// Tóm tắt cho màn sảnh.
   Future<ArenaSummary> summary(String childId) async {
     final date = _db.clock.today();

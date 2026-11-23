@@ -21,6 +21,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/database/app_database.dart';
 import '../../core/database/tables.dart';
+import '../arena/league_service.dart';
 import '../ladder/ladder_config.dart';
 import '../math/math_session.dart' show strandNames;
 import '../questions/figure_svg.dart';
@@ -53,6 +54,7 @@ class _QaMenuScreenState extends ConsumerState<QaMenuScreen> {
   List<ReviewQueueData> _reviewEntries = [];
   List<Attempt> _attempts = [];
   bool _loading = true;
+  String _leagueText = '';
 
   // Xem thử dạng bài: dạng và mức đang chọn + câu đang xem.
   String _previewFormId = allQuestionGenerators.first.formId;
@@ -78,8 +80,17 @@ class _QaMenuScreenState extends ConsumerState<QaMenuScreen> {
     final rungs = await _service.rungs(childId: childId);
     final entries = await _service.reviewEntries(childId: childId);
     final attempts = await _service.recentAttempts(childId: childId);
+    final league = LeagueService(db: widget.db);
+    final week = await league.week(childId);
+    final chest = await league.pendingChest(childId);
+    final leagueText =
+        'Tuần bắt đầu thứ Hai ${week.weekStart.substring(8)}/${week.weekStart.substring(5, 7)}: ${week.points} câu đúng, '
+        '${week.attempts} ngày thi, hạng ${week.tier?.label ?? 'chưa có'}, '
+        'còn ${week.daysLeft} ngày. '
+        'Rương tuần trước: ${chest == null ? 'không có/đã nhận' : '${chest.tier.label} (${chest.gems} kim cương)'}';
     if (!mounted) return;
     setState(() {
+      _leagueText = leagueText;
       _childId = childId;
       _rungs = rungs;
       _reviewEntries = entries;
@@ -210,6 +221,12 @@ class _QaMenuScreenState extends ConsumerState<QaMenuScreen> {
                     'thật). Đề ngày mới tạo khi mở Thị trấn ở ngày mới; '
                     'mục ôn tập đến hạn sẽ hiện trong đề.',
                     style: TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                  _sectionTitle('Hạng đấu trường tuần'),
+                  Text(
+                    _leagueText,
+                    key: const Key('qa-league-text'),
+                    style: const TextStyle(fontSize: 14),
                   ),
                   _sectionTitle('Bậc từng mảng'),
                   ...Strand.all.map((strand) {
