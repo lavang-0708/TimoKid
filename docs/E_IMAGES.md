@@ -1791,3 +1791,130 @@ trong phòng v3b; (d) overlay lid-zone mới
   (đối chiếu SHA trước khi báo).
 
 ĐƯỢC DUYỆT KIỂU 22/11 ~21:27 (Claude): đủ 20 file (gái + trai); 8 khung đi gái vẽ lại mặt rộng ĐẠT. Đẩy 4 lần (5+5+5+5, mỗi lần 4,42/4,37/4,37/4,47 MB .b64): `7a133271` (5 file), `66606bb0` (5 file), `d4759b95` (5 file), `e26c6dd0` (5 file); đầu nhánh sau đẩy `e26c6dd0`. 20/20 .b64 giải mã đúng từng byte PNG gốc trong vòng khứ hồi local (SHA-256 khớp) — đối chiếu blob SHA trên nhánh bị chặn (bảo vệ mã xác minh, giống bộ 04/05/06), Claude kiểm lại bằng git khi decode. Chưa decode (chờ Claude decode).
+### Lô 12 — Sóc (pet thường): trọn bộ 27 file (23/11/2026)
+
+Loài đầu tiên của lô 12 (sóc thường, càng hiếm càng đắt — sóc < capybara < rồng).
+4 tấm xem trước đã duyệt kiểu v2 (trứng + newborn/teen/adult đứng, 23/11 ~22:47)
+**dùng lại nguyên bản, không vẽ lại**; vẽ mới 5 vỏ trứng + 18 khung chuyển động
+(happy/sit/walk_a..d × newborn/teen/adult). 27 file vào
+`app/assets/images/pets/`, 512×512, PNG trong suốt, alpha sạch (semi 0, 0 px
+magenta cả thước chuẩn R>200/G<80/B>200 lẫn thước nới R>140/G<60/B>140),
+quantize 256 màu MAXCOVERAGE + Floyd–Steinberg. Vẽ từ 4 ảnh đứng sóc đã duyệt
+(giữ đúng nhận dạng: lông nâu đỏ + bụng kem + đuôi xù to + tai nhọn + mắt nâu to);
+walk nhìn nghiêng 3/4 quay PHẢI, chân luân phiên, chân y=439; happy nhấc 40 px
+(đáy y=399); sit chân y=439; newborn đi KHÔNG vỏ (đã nở, như bản sửa chó newborn
+lô 8B-fix). Tổng PNG 3.883.520 B (~5,18 MB .b64).
+
+#### Bảng 27 file
+
+| file | byte | bbox (x0, y0, x1, y1) | đất y | SHA-256 (12 ký tự đầu) | lần vẽ |
+|---|---|---|---|---|---|
+| squirrel_adult.png | 119009 | 86, 40, 425, 439 | 439 | 1614bba75c2d | 1 |
+| squirrel_adult_happy.png | 150880 | 64, 8, 446, 399 | 399 | 871a7ee562a1 | 1 |
+| squirrel_adult_sit.png | 155904 | 72, 40, 438, 439 | 439 | 1a35ae88b105 | 1 |
+| squirrel_adult_walk_a.png | 179314 | 26, 40, 485, 439 | 439 | 35eb94e85aa4 | 2 |
+| squirrel_adult_walk_b.png | 188758 | 8, 40, 503, 439 | 439 | 1a37fc96a5db | 2 |
+| squirrel_adult_walk_c.png | 182436 | 30, 40, 480, 439 | 439 | dd029c0c843c | 1 |
+| squirrel_adult_walk_d.png | 175864 | 0, 40, 510, 439 | 439 | aa47049757bc | 2 |
+| squirrel_egg.png | 113014 | 62, 40, 448, 439 | 439 | 5b77d2b80058 | 1 |
+| squirrel_egg_crack_1.png | 117446 | 97, 40, 414, 439 | 439 | c642e456d29f | 1 |
+| squirrel_egg_crack_2.png | 113153 | 104, 40, 407, 439 | 439 | 12024db9a4c4 | 1 |
+| squirrel_egg_crack_3.png | 135738 | 78, 40, 433, 439 | 439 | 2a4ed509947d | 1 |
+| squirrel_newborn.png | 102843 | 64, 40, 446, 439 | 439 | ebb719ba29d1 | 1 |
+| squirrel_newborn_happy.png | 128688 | 75, 8, 436, 399 | 399 | cc9df4ba211e | 1 |
+| squirrel_newborn_sit.png | 134371 | 79, 40, 432, 439 | 439 | 52e547ee72de | 1 |
+| squirrel_newborn_walk_a.png | 159694 | 29, 41, 482, 439 | 439 | c6676d9901e7 | 1 |
+| squirrel_newborn_walk_b.png | 157227 | 30, 40, 481, 439 | 439 | f02558efbc15 | 1 |
+| squirrel_newborn_walk_c.png | 138977 | 32, 40, 477, 439 | 439 | 1e1e1fbc88fa | 1 |
+| squirrel_newborn_walk_d.png | 157123 | 24, 40, 487, 439 | 439 | 4e7f15b0108d | 1 |
+| squirrel_shell_bottom.png | 88762 | 102, 155, 407, 439 | 439 | 2b1b1d8f9859 | 1 |
+| squirrel_shell_top.png | 67000 | 102, 60, 407, 262 | 262 | e2cff270861a | 1 |
+| squirrel_teen.png | 127188 | 75, 40, 435, 439 | 439 | 66077fce0ed7 | 1 |
+| squirrel_teen_happy.png | 141427 | 68, 9, 442, 399 | 399 | 9d86dd36e82a | 1 |
+| squirrel_teen_sit.png | 163209 | 56, 40, 454, 439 | 439 | 4b8aa7075f3e | 1 |
+| squirrel_teen_walk_a.png | 175383 | 31, 40, 479, 439 | 439 | 643b62fcd840 | 1 |
+| squirrel_teen_walk_b.png | 180279 | 13, 40, 497, 439 | 439 | 78c7ab45d97a | 1 |
+| squirrel_teen_walk_c.png | 168570 | 43, 40, 467, 439 | 439 | 61d317a8d18c | 1 |
+| squirrel_teen_walk_d.png | 161263 | 54, 40, 457, 439 | 439 | 7e17ddac69b1 | 1 |
+
+#### Mốc đo (đo bằng code từ ảnh thật)
+
+- Trứng kín: crack_1 bbox (97, 40, 414, 439), rộng 318 px, tâm x=255.
+- Vỏ nứt tăng dần: dark-px (R<100/G<80/B<60) crack_1 = 72 → crack_2 = 3.333 →
+  crack_3 = 3.665; crack_1 chỉ vài vết nứt mảnh ở đỉnh, crack_2 nứt zigzag đậm
+  khắp nửa trên + chỏm lông cam thò ra ở đỉnh, crack_3 nứt rộng thấy mặt + 2 chân
+  trước của sóc (dark-px bão hoà ở crack_3 vì khe nứt lấp bằng lông sáng, không
+  phải vạch tối — mức tăng đọc bằng mắt).
+- Vỏ rời: shell_top (102, 60, 407, 262), rộng 306, cao 203; shell_bottom (102,
+  155, 407, 439), rộng 306, cao 285, đáy y=439. Khớp trứng kín crack_1: cùng tâm
+  x=255, rộng kém 12 px, đỉnh nắp thấp hơn 20 px, đáy bằng nhau; chồng 2 nửa lên
+  nhau vẽ đúng viền trứng kín (chênh ~12 px). So với mèo lô 8A (nắp 282×230, bát
+  282×170): nắp sóc nông hơn, bát sâu hơn, chồng nhau 107 px (mèo 27 px) — chỗ
+  răng cưa cài nhau, nhìn riêng vẫn ra nửa vỏ.
+- Happy nhấc 40 px cả 3 giai đoạn (newborn/teen/adult đáy y=399, đỉnh y=8–9);
+  mắt cười nhắm + miệng cười hở + 2 chân trước giơ lên, newborn happy vẫn ngồi
+  trong nửa vỏ dưới như ảnh đứng.
+- Chu kỳ đi: a/c đối chân, b/d bước giữa; đầu lệch ≤2 px trong chu kỳ; đuôi xù
+  theo dáng đi, không che thân. Adult walk_a/b vẽ lại lần 2 (bản v1 thân dựng
+  ~45°, bản v2 nằm ngang 4 chân như teen — đã dùng bản v2).
+
+#### Cách làm
+
+- Vẽ từng tấm bằng media generation trên nền magenta #FF00FF, lấy ảnh đứng cùng
+  giai đoạn làm tham chiếu; adult walk_a/b vẽ lại lấy teen walk_a/b làm mẫu tư
+  thế. Tổng 26 lần vẽ (23 tấm + 3 vẽ lại).
+- Tách nền + quantize bằng code (`lot12/work/squirrel/process_squirrel.py`,
+  tái dùng tách nền `process_v2.py`: key median góc + flood-fill nền từ biên qua
+  pixel magenta-hued, KHÔNG `binary_fill_holes`; m2/m3 chỉ trong 3 px quanh
+  magenta thật; rim-recolor; quantize 256 màu MAXCOVERAGE + Floyd–Steinberg).
+  Happy scale cao 392 px đặt y=8; vỏ scale theo rộng 306 px, tâm x=255, nắp neo
+  y=60, bát neo đáy y=439. Raw shell_top vẽ cả 2 nửa trong 1 khung → tách bằng
+  connected components, giữ nửa trên (không vẽ lại).
+- Sửa tàn dư magenta: 12 file còn 1–14 px magenta sau quantize (kể cả đốm trong
+  thân: adult_walk_a 14 px, adult_sit 6 px) + 1 px strict-magenta (233,76,220) ở
+  vùng miệng adult_happy mà thước nới (G<60) không bắt được (G=76); sửa bằng
+  cách tô màu palette an toàn gần nhất, KHÔNG thêm màu mới (bản thử median
+  neighbor đã bỏ vì đẩy adult_sit lên 258 màu, adult_walk_a 262 màu).
+
+#### Kiểm chứng
+
+- Đo bằng code ĐẠT 27/27: 512×512, semi 0, magenta 0 (cả 2 thước), ≤256 màu;
+  thân cao 400 px (y 40→439), đất y=439; happy cao 391–392 px, đáy y=399.
+- Soi bằng mắt trên nền tối (60,60,80) + nền phòng v3b ở cỡ app (newborn 40% /
+  teen 58% / adult 72% chiều cao bé 360 px) + phóng 3× viền mặt/tai/đuôi/chân:
+  không lỗ alpha, không mép thẳng, không tàn dư magenta (vài đốm hồng dither
+  ≤2 px trên mép lông, dưới ngưỡng đo, không thấy ở cỡ app).
+- Lỗ trong suốt kín (khe vòng cuộn đuôi, khe chân–đuôi) lớn nhất: teen 486 px,
+  teen_sit 440 px, teen_happy 341 px — khe hở tự nhiên như lô 12 v1 (teen 542 px),
+  không phải lỗ thân.
+- 4 file xem trước đối chiếu SHA-256 khớp nguyên bản (egg `5b77d2b8…`,
+  newborn `ebb719ba…`, teen `66077fce…`, adult `1614bba7…`).
+
+#### Điểm chưa chắc — nói thẳng
+
+1. adult_walk_d: đầu chóp đuôi chạm mép trái khung x=0 (5 px, y143–147), vài sợi
+   lông ngọn bị cắt; vẽ lại lần 2 còn tệ hơn (rộng 522 px, chạm 45 px trái +
+   19 px phải) nên GIỮ bản v1. Ở cỡ app không thấy; chờ Claude chốt chấp nhận.
+2. Dark-px nứt bão hoà crack_2→crack_3 (3.333→3.665) — mức tăng đọc bằng mắt,
+   không đọc bằng số này.
+3. Bát vỏ sâu hơn mèo lô 8A (285 px so với 170 px), nắp nông hơn (203 px so với
+   230 px); chồng nhau 107 px. Nhìn riêng vẫn ra nửa vỏ, chồng lên trứng kín
+   vẫn đúng viền.
+4. Đối chân a/c chỉ gần đúng (AI vẽ), như lô 8B; newborn a/d hơi giống nhau (cả
+   2 đều chân trước vươn tới trước).
+5. Teen→adult phân biệt chủ yếu bằng đuôi to/xù hơn + thân dài hơn, như bản xem
+   trước đã duyệt (ghi trong report v1).
+
+#### Kế hoạch đẩy (4 lần .b64, CHỈ NHÁP — parent đẩy)
+
+- Đợt 1 (6 file, PNG 907767 B, .b64 ~1210356 B): squirrel_adult_walk_b.png, squirrel_teen_sit.png, squirrel_newborn_walk_a.png, squirrel_adult_sit.png, squirrel_teen.png, squirrel_egg.png
+- Đợt 2 (7 file, PNG 1007833 B, .b64 ~1343777 B): squirrel_adult_walk_c.png, squirrel_teen_walk_c.png, squirrel_teen_walk_d.png, squirrel_adult_happy.png, squirrel_newborn_happy.png, squirrel_egg_crack_2.png, squirrel_newborn.png
+- Đợt 3 (7 file, PNG 973509 B, .b64 ~1298012 B): squirrel_teen_walk_b.png, squirrel_teen_walk_a.png, squirrel_newborn_walk_d.png, squirrel_newborn_walk_c.png, squirrel_egg_crack_3.png, squirrel_adult.png, squirrel_shell_top.png
+- Đợt 4 (7 file, PNG 994411 B, .b64 ~1325881 B): squirrel_adult_walk_a.png, squirrel_adult_walk_d.png, squirrel_newborn_walk_b.png, squirrel_teen_happy.png, squirrel_newborn_sit.png, squirrel_egg_crack_1.png, squirrel_shell_bottom.png
+Tổng .b64 ~5,18 MB; đích `app/assets/images/pets/`; mỗi lần ≤8 file, mỗi file
+.b64 <1.217.688 B. Mục này do parent gộp vào `docs/E_IMAGES.md` cùng đợt đẩy
+(xem cuối mục); Claude decode + kiểm bằng git (đối chiếu blob SHA) sau đó.
+
+Đã đẩy 4 lần .b64 (23/11/2026): `84c6cd8c` (6 file), `d2cc9a51` (7 file),
+`0b7c3c07` (7 file), `de3e285d` (7 file), 27/27 vòng khứ hồi local khớp từng
+byte. Chưa decode (chờ Claude decode).
