@@ -7,9 +7,11 @@
 /// (chưa làm / đang làm / xong), số câu đúng + xu nhận trong chặng,
 /// bậc hiện tại của mảng, các chặng tự chọn đã làm hôm nay.
 ///
-/// Nút lớn "Thử thách" để xác nhận vào làm: chặng ngày nếu chưa xong,
-/// xong rồi thì sinh chặng tự chọn mới ([DailySetService.buildExtraStage])
-/// rồi vào làm. Nhà hồng (Nhà của bé) không vào màn này mà về Phòng
+/// Nút lớn "Thử thách" để xác nhận vào làm: chặng ngày nếu chưa xong;
+/// xong rồi thì nút thành "Leo tầng N" — leo tầng tiếp theo của Tháp
+/// 30 tầng của mảng (xem `tower_config.dart`, [TowerService]). Bên
+/// phải thẻ là cột tầng: tầng đã qua / tầng hiện tại / tầng khóa,
+/// tầng boss có huy hiệu (icon Material tạm khi [towerArtReady] tắt). Nhà hồng (Nhà của bé) không vào màn này mà về Phòng
 /// như trước (xem [TownScreen]).
 ///
 /// Nút Trở về tròn ở góc trên trái về Thị trấn (xem
@@ -30,6 +32,8 @@ import '../daily_set/daily_set_service.dart';
 import '../ladder/ladder_service.dart';
 import '../math/math_decor.dart';
 import '../math/math_screen.dart';
+import '../tower/tower_config.dart';
+import '../tower/tower_service.dart';
 import '../town/town_assets.dart';
 import 'building_stats.dart';
 
@@ -58,8 +62,12 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
   String? _error;
   bool _loading = true;
 
-  /// Đang sinh chặng tự chọn (khóa nút Thử thách lúc chờ).
-  bool _starting = false;
+  /// Tầng tháp cao nhất bé đã qua ở mảng này (0 = chưa qua tầng nào).
+  int _highestFloor = 0;
+
+  ScrollController _floorScroll = ScrollController();
+
+  static const double _floorTileHeight = 34;
 
   int get _stageIndex => widget.args?.stageIndex ?? 0;
 
@@ -79,6 +87,12 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
     _load();
   }
 
+  @override
+  void dispose() {
+    _floorScroll.dispose();
+    super.dispose();
+  }
+
   Future<void> _load() async {
     try {
       final db = ref.read(databaseProvider);
@@ -91,9 +105,18 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
         childId: childId,
         stageIndex: _stageIndex,
       );
+      final highest = await TowerService(db: db)
+          .highestCleared(childId: childId, strand: Strand.all[_stageIndex]);
       if (!mounted) return;
+      // Cuộn sẵn để tầng hiện tại nằm gần đáy khung nhìn (đảo chiều:
+      // offset 0 là tầng 1).
+      _floorScroll.dispose();
+      _floorScroll = ScrollController(
+        initialScrollOffset: (highest - 1).clamp(0, 30) * _floorTileHeight,
+      );
       setState(() {
         _stats = stats;
+        _highestFloor = highest;
         _loading = false;
       });
     } catch (e) {
@@ -106,10 +129,10 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
   }
 
   /// Nút Thử thách: chặng ngày chưa xong thì vào chặng ngày; xong
-  /// rồi thì sinh chặng tự chọn mới rồi vào làm.
+  /// rồi thì thành "Leo tầng N" và vào làm tầng đó của tháp.
   Future<void> _onChallenge() async {
     final stats = _stats;
-    if (stats == null || _starting) return;
+    if (stats == null) return;
     if (stats.status != StageStatus.done) {
       if (!mounted) return;
       context.go(
@@ -118,24 +141,17 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
       );
       return;
     }
-    setState(() => _starting = true);
-    try {
-      final db = ref.read(databaseProvider);
-      final childId = await db.ensureSeeded();
-      final questions = await _dailySetService(db)
-          .buildExtraStage(childId: childId, strand: Strand.all[_stageIndex]);
-      if (!mounted) return;
-      context.go(
-        MathScreen.route,
-        extra: MathScreenArgs(extraQuestions: questions),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _starting = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Chưa sinh được chặng tự chọn: $e')),
-      );
-    }
+    // Xong chặng ngày: leo tầng kế tiếp của tháp (câu sinh trong
+    // MathScreen để thử lại tầng cũng ra câu mới).
+    final floor = _highestFloor + 1;
+    if (floor > TowerConfig.floorsPerTower) return;
+    context.go(
+      MathScreen.route,
+      extra: MathScreenArgs(
+        towerStrand: Strand.all[_stageIndex],
+        towerFloor: floor,
+      ),
+    );
   }
 
   @override
@@ -218,68 +234,13 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
             ),
             const SizedBox(height: 8),
             Expanded(
-              child: Container(
-                key: const Key('building-stats-card'),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.08),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _StatBlock(
-                            label: 'Chặng',
-                            value: statusText,
-                            valueKey: const Key('building-status'),
-                          ),
-                        ),
-                        Expanded(
-                          child: _StatBlock(
-                            label: 'Câu đúng',
-                            value: '${stats.correctCount}/5',
-                            valueKey: const Key('building-correct'),
-                          ),
-                        ),
-                        Expanded(
-                          child: _StatBlock(
-                            label: 'Xu nhận',
-                            value: '${stats.xuEarned} xu',
-                            valueKey: const Key('building-xu'),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      extraText,
-                      key: const Key('building-extra'),
-                      textAlign: TextAlign.center,
-                      // Một dòng: phông test Ahem rộng, dòng dài gãy
-                      // làm đôi sẽ tràn thẻ ở 608x248.
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: MathColors.questionText,
-                      ),
-                    ),
-                  ],
-                ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(child: _statsCard(stats, extraText, statusText)),
+                  const SizedBox(width: 8),
+                  SizedBox(width: 150, child: _towerColumn(stats)),
+                ],
               ),
             ),
             const SizedBox(height: 8),
@@ -288,23 +249,20 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
                 height: 56,
                 child: ElevatedButton(
                   key: const Key('building-challenge-button'),
-                  onPressed: _starting ? null : _onChallenge,
+                  onPressed: _towerFinished ? null : _onChallenge,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _starting ? 'Đang chuẩn bị…' : 'Thử thách',
+                        _challengeTitle(stats),
                         style: const TextStyle(fontSize: 22),
                       ),
-                      if (!_starting)
-                        Text(
-                          stats.status == StageStatus.done
-                              ? 'Chặng ngày xong, làm chặng tự chọn'
-                              : 'Làm chặng hôm nay',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 13),
-                        ),
+                      Text(
+                        _challengeSubtitle(stats),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 13),
+                      ),
                     ],
                   ),
                 ),
@@ -312,6 +270,131 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  bool get _towerFinished => _highestFloor >= TowerConfig.floorsPerTower;
+
+  String _challengeTitle(BuildingStats stats) {
+    if (stats.status != StageStatus.done) return 'Thử thách';
+    return _towerFinished
+        ? 'Đã lên đỉnh tháp'
+        : 'Leo tầng ${_highestFloor + 1}';
+  }
+
+  String _challengeSubtitle(BuildingStats stats) {
+    if (stats.status != StageStatus.done) return 'Làm chặng hôm nay';
+    if (_towerFinished) {
+      return 'Bé đã qua cả ${TowerConfig.floorsPerTower} tầng';
+    }
+    final floor = _highestFloor + 1;
+    final needed = TowerConfig.passNeeded(floor);
+    return TowerConfig.isBoss(floor)
+        ? 'Tầng boss: đúng $needed/${TowerConfig.questionsPerFloor} câu'
+        : 'Cần đúng $needed/${TowerConfig.questionsPerFloor} câu';
+  }
+
+  /// Cột tầng của tháp (tầng cao nhất ở trên, danh sách đảo chiều
+  /// nên tầng 1 ở đáy): đã qua / hiện tại / khóa. Mở màn là cuộn sẵn
+  /// tới gần tầng hiện tại ([_floorScroll]).
+  Widget _towerColumn(BuildingStats stats) {
+    final current = _highestFloor + 1;
+    return Container(
+      key: const Key('building-tower'),
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ListView.builder(
+        key: const Key('building-tower-list'),
+        reverse: true,
+        controller: _floorScroll,
+        itemExtent: _floorTileHeight,
+        itemCount: TowerConfig.floorsPerTower,
+        padding: EdgeInsets.zero,
+        itemBuilder: (context, index) {
+          final floor = index + 1;
+          return _FloorTile(
+            floor: floor,
+            state: floor <= _highestFloor
+                ? _FloorState.cleared
+                : floor == current
+                ? _FloorState.current
+                : _FloorState.locked,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _statsCard(BuildingStats stats, String extraText, String statusText) {
+    return Container(
+      key: const Key('building-stats-card'),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _StatBlock(
+                  label: 'Chặng',
+                  value: statusText,
+                  valueKey: const Key('building-status'),
+                ),
+              ),
+              Expanded(
+                child: _StatBlock(
+                  label: 'Câu đúng',
+                  value: '${stats.correctCount}/5',
+                  valueKey: const Key('building-correct'),
+                ),
+              ),
+              Expanded(
+                child: _StatBlock(
+                  label: 'Xu nhận',
+                  value: '${stats.xuEarned} xu',
+                  valueKey: const Key('building-xu'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            extraText,
+            key: const Key('building-extra'),
+            textAlign: TextAlign.center,
+            // Một dòng: phông test Ahem rộng, dòng dài gãy
+            // làm đôi sẽ tràn thẻ ở 608x248.
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 16,
+              color: MathColors.questionText,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -354,6 +437,82 @@ class _StatBlock extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+enum _FloorState { cleared, current, locked }
+
+/// Một tầng trong cột tháp: tầng đã qua (dấu tích), tầng hiện tại
+/// (nổi màu), tầng khóa (ổ khóa); tầng boss có huy hiệu. Khi
+/// [towerArtReady] tắt dùng icon Material tạm thay ảnh
+/// `ui_tower_lock` / `ui_tower_boss`.
+class _FloorTile extends StatelessWidget {
+  const _FloorTile({required this.floor, required this.state});
+
+  final int floor;
+  final _FloorState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final boss = TowerConfig.isBoss(floor);
+    final color = switch (state) {
+      _FloorState.cleared => const Color(0xFF2E8B57),
+      _FloorState.current => MathColors.questionText,
+      _FloorState.locked => const Color(0xFF8A7FA6),
+    };
+    final stateIcon = switch (state) {
+      _FloorState.cleared => Icons.check_circle,
+      _FloorState.current => Icons.play_circle_fill,
+      _FloorState.locked => Icons.lock,
+    };
+    return Container(
+      key: Key('tower-floor-$floor'),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        color: state == _FloorState.current
+            ? const Color(0xFFFFE9A8)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          if (towerArtReady && state == _FloorState.locked)
+            Image.asset(TowerConfig.lockAsset, width: 18, height: 18)
+          else
+            Icon(stateIcon, size: 18, color: color),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              'Tầng $floor',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: state == _FloorState.current
+                    ? FontWeight.bold
+                    : FontWeight.normal,
+                color: color,
+              ),
+            ),
+          ),
+          if (boss && towerArtReady)
+            Image.asset(
+              TowerConfig.bossAsset,
+              key: Key('tower-boss-$floor'),
+              width: 18,
+              height: 18,
+            )
+          else if (boss)
+            Icon(
+              Icons.shield,
+              key: Key('tower-boss-$floor'),
+              size: 18,
+              color: const Color(0xFFD9534F),
+            ),
+        ],
+      ),
     );
   }
 }

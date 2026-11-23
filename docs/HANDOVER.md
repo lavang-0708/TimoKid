@@ -1,11 +1,12 @@
 # HANDOVER — TimoKid
 
-Cập nhật cuối: 22/11/2026 (T2-06b: Đồ cho pet, Nội thất, bộ đồ cao cấp, nút Cho ăn/Chơi); trước đó 21/11/2026 (main `99a87cf` sau PR #34: nhân vật toàn thân + đi lại trong Phòng + pet lớn dần + Tủ đồ; PR #33 thêm 12 dạng bài; PR #32 (D) đã merge). Đọc mục "Hiện trạng sau PR #33/#34" ngay dưới trước; các dòng lịch sử phía sau giữ nguyên cách viết lúc đó.
+Cập nhật cuối: 23/11/2026 (tháp nhiều tầng + boss); trước đó 22/11/2026 (T2-06b: Đồ cho pet, Nội thất, bộ đồ cao cấp, nút Cho ăn/Chơi); trước đó 21/11/2026 (main `99a87cf` sau PR #34: nhân vật toàn thân + đi lại trong Phòng + pet lớn dần + Tủ đồ; PR #33 thêm 12 dạng bài; PR #32 (D) đã merge). Đọc mục "Hiện trạng sau PR #33/#34" ngay dưới trước; các dòng lịch sử phía sau giữ nguyên cách viết lúc đó.
 
 ## Hiện trạng sau PR #33/#34 (đọc mục này trước — thay thế các dòng cũ bên dưới khi mâu thuẫn)
 
 Các dòng lịch sử bên dưới viết tại thời điểm từng PR; số liệu và cách làm sau đã đổi. Hiện trạng đối chiếu với code trên `main` (21/11):
 
+- **Tháp nhiều tầng + boss (23/11, nhánh `feat/tower-floors`)**: mỗi tòa 30 tầng, nút ở màn Tòa nhà thành "Leo tầng N" sau khi xong chặng ngày; cột tầng bên phải thẻ (đã qua / hiện tại / khóa, boss có huy hiệu). Code `app/lib/features/tower/` (`tower_config.dart` mọi hằng số + cờ `towerArtReady = false`, `tower_service.dart`: `highestCleared`, `nextFloor`, `recordResult`, luồng `floorCleared`). Tầng cao nhất ở `settings` `tower_floor.<mảng>`. Câu tháp sinh bằng `DailySetService.buildTowerFloor`, chạy qua `MathScreen` (`MathScreenArgs.towerStrand/towerFloor`) và `StageSession.towerFloor`; kết quả chấm vào `StageSession.towerOutcome` rồi hiện ở `StageResultScreen` (qua/trượt tầng, thưởng lần đầu, Leo tầng kế / Thử lại). Hook cho pet: một chỗ ghi chú `HOOK DUY NHẤT` trong `StageSession._finishStage`. Xem `docs/DECISIONS.md` mục 23/11.
 - **Dạng bài: 84** (lôgic 18, số học 15, lý thuyết số 17, hình học 17, tổ hợp 17) — `app/lib/features/questions/question_registry.dart`, `tools/question_bank/TIMO3_FORMS.md`. "48 dạng / 103 cặp" ở T1-05 là số lúc port `gen.py`; QA menu và đề ngày dùng đủ 84.
 - **Nhân vật: ảnh toàn thân** (`kid_assets.dart`, `kid_sprite.dart`, `kid_look_service.dart`): 3 bộ đồ × nghỉ/vẫy mỗi dáng, mắt nhắm là miếng vá, mũ/nơ-kẹp + kính + giày trắng là lớp phủ, balo là biến thể ảnh toàn thân, khung đi bộ `dr`/`ur` a–d chỉ dùng khi không đeo gì thêm. `CharacterView`/`girlSet1`/lớp tạm xám là **legacy** (file còn vì test cũ). Chi tiết: `docs/ASSETS.md`.
 - **Màn mở đầu: 4 bước cho cả nam và nữ** (giới tính, bộ đồ, đặt tên, trứng). Không còn "nữ 5 bước / nam 7 bước".

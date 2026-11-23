@@ -166,7 +166,9 @@ void main() {
     expect(find.text('Chặng 1 — Lôgic'), findsOneWidget);
   });
 
-  testWidgets('chặng đã xong: Thử thách vào chặng tự chọn', (tester) async {
+  testWidgets('chặng đã xong: nút thành Leo tầng 1 và vào tầng tháp', (
+    tester,
+  ) async {
     await db.dailySetsDao.updateStageStatus(
       id: setId,
       stageIndex: 0,
@@ -175,13 +177,14 @@ void main() {
     await pumpBuilding(tester);
 
     expect(find.text('Xong ✓'), findsOneWidget);
-    expect(find.text('Chặng ngày xong, làm chặng tự chọn'), findsOneWidget);
+    expect(find.text('Leo tầng 1'), findsOneWidget);
+    expect(find.text('Cần đúng 3/5 câu'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('building-challenge-button')));
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('math-screen')), findsOneWidget);
-    expect(find.text('Chặng tự chọn — Lôgic'), findsOneWidget);
+    expect(find.text('Tầng 1 — Lôgic'), findsOneWidget);
   });
 
   testWidgets('đang làm: hiện Đúng X/5 + xu, Thử thách vào lại chặng', (
