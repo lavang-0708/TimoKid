@@ -187,9 +187,10 @@ void main() {
     await tester.tap(find.byKey(const Key('room-pet-play-button')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('room-pet-pat')));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.text(petLockedLine), findsOneWidget);
     expect(await PetCareService(db: db).playedToday(childId), isFalse);
+    await teardown(tester);
   });
 
   testWidgets('vuốt ve sau khi xong chặng: tính là chơi, pet vui', (
@@ -200,9 +201,10 @@ void main() {
     await tester.tap(find.byKey(const Key('room-pet-play-button')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('room-pet-pat')));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(await PetCareService(db: db).playedToday(childId), isTrue);
     expect(find.byKey(const Key('room-pet-mood-sad')), findsNothing);
+    await teardown(tester);
   });
 
   testWidgets('suất ăn nhận khi học: cho ăn bằng suất ăn, pet hết đói', (

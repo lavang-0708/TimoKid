@@ -1308,7 +1308,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             SizedBox(
-                              height: 80,
+                              height: 56,
                               child: Image.asset(
                                 p.hatched
                                     ? petAsset(p.species, p.stage)
@@ -1387,7 +1387,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             SizedBox(
-                              height: 80,
+                              height: 56,
                               child: Image.asset(
                                 eggSpeciesAssets[sp] ?? petEggAsset(sp),
                                 fit: BoxFit.contain,
