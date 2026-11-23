@@ -61,11 +61,11 @@ void main() {
       expect(petShopSpeciesById('dragon')!.rarity, PetRarity.epic);
       expect(newPetArtReady, {
         'squirrel': true,
-        'capybara': false,
+        'capybara': true,
         'dragon': false,
       });
       expect(isPetSpeciesBuyable('squirrel'), isTrue);
-      expect(isPetSpeciesBuyable('capybara'), isFalse);
+      expect(isPetSpeciesBuyable('capybara'), isTrue);
       expect(isPetSpeciesBuyable('dragon'), isFalse);
       expect(petUiArtReady, isFalse);
       final items = shopPetEggItems();
@@ -78,13 +78,11 @@ void main() {
     test('cờ hình tắt: Sắp có, không trừ kim cương, không tạo pet', () async {
       await gems(500);
       final shop = ShopService(db: db);
-      for (final species in ['capybara', 'dragon']) {
-        expect(
-          await shop.buyPetEgg(childId: childId, species: species),
-          BuyResult.comingSoon,
-        );
-        expect(await PetService(db: db).owns(childId, species), isFalse);
-      }
+      expect(
+        await shop.buyPetEgg(childId: childId, species: 'dragon'),
+        BuyResult.comingSoon,
+      );
+      expect(await PetService(db: db).owns(childId, 'dragon'), isFalse);
       expect(await gemBalance(), 500);
     });
 
@@ -97,6 +95,17 @@ void main() {
       );
       expect(await gemBalance(), 80);
       expect(await PetService(db: db).owns(childId, 'squirrel'), isTrue);
+    });
+
+    test('cờ mặc định: capybara mua được với 60 kim cương', () async {
+      await gems(100);
+      final shop = ShopService(db: db);
+      expect(
+        await shop.buyPetEgg(childId: childId, species: 'capybara'),
+        BuyResult.bought,
+      );
+      expect(await gemBalance(), 40);
+      expect(await PetService(db: db).owns(childId, 'capybara'), isTrue);
     });
 
     test(
