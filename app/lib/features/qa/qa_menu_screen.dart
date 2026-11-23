@@ -23,6 +23,7 @@ import '../../core/database/app_database.dart';
 import '../../core/database/tables.dart';
 import '../arena/league_service.dart';
 import '../ladder/ladder_config.dart';
+import '../pet/dragon_fx_preview.dart';
 import '../math/math_session.dart' show strandNames;
 import '../pet/pet_config.dart';
 import '../quests/quest_service.dart';
@@ -504,6 +505,19 @@ class _QaMenuScreenState extends ConsumerState<QaMenuScreen> {
                       ),
                     ),
                   ],
+                  _sectionTitle('Rồng'),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: ElevatedButton(
+                      key: const Key('qa-dragon-fx'),
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => const DragonFxPreviewScreen(),
+                        ),
+                      ),
+                      child: const Text('Xem thử hiệu ứng rồng'),
+                    ),
+                  ),
                   _sectionTitle('Xóa dữ liệu'),
                   Align(
                     alignment: Alignment.centerLeft,

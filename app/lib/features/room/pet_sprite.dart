@@ -289,6 +289,13 @@ class _PetSpriteState extends State<PetSprite> with TickerProviderStateMixin {
       asset,
       fit: BoxFit.contain,
       gaplessPlayback: true,
+      // Loài chưa có hình (vd rồng chờ Muse): icon tạm thay vì lỗi.
+      errorBuilder: (_, _, _) => const FittedBox(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Icon(Icons.pets_rounded, color: Color(0xFF5DC3A8)),
+        ),
+      ),
     );
     if (widget.facingLeft) {
       picture = Transform.flip(flipX: true, child: picture);

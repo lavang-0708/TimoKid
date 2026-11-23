@@ -323,6 +323,18 @@ Các mục trên là nhật ký quyết định theo thời điểm; mục này 
 - **Tuần** = thứ Hai đến Chủ nhật giờ Việt Nam, tính từ `db.clock.today()` (QA nhảy ngày thử được). **Điểm tuần** = tổng số câu đúng theo ngày, mỗi ngày chỉ tính bài đúng nhiều nhất (tối đa 25) để thi lại luyện tập không làm phình điểm. Hạng: Đồng (đã thi ≥1 ngày), Bạc ≥40, Vàng ≥80, Kim cương ≥120. Mọi số (ngưỡng, kim cương rương 2/4/7/12, cờ `leagueArtReady = false`) ở `league_config.dart`.
 - **Rương cuối tuần**: chỉ xét tuần ngay trước (không bù tuần cũ hơn). Hiện ở sảnh Đấu trường khi mở sảnh (chưa gắn vào Thị trấn để không đụng màn khác). Nhận một lần: khóa `settings` `arena_week_claimed.<thứ Hai>` + dòng ví `gem` (`arena_week_chest`, refId `arena_week:<childId>:<thứ Hai>`) trong một transaction; thiếu một trong hai vẫn không cộng đôi. Nội dung cố định theo hạng.
 - Không đổi schema. API cho nhiệm vụ ngày: `ArenaService.didArenaToday(childId)`.
+## 24/11/2026 — Hiệu ứng rồng (nhánh `feat/dragon-fx`)
+
+- **Rồng là pet siêu hiếm đầu tiên, có tương tác + hiệu ứng riêng**: vầng sáng sau rồng mọi lúc (Phòng, thẻ trứng ở Cửa hàng, "Pet của bé"); chạm rồng trong Phòng hiện 3 nút tròn Phun lửa / Phun nước / Bay (tự ẩn sau 5 giây hoặc khi chạm sàn); pet khác giữ nguyên hành vi chạm cũ. Lửa/nước chỉ để vui, không làm hỏng gì (chưa có phản ứng với đồ vật — cố ý giữ gọn).
+- **Mọi con số một chỗ**: `app/lib/features/pet/dragon_fx_config.dart` (thời gian, ngưỡng bay-đi 450 px khung Phòng, miệng rồng `dragonMouth` = (360, 200) TẠM đoán, màu, số hạt, trần 40 hạt) + cờ `dragonFxArtReady = false`. Widget ở `dragon_fx.dart`, màn xem thử ở `dragon_fx_preview.dart`.
+- **Có hình thật hay vẽ code**: cờ `dragonFxArtReady` (chỉ áp cho rồng TRƯỞNG THÀNH). Tắt → vầng sáng = quầng xuyên tâm xanh bạc hà - vàng + đốm lấp lánh; phun = hạt (lửa cam→vàng rồi tàn lửa; giọt nước + bong bóng rồi tóe); bay = ảnh đứng nâng lên + lắc + đốm vỗ cánh. Bật → `dragon_aura.png` nhịp thở, `dragon_fire_1..4` / `dragon_water_1..4` (120 ms/khung, khung 3 giữ thêm 450 ms), `dragon_fly_a..d` lặp khi bay.
+- **Theo giai đoạn**: trưởng thành chơi đủ bộ; mới nở/nhỡ chỉ bản nhỏ code (ít tia lửa / bong bóng, nhảy-vỗ cánh) và nhắc một lần "Lớn lên rồng sẽ phun lửa thật!" (cờ trong phiên mở Phòng, không lưu DB — mở lại Phòng sẽ nhắc lại).
+- **Đi quãng dài thì bay**: rồng trưởng thành, quãng đi > ngưỡng → nâng lên (khung bay/ảnh đứng nâng), hạ cánh khi tới nơi. Bóng đất co lại + mờ theo độ cao (`DragonFxController.lift`).
+- **Nhẹ cho tablet tầm trung**: mỗi hiệu ứng là một CustomPainter, hạt tính bằng công thức từ tiến độ (không cấp phát mỗi khung), hạt giả ngẫu nhiên tạo một lần, controller dispose. Cổng `AnimationGate` tắt → hành động xong ngay, vầng sáng tĩnh.
+- **Chưa có hình rồng cơ bản**: `PetSprite` nay có `errorBuilder` (icon pets tạm) cho mọi loài thiếu hình, nên rồng hiển thị được (icon) cho tới khi Muse giao 27 file.
+- **Xem thử trước khi mua**: menu QA → "Xem thử hiệu ứng rồng" (chọn giai đoạn, quay trái/phải, 3 nút).
+- Sửa kèm: ô pet và bong bóng tâm trạng trong Phòng có `ValueKey` để bật/tắt bong bóng không dựng lại pet.
+
 ## 23/11/2026 — D: Pet — chăm sóc, lớn theo câu đúng, ăn mừng, nhiều pet
 
 - **Chủ dự án ĐẢO quyết định cũ "không có đói/ốm/buồn" (PLAN T2-07, quy tắc T2-06b)**: từ 23/11 pet có đói/buồn/vui theo ngày. Vẫn nhẹ nhàng: không ốm, không chết, không mất pet, không trừ xp hay xu; chỉ đổi hình (bong bóng, nhảy vui). Các chỗ ghi "không đói/ốm/buồn" ở các mục T2-06b, F phía trên là lịch sử.

@@ -33,6 +33,7 @@ import '../../core/widgets/press_bounce.dart';
 import '../../core/widgets/round_back_button.dart';
 import '../character/kid_assets.dart';
 import '../onboarding/onboarding_service.dart';
+import '../pet/dragon_fx.dart';
 import '../pet/pet_config.dart';
 import '../pet/pet_service.dart';
 import '../room/room_screen.dart';
@@ -554,15 +555,17 @@ class ShopItemArt extends StatelessWidget {
       // Trứng pet mới: có hình thì hiện ảnh trứng, chưa có thì icon trứng
       // vẽ bằng code.
       final ready = newPetArtReady[item.species] ?? false;
+      final egg = ready
+          ? Image.asset(
+              'assets/images/pets/${item.species}_egg.png',
+              fit: BoxFit.contain,
+              errorBuilder: (_, _, _) => const _EggIcon(),
+            )
+          : const _EggIcon();
       return Padding(
         padding: const EdgeInsets.all(6),
-        child: ready
-            ? Image.asset(
-                'assets/images/pets/${item.species}_egg.png',
-                fit: BoxFit.contain,
-                errorBuilder: (_, _, _) => const _EggIcon(),
-              )
-            : const _EggIcon(),
+        // Rồng siêu hiếm: có vầng sáng sau trứng.
+        child: DragonAura.wrapIf(item.species ?? '', egg),
       );
     }
     final itemAsset = item.asset;

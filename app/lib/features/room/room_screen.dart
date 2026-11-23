@@ -64,6 +64,8 @@ import '../onboarding/egg_service.dart';
 import '../onboarding/onboarding_config.dart';
 import '../onboarding/onboarding_model.dart';
 import '../onboarding/onboarding_service.dart';
+import '../pet/dragon_fx.dart';
+import '../pet/dragon_fx_config.dart';
 import '../pet/pet_care_service.dart';
 import '../pet/pet_celebration.dart';
 import '../pet/pet_config.dart';
@@ -157,6 +159,12 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   int _kidWalkId = 0;
   int _petWalkId = 0;
 
+  // Rồng: hành động + bảng 3 nút (chạm rồng hiện, tự ẩn sau vài giây).
+  final DragonFxController _dragonFx = DragonFxController();
+  bool _dragonMenu = false;
+  bool _dragonHintShown = false;
+  Timer? _dragonMenuTimer;
+
   @override
   void initState() {
     super.initState();
@@ -169,6 +177,8 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     _waveTimer?.cancel();
     _kidMove.dispose();
     _petMove.dispose();
+    _dragonMenuTimer?.cancel();
+    _dragonFx.dispose();
     _propCtl.dispose();
     super.dispose();
   }
@@ -341,6 +351,10 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       );
       return;
     }
+    if (species == dragonSpecies) {
+      _onDragonTap();
+      return;
+    }
     setState(() => _petBounce++);
     final happy = petHappyLines[species] ?? 'Vui quá!';
     final next = petXpToNextStage(_petXp);
@@ -349,6 +363,39 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       PetMood.sad => 'Chơi với tớ đi, tớ buồn quá!',
       _ => next == null ? happy : '$happy Còn $next câu đúng nữa tớ sẽ lớn!',
     }, seconds: 2);
+  }
+
+  /// Chạm rồng: nhảy vui + hiện/ẩn 3 nút hành động (tự ẩn sau
+  /// [dragonMenuHideMs]). Rồng chưa lớn nhắc một lần là lớn rồng mới
+  /// phun lửa thật.
+  void _onDragonTap() {
+    _dragonMenuTimer?.cancel();
+    final open = !_dragonMenu;
+    setState(() {
+      _petBounce++;
+      _dragonMenu = open;
+    });
+    if (open) {
+      _dragonMenuTimer = Timer(
+        const Duration(milliseconds: dragonMenuHideMs),
+        _hideDragonMenu,
+      );
+      if (_petStage != PetStage.adult && !_dragonHintShown) {
+        _dragonHintShown = true;
+        _showBubble(dragonHintText, seconds: 3);
+      }
+    }
+  }
+
+  void _hideDragonMenu() {
+    _dragonMenuTimer?.cancel();
+    if (!mounted || !_dragonMenu) return;
+    setState(() => _dragonMenu = false);
+  }
+
+  void _onDragonAction(DragonAction action) {
+    _hideDragonMenu();
+    _dragonFx.play(action);
   }
 
   /// Tủ đồ (E): chọn 1 trong 3 bộ đồ và phụ kiện đầu, xem trước ngay
@@ -834,6 +881,8 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   /// (G) Bé chạm vào sàn: nhân vật đi tới đó, pet đi theo sau lưng.
   void _onFloorTap(Offset frame) {
     if (_petMenu != null) setState(() => _petMenu = null);
+    _hideDragonMenu();
+    _dragonFx.cancel();
     final extra = _extraObstacles;
     final target = roomWalkTarget(frame, extra: extra);
     final path = roomWalkPath(_kidFeet, target, extra: extra);
@@ -858,6 +907,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     final id = isKid ? ++_kidWalkId : ++_petWalkId;
     bool current() => (isKid ? _kidWalkId : _petWalkId) == id;
     controller.stop();
+    if (!isKid) _dragonFx.setCruising(false);
     if (!AnimationGate.enabled) {
       // Test: tới nơi ngay, không chạy hiệu ứng.
       setState(() {
@@ -892,6 +942,15 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       final length = cumulative.last;
       final speed = isKid ? roomWalkSpeed : roomWalkSpeed * 1.15;
       final seconds = roomWalkDuration(length, speed: speed);
+      // Rồng trưởng thành đi quãng dài thì bay (hạ cánh khi tới nơi).
+      if (!isKid &&
+          dragonShouldFlyWalk(
+            species: _eggSpecies ?? '',
+            stage: _petStage,
+            length: length,
+          )) {
+        _dragonFx.setCruising(true);
+      }
       controller.duration = Duration(milliseconds: (seconds * 1000).round());
       var segment = -1;
       void tick() {
@@ -938,6 +997,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       }
     }
     if (!mounted || !current()) return;
+    if (!isKid) _dragonFx.setCruising(false);
     setState(() {
       if (isKid) {
         _kidWalking = false;
@@ -1332,16 +1392,19 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                           children: [
                             SizedBox(
                               height: 56,
-                              child: Image.asset(
-                                p.hatched
-                                    ? petAsset(p.species, p.stage)
-                                    : (eggSpeciesAssets[p.species] ??
-                                          petEggAsset(p.species)),
-                                fit: BoxFit.contain,
-                                errorBuilder: (_, _, _) => const Icon(
-                                  Icons.pets_rounded,
-                                  size: 48,
-                                  color: Color(0xFFB9A3E3),
+                              child: DragonAura.wrapIf(
+                                p.species,
+                                Image.asset(
+                                  p.hatched
+                                      ? petAsset(p.species, p.stage)
+                                      : (eggSpeciesAssets[p.species] ??
+                                            petEggAsset(p.species)),
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, _, _) => const Icon(
+                                    Icons.pets_rounded,
+                                    size: 48,
+                                    color: Color(0xFFB9A3E3),
+                                  ),
                                 ),
                               ),
                             ),
@@ -1468,7 +1531,11 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
 
           /// Bóng đổ mềm ngay dưới [anchor]: rộng 85% và cao 10%
           /// chiều rộng món (nhân vật/pet dùng bề rộng hình).
-          Widget frameShadow(Offset anchor, double width) {
+          Widget frameShadow(
+            Offset anchor,
+            double width, {
+            ValueNotifier<double>? lift,
+          }) {
             final sw = width * 0.85;
             final sh = width * 0.10;
             return Positioned(
@@ -1476,7 +1543,23 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
               top: fy(anchor.dy - sh * 0.3),
               width: fx(sw),
               height: fy(sh),
-              child: const _SoftShadow(),
+              // Rồng bay: bóng đất co lại + mờ theo độ cao.
+              child: lift == null
+                  ? const _SoftShadow()
+                  : ValueListenableBuilder<double>(
+                      valueListenable: lift,
+                      builder: (context, l, child) {
+                        final k = (l / dragonFlyLift).clamp(0.0, 1.0);
+                        return Opacity(
+                          opacity: 1 - (1 - dragonShadowMinOpacity) * k,
+                          child: Transform.scale(
+                            scale: 1 - (1 - dragonShadowMinScale) * k,
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: const _SoftShadow(),
+                    ),
             );
           }
 
@@ -1568,16 +1651,24 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
               (
                 _petFeet.dy,
                 [
-                  frameShadow(_petFeet, petBox * 0.7),
-                  if (_hatched && _mood != null)
+                  frameShadow(
+                    _petFeet,
+                    petBox * 0.7,
+                    lift: _eggSpecies == dragonSpecies ? _dragonFx.lift : null,
+                  ),
+                  if (_hatched && _mood != null && !_dragonMenu)
                     Positioned(
+                      key: const ValueKey('room-pet-mood'),
                       left: fx(_petFeet.dx - 28),
                       top: fy(_petFeet.dy - petBox * 440 / 512 - 44),
                       width: fx(56),
                       height: fy(56),
                       child: _PetMoodBubble(mood: _mood!),
                     ),
+                  // Có khóa: bong bóng tâm trạng bật/tắt không làm pet
+                  // (và hiệu ứng rồng đang chạy) bị dựng lại.
                   Positioned(
+                    key: const ValueKey('room-pet-slot'),
                     left: fx(_petFeet.dx - petBox / 2),
                     top: fy(_petFeet.dy - petBox * 440 / 512),
                     width: fx(petBox),
@@ -1590,6 +1681,36 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                       walking: _petWalking,
                       facingLeft: _petFacingLeft,
                       onTap: _onPetTap,
+                      dragonFx: _dragonFx,
+                    ),
+                  ),
+                ],
+              ),
+            // Bảng 3 nút của rồng: phía trên đầu, vẽ trên cùng.
+            if (_eggSpecies == dragonSpecies && _hatched && _dragonMenu)
+              (
+                3000,
+                [
+                  Positioned(
+                    left:
+                        (fx(_petFeet.dx) - DragonActionMenu.widthFor(fx(1)) / 2)
+                            .clamp(
+                              4.0,
+                              math.max(
+                                4.0,
+                                fx(roomFrameWidth) -
+                                    DragonActionMenu.widthFor(fx(1)) -
+                                    4,
+                              ),
+                            ),
+                    top: math.max(
+                      4.0,
+                      fy(_petFeet.dy - petBox * 440 / 512 - 150),
+                    ),
+                    child: DragonActionMenu(
+                      scale: fx(1),
+                      enabled: !_dragonFx.busy,
+                      onAction: _onDragonAction,
                     ),
                   ),
                 ],
@@ -1864,6 +1985,7 @@ class _PetSlot extends StatelessWidget {
     required this.walking,
     required this.facingLeft,
     required this.onTap,
+    this.dragonFx,
   });
 
   final String species;
@@ -1874,10 +1996,22 @@ class _PetSlot extends StatelessWidget {
   final bool facingLeft;
   final VoidCallback onTap;
 
+  /// Điều khiển hiệu ứng khi pet là rồng.
+  final DragonFxController? dragonFx;
+
   @override
   Widget build(BuildContext context) {
     final Widget shown;
-    if (hatched) {
+    final fxCtl = dragonFx;
+    if (hatched && species == dragonSpecies && fxCtl != null) {
+      shown = DragonPetView(
+        controller: fxCtl,
+        stage: stage == PetStage.egg ? PetStage.newborn : stage,
+        walking: walking,
+        facingLeft: facingLeft,
+        happyTick: bounce,
+      );
+    } else if (hatched) {
       shown = PetSprite(
         species: species,
         stage: stage == PetStage.egg ? PetStage.newborn : stage,
