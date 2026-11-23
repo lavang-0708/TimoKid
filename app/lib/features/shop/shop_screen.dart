@@ -29,6 +29,7 @@ import '../../core/animation/animation_gate.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/tables.dart';
 import '../../core/widgets/game_ui.dart';
+import '../../core/widgets/rarity_badge.dart';
 import '../../core/widgets/press_bounce.dart';
 import '../../core/widgets/round_back_button.dart';
 import '../character/kid_assets.dart';
@@ -847,36 +848,14 @@ class _ItemCard extends StatelessWidget {
                             outfit: outfit,
                           ),
                         ),
-                        if (item.rarity != null)
+                        if (item.rarity != null &&
+                            item.rarity != PetRarity.common)
                           Positioned(
                             left: 0,
                             top: 0,
-                            child: Container(
+                            child: RarityBadge(
                               key: Key('shop-rarity-${item.id}'),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: switch (item.rarity!) {
-                                  PetRarity.common => const Color(0xFFD8F0DD),
-                                  PetRarity.rare => const Color(0xFFCDE4FF),
-                                  PetRarity.epic => const Color(0xFFF3D3FF),
-                                },
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
-                                ),
-                              ),
-                              child: Text(
-                                item.rarity!.label,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w900,
-                                  color: gameInk,
-                                ),
-                              ),
+                              rarity: item.rarity!,
                             ),
                           ),
                         if (count != null)
