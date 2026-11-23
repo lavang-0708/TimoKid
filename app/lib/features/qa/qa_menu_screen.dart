@@ -24,6 +24,7 @@ import '../../core/database/tables.dart';
 import '../arena/league_service.dart';
 import '../ladder/ladder_config.dart';
 import '../math/math_session.dart' show strandNames;
+import '../quests/quest_service.dart';
 import '../questions/figure_svg.dart';
 import '../questions/question.dart';
 import '../questions/question_registry.dart';
@@ -55,6 +56,7 @@ class _QaMenuScreenState extends ConsumerState<QaMenuScreen> {
   List<Attempt> _attempts = [];
   bool _loading = true;
   String _leagueText = '';
+  String _questText = '';
 
   // Xem thử dạng bài: dạng và mức đang chọn + câu đang xem.
   String _previewFormId = allQuestionGenerators.first.formId;
@@ -88,8 +90,14 @@ class _QaMenuScreenState extends ConsumerState<QaMenuScreen> {
         '${week.attempts} ngày thi, hạng ${week.tier?.label ?? 'chưa có'}, '
         'còn ${week.daysLeft} ngày. '
         'Rương tuần trước: ${chest == null ? 'không có/đã nhận' : '${chest.tier.label} (${chest.gems} kim cương)'}';
+    final board = await QuestService(db: widget.db).board(childId);
+    final questText =
+        'Mã nhiệm vụ: ${board.quests.map((q) => '${q.quest.id} '
+            '${q.progress}/${q.target}${q.claimed ? ' (đã nhận)' : ''}').join('; ')}. '
+        'Chuỗi ${board.streak} ngày, rương chờ nhận: ${board.pendingChests.length}';
     if (!mounted) return;
     setState(() {
+      _questText = questText;
       _leagueText = leagueText;
       _childId = childId;
       _rungs = rungs;
@@ -226,6 +234,12 @@ class _QaMenuScreenState extends ConsumerState<QaMenuScreen> {
                   Text(
                     _leagueText,
                     key: const Key('qa-league-text'),
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  _sectionTitle('Nhiệm vụ ngày + chuỗi'),
+                  Text(
+                    _questText,
+                    key: const Key('qa-quest-text'),
                     style: const TextStyle(fontSize: 14),
                   ),
                   _sectionTitle('Bậc từng mảng'),

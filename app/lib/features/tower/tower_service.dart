@@ -109,6 +109,25 @@ class TowerService {
     return highest >= TowerConfig.floorsPerTower ? null : highest + 1;
   }
 
+  /// Số lượt qua tầng (mọi mảng) trong ngày [date] (`YYYY-MM-DD`, giờ
+  /// Việt Nam); mặc định hôm nay. Nhiệm vụ ngày đọc số này.
+  Future<int> clearsOn(String childId, {String? date}) async {
+    final raw = await _db.settingsDao.getValue(
+      childId: childId,
+      key: TowerConfig.clearsKey(date ?? _db.clock.today()),
+    );
+    return int.tryParse(raw ?? '') ?? 0;
+  }
+
+  Future<void> _bumpClearsToday(String childId) async {
+    final n = await clearsOn(childId);
+    await _db.settingsDao.setValue(
+      childId: childId,
+      key: TowerConfig.clearsKey(_db.clock.today()),
+      value: '${n + 1}',
+    );
+  }
+
   /// Chấm lượt leo [floor] của [strand] với [firstTryCorrect] câu đúng
   /// ngay lần đầu. Qua tầng thì cập nhật tầng cao nhất; nếu là lần qua
   /// đầu tiên (floor > tầng cao nhất cũ) thì cộng thưởng một lần.
@@ -168,6 +187,7 @@ class TowerService {
           value: '$floor',
         );
       }
+      await _bumpClearsToday(childId);
       _events.add(
         TowerFloorCleared(
           childId: childId,

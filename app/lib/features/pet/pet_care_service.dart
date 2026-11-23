@@ -111,17 +111,23 @@ class PetCareService {
   }
 
   /// Hôm nay bé đã cho pet nào ăn chưa (dùng cho nhiệm vụ ngày).
-  Future<bool> fedToday(String childId) async {
-    for (final v in (await _readCare(childId, _today)).values) {
-      if (v is Map && ((v['feed'] as num?) ?? 0) > 0) return true;
-    }
-    return false;
-  }
+  Future<bool> fedToday(String childId) => fedOn(childId, _today);
 
   /// Hôm nay bé đã chơi với pet nào chưa (dùng cho nhiệm vụ ngày).
-  Future<bool> playedToday(String childId) async {
-    for (final v in (await _readCare(childId, _today)).values) {
-      if (v is Map && ((v['play'] as num?) ?? 0) > 0) return true;
+  Future<bool> playedToday(String childId) => playedOn(childId, _today);
+
+  /// Như [fedToday] nhưng cho ngày [date] (`YYYY-MM-DD`): nhiệm vụ ngày
+  /// đếm chuỗi qua các ngày trước.
+  Future<bool> fedOn(String childId, String date) =>
+      _anyCare(childId, date, 'feed');
+
+  /// Như [playedToday] nhưng cho ngày [date].
+  Future<bool> playedOn(String childId, String date) =>
+      _anyCare(childId, date, 'play');
+
+  Future<bool> _anyCare(String childId, String date, String field) async {
+    for (final v in (await _readCare(childId, date)).values) {
+      if (v is Map && ((v[field] as num?) ?? 0) > 0) return true;
     }
     return false;
   }

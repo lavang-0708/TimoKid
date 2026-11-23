@@ -35,6 +35,7 @@ import 'package:timokid/features/room/room_assets.dart';
 import 'package:timokid/features/room/room_screen.dart';
 import 'package:timokid/features/town/town_screen.dart';
 
+import '../../helpers/quest_pin.dart';
 import '../../goldens/room_golden_data.dart';
 import '../../helpers/kid_images.dart';
 
@@ -87,6 +88,7 @@ void main() {
     db = openMemoryDb(clock: clock);
     addTearDown(db.close);
     childId = await db.ensureSeeded();
+    await pinQuestsForGolden(db, childId);
     final service = DailySetService(
       dailySetsDao: db.dailySetsDao,
       reviewQueueDao: db.reviewQueueDao,

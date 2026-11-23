@@ -137,6 +137,28 @@ class AttemptsDao extends DatabaseAccessor<AppDatabase>
     return query.get();
   }
 
+  /// Số câu đúng ngay lần đầu trong khoảng [start, end) (dùng cho nhiệm
+  /// vụ ngày). [strand] lọc theo mảng; [reviewOnly] chỉ tính câu ôn tập.
+  Future<int> countFirstTryBetween({
+    required String childId,
+    required DateTime start,
+    required DateTime end,
+    String? strand,
+    bool reviewOnly = false,
+  }) async {
+    final query = select(db.attempts)
+      ..where(
+        (t) =>
+            t.childId.equals(childId) &
+            t.correctFirstTry.equals(true) &
+            t.createdAt.isBiggerOrEqualValue(start) &
+            t.createdAt.isSmallerThanValue(end),
+      );
+    if (strand != null) query.where((t) => t.strand.equals(strand));
+    if (reviewOnly) query.where((t) => t.isReview.equals(true));
+    return (await query.get()).length;
+  }
+
   /// Các lượt trả lời gần nhất của một mảng (phục vụ cửa sổ 10 câu
   /// của T1-07). `since` giới hạn từ mốc đổi bậc gần nhất trở đi.
   Future<List<Attempt>> getRecentStrandAttempts({
