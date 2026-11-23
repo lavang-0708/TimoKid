@@ -24,6 +24,7 @@ import '../../core/database/tables.dart';
 import '../arena/league_service.dart';
 import '../ladder/ladder_config.dart';
 import '../math/math_session.dart' show strandNames;
+import '../pet/pet_config.dart';
 import '../quests/quest_service.dart';
 import '../questions/figure_svg.dart';
 import '../questions/question.dart';
@@ -123,6 +124,103 @@ class _QaMenuScreenState extends ConsumerState<QaMenuScreen> {
   Future<void> _resetDay() async {
     _service.resetDay();
     await _load();
+  }
+
+  /// Chạy một thao tác thử rồi tải lại và báo kết quả ngắn.
+  Future<void> _act(String done, Future<Object?> Function(String c) fn) async {
+    final childId = _childId;
+    if (childId == null) return;
+    final r = await fn(childId);
+    await _load();
+    if (!mounted) return;
+    final failed = r == false;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(failed ? 'Không làm được (chưa có pet/trứng?)' : done),
+      ),
+    );
+  }
+
+  Widget _qaButton(String key, String label, VoidCallback onPressed) =>
+      ElevatedButton(key: Key(key), onPressed: onPressed, child: Text(label));
+
+  Widget _testSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionTitle('Thử mốc pet / đề ngày / tuần'),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            _qaButton(
+              'qa-pet-xp-newborn',
+              'Pet xp = 0 (mới nở)',
+              () => _act('Đã đặt xp 0', (c) => _service.setActivePetXp(c, 0)),
+            ),
+            _qaButton(
+              'qa-pet-xp-teen',
+              'Pet xp = $petTeenXp (nhỡ)',
+              () => _act(
+                'Đã đặt xp $petTeenXp',
+                (c) => _service.setActivePetXp(c, petTeenXp),
+              ),
+            ),
+            _qaButton(
+              'qa-pet-xp-adult',
+              'Pet xp = $petAdultXp (trưởng thành)',
+              () => _act(
+                'Đã đặt xp $petAdultXp',
+                (c) => _service.setActivePetXp(c, petAdultXp),
+              ),
+            ),
+            _qaButton(
+              'qa-pet-xp-plus50',
+              'Pet +50 xp',
+              () => _act('Đã +50 xp', (c) async {
+                return (await _service.addPetXp(c, 50)) != null;
+              }),
+            ),
+            _qaButton(
+              'qa-pet-mood-reset',
+              'Reset ăn/chơi hôm nay',
+              () => _act('Đã reset tâm trạng pet', _service.resetPetMoodToday),
+            ),
+            _qaButton(
+              'qa-pet-meals',
+              '+10 suất ăn',
+              () => _act('Đã +10 suất ăn', (c) => _service.giveMeals(c, 10)),
+            ),
+            _qaButton(
+              'qa-hatch-now',
+              'Nở trứng ngay',
+              () => _act('Đã nở trứng', _service.hatchNow),
+            ),
+            _qaButton(
+              'qa-daily-done',
+              'Xong đề ngày hôm nay',
+              () => _act('Đã xong 5 chặng hôm nay', _service.markDailySetDone),
+            ),
+            _qaButton('qa-advance-monday', 'Sang thứ Hai kế tiếp', () async {
+              final d = _service.advanceToNextMonday();
+              await _load();
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Đã nhảy +$d ngày tới thứ Hai')),
+              );
+            }),
+            _qaButton(
+              'qa-clear-quest-claims',
+              'Xóa dấu nhận nhiệm vụ hôm nay',
+              () => _act(
+                'Đã xóa dấu nhận nhiệm vụ hôm nay',
+                _service.clearTodayQuestClaims,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   Future<void> _setRung(String strand, int rung) async {
@@ -230,6 +328,7 @@ class _QaMenuScreenState extends ConsumerState<QaMenuScreen> {
                     'mục ôn tập đến hạn sẽ hiện trong đề.',
                     style: TextStyle(fontSize: 14, color: Colors.black54),
                   ),
+                  _testSection(),
                   _sectionTitle('Hạng đấu trường tuần'),
                   Text(
                     _leagueText,

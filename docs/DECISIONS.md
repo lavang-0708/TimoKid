@@ -348,3 +348,7 @@ Các mục trên là nhật ký quyết định theo thời điểm; mục này 
 - **QA menu**: mục "Nhiệm vụ ngày + chuỗi" in mã nhiệm vụ, tiến độ, chuỗi, số rương chờ (xem được khi nhảy ngày).
 - **Golden**: golden Thị trấn/Phòng có nút mới. Mã bé ngẫu nhiên nên seed nhiệm vụ đổi mỗi lần chạy; `test/helpers/quest_pin.dart` ghim bộ nhiệm vụ cho golden để chấm đỏ không chập chờn.
 
+
+## Bản thử mở hết tính năng (24/11/2026)
+
+Chủ dự án chốt 24/11: khi thử thì mở hết, không khóa đề đầu ngày; cờ `TEST_UNLOCKS` (compile-time, mặc định tắt) để bản chính thức về như cũ. Tag `v0.0.x` build với cờ bật (xem docs/RELEASE.md). Khi bật: mở Phòng/Tủ đồ/Cửa hàng, tháp, vuốt ve pet không cần xong chặng; tặng 10.000 xu + 10.000 kim cương (refId `test_grant_v1`, nạp lại `test_topup_<n>` khi dưới 1.000); menu QA bật với nút đặt mốc pet, suất ăn, nở trứng, tua ngày; nhãn "BẢN THỬ" ở Thị trấn.

@@ -15,6 +15,7 @@ library;
 import '../../core/database/app_database.dart';
 import '../../core/database/daos.dart';
 import '../../core/database/models.dart';
+import '../../core/test_build.dart';
 import '../../core/time/clock.dart';
 import '../daily_set/daily_set_config.dart';
 
@@ -29,6 +30,8 @@ class RoomService {
   /// Bé đã xong đề ngày hôm nay chưa (cả 5 chặng `done`).
   /// Chưa có đề hôm nay thì chưa xong (khóa).
   Future<bool> isPlayUnlocked(String childId) async {
+    // Bản thử (cờ TEST_UNLOCKS): mở hết, không cần xong đề ngày.
+    if (TestUnlocks.enabled) return true;
     final set = await _sets.getDailySet(childId, _clock.today());
     if (set == null) return false;
     final statuses = _sets.readStageStatus(set);

@@ -5,16 +5,20 @@
 /// - Bản debug (`flutter run` / APK debug): luôn bật.
 /// - Bản release: bật bằng `--dart-define=QA_MENU=true` khi build
 ///   (vd: `flutter build apk --dart-define=QA_MENU=true`).
+/// - Bản thử (`--dart-define=TEST_UNLOCKS=true`): cũng bật.
 /// - Bản release không có cờ: menu không tồn tại — cả vùng nhấn giữ
 ///   ở góc màn hình cũng không được gắn vào cây widget.
 library;
 
 import 'package:flutter/foundation.dart';
 
+import '../../core/test_build.dart';
+
 /// Cổng bật/tắt menu QA cho bản build hiện tại.
 class QaConfig {
   const QaConfig._();
 
   /// Menu QA có được bật trong bản build này không.
-  static const bool enabled = kDebugMode || bool.fromEnvironment('QA_MENU');
+  static const bool enabled =
+      kDebugMode || bool.fromEnvironment('QA_MENU') || testUnlocks;
 }

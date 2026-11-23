@@ -22,6 +22,7 @@ library;
 import 'dart:convert';
 
 import '../../core/database/app_database.dart';
+import '../../core/test_build.dart';
 import '../room/room_service.dart';
 import '../shop/shop_service.dart';
 import 'pet_config.dart';
@@ -149,7 +150,9 @@ class PetCareService {
 
   /// "Học xong mới chơi": vuốt ve chỉ được tính sau khi xong ít nhất
   /// [petPatMinStagesToday] chặng hôm nay.
+  /// Bản thử (cờ TEST_UNLOCKS) luôn cho vuốt ve.
   Future<bool> canPat(String childId) async =>
+      TestUnlocks.enabled ||
       await stagesDoneToday(childId) >= petPatMinStagesToday;
 
   // --------------------------------------------------------------- ghi

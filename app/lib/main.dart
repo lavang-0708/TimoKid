@@ -6,10 +6,12 @@ import 'package:material_ui/material_ui.dart';
 import 'core/database/app_database.dart';
 import 'core/database/database_provider.dart';
 import 'core/router/app_router.dart';
+import 'core/test_build.dart';
 import 'core/theme/app_theme.dart';
 import 'features/onboarding/egg_service.dart';
 import 'features/onboarding/onboarding_service.dart';
 import 'features/qa/qa_menu_opener.dart';
+import 'features/qa/test_grant_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +20,10 @@ Future<void> main() async {
   // số dư xu và tiến độ đề ngày ngay từ đầu.
   final db = AppDatabase();
   final childId = await db.ensureSeeded();
+  // Bản thử (cờ TEST_UNLOCKS): tặng 10.000 xu + 10.000 kim cương (một lần).
+  if (TestUnlocks.enabled) {
+    await TestGrantService(db: db).grantIfNeeded(childId);
+  }
   // Màn đầu (T2-03): chưa xong mở đầu thì vào màn tạo nhân vật;
   // máy 0.1 cũ (không có cờ mở đầu) thì bỏ qua. Có lần nở trứng
   // đang chờ (tắt app giữa chừng sau khi xong chặng đầu) thì vào
