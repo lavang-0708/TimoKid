@@ -90,7 +90,7 @@ const List<PetShopSpecies> petShopSpecies = <PetShopSpecies>[
 /// rồi đổi cờ loài đó thành `true`.
 const Map<String, bool> newPetArtReady = <String, bool>{
   'squirrel': true,
-  'capybara': false,
+  'capybara': true,
   'dragon': false,
 };
 
