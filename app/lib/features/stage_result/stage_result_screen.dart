@@ -19,7 +19,10 @@ import '../math/math_decor.dart';
 import '../math/math_screen.dart';
 import '../math/math_session.dart' show strandNames;
 import '../onboarding/egg_service.dart';
+import '../building/building_screen.dart';
 import '../onboarding/hatch_screen.dart';
+import '../tower/tower_service.dart';
+import '../../core/database/tables.dart' show Strand;
 
 /// Kết quả một chặng, màn làm toán truyền qua GoRouter `extra`.
 class StageResultArgs {
@@ -31,6 +34,7 @@ class StageResultArgs {
     required this.totalQuestions,
     required this.xuEarned,
     this.nextStageIndex,
+    this.tower,
   });
 
   /// Chỉ số chặng vừa xong (0–4); -1 với chặng tự chọn.
@@ -44,6 +48,9 @@ class StageResultArgs {
 
   /// Chặng tiếp theo (null nếu đây là chặng cuối của đề ngày).
   final int? nextStageIndex;
+
+  /// Kết quả leo tầng tháp; null nếu không phải tầng tháp.
+  final TowerOutcome? tower;
 }
 
 /// Màn Kết quả chặng — route `/stage-result`.
@@ -74,6 +81,139 @@ class StageResultScreen extends StatelessWidget {
       return;
     }
     next();
+  }
+
+  /// Màn kết quả của một lượt leo tầng tháp: qua/chưa qua tầng, số
+  /// câu đúng ngay lần đầu so với ngưỡng, thưởng lần qua đầu tiên.
+  Widget _buildTower(
+    BuildContext context,
+    StageResultArgs args,
+    TowerOutcome tower,
+    String strandName,
+  ) {
+    final background = MathColors.strandBackground(args.strand);
+    final what = tower.isBoss ? 'boss tầng' : 'tầng';
+    final title = tower.passed
+        ? 'Qua $what ${tower.floor}!'
+        : 'Chưa qua $what ${tower.floor}';
+    final reward = <String>[
+      if (tower.rewardXu > 0) '${tower.rewardXu} xu',
+      if (tower.rewardGems > 0) '${tower.rewardGems} kim cương',
+    ];
+    final stageIndex = Strand.all.indexOf(args.strand);
+    void toBuilding() => context.go(
+      BuildingScreen.route,
+      extra: BuildingScreenArgs(stageIndex: stageIndex < 0 ? 0 : stageIndex),
+    );
+    void climb(int floor) => context.go(
+      MathScreen.route,
+      extra: MathScreenArgs(towerStrand: args.strand, towerFloor: floor),
+    );
+    return Scaffold(
+      key: const Key('stage-result-screen'),
+      backgroundColor: background,
+      appBar: AppBar(
+        title: Text('Tháp $strandName'),
+        backgroundColor: background,
+        foregroundColor: MathColors.questionText,
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                key: const Key('tower-result-title'),
+                style: const TextStyle(fontSize: 30),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Đúng ngay lần đầu ${tower.firstTryCorrect}/'
+                '${args.totalQuestions} câu (cần ${tower.passNeeded})',
+                key: const Key('stage-result-correct-count'),
+                style: const TextStyle(fontSize: 22),
+              ),
+              const SizedBox(height: 8),
+              if (reward.isNotEmpty)
+                Text(
+                  'Thưởng lần đầu qua tầng: ${reward.join(' + ')}',
+                  key: const Key('tower-result-reward'),
+                  style: const TextStyle(fontSize: 24),
+                )
+              else if (tower.passed)
+                const Text(
+                  'Tầng này bé đã qua rồi, không có thưởng thêm.',
+                  key: Key('tower-result-reward'),
+                  style: TextStyle(fontSize: 20),
+                )
+              else
+                const Text(
+                  'Thử lại với câu mới nhé, bé làm được!',
+                  key: Key('tower-result-reward'),
+                  style: TextStyle(fontSize: 22),
+                ),
+              const SizedBox(height: 4),
+              Text(
+                'Xu từng câu: ${args.xuEarned - tower.rewardXu} xu',
+                key: const Key('stage-result-xu'),
+                style: const TextStyle(fontSize: 20),
+              ),
+              const SizedBox(height: 20),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+                  ElevatedButton.icon(
+                    key: const Key('stage-result-back-button'),
+                    icon: const Text('←', style: TextStyle(fontSize: 24)),
+                    label: const Text(
+                      'Về Tòa nhà',
+                      style: TextStyle(fontSize: 22),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(56, 56),
+                    ),
+                    onPressed: () => _continue(context, next: toBuilding),
+                  ),
+                  if (tower.passed && tower.nextFloor != null)
+                    ElevatedButton.icon(
+                      key: const Key('tower-next-floor-button'),
+                      icon: const Text('→', style: TextStyle(fontSize: 24)),
+                      label: Text(
+                        'Leo tầng ${tower.nextFloor}',
+                        style: const TextStyle(fontSize: 22),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(56, 56),
+                      ),
+                      onPressed: () => _continue(
+                        context,
+                        next: () => climb(tower.nextFloor!),
+                      ),
+                    ),
+                  if (!tower.passed)
+                    ElevatedButton.icon(
+                      key: const Key('tower-retry-button'),
+                      icon: const Text('↻', style: TextStyle(fontSize: 24)),
+                      label: const Text(
+                        'Thử lại',
+                        style: TextStyle(fontSize: 22),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(56, 56),
+                      ),
+                      onPressed: () =>
+                          _continue(context, next: () => climb(tower.floor)),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -108,6 +248,10 @@ class StageResultScreen extends StatelessWidget {
       );
     }
     final strandName = strandNames[args.strand] ?? args.strand;
+    final tower = args.tower;
+    if (tower != null) {
+      return _buildTower(context, args, tower, strandName);
+    }
     final title = args.stageIndex >= 0
         ? 'Xong chặng ${args.stageIndex + 1} — $strandName!'
         : 'Xong chặng tự chọn — $strandName!';

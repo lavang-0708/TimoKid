@@ -164,6 +164,53 @@ class DailySetService {
     );
   }
 
+  /// Sinh [DailySetConfig.questionsPerStage] câu cho một tầng tháp của
+  /// mảng [strand] (tuần 23/11, mục A): TẤT CẢ câu cùng bậc [rung]
+  /// (bậc của tầng, xem `TowerConfig.rungForFloor`), không có câu ôn
+  /// tập. Kiểu trả lời theo bậc như thang ải. Không lưu vào
+  /// `daily_sets`; mỗi lần gọi sinh câu mới nên thử lại tầng luôn có
+  /// câu mới.
+  Future<List<DailySetQuestion>> buildTowerFloor({
+    required String childId,
+    required String strand,
+    required int rung,
+  }) async {
+    if (!Strand.all.contains(strand)) {
+      throw ArgumentError('Không có mảng nào mang mã $strand');
+    }
+    final usage = await _formUsageLast7Days(childId: childId);
+    final level = LadderConfig.levelForRung(rung);
+    final answerType = LadderConfig.answerTypeForRung(rung);
+    final usedFormIds = <String>{};
+    final questions = <DailySetQuestion>[];
+    for (var i = 0; i < DailySetConfig.questionsPerStage; i++) {
+      var useLevel = level;
+      var candidates = _formsSupporting(strand, useLevel);
+      if (candidates.isEmpty) {
+        useLevel = _nearestLevelWithForms(strand, useLevel);
+        candidates = _formsSupporting(strand, useLevel);
+      }
+      final formId = _picker.pick(
+        candidates: candidates,
+        usedFormIds: usedFormIds,
+        neededType: answerType,
+        usageLast7Days: usage,
+        random: _random,
+      );
+      usedFormIds.add(formId);
+      questions.add(
+        _makeQuestion(
+          formId: formId,
+          strand: strand,
+          level: useLevel,
+          rung: rung,
+          answerType: answerType,
+        ),
+      );
+    }
+    return questions;
+  }
+
   /// Sinh 25 câu của đề ngày: 5 chặng theo thứ tự 5 mảng
   /// ([Strand.all]); bé chọn thứ tự chặng tùy ý là việc của giao diện
   /// (T1-09), thứ tự lưu ở đây chỉ là thứ tự mặc định.

@@ -50,6 +50,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../core/database/app_database.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/models.dart';
 import '../../core/widgets/round_back_button.dart';
@@ -62,12 +63,24 @@ import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
 import '../sound/sound_service.dart';
 import '../stage_result/stage_result_screen.dart';
+import '../tower/tower_config.dart';
 import 'math_decor.dart';
 import 'math_session.dart';
 
 /// Tham số vào màn làm toán qua GoRouter `extra`.
 class MathScreenArgs {
-  const MathScreenArgs({this.stageIndex, this.extraQuestions});
+  const MathScreenArgs({
+    this.stageIndex,
+    this.extraQuestions,
+    this.towerStrand,
+    this.towerFloor,
+  });
+
+  /// Leo tầng tháp (tuần 23/11, mục A): mảng + số tầng (1–30). Màn tự
+  /// sinh 5 câu của tầng ([DailySetService.buildTowerFloor]); thử lại
+  /// tầng thì vào lại với cùng tham số để có câu mới.
+  final String? towerStrand;
+  final int? towerFloor;
 
   /// Chỉ số chặng cần làm (0–4). Bỏ trống: chặng đầu tiên chưa xong.
   final int? stageIndex;
@@ -205,6 +218,16 @@ class _MathScreenState extends ConsumerState<MathScreen>
     _coinController = null;
   }
 
+  DailySetService _dailySetService(AppDatabase db) => DailySetService(
+    dailySetsDao: db.dailySetsDao,
+    reviewQueueDao: db.reviewQueueDao,
+    ladderService: LadderService(
+      attemptsDao: db.attemptsDao,
+      skillProgressDao: db.skillProgressDao,
+    ),
+    clock: db.clock,
+  );
+
   StageResultArgs _resultArgs(StageSession session) {
     final next =
         session.stageIndex >= 0 &&
@@ -219,6 +242,7 @@ class _MathScreenState extends ConsumerState<MathScreen>
       totalQuestions: session.resolved.length,
       xuEarned: session.xuEarned,
       nextStageIndex: next,
+      tower: session.towerOutcome,
     );
   }
 
@@ -229,7 +253,16 @@ class _MathScreenState extends ConsumerState<MathScreen>
     try {
       final db = ref.read(databaseProvider);
       final childId = await db.ensureSeeded();
-      final extraQuestions = widget.args?.extraQuestions;
+      var extraQuestions = widget.args?.extraQuestions;
+      final towerFloor = widget.args?.towerFloor;
+      final towerStrand = widget.args?.towerStrand;
+      if (towerFloor != null && towerStrand != null) {
+        extraQuestions = await _dailySetService(db).buildTowerFloor(
+          childId: childId,
+          strand: towerStrand,
+          rung: TowerConfig.rungForFloor(towerFloor),
+        );
+      }
       if (extraQuestions != null) {
         final session = StageSession(
           db: db,
@@ -237,6 +270,7 @@ class _MathScreenState extends ConsumerState<MathScreen>
           dailySetId: null,
           stageIndex: -1,
           questions: extraQuestions,
+          towerFloor: towerFloor,
           rewardService: RewardService(
             db: db,
             config: await RewardConfig.load(db),
@@ -359,7 +393,10 @@ class _MathScreenState extends ConsumerState<MathScreen>
     final strand = question.spec.strand;
     final strandName = strandNames[strand] ?? strand;
     final background = MathColors.strandBackground(strand);
-    final title = session.stageIndex >= 0
+    final title = session.towerFloor != null
+        ? '${TowerConfig.isBoss(session.towerFloor!) ? 'Boss tầng' : 'Tầng'} '
+              '${session.towerFloor} — $strandName'
+        : session.stageIndex >= 0
         ? 'Chặng ${session.stageIndex + 1} — $strandName'
         : 'Chặng tự chọn — $strandName';
     // Băng phản hồi: đúng thì băng xanh toàn màn (kèm nút Tiếp);

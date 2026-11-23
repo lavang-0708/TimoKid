@@ -35,6 +35,7 @@ import '../questions/question_registry.dart';
 import '../review_book/review_book_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
+import '../tower/tower_service.dart';
 
 /// Tên tiếng Việt của từng mảng, hiện trên thanh tiêu đề màn làm toán
 /// và màn kết quả chặng.
@@ -154,6 +155,7 @@ class StageSession extends ChangeNotifier {
     required this.stageIndex,
     required List<DailySetQuestion> questions,
     RewardService? rewardService,
+    this.towerFloor,
   }) : _db = db,
        _attemptsDao = db.attemptsDao,
        _ladder = LadderService(
@@ -186,6 +188,16 @@ class StageSession extends ChangeNotifier {
 
   /// Chỉ số chặng trong đề ngày (0–4); -1 với chặng tự chọn.
   final int stageIndex;
+
+  /// Tầng tháp đang leo (1–30); null nếu không phải tầng tháp. Tầng
+  /// tháp là chặng tự chọn ([dailySetId] null, [stageIndex] -1) nên
+  /// lượt trả lời ghi vào `attempts` y như chặng tự chọn (thang ải +
+  /// sổ ôn tập vẫn chạy), nhưng KHÔNG cộng xu "xong chặng" — thưởng
+  /// tầng là thưởng lần đầu qua của [TowerService].
+  final int? towerFloor;
+
+  /// Kết quả chấm tầng tháp, có sau khi xong chặng (chỉ khi [towerFloor]).
+  TowerOutcome? towerOutcome;
 
   /// 5 câu của chặng, đã sinh lại xong.
   final List<ResolvedQuestion> resolved;
@@ -382,16 +394,34 @@ class StageSession extends ChangeNotifier {
   /// đề ngày (+20 xu, +1 kim cương, một lần mỗi ngày) và đánh dấu đề
   /// đã xong; xu thưởng đề ngày tính vào `xuEarned` của chặng này.
   Future<void> _finishStage() async {
-    xuEarned += await _rewards.awardStageComplete(
-      childId: childId,
-      dailySetId: dailySetId,
-      stageIndex: stageIndex,
-    );
+    final floor = towerFloor;
+    if (floor != null) {
+      final outcome = await TowerService(db: _db).recordResult(
+        childId: childId,
+        strand: resolved.first.spec.strand,
+        floor: floor,
+        firstTryCorrect: firstTryCorrectCount,
+      );
+      towerOutcome = outcome;
+      xuEarned += outcome.rewardXu;
+    } else {
+      xuEarned += await _rewards.awardStageComplete(
+        childId: childId,
+        dailySetId: dailySetId,
+        stageIndex: stageIndex,
+      );
+    }
     // Nở trứng (T2-03): xong chặng (kể cả chặng tự chọn) mà bé đã
     // chọn trứng mà trứng chưa nở thì đặt cờ chờ nở — màn Kết quả
     // chặng sẽ rẽ sang màn nở trứng. Chỉ xảy ra một lần duy nhất
     // (xem `EggService.noteStageCompleted`).
     await _eggs.noteStageCompleted(childId);
+    // ===== HOOK DUY NHẤT: MỘT CHẶNG VỪA HOÀN THÀNH =====
+    // Chạy cho mọi loại chặng (chặng ngày, chặng tự chọn, tầng tháp
+    // — dù qua hay trượt tầng). Chỗ này để tính năng sau gắn vào,
+    // vd. pet nhận một "suất ăn" mỗi chặng xong. Tầng tháp đã qua
+    // còn có [TowerService.floorCleared] (nhiệm vụ ngày).
+    // Chưa gắn gì — không thêm logic pet ở nhánh này.
     if (dailySetId != null) {
       await _db.dailySetsDao.updateStageStatus(
         id: dailySetId!,
