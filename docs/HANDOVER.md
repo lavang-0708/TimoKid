@@ -1,6 +1,13 @@
 # HANDOVER — TimoKid
 
-Cập nhật cuối: 23/11/2026 (tháp nhiều tầng + boss; Pet D: bảng pets, xp theo câu đúng, chăm pet); trước đó 22/11/2026 (T2-06b: Đồ cho pet, Nội thất, bộ đồ cao cấp, nút Cho ăn/Chơi); trước đó 21/11/2026 (main `99a87cf` sau PR #34: nhân vật toàn thân + đi lại trong Phòng + pet lớn dần + Tủ đồ; PR #33 thêm 12 dạng bài; PR #32 (D) đã merge). Đọc mục "Hiện trạng sau PR #33/#34" ngay dưới trước; các dòng lịch sử phía sau giữ nguyên cách viết lúc đó.
+Cập nhật cuối: 23/11/2026 (nhiệm vụ ngày + chuỗi; tháp nhiều tầng + boss; Pet D: bảng pets, xp theo câu đúng, chăm pet); trước đó 22/11/2026 (T2-06b: Đồ cho pet, Nội thất, bộ đồ cao cấp, nút Cho ăn/Chơi); trước đó 21/11/2026 (main `99a87cf` sau PR #34: nhân vật toàn thân + đi lại trong Phòng + pet lớn dần + Tủ đồ; PR #33 thêm 12 dạng bài; PR #32 (D) đã merge). Đọc mục "Hiện trạng sau PR #33/#34" ngay dưới trước; các dòng lịch sử phía sau giữ nguyên cách viết lúc đó.
+
+## Nhiệm vụ ngày + chuỗi (23/11/2026, nhánh `feat/daily-quests`, chồng lên `feat/pet-care`, chờ review)
+
+- Code `app/lib/features/quests/`: `quest_config.dart` (mọi số + cờ `questArtReady = false`), `quest_service.dart` (`QuestService.pickQuests` chọn theo seed, `board`, `claim`, `claimStreakChest`, `streak`, `hasClaimable`), `quest_widgets.dart` (`QuestHudButton` có chấm đỏ, `showQuestBoardDialog`). Nút ở HUD Thị trấn (`town-quest-button`) và Phòng (`room-quest-button`); mục QA "Nhiệm vụ ngày + chuỗi".
+- Tiến độ tính từ dữ liệu có sẵn theo ngày (xem DECISIONS 23/11 mục C); thêm `TowerService.clearsOn` (bộ đếm `tower_clears.<ngày>`), `PetCareService.fedOn/playedOn`, `AttemptsDao.countFirstTryBetween`. Bộ 3 nhiệm vụ lưu ở `settings` `quest_day.<ngày>`.
+- Golden Thị trấn/Phòng phải dùng `test/helpers/quest_pin.dart` (seed nhiệm vụ phụ thuộc mã bé ngẫu nhiên).
+- Chờ hình Muse lô 13: `ui_quest_board`, `ui_quest_check`, `ui_streak_flame`, `ui_streak_chest` → thêm PNG + manifest rồi đặt `questArtReady = true`.
 
 ## Pet D (23/11/2026, nhánh `feat/pet-care`, chờ review) — đọc trước mục dưới
 

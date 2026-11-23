@@ -14,6 +14,8 @@ import '../daily_set/daily_set_service.dart';
 import '../ladder/ladder_service.dart';
 import '../onboarding/onboarding_model.dart';
 import '../onboarding/onboarding_service.dart';
+import '../quests/quest_service.dart';
+import '../quests/quest_widgets.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
 import '../room/room_screen.dart';
@@ -61,6 +63,7 @@ class _TownScreenState extends ConsumerState<TownScreen> {
   bool _loading = true;
   String? _error;
   CharacterProfile? _profile;
+  bool _questDot = false;
 
   @override
   void initState() {
@@ -97,8 +100,14 @@ class _TownScreenState extends ConsumerState<TownScreen> {
       );
       final balances = await rewardService.balances(childId);
       final profile = await OnboardingService(db: db).loadProfile(childId);
+      // Chấm đỏ nhiệm vụ ngày; lỗi ở đây không được làm hỏng Thị trấn.
+      var questDot = false;
+      try {
+        questDot = await QuestService(db: db).hasClaimable(childId);
+      } catch (_) {}
       if (!mounted) return;
       setState(() {
+        _questDot = questDot;
         _statuses = statuses;
         _xu = balances[Currency.xu] ?? 0;
         _gems = balances[Currency.gem] ?? 0;
@@ -261,6 +270,15 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                           ],
                         ),
                       ),
+                    ),
+                    const SizedBox(width: 8),
+                    QuestHudButton(
+                      key: const Key('town-quest-button'),
+                      showDot: _questDot,
+                      onPressed: () async {
+                        await showQuestBoardDialog(context);
+                        if (mounted) _refresh();
+                      },
                     ),
                   ],
                 ),

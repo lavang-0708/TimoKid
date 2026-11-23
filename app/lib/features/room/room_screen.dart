@@ -68,6 +68,8 @@ import '../pet/pet_care_service.dart';
 import '../pet/pet_celebration.dart';
 import '../pet/pet_config.dart';
 import '../pet/pet_service.dart';
+import '../quests/quest_service.dart';
+import '../quests/quest_widgets.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
 import '../shop/shop_catalog.dart';
@@ -112,6 +114,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   bool _hatched = false;
   bool _hatchPending = false;
   int _xu = 0;
+  bool _questDot = false;
   int _gems = 0;
   int _done = 0;
   bool _unlocked = false;
@@ -219,6 +222,10 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       }
       final mood = await care.mood(childId);
       final meals = await care.mealCount(childId);
+      var questDot = false;
+      try {
+        questDot = await QuestService(db: db).hasClaimable(childId);
+      } catch (_) {}
       final allPets = await petService.pets(childId);
       final canClaim = await petService.canClaimStarterEgg(childId);
       final claimSpecies = canClaim
@@ -227,6 +234,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       if (!mounted) return;
       setState(() {
         _childId = childId;
+        _questDot = questDot;
         _headAccessory = accessory;
         _glasses = glasses;
         _whiteShoes = whiteShoes;
@@ -976,13 +984,29 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GameRoundButton(
-                      key: const Key('room-town-button'),
-                      icon: Icons.location_city_rounded,
-                      image: '$uiArt/ui_icon_town.png',
-                      color: const Color(0xFFA07BE0),
-                      label: 'Thị trấn',
-                      onPressed: () => context.go(TownScreen.route),
+                    // Cột nút bên trái: Thị trấn, rồi Nhiệm vụ (xếp dọc để
+                    // thanh chỉ số không bị ép hẹp ở màn nhỏ).
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GameRoundButton(
+                          key: const Key('room-town-button'),
+                          icon: Icons.location_city_rounded,
+                          image: '$uiArt/ui_icon_town.png',
+                          color: const Color(0xFFA07BE0),
+                          label: 'Thị trấn',
+                          onPressed: () => context.go(TownScreen.route),
+                        ),
+                        const SizedBox(height: 4),
+                        QuestHudButton(
+                          key: const Key('room-quest-button'),
+                          showDot: _questDot,
+                          onPressed: () async {
+                            await showQuestBoardDialog(context);
+                            if (mounted) _refresh();
+                          },
+                        ),
+                      ],
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -1033,7 +1057,6 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                       ),
                     ),
                     const SizedBox(width: 8),
-
                     GameRoundButton(
                       key: const Key('room-wardrobe-button'),
                       icon: Icons.checkroom_rounded,

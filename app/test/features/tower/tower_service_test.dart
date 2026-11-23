@@ -37,6 +37,18 @@ void main() {
         firstTryCorrect: correct,
       );
 
+  test(
+    'đếm lượt qua tầng theo ngày giờ Việt Nam (cho nhiệm vụ ngày)',
+    () async {
+      expect(await tower.clearsOn(childId), 0);
+      await clear(1, 2); // trượt: không tính
+      await clear(1, 3);
+      await clear(1, 4); // qua lại tầng cũ vẫn là một lượt qua tầng
+      expect(await tower.clearsOn(childId), 2);
+      expect(await tower.clearsOn(childId, date: '2026-11-22'), 0);
+    },
+  );
+
   test('chưa leo: tầng cao nhất 0, tầng kế 1', () async {
     expect(
       await tower.highestCleared(childId: childId, strand: Strand.logic),

@@ -36,6 +36,7 @@ import 'package:timokid/features/stage_result/stage_result_screen.dart';
 import 'package:timokid/features/town/town_assets.dart';
 import 'package:timokid/features/town/town_screen.dart';
 
+import '../../helpers/quest_pin.dart';
 import '../../goldens/town_golden_data.dart';
 
 AppDatabase openMemoryDb({Clock? clock}) => AppDatabase(
@@ -88,6 +89,7 @@ void main() {
     db = openMemoryDb(clock: clock);
     addTearDown(db.close);
     childId = await db.ensureSeeded();
+    await pinQuestsForGolden(db, childId);
     final service = DailySetService(
       dailySetsDao: db.dailySetsDao,
       reviewQueueDao: db.reviewQueueDao,

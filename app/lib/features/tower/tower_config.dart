@@ -64,6 +64,10 @@ class TowerConfig {
   /// Khóa `settings` (theo bé) lưu tầng cao nhất đã qua của một mảng.
   static String settingsKey(String strand) => 'tower_floor.$strand';
 
+  /// Khóa `settings` (theo bé) đếm số lượt qua tầng trong một ngày
+  /// (giờ Việt Nam) — cho nhiệm vụ ngày "leo qua 1 tầng tháp".
+  static String clearsKey(String date) => 'tower_clears.$date';
+
   /// `refId` của dòng ví thưởng lần đầu — chống cộng trùng.
   static String rewardRefId({
     required String childId,
