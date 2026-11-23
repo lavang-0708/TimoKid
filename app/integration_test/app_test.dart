@@ -143,7 +143,14 @@ void main() {
     // Nút khu 0 của màn Thị trấn T1-12 (tên key cũ `town-math-button`
     // đã bỏ khi viết lại màn Thị trấn). Từ PR (B): nút khu vào màn
     // Tòa nhà, bấm Thử thách mới vào màn toán.
-    await tapVisible(const Key('town-stage-0-button'));
+    // Bấm phần DƯỚI khu 0: tâm khu nằm dưới hàng nút HUD (nút Nhiệm vụ
+    // từ PR #65) trên máy ảo nhỏ nên tap() chạm nhầm nút HUD.
+    final zone0 = find.byKey(const Key('town-stage-0-button'));
+    await tester.ensureVisible(zone0);
+    await tester.pumpAndSettle();
+    final r0 = tester.getRect(zone0);
+    await tester.tapAt(Offset(r0.center.dx, r0.bottom - r0.height * 0.15));
+    await tester.pumpAndSettle();
     expect(find.byKey(const Key('building-screen')), findsOneWidget);
     await tapVisible(const Key('building-challenge-button'));
     expect(find.byKey(const Key('math-screen')), findsOneWidget);
