@@ -110,3 +110,15 @@ class ArenaAttemptsDaoManager {
   $$ArenaAttemptsTableTableManager get arenaAttempts =>
       $$ArenaAttemptsTableTableManager(_db.attachedDatabase, _db.arenaAttempts);
 }
+
+mixin _$PetsDaoMixin on DatabaseAccessor<AppDatabase> {
+  $PetsTable get pets => attachedDatabase.pets;
+  PetsDaoManager get managers => PetsDaoManager(this);
+}
+
+class PetsDaoManager {
+  final _$PetsDaoMixin _db;
+  PetsDaoManager(this._db);
+  $$PetsTableTableManager get pets =>
+      $$PetsTableTableManager(_db.attachedDatabase, _db.pets);
+}

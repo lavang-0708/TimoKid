@@ -10,6 +10,8 @@ library;
 
 import '../../core/database/app_database.dart';
 import '../../core/database/tables.dart';
+import '../pet/pet_care_service.dart';
+import '../pet/pet_service.dart';
 import 'arena_config.dart';
 import 'arena_session.dart';
 
@@ -106,6 +108,12 @@ class ArenaService {
           refId: refId,
         );
       }
+      // Pet (D): câu đúng của đấu trường (không gợi ý, không thử lại)
+      // đều là đúng ngay lần đầu → cộng xp; xong đấu trường lần đầu
+      // trong ngày nhận một suất ăn.
+      await PetService(db: _db).addXp(childId, amount: score.correct);
+      await PetCareService(db: _db)
+          .awardMeal(childId, refId: 'arena:$childId:$date');
       await _db.arenaAttemptsDao.record(
         childId: childId,
         date: date,

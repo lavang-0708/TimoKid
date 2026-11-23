@@ -378,3 +378,44 @@ class ArenaAttempts extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// Pet của bé (D, schema v4). Một dòng là một pet (trứng hoặc đã nở).
+/// Mỗi bé chỉ có TỐI ĐA một pet mỗi loài (unique child_id + species) và
+/// ĐÚNG MỘT pet `active` (đi theo bé; chỉ mục unique từng phần
+/// `pets_one_active` chặn hai pet active ở tầng SQLite).
+/// `xp` = số câu đúng ngay lần đầu tích lũy khi pet đi theo (quyết định
+/// giai đoạn, xem `pet_growth.dart`); `stage_seen` = giai đoạn bé đã
+/// thấy lần cuối (`egg`/`newborn`/`teen`/`adult`), để chiếu màn ăn mừng
+/// khi pet lớn hơn.
+class Pets extends Table {
+  TextColumn get id => text()();
+
+  TextColumn get childId => text()();
+
+  /// Mã loài: `dog`, `cat`, `rabbit`, `squirrel`, `capybara`, `dragon`.
+  TextColumn get species => text()();
+
+  IntColumn get xp => integer().withDefault(const Constant(0))();
+
+  TextColumn get stageSeen => text().withDefault(const Constant('egg'))();
+
+  /// Đã nở khỏi trứng chưa.
+  BoolColumn get hatched => boolean().withDefault(const Constant(false))();
+
+  /// Pet đang đi theo bé (đúng một pet mỗi bé).
+  BoolColumn get active => boolean().withDefault(const Constant(false))();
+
+  DateTimeColumn get createdAt => dateTime()();
+
+  DateTimeColumn get updatedAt => dateTime()();
+
+  BoolColumn get synced => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {childId, species},
+  ];
+}

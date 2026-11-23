@@ -282,7 +282,7 @@ const Map<String, String> petHappyLines = <String, String>{
 };
 
 /// Câu khi bé chạm vào pet mà phần chơi còn khóa.
-const String petLockedLine = 'Chơi với tớ cần xong đề ngày đã nhé!';
+const String petLockedLine = 'Học xong một chặng rồi mới vuốt ve tớ nhé!';
 
 /// Đa giác sàn (nơi nhân vật + pet đứng), khung 1600x900.
 /// Đã kiểm chứng bằng code trên nền thật (mẫu màu sàn gỗ).

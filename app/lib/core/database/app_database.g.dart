@@ -5576,6 +5576,613 @@ class ArenaAttemptsCompanion extends UpdateCompanion<ArenaAttempt> {
   }
 }
 
+class $PetsTable extends Pets with TableInfo<$PetsTable, Pet> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PetsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _childIdMeta = const VerificationMeta(
+    'childId',
+  );
+  @override
+  late final GeneratedColumn<String> childId = GeneratedColumn<String>(
+    'child_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _speciesMeta = const VerificationMeta(
+    'species',
+  );
+  @override
+  late final GeneratedColumn<String> species = GeneratedColumn<String>(
+    'species',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _xpMeta = const VerificationMeta('xp');
+  @override
+  late final GeneratedColumn<int> xp = GeneratedColumn<int>(
+    'xp',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _stageSeenMeta = const VerificationMeta(
+    'stageSeen',
+  );
+  @override
+  late final GeneratedColumn<String> stageSeen = GeneratedColumn<String>(
+    'stage_seen',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('egg'),
+  );
+  static const VerificationMeta _hatchedMeta = const VerificationMeta(
+    'hatched',
+  );
+  @override
+  late final GeneratedColumn<bool> hatched = GeneratedColumn<bool>(
+    'hatched',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("hatched" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _activeMeta = const VerificationMeta('active');
+  @override
+  late final GeneratedColumn<bool> active = GeneratedColumn<bool>(
+    'active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    childId,
+    species,
+    xp,
+    stageSeen,
+    hatched,
+    active,
+    createdAt,
+    updatedAt,
+    synced,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'pets';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Pet> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('child_id')) {
+      context.handle(
+        _childIdMeta,
+        childId.isAcceptableOrUnknown(data['child_id']!, _childIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_childIdMeta);
+    }
+    if (data.containsKey('species')) {
+      context.handle(
+        _speciesMeta,
+        species.isAcceptableOrUnknown(data['species']!, _speciesMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_speciesMeta);
+    }
+    if (data.containsKey('xp')) {
+      context.handle(_xpMeta, xp.isAcceptableOrUnknown(data['xp']!, _xpMeta));
+    }
+    if (data.containsKey('stage_seen')) {
+      context.handle(
+        _stageSeenMeta,
+        stageSeen.isAcceptableOrUnknown(data['stage_seen']!, _stageSeenMeta),
+      );
+    }
+    if (data.containsKey('hatched')) {
+      context.handle(
+        _hatchedMeta,
+        hatched.isAcceptableOrUnknown(data['hatched']!, _hatchedMeta),
+      );
+    }
+    if (data.containsKey('active')) {
+      context.handle(
+        _activeMeta,
+        active.isAcceptableOrUnknown(data['active']!, _activeMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {childId, species},
+  ];
+  @override
+  Pet map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Pet(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      childId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}child_id'],
+      )!,
+      species: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}species'],
+      )!,
+      xp: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}xp'],
+      )!,
+      stageSeen: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}stage_seen'],
+      )!,
+      hatched: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}hatched'],
+      )!,
+      active: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}active'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
+    );
+  }
+
+  @override
+  $PetsTable createAlias(String alias) {
+    return $PetsTable(attachedDatabase, alias);
+  }
+}
+
+class Pet extends DataClass implements Insertable<Pet> {
+  final String id;
+  final String childId;
+
+  /// Mã loài: `dog`, `cat`, `rabbit`, `squirrel`, `capybara`, `dragon`.
+  final String species;
+  final int xp;
+  final String stageSeen;
+
+  /// Đã nở khỏi trứng chưa.
+  final bool hatched;
+
+  /// Pet đang đi theo bé (đúng một pet mỗi bé).
+  final bool active;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final bool synced;
+  const Pet({
+    required this.id,
+    required this.childId,
+    required this.species,
+    required this.xp,
+    required this.stageSeen,
+    required this.hatched,
+    required this.active,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.synced,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['child_id'] = Variable<String>(childId);
+    map['species'] = Variable<String>(species);
+    map['xp'] = Variable<int>(xp);
+    map['stage_seen'] = Variable<String>(stageSeen);
+    map['hatched'] = Variable<bool>(hatched);
+    map['active'] = Variable<bool>(active);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
+    return map;
+  }
+
+  PetsCompanion toCompanion(bool nullToAbsent) {
+    return PetsCompanion(
+      id: Value(id),
+      childId: Value(childId),
+      species: Value(species),
+      xp: Value(xp),
+      stageSeen: Value(stageSeen),
+      hatched: Value(hatched),
+      active: Value(active),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      synced: Value(synced),
+    );
+  }
+
+  factory Pet.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Pet(
+      id: serializer.fromJson<String>(json['id']),
+      childId: serializer.fromJson<String>(json['childId']),
+      species: serializer.fromJson<String>(json['species']),
+      xp: serializer.fromJson<int>(json['xp']),
+      stageSeen: serializer.fromJson<String>(json['stageSeen']),
+      hatched: serializer.fromJson<bool>(json['hatched']),
+      active: serializer.fromJson<bool>(json['active']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'childId': serializer.toJson<String>(childId),
+      'species': serializer.toJson<String>(species),
+      'xp': serializer.toJson<int>(xp),
+      'stageSeen': serializer.toJson<String>(stageSeen),
+      'hatched': serializer.toJson<bool>(hatched),
+      'active': serializer.toJson<bool>(active),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
+    };
+  }
+
+  Pet copyWith({
+    String? id,
+    String? childId,
+    String? species,
+    int? xp,
+    String? stageSeen,
+    bool? hatched,
+    bool? active,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    bool? synced,
+  }) => Pet(
+    id: id ?? this.id,
+    childId: childId ?? this.childId,
+    species: species ?? this.species,
+    xp: xp ?? this.xp,
+    stageSeen: stageSeen ?? this.stageSeen,
+    hatched: hatched ?? this.hatched,
+    active: active ?? this.active,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
+  );
+  Pet copyWithCompanion(PetsCompanion data) {
+    return Pet(
+      id: data.id.present ? data.id.value : this.id,
+      childId: data.childId.present ? data.childId.value : this.childId,
+      species: data.species.present ? data.species.value : this.species,
+      xp: data.xp.present ? data.xp.value : this.xp,
+      stageSeen: data.stageSeen.present ? data.stageSeen.value : this.stageSeen,
+      hatched: data.hatched.present ? data.hatched.value : this.hatched,
+      active: data.active.present ? data.active.value : this.active,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Pet(')
+          ..write('id: $id, ')
+          ..write('childId: $childId, ')
+          ..write('species: $species, ')
+          ..write('xp: $xp, ')
+          ..write('stageSeen: $stageSeen, ')
+          ..write('hatched: $hatched, ')
+          ..write('active: $active, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    childId,
+    species,
+    xp,
+    stageSeen,
+    hatched,
+    active,
+    createdAt,
+    updatedAt,
+    synced,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Pet &&
+          other.id == this.id &&
+          other.childId == this.childId &&
+          other.species == this.species &&
+          other.xp == this.xp &&
+          other.stageSeen == this.stageSeen &&
+          other.hatched == this.hatched &&
+          other.active == this.active &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
+}
+
+class PetsCompanion extends UpdateCompanion<Pet> {
+  final Value<String> id;
+  final Value<String> childId;
+  final Value<String> species;
+  final Value<int> xp;
+  final Value<String> stageSeen;
+  final Value<bool> hatched;
+  final Value<bool> active;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<bool> synced;
+  final Value<int> rowid;
+  const PetsCompanion({
+    this.id = const Value.absent(),
+    this.childId = const Value.absent(),
+    this.species = const Value.absent(),
+    this.xp = const Value.absent(),
+    this.stageSeen = const Value.absent(),
+    this.hatched = const Value.absent(),
+    this.active = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PetsCompanion.insert({
+    required String id,
+    required String childId,
+    required String species,
+    this.xp = const Value.absent(),
+    this.stageSeen = const Value.absent(),
+    this.hatched = const Value.absent(),
+    this.active = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.synced = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       childId = Value(childId),
+       species = Value(species),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<Pet> custom({
+    Expression<String>? id,
+    Expression<String>? childId,
+    Expression<String>? species,
+    Expression<int>? xp,
+    Expression<String>? stageSeen,
+    Expression<bool>? hatched,
+    Expression<bool>? active,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (childId != null) 'child_id': childId,
+      if (species != null) 'species': species,
+      if (xp != null) 'xp': xp,
+      if (stageSeen != null) 'stage_seen': stageSeen,
+      if (hatched != null) 'hatched': hatched,
+      if (active != null) 'active': active,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PetsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? childId,
+    Value<String>? species,
+    Value<int>? xp,
+    Value<String>? stageSeen,
+    Value<bool>? hatched,
+    Value<bool>? active,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<bool>? synced,
+    Value<int>? rowid,
+  }) {
+    return PetsCompanion(
+      id: id ?? this.id,
+      childId: childId ?? this.childId,
+      species: species ?? this.species,
+      xp: xp ?? this.xp,
+      stageSeen: stageSeen ?? this.stageSeen,
+      hatched: hatched ?? this.hatched,
+      active: active ?? this.active,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (childId.present) {
+      map['child_id'] = Variable<String>(childId.value);
+    }
+    if (species.present) {
+      map['species'] = Variable<String>(species.value);
+    }
+    if (xp.present) {
+      map['xp'] = Variable<int>(xp.value);
+    }
+    if (stageSeen.present) {
+      map['stage_seen'] = Variable<String>(stageSeen.value);
+    }
+    if (hatched.present) {
+      map['hatched'] = Variable<bool>(hatched.value);
+    }
+    if (active.present) {
+      map['active'] = Variable<bool>(active.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PetsCompanion(')
+          ..write('id: $id, ')
+          ..write('childId: $childId, ')
+          ..write('species: $species, ')
+          ..write('xp: $xp, ')
+          ..write('stageSeen: $stageSeen, ')
+          ..write('hatched: $hatched, ')
+          ..write('active: $active, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -5588,6 +6195,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SettingsTable settings = $SettingsTable(this);
   late final $InventoryTable inventory = $InventoryTable(this);
   late final $ArenaAttemptsTable arenaAttempts = $ArenaAttemptsTable(this);
+  late final $PetsTable pets = $PetsTable(this);
   late final ChildrenDao childrenDao = ChildrenDao(this as AppDatabase);
   late final AttemptsDao attemptsDao = AttemptsDao(this as AppDatabase);
   late final SkillProgressDao skillProgressDao = SkillProgressDao(
@@ -5603,6 +6211,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final ArenaAttemptsDao arenaAttemptsDao = ArenaAttemptsDao(
     this as AppDatabase,
   );
+  late final PetsDao petsDao = PetsDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5617,6 +6226,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     settings,
     inventory,
     arenaAttempts,
+    pets,
   ];
 }
 
@@ -8362,6 +8972,296 @@ typedef $$ArenaAttemptsTableProcessedTableManager =
       ArenaAttempt,
       PrefetchHooks Function()
     >;
+typedef $$PetsTableCreateCompanionBuilder = PetsCompanion Function({
+  required String id,
+  required String childId,
+  required String species,
+  Value<int> xp,
+  Value<String> stageSeen,
+  Value<bool> hatched,
+  Value<bool> active,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<bool> synced,
+  Value<int> rowid,
+});
+typedef $$PetsTableUpdateCompanionBuilder = PetsCompanion Function({
+  Value<String> id,
+  Value<String> childId,
+  Value<String> species,
+  Value<int> xp,
+  Value<String> stageSeen,
+  Value<bool> hatched,
+  Value<bool> active,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<bool> synced,
+  Value<int> rowid,
+});
+
+class $$PetsTableFilterComposer extends Composer<_$AppDatabase, $PetsTable> {
+  $$PetsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get childId => $composableBuilder(
+    column: $table.childId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get species => $composableBuilder(
+    column: $table.species,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get xp => $composableBuilder(
+    column: $table.xp,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get stageSeen => $composableBuilder(
+    column: $table.stageSeen,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get hatched => $composableBuilder(
+    column: $table.hatched,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get active => $composableBuilder(
+    column: $table.active,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PetsTableOrderingComposer extends Composer<_$AppDatabase, $PetsTable> {
+  $$PetsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get childId => $composableBuilder(
+    column: $table.childId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get species => $composableBuilder(
+    column: $table.species,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get xp => $composableBuilder(
+    column: $table.xp,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get stageSeen => $composableBuilder(
+    column: $table.stageSeen,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get hatched => $composableBuilder(
+    column: $table.hatched,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get active => $composableBuilder(
+    column: $table.active,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PetsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PetsTable> {
+  $$PetsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get childId =>
+      $composableBuilder(column: $table.childId, builder: (column) => column);
+
+  GeneratedColumn<String> get species =>
+      $composableBuilder(column: $table.species, builder: (column) => column);
+
+  GeneratedColumn<int> get xp =>
+      $composableBuilder(column: $table.xp, builder: (column) => column);
+
+  GeneratedColumn<String> get stageSeen =>
+      $composableBuilder(column: $table.stageSeen, builder: (column) => column);
+
+  GeneratedColumn<bool> get hatched =>
+      $composableBuilder(column: $table.hatched, builder: (column) => column);
+
+  GeneratedColumn<bool> get active =>
+      $composableBuilder(column: $table.active, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+}
+
+class $$PetsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PetsTable,
+          Pet,
+          $$PetsTableFilterComposer,
+          $$PetsTableOrderingComposer,
+          $$PetsTableAnnotationComposer,
+          $$PetsTableCreateCompanionBuilder,
+          $$PetsTableUpdateCompanionBuilder,
+          (Pet, BaseReferences<_$AppDatabase, $PetsTable, Pet>),
+          Pet,
+          PrefetchHooks Function()
+        > {
+  $$PetsTableTableManager(_$AppDatabase db, $PetsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PetsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PetsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PetsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> childId = const Value.absent(),
+                Value<String> species = const Value.absent(),
+                Value<int> xp = const Value.absent(),
+                Value<String> stageSeen = const Value.absent(),
+                Value<bool> hatched = const Value.absent(),
+                Value<bool> active = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PetsCompanion(
+                id: id,
+                childId: childId,
+                species: species,
+                xp: xp,
+                stageSeen: stageSeen,
+                hatched: hatched,
+                active: active,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                synced: synced,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String childId,
+                required String species,
+                Value<int> xp = const Value.absent(),
+                Value<String> stageSeen = const Value.absent(),
+                Value<bool> hatched = const Value.absent(),
+                Value<bool> active = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<bool> synced = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PetsCompanion.insert(
+                id: id,
+                childId: childId,
+                species: species,
+                xp: xp,
+                stageSeen: stageSeen,
+                hatched: hatched,
+                active: active,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                synced: synced,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PetsTable, Pet>(table),
+                  BaseReferences<_$AppDatabase, $PetsTable, Pet>(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PetsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PetsTable,
+      Pet,
+      $$PetsTableFilterComposer,
+      $$PetsTableOrderingComposer,
+      $$PetsTableAnnotationComposer,
+      $$PetsTableCreateCompanionBuilder,
+      $$PetsTableUpdateCompanionBuilder,
+      (Pet, BaseReferences<_$AppDatabase, $PetsTable, Pet>),
+      Pet,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8384,4 +9284,5 @@ class $AppDatabaseManager {
       $$InventoryTableTableManager(_db, _db.inventory);
   $$ArenaAttemptsTableTableManager get arenaAttempts =>
       $$ArenaAttemptsTableTableManager(_db, _db.arenaAttempts);
+  $$PetsTableTableManager get pets => $$PetsTableTableManager(_db, _db.pets);
 }

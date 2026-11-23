@@ -30,6 +30,8 @@ import '../../core/database/models.dart';
 import '../../core/database/tables.dart' hide AnswerType;
 import '../ladder/ladder_service.dart';
 import '../onboarding/egg_service.dart';
+import '../pet/pet_care_service.dart';
+import '../pet/pet_service.dart';
 import '../questions/question.dart';
 import '../questions/question_registry.dart';
 import '../review_book/review_book_service.dart';
@@ -167,6 +169,8 @@ class StageSession extends ChangeNotifier {
          clock: db.clock,
        ),
        _eggs = EggService(db: db),
+       _pets = PetService(db: db),
+       _petCare = PetCareService(db: db),
        _rewards =
            rewardService ??
            RewardService(db: db, config: RewardConfig.defaults()),
@@ -179,6 +183,8 @@ class StageSession extends ChangeNotifier {
   final LadderService _ladder;
   final ReviewBookService _reviewBook;
   final EggService _eggs;
+  final PetService _pets;
+  final PetCareService _petCare;
   final RewardService _rewards;
 
   final String childId;
@@ -369,7 +375,12 @@ class StageSession extends ChangeNotifier {
     if (correct) {
       correctCount++;
       consecutiveCorrect++;
-      if (firstTry) firstTryCorrectCount++;
+      if (firstTry) {
+        firstTryCorrectCount++;
+        // Pet lớn theo câu đúng ngay lần đầu (D): mọi nơi dùng
+        // StageSession (chặng ngày, chặng tự chọn, tầng tháp) đều cộng.
+        await _pets.addXp(childId);
+      }
       final xu = await _rewards.awardQuestion(
         childId: childId,
         rung: spec.rung,
@@ -416,12 +427,18 @@ class StageSession extends ChangeNotifier {
     // chặng sẽ rẽ sang màn nở trứng. Chỉ xảy ra một lần duy nhất
     // (xem `EggService.noteStageCompleted`).
     await _eggs.noteStageCompleted(childId);
-    // ===== HOOK DUY NHẤT: MỘT CHẶNG VỪA HOÀN THÀNH =====
-    // Chạy cho mọi loại chặng (chặng ngày, chặng tự chọn, tầng tháp
-    // — dù qua hay trượt tầng). Chỗ này để tính năng sau gắn vào,
-    // vd. pet nhận một "suất ăn" mỗi chặng xong. Tầng tháp đã qua
-    // còn có [TowerService.floorCleared] (nhiệm vụ ngày).
-    // Chưa gắn gì — không thêm logic pet ở nhánh này.
+    // Pet (D): mỗi chặng xong một suất ăn, chạy cho mọi loại chặng
+    // (chặng ngày, chặng tự chọn, tầng tháp — dù qua hay trượt).
+    // Chặng ngày nhận một lần cho mỗi (đề, chặng); tầng tháp một lần
+    // cho mỗi (mảng, tầng, ngày) nên thử lại cùng tầng trong ngày
+    // không nhận thêm; chặng tự chọn làm lúc nào cũng nhận. (Xp cộng
+    // riêng cho từng câu đúng ngay lần đầu ở `_resolveQuestion`.)
+    // Tầng tháp đã qua còn có [TowerService.floorCleared] (nhiệm vụ ngày).
+    final mealRef = towerFloor != null
+        ? 'meal:tower:${resolved.first.spec.strand}:$towerFloor:'
+              '${_db.clock.today()}'
+        : (dailySetId == null ? null : 'stage:$dailySetId:$stageIndex');
+    await _petCare.awardMeal(childId, refId: mealRef);
     if (dailySetId != null) {
       await _db.dailySetsDao.updateStageStatus(
         id: dailySetId!,

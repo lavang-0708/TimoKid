@@ -741,3 +741,68 @@ class ArenaAttemptsDao extends DatabaseAccessor<AppDatabase>
             ..limit(1))
           .getSingleOrNull();
 }
+
+/// Pet của bé (D, schema v4). Chỉ CRUD thô; luật (một pet active, cộng
+/// xp, nở, đổi pet) nằm ở `PetService`.
+@DriftAccessor(tables: [Pets])
+class PetsDao extends DatabaseAccessor<AppDatabase> with _$PetsDaoMixin {
+  PetsDao(super.db);
+
+  Future<List<Pet>> getAll(String childId) =>
+      (select(db.pets)
+            ..where((t) => t.childId.equals(childId))
+            ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
+          .get();
+
+  Future<Pet?> getById(String petId) =>
+      (select(db.pets)..where((t) => t.id.equals(petId))).getSingleOrNull();
+
+  Future<Pet?> getActive(String childId) =>
+      (select(db.pets)
+            ..where((t) => t.childId.equals(childId) & t.active.equals(true)))
+          .getSingleOrNull();
+
+  Future<Pet?> getBySpecies(String childId, String species) =>
+      (select(db.pets)..where(
+            (t) => t.childId.equals(childId) & t.species.equals(species),
+          ))
+          .getSingleOrNull();
+
+  /// Thêm một pet; trả dòng vừa thêm. Gọi trong transaction của service.
+  Future<Pet> insertPet({
+    required String childId,
+    required String species,
+    int xp = 0,
+    String stageSeen = 'egg',
+    bool hatched = false,
+    bool active = false,
+  }) async {
+    final now = db.clock.now();
+    final id = newId();
+    await into(db.pets).insert(
+      PetsCompanion.insert(
+        id: id,
+        childId: childId,
+        species: species,
+        xp: Value(xp),
+        stageSeen: Value(stageSeen),
+        hatched: Value(hatched),
+        active: Value(active),
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+    return (await getById(id))!;
+  }
+
+  Future<void> updatePet(String petId, PetsCompanion changes) =>
+      (update(db.pets)..where((t) => t.id.equals(petId))).write(
+        changes.copyWith(updatedAt: Value(db.clock.now())),
+      );
+
+  /// Bỏ active mọi pet của bé (bước đầu của đổi pet).
+  Future<void> clearActive(String childId) =>
+      (update(db.pets)
+            ..where((t) => t.childId.equals(childId) & t.active.equals(true)))
+          .write(PetsCompanion(active: const Value(false)));
+}

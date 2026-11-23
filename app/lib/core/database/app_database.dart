@@ -1,5 +1,5 @@
 /// Database Drift của TimoKid: 7 bảng bản 0.1 + `inventory` (T2-06) +
-/// `arena_attempts` (T2-10), schema v3.
+/// `arena_attempts` (T2-10) + `pets` (D), schema v4.
 ///
 /// Mở file `timokid.sqlite` trong thư mục tài liệu của app trên máy thật
 /// (qua `drift_flutter`). Test truyền executor riêng
@@ -16,7 +16,9 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
+import '../../features/pet/pet_config.dart';
 import '../time/clock.dart';
+import 'models.dart';
 import 'daos.dart';
 import 'tables.dart';
 
@@ -43,6 +45,7 @@ const defaultRewardsJson =
     Settings,
     Inventory,
     ArenaAttempts,
+    Pets,
   ],
   daos: [
     ChildrenDao,
@@ -54,6 +57,7 @@ const defaultRewardsJson =
     SettingsDao,
     InventoryDao,
     ArenaAttemptsDao,
+    PetsDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -68,7 +72,7 @@ class AppDatabase extends _$AppDatabase {
   Clock clock;
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -82,6 +86,7 @@ class AppDatabase extends _$AppDatabase {
       // lớp database phải import feature mở đầu; tên khóa giữ đồng
       // bộ với `OnboardingService.onboardingCompletedKey`.
       await _seedSetting('onboarding_completed', 'false');
+      await _createPetIndexes();
     },
     onUpgrade: (migrator, from, to) async {
       // v1 → v2 (T2-06): thêm bảng `inventory`; mọi dữ liệu cũ giữ nguyên.
@@ -92,8 +97,81 @@ class AppDatabase extends _$AppDatabase {
       if (from < 3) {
         await migrator.createTable(arenaAttempts);
       }
+      // v3 → v4 (D): thêm bảng `pets`, chuyển pet cũ từ `settings`.
+      if (from < 4) {
+        await migrator.createTable(pets);
+        await _createPetIndexes();
+        await _migrateLegacyPets();
+      }
     },
   );
+
+  /// Chỉ mục unique từng phần: mỗi bé chỉ một pet `active` (SQLite
+  /// không có cú pháp này trong định nghĩa bảng Drift nên tạo bằng SQL).
+  Future<void> _createPetIndexes() => customStatement(
+    'CREATE UNIQUE INDEX IF NOT EXISTS pets_one_active '
+    'ON pets (child_id) WHERE active = 1',
+  );
+
+  /// Migration v3 → v4: mỗi bé có `selected_egg` hợp lệ trong `settings`
+  /// được chuyển thành một dòng `pets` (active). `hatched` theo
+  /// `egg_hatched`. Pet đã nở: xp = số ngày xong đề × 20 nhưng không
+  /// thấp hơn ngưỡng giai đoạn cũ (nhỡ ≥ 80, lớn ≥ 250) để bé không bị
+  /// tụt giai đoạn; `stage_seen` = giai đoạn mới tính được (nên không
+  /// chiếu ăn mừng giả). Các khóa cũ trong `settings` được giữ nguyên
+  /// (không còn dùng, an toàn nếu cần xem lại). Chạy một lần (chỉ trong
+  /// `onUpgrade`), và bỏ qua bé đã có pet.
+  Future<void> _migrateLegacyPets() async {
+    final eggs =
+        await (select(settings)..where(
+              (t) => t.key.equals('selected_egg') & t.childId.isNotNull(),
+            ))
+            .get();
+    for (final egg in eggs) {
+      final childId = egg.childId!;
+      final species = egg.value;
+      if (!const ['dog', 'cat', 'rabbit'].contains(species)) continue;
+      if (await petsDao.getBySpecies(childId, species) != null) continue;
+      final hatched =
+          await settingsDao.getValue(childId: childId, key: 'egg_hatched') ==
+          'true';
+      var xp = 0;
+      var seen = 'egg';
+      if (hatched) {
+        final days = await _legacyDoneDays(childId);
+        xp = days * petMigrationXpPerDay;
+        if (days >= legacyPetAdultDays && xp < petAdultXp) xp = petAdultXp;
+        if (days >= legacyPetTeenDays && days < legacyPetAdultDays) {
+          if (xp < petTeenXp) xp = petTeenXp;
+        }
+        seen = xp >= petAdultXp
+            ? 'adult'
+            : (xp >= petTeenXp ? 'teen' : 'newborn');
+      }
+      await petsDao.insertPet(
+        childId: childId,
+        species: species,
+        xp: xp,
+        stageSeen: seen,
+        hatched: hatched,
+        active: true,
+      );
+    }
+  }
+
+  /// Số ngày bé đã xong trọn đề ngày (đủ 5 chặng) — luật cũ của pet.
+  Future<int> _legacyDoneDays(String childId) async {
+    final sets = await dailySetsDao.getDailySetsForChild(childId);
+    var n = 0;
+    for (final set in sets) {
+      final statuses = dailySetsDao.readStageStatus(set);
+      if (statuses.length == 5 &&
+          statuses.every((s) => s == StageStatus.done)) {
+        n++;
+      }
+    }
+    return n;
+  }
 
   /// Tạo trigger chặn sửa/xóa trên hai bảng append-only (xem ghi chú
   /// ở đầu file). Gọi trong [migration] lúc tạo DB mới, và gọi lại
@@ -132,6 +210,7 @@ class AppDatabase extends _$AppDatabase {
     }
     await Migrator(this).createAll();
     await _createAppendOnlyTriggers();
+    await _createPetIndexes();
     await ensureSeeded();
     // Về trạng thái mới cài: mở đầu chưa xong nên lần mở sau hiện
     // lại màn tạo nhân vật (để QA kiểm được luồng mở đầu).
