@@ -98,7 +98,7 @@ NAME_PATTERNS = {
     ),
     # Ảnh giai đoạn + trứng nứt/vỏ (lô 8A) + khung đi/vui/ngồi (lô 8B).
     "pet": re.compile(
-        r"^(dog|cat|rabbit)_("
+        r"^(dog|cat|rabbit|squirrel|capybara|dragon)_("
         r"egg|newborn|teen|adult"
         r"|egg_crack_[1-3]|shell_(top|bottom)"
         r"|(newborn|teen|adult)_(walk_[a-d]|happy|sit)"
