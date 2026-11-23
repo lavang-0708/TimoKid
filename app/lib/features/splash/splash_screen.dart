@@ -113,7 +113,7 @@ class _SplashScreenState extends State<SplashScreen>
                       borderRadius: BorderRadius.circular(8),
                       child: LinearProgressIndicator(
                         key: const Key('splash-progress'),
-                        value: AnimationGate.enabled ? t : null,
+                        value: AnimationGate.enabled ? t : 1,
                         minHeight: 12,
                         backgroundColor: const Color(0x66FFFFFF),
                         color: const Color(0xFFFF9EB5),
