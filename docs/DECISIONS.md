@@ -318,3 +318,8 @@ Các mục trên là nhật ký quyết định theo thời điểm; mục này 
 - Câu tháp ghi `attempts` như chặng tự chọn (`daily_set_id`/`stage` trống) nên thang ải + sổ ôn tập chạy như cũ; hệ quả: dòng "Tự chọn hôm nay: N đã xong" trên màn Tòa nhà cũng đếm cả tầng tháp.
 - Ảnh `ui_tower_lock`, `ui_tower_boss` chưa có → icon Material tạm, cờ `towerArtReady = false`.
 - Điểm gắn cho tính năng sau: `TowerService.highestCleared`/`nextFloor`, luồng `TowerService.floorCleared` (nhiệm vụ ngày), và đúng MỘT chỗ "chặng vừa hoàn thành" trong `StageSession._finishStage` (có chú thích HOOK) cho pet nhận suất ăn. Chưa làm gì về pet ở nhánh này.
+### Hạng đấu trường theo tuần (23/11, spec mục B)
+
+- **Tuần** = thứ Hai đến Chủ nhật giờ Việt Nam, tính từ `db.clock.today()` (QA nhảy ngày thử được). **Điểm tuần** = tổng số câu đúng theo ngày, mỗi ngày chỉ tính bài đúng nhiều nhất (tối đa 25) để thi lại luyện tập không làm phình điểm. Hạng: Đồng (đã thi ≥1 ngày), Bạc ≥40, Vàng ≥80, Kim cương ≥120. Mọi số (ngưỡng, kim cương rương 2/4/7/12, cờ `leagueArtReady = false`) ở `league_config.dart`.
+- **Rương cuối tuần**: chỉ xét tuần ngay trước (không bù tuần cũ hơn). Hiện ở sảnh Đấu trường khi mở sảnh (chưa gắn vào Thị trấn để không đụng màn khác). Nhận một lần: khóa `settings` `arena_week_claimed.<thứ Hai>` + dòng ví `gem` (`arena_week_chest`, refId `arena_week:<childId>:<thứ Hai>`) trong một transaction; thiếu một trong hai vẫn không cộng đôi. Nội dung cố định theo hạng.
+- Không đổi schema. API cho nhiệm vụ ngày: `ArenaService.didArenaToday(childId)`.
