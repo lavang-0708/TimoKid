@@ -1918,3 +1918,143 @@ Tổng .b64 ~5,18 MB; đích `app/assets/images/pets/`; mỗi lần ≤8 file, m
 Đã đẩy 4 lần .b64 (23/11/2026): `84c6cd8c` (6 file), `d2cc9a51` (7 file),
 `0b7c3c07` (7 file), `de3e285d` (7 file), 27/27 vòng khứ hồi local khớp từng
 byte. Chưa decode (chờ Claude decode).
+### Lô 12 — Capybara (pet hiếm): trọn bộ 27 file (23/11/2026)
+
+Loài thứ hai của lô 12 (capybara hiếm — sóc < capybara < rồng).
+4 tấm xem trước đã duyệt kiểu v2 (trứng + newborn/teen/adult đứng, 23/11 ~22:57)
+**dùng lại nguyên bản, không vẽ lại**; vẽ mới 5 vỏ trứng + 18 khung chuyển động
+(happy/sit/walk_a..d × newborn/teen/adult). 27 file vào
+`app/assets/images/pets/`, 512×512, PNG trong suốt, alpha sạch (semi 0, 0 px
+magenta cả thước chuẩn R>200/G<80/B>200 lẫn thước nới R>140/G<60/B>140 —
+trừ 4 px dark-magenta có sẵn trong file trứng đã duyệt, xem mục "Điểm chưa chắc"),
+quantize 256 màu MAXCOVERAGE + Floyd–Steinberg. Vẽ từ 4 ảnh đứng capybara đã duyệt
+(giữ đúng nhận dạng: lông nâu xám ấm + bụng kem + quýt nhỏ + lá xanh trên đầu +
+má hồng to + mắt híp thư thái; teen đứng 4 chân; adult mắt híp sâu nhất);
+walk nhìn nghiêng 3/4 quay PHẢI, chân luân phiên, chân y=439; happy nhấc 40 px
+(đáy y=399); sit chân y=439; newborn đi KHÔNG vỏ (đã nở, như bản sửa chó newborn
+lô 8B-fix). Tổng PNG 2.886.931 B (~3,85 MB .b64).
+
+#### Bảng 27 file
+
+| file | byte | bbox (x0, y0, x1, y1) | đất y | SHA-256 (12 ký tự đầu) | lần vẽ |
+|---|---|---|---|---|---|
+| capybara_adult.png | 99099 | 125, 40, 386, 439 | 439 | 6fa7ce144065 | 1 |
+| capybara_adult_happy.png | 103187 | 112, 8, 399, 399 | 399 | 30baf2810a88 | 1 |
+| capybara_adult_sit.png | 101688 | 124, 40, 387, 439 | 439 | 1f78ea95c8c3 | 1 |
+| capybara_adult_walk_a.png | 111748 | 80, 40, 431, 439 | 439 | bb94f540093f | 1 |
+| capybara_adult_walk_b.png | 121794 | 73, 40, 438, 439 | 439 | 29b3ebbf6f9c | 1 |
+| capybara_adult_walk_c.png | 119107 | 67, 40, 443, 439 | 439 | f559e19580b2 | 1 |
+| capybara_adult_walk_d.png | 119283 | 62, 40, 449, 439 | 439 | 911d60086f64 | 1 |
+| capybara_egg.png | 114706 | 103, 40, 408, 439 | 439 | 7b7fa0461b05 | 1 |
+| capybara_egg_crack_1.png | 108685 | 95, 40, 415, 439 | 439 | 1ddc3233c99c | 1 |
+| capybara_egg_crack_2.png | 114000 | 103, 40, 407, 439 | 439 | 588f1ff9dbc6 | 1 |
+| capybara_egg_crack_3.png | 106889 | 116, 40, 395, 439 | 439 | 38a662ae3e24 | 2 |
+| capybara_newborn.png | 117901 | 94, 40, 417, 439 | 439 | 3e739f892438 | 1 |
+| capybara_newborn_happy.png | 114554 | 100, 8, 411, 399 | 399 | e79d6b5cf4ef | 1 |
+| capybara_newborn_sit.png | 109622 | 133, 40, 377, 439 | 439 | 3d6f89ef4c5a | 1 |
+| capybara_newborn_walk_a.png | 105796 | 62, 40, 449, 439 | 439 | feac8c496889 | 1 |
+| capybara_newborn_walk_b.png | 113316 | 62, 40, 448, 439 | 439 | fac79290c7d2 | 3 |
+| capybara_newborn_walk_c.png | 100072 | 59, 40, 452, 439 | 439 | 22471723b51a | 1 |
+| capybara_newborn_walk_d.png | 110252 | 59, 40, 452, 439 | 439 | 057a6939ecee | 3 |
+| capybara_shell_bottom.png | 78859 | 101, 166, 409, 439 | 439 | 680f28667d44 | 1 |
+| capybara_shell_top.png | 73834 | 101, 60, 409, 278 | 278 | 242df8d0fad3 | 2 |
+| capybara_teen.png | 99028 | 110, 40, 401, 439 | 439 | bc1e778b30b6 | 1 |
+| capybara_teen_happy.png | 94268 | 120, 8, 390, 399 | 399 | 2e1006191c62 | 1 |
+| capybara_teen_sit.png | 107845 | 93, 40, 417, 439 | 439 | 63614b66874e | 2 |
+| capybara_teen_walk_a.png | 114587 | 56, 40, 454, 439 | 439 | 141854ad6eab | 1 |
+| capybara_teen_walk_b.png | 112015 | 87, 40, 424, 439 | 439 | ccc554fd4b1b | 1 |
+| capybara_teen_walk_c.png | 106427 | 82, 40, 428, 439 | 439 | fbac8fec7f36 | 2 |
+| capybara_teen_walk_d.png | 108369 | 83, 40, 428, 439 | 439 | 6b09ddeaf5dd | 1 |
+
+#### Mốc đo (đo bằng code từ ảnh thật)
+
+- Trứng kín: crack_1 bbox (95, 40, 415, 439), rộng 321 px, tâm x=255.
+- Vỏ nứt tăng dần: dark-px (R<100/G<80/B<60) crack_1 = 160 → crack_2 = 3.970 →
+  crack_3 = 4.216; crack_1 chỉ vài vết nứt mảnh ở đỉnh, crack_2 nứt zigzag đậm
+  khắp nửa trên + chỏm lông nâu xám thò ra ở đỉnh, crack_3 nứt rộng thấy mặt + 2 chân
+  trước của capybara (dark-px tăng ít ở 2→3 vì khe nứt lấp bằng lông sáng — mức
+  tăng đọc bằng mắt).
+- Vỏ rời: shell_top (101, 60, 409, 278), rộng 309, cao 219; shell_bottom (101,
+  166, 409, 439), rộng 309, cao 274, đáy y=439. Khớp trứng kín crack_1: cùng tâm
+  x=255, rộng kém 12 px, chồng 2 nửa lên nhau vẽ đúng viền trứng kín (IoU 0,9298,
+  sóc 0,9326); chồng nhau 113 hàng. So với sóc lô 12 (nắp 306×203, bát 306×285):
+  nắp capybara cao hơn (219 px), bát nông hơn (274 px).
+- **Không còn viền plum tối sát đáy vỏ** (v2 đã xoá): shell_bottom tổng 98 px plum,
+  20 hàng đáy (y420–439) = 0 px, y400–439 chỉ 2 px.
+- Happy nhấc 40 px cả 3 giai đoạn (newborn/teen/adult đáy y=399, đỉnh y=8);
+  mắt híp cười + miệng cười hở + 2 chân trước giơ lên, newborn happy vẫn ngồi
+  trong nửa vỏ dưới như ảnh đứng.
+- Chu kỳ đi: a/c đối chân, b/d bước giữa; chân y=439; quay PHẢI. Lông khung đi đã
+  chỉnh ấm bằng code (xem "Cách làm"): trung vị lông R−B sau chỉnh 62–84, ảnh
+  đứng 96–108.
+
+#### Cách làm
+
+- Vẽ từng tấm bằng media generation trên nền magenta #FF00FF, lấy ảnh đứng cùng
+  giai đoạn làm tham chiếu. Tổng 31 lần vẽ (23 tấm + 8 vẽ lại: crack_3, shell_top,
+  newborn walk_b/d, teen sit, teen walk_c — mỗi file 2–3 lần).
+- Tách nền + quantize bằng code (`lot12/work/capybara/process_capybara_*.py`,
+  tái dùng tách nền `process_v2.py`: key median góc + flood-fill nền từ biên qua
+  pixel magenta-hued, KHÔNG `binary_fill_holes`; m2/m3 chỉ trong 3 px quanh
+  magenta thật; rim-recolor; quantize 256 màu MAXCOVERAGE + Floyd–Steinberg).
+  Happy scale cao 392 px đặt y=8; vỏ scale theo rộng 309 px, tâm x=255, nắp neo
+  y=60, bát neo đáy y=439.
+- Sửa tàn dư magenta: 4 file còn 1–2 px magenta-nới sau quantize (adult_happy 1,
+  teen_happy 1, teen_walk_c 1, newborn_happy 2) — tô màu palette an toàn gần nhất,
+  KHÔNG thêm màu mới; đo lại 0/0.
+- **Chỉnh ấm lông khung đi bằng code** (`warm_walk_apply.py`): lông khung đi vẽ ra
+  xám lạnh (trung vị lông R−B 33–55) so với ảnh đứng nâu ấm (R−B 96–108) — chỉnh
+  bằng histogram-match theo kênh, chỉ trên vùng lông, cường độ 0,5 (bản đủ 1,0
+  ngả cam quá đà nên bỏ), feather mép 1,2 px, quantize lại 256 màu. Bản gốc giữ
+  trong `raw_warm_backup/`.
+
+#### Kiểm chứng
+
+- Đo bằng code ĐẠT 23/23 file mới: 512×512, semi 0, magenta 0 (cả 2 thước), ≤256 màu;
+  thân cao 400 px (y 40→439), đất y=439; happy cao 392 px, đáy y=399. 4 file xem
+  trước đối chiếu SHA-256 khớp nguyên bản (egg `7b7fa0461b05…`, newborn
+  `3e739f892438…`, teen `bc1e778b30b6…`, adult `6fa7ce144065…`).
+- Soi bằng mắt trên nền tối (60,60,80) + nền phòng v3b ở cỡ app (newborn 40% /
+  teen 58% / adult 72% chiều cao bé 360 px) + phóng 3× viền mặt/mắt/lông/chân:
+  không lỗ alpha, không mép thẳng, không tàn dư magenta; quýt + lá xanh + má hồng
+  to + mắt híp ở MỌI khung; teen đứng 4 chân, adult ngồi mũm nhất.
+- Lỗ trong suốt kín lớn nhất: teen_walk_d 55 px, teen_walk_b 19 px, teen 16 px — khe
+  hở lông tự nhiên, không phải lỗ thân.
+
+#### Điểm chưa chắc — nói thẳng
+
+1. crack_2: chỏm lông thò ra hơi nhọn/xám, giống lông nhím hơn lông mềm capybara;
+   nứt zigzag + vân sóng nửa dưới đúng brief nên giữ, không vẽ lại.
+2. crack_3 v2 KHÔNG có mảnh vỏ bay (bản v1 mảnh văng quá xa, xử lý rối) — nắp đội
+   sát trên đầu như mũ; nếu Claude muốn đúng brief từng chữ thì vẽ lại.
+3. Dark-px nứt bão hoà crack_2→crack_3 (+6%) — mức tăng đọc bằng mắt, không đọc
+   bằng số này.
+4. Vòm nắp hơi phình hơn trứng kín ở y100–200 (rộng hơn tới +19 px ở y150); IoU
+   0,9298 vẫn tương đương sóc.
+5. Vệt tím rất mỏng ở mép đáy shell_bottom/crack_2 (bóng nâu của vỏ, magenta = 0) —
+   không thấy ở cỡ app.
+6. Teen→adult phân biệt bằng độ mũm + tỉ lệ hiển thị trong app (58% vs 72%), như
+   sóc; teen đứng bbox rộng 292 px > adult 262 px do tư thế.
+7. Đối chân a/c chỉ gần đúng (AI vẽ), như lô 8B/sóc; newborn b/d đọc như khung sải
+   hơn là chân lướt qua nhau.
+8. capybara_egg.png (xem trước v2 đã duyệt) có sẵn 4 px dark-magenta ở (265–268,
+   55), RGB (175–188, 33–52, 196–215) — ghi trong redo_v2, KHÔNG sửa (file duyệt
+   dùng lại nguyên bản).
+9. Lông khung đi đã chỉnh ấm bằng code (không vẽ lại): R−B 62–84 so với ảnh đứng
+   96–108; lông sáng nhất ở khung newborn còn ánh hồng nhạt ở cỡ xem trước; bản
+   gốc giữ trong `raw_warm_backup/`.
+
+#### Kế hoạch đẩy (4 lần .b64, CHỈ NHÁP — parent đẩy)
+
+- Đợt 1 (7 file, PNG 754076 B, .b64 ~1005434 B): capybara_adult_walk_b.png, capybara_egg_crack_2.png, capybara_egg_crack_3.png, capybara_newborn_walk_d.png, capybara_teen.png, capybara_teen_happy.png, capybara_teen_sit.png
+- Đợt 2 (7 file, PNG 733916 B, .b64 ~978554 B): capybara_adult_happy.png, capybara_adult_sit.png, capybara_adult_walk_a.png, capybara_adult_walk_d.png, capybara_newborn_happy.png, capybara_newborn_sit.png, capybara_shell_top.png
+- Đợt 3 (6 file, PNG 660262 B, .b64 ~880349 B): capybara_adult_walk_c.png, capybara_egg_crack_1.png, capybara_newborn_walk_a.png, capybara_newborn_walk_c.png, capybara_teen_walk_a.png, capybara_teen_walk_b.png
+- Đợt 4 (7 file, PNG 738677 B, .b64 ~984902 B): capybara_adult.png, capybara_egg.png, capybara_newborn.png, capybara_newborn_walk_b.png, capybara_shell_bottom.png, capybara_teen_walk_c.png, capybara_teen_walk_d.png
+Tổng .b64 ~3,85 MB; đích `app/assets/images/pets/`; mỗi lần ≤8 file, mỗi file
+.b64 <1.217.688 B. Mục này do parent gộp vào `docs/E_IMAGES.md` cùng đợt đẩy
+(xem cuối mục); Claude decode + kiểm bằng git (đối chiếu blob SHA) sau đó.
+
+Đã đẩy 4 lần .b64 (24/11/2026): `faacbff1` (7 file), đợt 2 (7 file, exec bị
+restart nhưng đã kiểm trên nhánh: shell_top + adult_happy khớp từng byte),
+`78e630cd` (6 file), `a62542f7` (7 file), 27/27 vòng khứ hồi local khớp từng
+byte. Chưa decode (chờ Claude decode).
