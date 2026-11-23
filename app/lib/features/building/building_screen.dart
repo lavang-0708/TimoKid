@@ -23,6 +23,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/database/app_database.dart';
+import '../../core/test_build.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/models.dart';
 import '../../core/database/tables.dart';
@@ -133,7 +134,7 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
   Future<void> _onChallenge() async {
     final stats = _stats;
     if (stats == null) return;
-    if (stats.status != StageStatus.done) {
+    if (!_towerOpen(stats)) {
       if (!mounted) return;
       context.go(
         MathScreen.route,
@@ -274,17 +275,21 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
     );
   }
 
+  /// Tháp mở khi chặng ngày đã xong; bản thử (cờ TEST_UNLOCKS) mở luôn.
+  bool _towerOpen(BuildingStats stats) =>
+      TestUnlocks.enabled || stats.status == StageStatus.done;
+
   bool get _towerFinished => _highestFloor >= TowerConfig.floorsPerTower;
 
   String _challengeTitle(BuildingStats stats) {
-    if (stats.status != StageStatus.done) return 'Thử thách';
+    if (!_towerOpen(stats)) return 'Thử thách';
     return _towerFinished
         ? 'Đã lên đỉnh tháp'
         : 'Leo tầng ${_highestFloor + 1}';
   }
 
   String _challengeSubtitle(BuildingStats stats) {
-    if (stats.status != StageStatus.done) return 'Làm chặng hôm nay';
+    if (!_towerOpen(stats)) return 'Làm chặng hôm nay';
     if (_towerFinished) {
       return 'Bé đã qua cả ${TowerConfig.floorsPerTower} tầng';
     }

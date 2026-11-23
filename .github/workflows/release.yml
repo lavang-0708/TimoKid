@@ -81,7 +81,15 @@ jobs:
           IFS=. read -r a b c <<< "$name"
           code=$(( a * 10000 + b * 100 + c ))
           echo "Phiên bản $name, mã $code"
-          flutter build apk --release --build-name="$name" --build-number="$code"
+          # Bản thử (tag v0.0.x): mở hết tính năng + menu QA + tặng xu,
+          # kim cương (cờ TEST_UNLOCKS, xem app/lib/core/test_build.dart).
+          # Bản chính thức (từ v0.2.0) build không cờ, về luật cũ.
+          defines=""
+          if [[ "$name" == 0.0.* ]]; then
+            defines="--dart-define=TEST_UNLOCKS=true --dart-define=QA_MENU=true"
+            echo "Bản thử: $defines"
+          fi
+          flutter build apk --release --build-name="$name" --build-number="$code" $defines
 
       - name: Đổi tên APK theo tag
         run: cp build/app/outputs/flutter-apk/app-release.apk "build/TimoKid-${GITHUB_REF_NAME}.apk"

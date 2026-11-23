@@ -15,13 +15,27 @@ library;
 
 import 'dart:math';
 
+import 'package:drift/drift.dart' show BooleanExpressionOperators, Value;
+
 import '../../core/database/app_database.dart';
 import '../../core/database/daos.dart';
+import '../../core/database/models.dart';
+import '../daily_set/daily_set_config.dart';
+import '../daily_set/daily_set_service.dart';
 import '../ladder/ladder_config.dart';
 import '../ladder/ladder_service.dart';
+import '../onboarding/egg_service.dart';
+import '../pet/pet_care_service.dart';
+import '../pet/pet_config.dart';
+import '../pet/pet_service.dart';
+import '../quests/quest_service.dart';
 import '../questions/question.dart';
 import '../questions/question_registry.dart';
 import '../review_book/review_book_service.dart';
+import '../rewards/reward_config.dart';
+import '../rewards/reward_service.dart';
+import '../room/pet_growth.dart';
+import '../shop/shop_service.dart';
 import 'debug_clock.dart';
 
 /// Các chức năng của menu QA, thao tác trên database của app.
@@ -67,6 +81,110 @@ class QaService {
   void resetDay() {
     final current = db.clock;
     if (current is DebugClock) current.reset();
+  }
+
+  /// Nhảy tới thứ Hai kế tiếp (nếu hôm nay đã là thứ Hai thì sang thứ
+  /// Hai tuần sau) để thử rương hạng tuần và chuỗi ngày. Trả số ngày
+  /// vừa nhảy.
+  int advanceToNextMonday() {
+    final weekday = db.clock.now().weekday;
+    var days = (DateTime.monday - weekday + 7) % 7;
+    if (days == 0) days = 7;
+    _debugClock().advanceBy(Duration(days: days));
+    return days;
+  }
+
+  // ------------------------------------------------------------------
+  // Thử mốc pet / đề ngày / nhiệm vụ (dùng cho bản thử).
+  // ------------------------------------------------------------------
+
+  /// Đặt xp của pet đang đi theo. Pet đã nở thì đặt luôn giai đoạn
+  /// "đã thấy" ngay dưới giai đoạn mới để lần vào Phòng kế tiếp hiện
+  /// màn ăn mừng lên lớp. Trả false nếu chưa có pet.
+  Future<bool> setActivePetXp(String childId, int xp) async {
+    final pet = await PetService(db: db).active(childId);
+    if (pet == null) return false;
+    final stage = petStageFor(xp: xp, hatched: pet.hatched);
+    final seen = switch (stage) {
+      PetStage.adult => PetStage.teen,
+      _ => PetStage.newborn,
+    };
+    await db.petsDao.updatePet(
+      pet.id,
+      PetsCompanion(
+        xp: Value(xp),
+        stageSeen: pet.hatched ? Value(seen.name) : const Value.absent(),
+      ),
+    );
+    return true;
+  }
+
+  /// Cộng [amount] xp cho pet đang đi theo (đường chính của app).
+  Future<int?> addPetXp(String childId, int amount) =>
+      PetService(db: db).addXp(childId, amount: amount);
+
+  /// Xóa lượt ăn/chơi hôm nay để thử lại tâm trạng pet.
+  Future<void> resetPetMoodToday(String childId) => db.settingsDao
+      .deleteSetting(childId: childId, key: petCareKey(db.clock.today()));
+
+  /// Cộng [count] suất ăn.
+  Future<void> giveMeals(String childId, int count) async {
+    final n = await ShopService(db: db).foodCount(childId, petMealId);
+    await db.settingsDao.setValue(
+      childId: childId,
+      key: petFoodCountKey(petMealId),
+      value: '${n + count}',
+    );
+  }
+
+  /// Cho pet-trứng đang đi theo nở ngay (đúng đường chính: đánh dấu
+  /// đã nở và xóa cờ chờ nở). Trả false nếu không có trứng chưa nở.
+  Future<bool> hatchNow(String childId) async {
+    final pet = await PetService(db: db).active(childId);
+    if (pet == null || pet.hatched) return false;
+    await EggService(db: db).consumeHatchCelebration(childId);
+    return true;
+  }
+
+  /// Đánh dấu xong cả 5 chặng của đề hôm nay (tạo đề nếu chưa có) và
+  /// nhận thưởng xong đề như thường (idempotent).
+  Future<void> markDailySetDone(String childId) async {
+    final set = await DailySetService(
+      dailySetsDao: db.dailySetsDao,
+      reviewQueueDao: db.reviewQueueDao,
+      ladderService: LadderService(
+        attemptsDao: db.attemptsDao,
+        skillProgressDao: db.skillProgressDao,
+      ),
+      clock: db.clock,
+    ).getOrCreateTodaySet(childId: childId);
+    for (var i = 0; i < DailySetConfig.stagesPerDay; i++) {
+      await db.dailySetsDao.updateStageStatus(
+        id: set.id,
+        stageIndex: i,
+        status: StageStatus.done,
+      );
+    }
+    await RewardService(
+      db: db,
+      config: await RewardConfig.load(db),
+    ).awardDailyCompleteIfDone(childId: childId, dailySetId: set.id);
+    await EggService(db: db).noteStageCompleted(childId);
+  }
+
+  /// Xóa dấu đã nhận nhiệm vụ hôm nay (dòng ví có refId nhận nhiệm vụ
+  /// và thưởng "đủ cả 3" của hôm nay) để nhận lại. Công cụ QA nên được
+  /// phép xóa dòng sổ ví (app thường chỉ thêm). Trả số dòng đã xóa.
+  Future<int> clearTodayQuestClaims(String childId) async {
+    final date = db.clock.today();
+    final quests = await QuestService(db: db).questsFor(childId) ?? const [];
+    final refs = <String>[
+      for (final q in quests) QuestService.claimRefId(childId, date, q.id),
+      QuestService.bonusRefId(childId, date),
+    ];
+    return (db.delete(
+      db.walletLedger,
+    )..where((t) => t.childId.equals(childId) & t.refId.isIn(refs))).go();
   }
 
   // ------------------------------------------------------------------

@@ -80,3 +80,15 @@ Bản thử đầu tiên sau khi nạp secrets sẽ dùng tag `v0.0.1`.
 Mỗi PR và mỗi lần push lên `main` đều build sẵn APK debug, tải ở tab
 **Actions** > lần chạy CI > **Artifacts** > `timokid-debug-apk`.
 APK debug chỉ để kiểm thử, không phát hành cho người dùng.
+
+
+## Bản thử và bản chính thức (24/11/2026)
+
+- Tag dạng `v0.0.x` là **bản thử**: workflow build với
+  `--dart-define=TEST_UNLOCKS=true --dart-define=QA_MENU=true`. App mở hết
+  tính năng (không cần xong đề ngày), tặng 10.000 xu + 10.000 kim cương một
+  lần (nạp lại khi dưới 1.000), có menu QA (đặt mốc pet, tua ngày…) và nhãn
+  "BẢN THỬ" ở góc Thị trấn.
+- Từ `v0.2.0` trở đi là bản chính thức: build không cờ, mọi luật như cũ.
+- Cờ nằm ở `app/lib/core/test_build.dart`; mọi chỗ khóa hỏi
+  `TestUnlocks.enabled`.

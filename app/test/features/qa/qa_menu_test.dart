@@ -155,6 +155,8 @@ void main() {
       final gesture = await openMenu(tester);
       final childId = await db.ensureSeeded();
 
+      await tester.ensureVisible(find.byKey(const Key('qa-rung-logic')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('qa-rung-logic')));
       await tester.pumpAndSettle();
       await tester.tap(find.text('4').last);

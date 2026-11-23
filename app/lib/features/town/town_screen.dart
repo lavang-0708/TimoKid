@@ -6,6 +6,7 @@ import '../../core/database/database_provider.dart';
 import '../../core/database/models.dart';
 import '../../core/database/tables.dart';
 import '../../core/widgets/game_ui.dart';
+import '../../core/widgets/test_build_badge.dart';
 import '../arena/arena_lobby_screen.dart';
 import '../building/building_screen.dart';
 import '../character/character_bounce.dart';
@@ -285,6 +286,8 @@ class _TownScreenState extends ConsumerState<TownScreen> {
               ),
             ),
           ),
+          // Bản thử: nhãn nhỏ ở góc dưới-trái (chỉ hiện khi bật cờ).
+          const Positioned(left: 6, bottom: 4, child: TestBuildBadge()),
         ],
       ),
     );
