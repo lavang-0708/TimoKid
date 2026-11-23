@@ -279,6 +279,7 @@ const Map<String, String> petHappyLines = <String, String>{
   'dog': 'Gâu gâu! Chơi với tớ nhé!',
   'cat': 'Meo meo! Tớ vui lắm!',
   'rabbit': 'Nhảy nhảy! Vui quá!',
+  'squirrel': 'Chít chít! Tớ vui lắm!',
 };
 
 /// Câu khi bé chạm vào pet mà phần chơi còn khóa.

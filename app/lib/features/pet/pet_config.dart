@@ -89,7 +89,7 @@ const List<PetShopSpecies> petShopSpecies = <PetShopSpecies>[
 /// không mua được. Khi có hình: thêm PNG `assets/images/pets/` + manifest
 /// rồi đổi cờ loài đó thành `true`.
 const Map<String, bool> newPetArtReady = <String, bool>{
-  'squirrel': false,
+  'squirrel': true,
   'capybara': false,
   'dragon': false,
 };

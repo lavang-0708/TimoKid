@@ -59,7 +59,14 @@ void main() {
       expect(petShopSpeciesById('squirrel')!.rarity, PetRarity.common);
       expect(petShopSpeciesById('capybara')!.rarity, PetRarity.rare);
       expect(petShopSpeciesById('dragon')!.rarity, PetRarity.epic);
-      expect(newPetArtReady.values, everyElement(isFalse));
+      expect(newPetArtReady, {
+        'squirrel': true,
+        'capybara': false,
+        'dragon': false,
+      });
+      expect(isPetSpeciesBuyable('squirrel'), isTrue);
+      expect(isPetSpeciesBuyable('capybara'), isFalse);
+      expect(isPetSpeciesBuyable('dragon'), isFalse);
       expect(petUiArtReady, isFalse);
       final items = shopPetEggItems();
       expect(items.map((i) => i.priceGems), [20, 60, 150]);
@@ -71,12 +78,25 @@ void main() {
     test('cờ hình tắt: Sắp có, không trừ kim cương, không tạo pet', () async {
       await gems(500);
       final shop = ShopService(db: db);
+      for (final species in ['capybara', 'dragon']) {
+        expect(
+          await shop.buyPetEgg(childId: childId, species: species),
+          BuyResult.comingSoon,
+        );
+        expect(await PetService(db: db).owns(childId, species), isFalse);
+      }
+      expect(await gemBalance(), 500);
+    });
+
+    test('cờ mặc định: sóc mua được với 20 kim cương', () async {
+      await gems(100);
+      final shop = ShopService(db: db);
       expect(
         await shop.buyPetEgg(childId: childId, species: 'squirrel'),
-        BuyResult.comingSoon,
+        BuyResult.bought,
       );
-      expect(await gemBalance(), 500);
-      expect(await PetService(db: db).owns(childId, 'squirrel'), isFalse);
+      expect(await gemBalance(), 80);
+      expect(await PetService(db: db).owns(childId, 'squirrel'), isTrue);
     });
 
     test(
@@ -198,7 +218,10 @@ void main() {
       tester,
     ) async {
       await gems(500);
-      await pumpShop(tester);
+      await pumpShop(
+        tester,
+        ready: const {'squirrel': false, 'capybara': false, 'dragon': false},
+      );
       for (final s in ['squirrel', 'capybara', 'dragon']) {
         expect(find.byKey(Key('shop-item-pet_egg_$s')), findsOneWidget);
         expect(find.byKey(Key('shop-soon-pet_egg_$s')), findsOneWidget);
