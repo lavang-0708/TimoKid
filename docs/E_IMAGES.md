@@ -2058,3 +2058,142 @@ Tổng .b64 ~3,85 MB; đích `app/assets/images/pets/`; mỗi lần ≤8 file, m
 restart nhưng đã kiểm trên nhánh: shell_top + adult_happy khớp từng byte),
 `78e630cd` (6 file), `a62542f7` (7 file), 27/27 vòng khứ hồi local khớp từng
 byte. Chưa decode (chờ Claude decode).
+### Lô 12 — Rồng (pet siêu hiếm): trọn bộ 27 file (24/11/2026)
+
+Loài thứ ba và cuối cùng của lô 12 (rồng siêu hiếm — sóc < capybara < rồng).
+4 tấm xem trước đã duyệt kiểu v2 (trứng + newborn/teen/adult đứng, 23/11 ~22:57)
+**dùng lại nguyên bản, không vẽ lại**; vẽ mới 5 vỏ trứng + 18 khung chuyển động
+(happy/sit/walk_a..d × newborn/teen/adult). 27 file vào
+`app/assets/images/pets/`, 512×512, PNG trong suốt, alpha sạch (semi 0, 0 px
+magenta thước chuẩn R>200/G<80/B>200 — còn 13 px dark-magenta thước nới
+R>140/G<60/B>140 là nét viền tím sẫm của artwork, xem mục "Điểm chưa chắc"),
+quantize 256 màu MAXCOVERAGE + Floyd–Steinberg. Vẽ từ 4 ảnh đứng rồng đã duyệt
+(giữ đúng nhận dạng: vảy pastel mint + bụng kem + sừng vàng-kem mềm tròn + cánh
+trong mờ mint-hồng + đốm vàng lấp lánh + mắt tím-xanh sẫm + vòng cổ vàng mỏng +
+mặt gem hình sao pastel ở cả 3 giai đoạn, KHÔNG khăn len cổ); walk nhìn nghiêng
+3/4 quay PHẢI, chân luân phiên, chân y=439; happy nhấc 40 px (đáy y=399); sit
+chân y=439; newborn đi KHÔNG vỏ (đã nở, như bản sửa chó newborn lô 8B-fix).
+Tổng PNG 3.955.938 B (~5,27 MB .b64).
+
+#### Bảng 27 file
+
+| file | byte | bbox (x0, y0, x1, y1) | đất y | SHA-256 (12 ký tự đầu) | lần vẽ |
+|---|---|---|---|---|---|
+| dragon_adult.png | 146872 | 54, 40, 457, 439 | 439 | 7eaaa6e9028c | 1 |
+| dragon_adult_happy.png | 142561 | 43, 8, 468, 399 | 399 | 44e4e70bde1b | 2 |
+| dragon_adult_sit.png | 156689 | 76, 40, 434, 439 | 439 | 41a64dbd4257 | 1 |
+| dragon_adult_walk_a.png | 150448 | 50, 40, 460, 439 | 439 | b39bf247c61d | 1 |
+| dragon_adult_walk_b.png | 130495 | 89, 40, 421, 439 | 439 | 48f2c4cfedc0 | 1 |
+| dragon_adult_walk_c.png | 123279 | 88, 40, 423, 439 | 439 | 210a1f80068b | 1 |
+| dragon_adult_walk_d.png | 134037 | 54, 40, 456, 439 | 439 | 55cc4d8f2db4 | 1 |
+| dragon_egg.png | 158795 | 88, 40, 422, 439 | 439 | e5e9b498f3d0 | 1 |
+| dragon_egg_crack_1.png | 139879 | 97, 40, 414, 439 | 439 | d020bed85e79 | 1 |
+| dragon_egg_crack_2.png | 147397 | 109, 40, 402, 439 | 439 | 160d6aac3b34 | 2 |
+| dragon_egg_crack_3.png | 181947 | 43, 40, 468, 439 | 439 | ca021a90bc25 | 1 |
+| dragon_newborn.png | 142755 | 102, 40, 409, 439 | 439 | 7b769fbd889a | 1 |
+| dragon_newborn_happy.png | 143995 | 45, 8, 465, 399 | 399 | 454cb1b2422a | 2 |
+| dragon_newborn_sit.png | 154701 | 75, 40, 436, 439 | 439 | 3c2631d857cd | 1 |
+| dragon_newborn_walk_a.png | 144509 | 70, 40, 440, 439 | 439 | face9044cc61 | 1 |
+| dragon_newborn_walk_b.png | 162500 | 77, 40, 434, 439 | 439 | 2556f9ed6ccd | 1 |
+| dragon_newborn_walk_c.png | 160411 | 58, 40, 453, 439 | 439 | 28bbfbce8283 | 1 |
+| dragon_newborn_walk_d.png | 150906 | 77, 40, 433, 439 | 439 | 8095bd4db8b5 | 1 |
+| dragon_shell_bottom.png | 111861 | 102, 106, 407, 439 | 439 | f5c9272e61ae | 1 |
+| dragon_shell_top.png | 123027 | 102, 60, 407, 360 | 360 | 0bbf8755ad30 | 2 |
+| dragon_teen.png | 149180 | 78, 40, 433, 439 | 439 | 8defa0decd34 | 1 |
+| dragon_teen_happy.png | 151152 | 34, 8, 476, 399 | 399 | 632f45421e36 | 1 |
+| dragon_teen_sit.png | 162326 | 68, 40, 443, 439 | 439 | c04600c35d35 | 1 |
+| dragon_teen_walk_a.png | 144614 | 73, 40, 438, 439 | 439 | d1eaa0dfbafc | 1 |
+| dragon_teen_walk_b.png | 143934 | 83, 40, 428, 439 | 439 | ca44b1bbccb6 | 1 |
+| dragon_teen_walk_c.png | 151671 | 81, 40, 430, 439 | 439 | 54d8e7b6cec3 | 1 |
+| dragon_teen_walk_d.png | 145997 | 85, 40, 425, 439 | 439 | 81294fcceaaf | 1 |
+
+#### Mốc đo (đo bằng code từ ảnh thật)
+
+- Trứng kín: crack_1 bbox (97, 40, 414, 439), rộng 318 px, tâm x=255.
+- Vỏ nứt tăng dần: dark-px (R<100/G<80/B<60) crack_1 = 224 → crack_2 = 3.476 →
+  crack_3 = 1.390; crack_1 chỉ vài vết nứt mảnh ở đỉnh, crack_2 nứt zigzag đậm
+  khắp nửa trên + chỏm vảy mint thò ra ở đỉnh, crack_3 nứt rộng thấy đầu rồng
+  (sừng vàng + cánh) + 2 chân trước + mảnh vỏ bay (dark-px giảm ở 2→3 vì khe
+  nứt rộng là khoảng trống trong suốt, không phải vạch tối — mức tăng đọc bằng mắt).
+- Vỏ rời: shell_top (102, 60, 407, 360), rộng 306, cao 301; shell_bottom (102,
+  106, 407, 439), rộng 306, cao 334, đáy y=439. Khớp trứng kín crack_1: cùng tâm
+  x=255, rộng kém 12 px, chồng 2 nửa lên nhau vẽ đúng viền trứng kín (IoU 0,9204,
+  sóc 0,9326, capybara 0,9298); chồng nhau 254 px (sóc 107 px) do nắp sâu hơn.
+- Happy nhấc 40 px cả 3 giai đoạn (newborn/teen/adult đáy y=399, đỉnh y=8);
+  mắt nhắm cười + 2 chân trước giơ lên + cánh xoè nhẹ, newborn happy vẫn ngồi
+  trong nửa vỏ dưới như ảnh đứng.
+- Chu kỳ đi: a/c đối chân, b/d bước giữa; chân y=439; quay PHẢI; cánh khép theo
+  thân khi đi, không che thân. Màu vảy mint khung đi so với ảnh đứng (median
+  G−B): newborn +3/−1/+2/+8, teen +1/+1/+10/+7, adult +4/−5/−4/−5 — lệch lớn
+  nhất +10, trong ngưỡng ±15, không vẽ lại, không chỉnh màu bằng code.
+
+#### Cách làm
+
+- Vẽ từng tấm bằng media generation trên nền magenta #FF00FF, lấy ảnh đứng cùng
+  giai đoạn làm tham chiếu. Tổng 31 lần gọi (27 file lần đầu + 4 vẽ lại:
+  crack_2, shell_top, newborn_happy, adult_happy).
+- Tách nền + quantize bằng code (`lot12/work/dragon/process_dragon.py`, tái dùng
+  tách nền `process_v2.py`: key median góc + flood-fill nền từ biên qua pixel
+  magenta-hued, KHÔNG `binary_fill_holes`; m2/m3 chỉ trong 3 px quanh magenta
+  thật; rim-recolor; quantize 256 màu MAXCOVERAGE + Floyd–Steinberg). Happy
+  scale cao 392 px đặt y=8; vỏ scale theo rộng 306 px, tâm x=255, nắp neo y=60,
+  bát neo đáy y=439. Raw shell_top vẽ cả 2 nửa trong 1 khung → tách bằng
+  connected components, giữ nửa trên (không vẽ lại).
+- Sửa tàn dư magenta sau quantize: 31 px rim-bleed (5 px thước chuẩn + 26 px
+  thước nới, đều ở mép cánh/viền, edge_d ≤ 2,2) — tô màu palette an toàn gần
+  nhất (median pixel lân cận không-magenta, cửa sổ 7×7), KHÔNG thêm màu mới;
+  kiểm lại bằng zoom 3×–6× không vết lạ; bản gốc giữ trong `raw_fix_backup/`.
+
+#### Kiểm chứng
+
+- Đo bằng code ĐẠT 27/27: 512×512, semi 0, magenta thước chuẩn 0, ≤256 màu; thân
+  cao 400 px (y 40→439), đất y=439; happy cao 392 px, đáy y=399. Còn 13 px
+  dark-magenta thước nới là nét viền tím sẫm của artwork (xem "Điểm chưa chắc").
+- Soi bằng mắt trên nền tối (60,60,80) + nền phòng v3b ở cỡ app (newborn 40% /
+  teen 58% / adult 72% chiều cao bé 360 px) + phóng 3×–6× viền mặt/mắt/cánh/
+  chân: không lỗ alpha, không mép thẳng, không tàn dư magenta thấy được; vòng
+  cổ + gem sao + cánh + sừng ở MỌI khung; cánh trong mờ vẫn đọc được, không bị ăn mất.
+- Lỗ trong suốt kín lớn nhất: adult_walk_a 2.290 px (khe giữa đuôi cuộn và chân
+  sau, x85–156/y349–400), newborn_walk_c 713 px (khe cánh–thân), dragon_egg
+  538 px (khe đuôi–vỏ) — khe hở tự nhiên giữa các bộ phận, không phải lỗ thân.
+- 4 file xem trước đối chiếu SHA-256 khớp nguyên bản (egg `e5e9b498f3d0…`,
+  newborn `7b769fbd889a…`, teen `8defa0decd34…`, adult `7eaaa6e9028c…`).
+
+#### Điểm chưa chắc — nói thẳng
+
+1. Dark-magenta thước nới còn 13 px, đều là nét viền tím sẫm của artwork (đã
+   kiểm bằng zoom 3×–6×): dragon_newborn.png (file xem trước đã duyệt, KHÔNG
+   sửa) 7 px; newborn_happy 4 px đường mi mắt nhắm (sâu trong mặt, edge_d
+   12,8–16,3); teen_happy 2 px viền cánh (304–305, 189–190). Thước chuẩn = 0.
+   Tiền lệ: trứng capybara có 4 px dark-magenta giữ nguyên.
+2. shell_top sâu hơn sóc (đáy y=360, chồng lấn 254 px vs sóc 107 px); IoU
+   0,9204 vẫn ngang sóc/capybara. Nếu app dùng làm "nắp" nhấc lên thì nắp này
+   sâu hơn hẳn.
+3. Dark-px nứt bão hoà crack_2→crack_3 (3.476→1.390) — mức tăng đọc bằng mắt,
+   không đọc bằng số này.
+4. crack_1 và crack_3 có viền trắng mỏng quanh trứng (kiểu sticker) — cùng
+   pipeline với các lô trước.
+5. crack_3: đuôi rồng thò ra bên phải + thân trứng nhỏ lại tương đối (bbox rộng
+   426 do mảnh vỏ bay) — giống bản xem trước gốc cũng có đuôi.
+6. Adult happy v2: đuôi cong sang phải (v1 cong trái), gem sao xanh-hồng pastel
+   thay vì hồng — vẫn là gem hình sao pastel, giữ.
+7. Teen happy còn 2–3 chấm glitter vàng li ti trôi nổi sát cánh (tàn dư sparkle
+   của raw) — nhìn như glitter cố ý.
+8. Đối chân a/c chỉ gần đúng (AI vẽ), như lô 8B/sóc/capybara; newborn a/c khác
+   biệt tinh tế ở góc 3/4.
+9. Teen→adult phân biệt bằng kích thước + cánh/đuôi lớn hơn, như sóc/capybara;
+   newborn walk_a vảy mint tối hơn ảnh đứng nhưng cùng tông (G−B +3).
+
+#### Kế hoạch đẩy (4 lần .b64, CHỈ NHÁP — parent đẩy)
+
+- Đợt 1 (7 file, PNG 1012523 B, .b64 ~1350031 B): adult_walk_b.png, egg_crack_3.png, newborn.png, shell_bottom.png, teen.png, teen_walk_a.png, teen_walk_c.png
+- Đợt 2 (7 file, PNG 1023165 B, .b64 ~1364220 B): egg_crack_1.png, egg_crack_2.png, newborn_sit.png, newborn_walk_a.png, newborn_walk_b.png, shell_top.png, teen_happy.png
+- Đợt 3 (6 file, PNG 902474 B, .b64 ~1203299 B): adult_happy.png, adult_sit.png, newborn_happy.png, newborn_walk_d.png, teen_sit.png, teen_walk_d.png
+- Đợt 4 (7 file, PNG 1017776 B, .b64 ~1357035 B): adult.png, adult_walk_a.png, adult_walk_c.png, adult_walk_d.png, egg.png, newborn_walk_c.png, teen_walk_b.png
+Tổng .b64 ~5,27 MB; đích `app/assets/images/pets/`; mỗi lần ≤8 file, mỗi file
+.b64 <1.217.688 B. Mục này do parent gộp vào `docs/E_IMAGES.md` cùng đợt đẩy
+(xem cuối mục); Claude decode + kiểm bằng git (đối chiếu blob SHA) sau đó.
+
+Đã đẩy 4 lần .b64 (24/11/2026): `59ed0830` (7 file), `80b55fa7` (7 file),
+`e3ab1c92` (6 file), `7f453960` (7 file), 27/27 vòng khứ hồi local khớp từng
+byte. Chưa decode (chờ Claude decode).

@@ -62,11 +62,11 @@ void main() {
       expect(newPetArtReady, {
         'squirrel': true,
         'capybara': true,
-        'dragon': false,
+        'dragon': true,
       });
       expect(isPetSpeciesBuyable('squirrel'), isTrue);
       expect(isPetSpeciesBuyable('capybara'), isTrue);
-      expect(isPetSpeciesBuyable('dragon'), isFalse);
+      expect(isPetSpeciesBuyable('dragon'), isTrue);
       expect(petUiArtReady, isFalse);
       final items = shopPetEggItems();
       expect(items.map((i) => i.priceGems), [20, 60, 150]);
@@ -77,7 +77,14 @@ void main() {
   group('ShopService.buyPetEgg', () {
     test('cờ hình tắt: Sắp có, không trừ kim cương, không tạo pet', () async {
       await gems(500);
-      final shop = ShopService(db: db);
+      final shop = ShopService(
+        db: db,
+        petArtReady: const {
+          'squirrel': true,
+          'capybara': true,
+          'dragon': false,
+        },
+      );
       expect(
         await shop.buyPetEgg(childId: childId, species: 'dragon'),
         BuyResult.comingSoon,

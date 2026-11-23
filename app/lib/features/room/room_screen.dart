@@ -759,7 +759,9 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       return;
     }
     final dir = _petFacingLeft ? -1.0 : 1.0;
-    final box = petBoxSize(_petStage) * roomDepthScale(_petFeet.dy);
+    final box =
+        petBoxSize(_petStage, species: _eggSpecies) *
+        roomDepthScale(_petFeet.dy);
     final at = Offset(
       (_petFeet.dx + dir * box * 0.6).clamp(30.0, roomFrameWidth - 30),
       _petFeet.dy + 4,
@@ -1610,7 +1612,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
           final kidBoxH = kidFrameHeight * 360 / kidBodyHeight * kidScale;
           final kidBoxW = kidBoxH * kidFrameWidth / kidFrameHeight;
           final petScale = roomDepthScale(_petFeet.dy);
-          final petBox = petBoxSize(_petStage) * petScale;
+          final petBox = petBoxSize(_petStage, species: _eggSpecies) * petScale;
           final shopFurniture = _shopFurniture;
           final actors = <(double, List<Widget>)>[
             // Nội thất mua đặt trên sàn: xếp theo chân y như nhân vật/pet.

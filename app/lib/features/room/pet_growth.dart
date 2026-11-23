@@ -34,7 +34,12 @@ const Map<PetStage, String> petStageNames = <PetStage, String>{
 
 /// Cạnh hộp pet (px khung Phòng) theo giai đoạn: thân cao
 /// 360 × tỉ lệ, ảnh 512 có thân 400 px.
-double petBoxSize(PetStage stage) => 360 * petHeightRatio[stage]! * 512 / 400;
+/// Hệ số cỡ riêng theo loài (chủ dự án 24/11: rồng siêu hiếm to hơn
+/// các pet khác một chút). Loài không có trong bảng: 1.
+const Map<String, double> petSpeciesScale = <String, double>{'dragon': 1.15};
+
+double petBoxSize(PetStage stage, {String? species}) =>
+    360 * petHeightRatio[stage]! * 512 / 400 * (petSpeciesScale[species] ?? 1);
 
 /// Đường dẫn ảnh pet theo loài + giai đoạn.
 String petAsset(String species, PetStage stage) =>
