@@ -4,7 +4,9 @@ import 'package:integration_test/integration_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:timokid/core/animation/animation_gate.dart';
 import 'package:timokid/core/database/database_provider.dart';
+import 'package:timokid/features/daily_set/daily_set_config.dart';
 import 'package:timokid/features/math/math_session.dart';
+import 'package:timokid/features/town/town_assets.dart';
 import 'package:timokid/main.dart' as app;
 
 /// Integration test: mở app thật trên máy ảo, đi hết màn mở đầu nữ
@@ -152,6 +154,15 @@ void main() {
     await tester.tapAt(Offset(r0.center.dx, r0.bottom - r0.height * 0.15));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('building-screen')), findsOneWidget);
+    // Tòa nhà nào đã mở (chạm khu trên máy ảo nhỏ có thể trúng khu kề):
+    // đọc tên tòa để lấy đúng 5 câu của chặng đó. Trước đây test luôn
+    // lấy 5 câu chặng 0 nên khi mở nhầm tòa khác, đáp án lệch → hỏng
+    // ngẫu nhiên ở 'math-correct' (CI 24/11).
+    final title = tester
+        .widget<Text>(find.byKey(const Key('building-title')))
+        .data;
+    final stage = townAreas.indexWhere((a) => a.name == title);
+    expect(stage, isNonNegative, reason: 'Không nhận ra tòa "$title"');
     await tapVisible(const Key('building-challenge-button'));
     expect(find.byKey(const Key('math-screen')), findsOneWidget);
 
@@ -170,7 +181,10 @@ void main() {
     final set = await db.dailySetsDao.getDailySet(childId, db.clock.today());
     final resolved = db.dailySetsDao
         .readQuestions(set!)
-        .sublist(0, 5)
+        .sublist(
+          stage * DailySetConfig.questionsPerStage,
+          (stage + 1) * DailySetConfig.questionsPerStage,
+        )
         .map(ResolvedQuestion.resolve)
         .toList();
 
