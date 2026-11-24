@@ -627,24 +627,45 @@ class _DragonPetViewState extends State<DragonPetView>
 
     Widget flip(Widget w) =>
         widget.facingLeft ? Transform.flip(flipX: true, child: w) : w;
-    Widget frame(String path) => flip(
-      Image.asset(
+    Widget frame(String path, {double shiftX = 0, double scale = 1}) {
+      Widget img = Image.asset(
         path,
         fit: BoxFit.contain,
         gaplessPlayback: true,
         errorBuilder: (_, _, _) => const SizedBox.shrink(),
-      ),
-    );
+      );
+      // Bù lệch/cỡ theo số đo của Muse (khung 512).
+      if (shiftX != 0) {
+        img = FractionalTranslation(
+          translation: Offset(shiftX / 512, 0),
+          child: img,
+        );
+      }
+      if (scale != 1) {
+        img = Transform.scale(
+          scale: scale,
+          alignment: Alignment.bottomCenter,
+          child: img,
+        );
+      }
+      return flip(img);
+    }
 
     // Thân: hình thật khi có (phun/bay) còn không thì ảnh đứng của pet.
     Widget body;
     if (art && breathing) {
       final ms = (_action.value * _action.duration!.inMilliseconds).round();
       final assets = dragonFxAssets(running!);
-      body = frame(assets[dragonFxArtFrameAt(ms)]);
+      body = frame(
+        assets[dragonFxArtFrameAt(ms)],
+        shiftX: running == DragonAction.fire ? dragonFireArtShiftX : 0,
+      );
     } else if (art && airborne) {
       final assets = dragonFxAssets(DragonAction.fly);
-      body = frame(assets[(_loop.value * 8).floor() % 4]);
+      body = frame(
+        assets[(_loop.value * 8).floor() % 4],
+        scale: dragonFlyArtScale,
+      );
     } else {
       body = PetSprite(
         species: dragonSpecies,

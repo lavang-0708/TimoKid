@@ -19,6 +19,7 @@ import 'package:timokid/features/daily_set/daily_set_service.dart';
 import 'package:timokid/features/ladder/ladder_service.dart';
 import 'package:timokid/features/onboarding/egg_service.dart';
 import 'package:timokid/features/onboarding/onboarding_service.dart';
+import 'package:timokid/features/pet/dragon_fx.dart';
 import 'package:timokid/features/pet/dragon_fx_config.dart';
 import 'package:timokid/features/pet/pet_config.dart';
 import 'package:timokid/features/room/pet_growth.dart';
@@ -131,7 +132,8 @@ void main() {
     for (final k in menuKeys) {
       expect(find.byKey(k), findsOneWidget);
     }
-    expect(find.byKey(const Key('dragon-aura-code')), findsOneWidget);
+    // Lô 12B đã về: rồng dùng hào quang vẽ tay.
+    expect(find.byKey(const Key('dragon-aura-art')), findsOneWidget);
     await tester.tapAt(const Offset(60, 330)); // sàn
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('dragon-fx-menu')), findsNothing);
@@ -174,8 +176,9 @@ void main() {
     await tester.tap(find.byKey(const Key('dragon-fx-fire')));
     await advance(tester, 400);
     expect(find.byKey(const Key('dragon-fx-running-fire')), findsOneWidget);
-    expect(find.byKey(const Key('dragon-breath-fire')), findsOneWidget);
-    await advance(tester, dragonFireMs + 300);
+    // Rồng trưởng thành phun bằng 4 khung vẽ tay (không còn hạt code).
+    expect(find.byKey(const Key('dragon-breath-fire')), findsNothing);
+    await advance(tester, dragonFxArtTotalMs + 300);
     expect(find.byKey(const Key('dragon-fx-running-fire')), findsNothing);
 
     // Không chọn gì: tự ẩn sau dragonMenuHideMs.

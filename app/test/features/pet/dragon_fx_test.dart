@@ -46,8 +46,10 @@ void main() {
     });
 
     test('cờ hình quyết định dùng hình thật (chỉ trưởng thành)', () {
-      expect(dragonFxArtReady, isFalse);
-      expect(dragonUsesArt(PetStage.adult), isFalse);
+      // Lô 12B đã về (24/11): cờ bật.
+      expect(dragonFxArtReady, isTrue);
+      expect(dragonUsesArt(PetStage.adult), isTrue);
+      expect(dragonUsesArt(PetStage.adult, artReady: false), isFalse);
       expect(dragonUsesArt(PetStage.adult, artReady: true), isTrue);
       expect(dragonUsesArt(PetStage.teen, artReady: true), isFalse);
       expect(
@@ -81,8 +83,14 @@ void main() {
     });
 
     test('thời gian hành động theo giai đoạn', () {
-      expect(dragonActionMs(DragonAction.fire, PetStage.adult), dragonFireMs);
-      expect(dragonActionMs(DragonAction.water, PetStage.adult), dragonWaterMs);
+      expect(
+        dragonActionMs(DragonAction.fire, PetStage.adult, artReady: false),
+        dragonFireMs,
+      );
+      expect(
+        dragonActionMs(DragonAction.water, PetStage.adult, artReady: false),
+        dragonWaterMs,
+      );
       expect(dragonActionMs(DragonAction.fire, PetStage.teen), dragonSmallMs);
       expect(dragonActionMs(DragonAction.fly, PetStage.newborn), dragonHopMs);
       expect(
@@ -161,14 +169,20 @@ void main() {
             findsOneWidget,
           );
           if (a == DragonAction.fly) {
-            await _advance(tester, dragonActionMs(a, stage) ~/ 2);
+            await _advance(
+              tester,
+              dragonActionMs(a, stage, artReady: false) ~/ 2,
+            );
             expect(c.lift.value, greaterThan(0));
             expect(find.byKey(const Key('dragon-flutter')), findsOneWidget);
           } else {
             await _advance(tester, 300);
             expect(find.byKey(Key('dragon-breath-${a.name}')), findsOneWidget);
           }
-          await _advance(tester, dragonActionMs(a, stage) + 200);
+          await _advance(
+            tester,
+            dragonActionMs(a, stage, artReady: false) + 200,
+          );
           expect(c.busy, isFalse);
           expect(c.lift.value, 0);
           expect(find.byKey(Key('dragon-fx-running-${a.name}')), findsNothing);
@@ -285,7 +299,7 @@ void main() {
           home: SizedBox(
             width: 200,
             height: 200,
-            child: DragonAura(child: SizedBox()),
+            child: DragonAura(artReady: false, child: SizedBox()),
           ),
         ),
       );
