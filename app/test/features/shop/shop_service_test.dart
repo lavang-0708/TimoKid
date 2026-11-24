@@ -11,6 +11,7 @@ import 'package:timokid/core/database/tables.dart';
 import 'package:timokid/features/character/kid_look_service.dart';
 import 'package:timokid/features/onboarding/onboarding_model.dart';
 import 'package:timokid/features/onboarding/onboarding_service.dart';
+import 'package:timokid/features/character/kid_assets.dart';
 import 'package:timokid/features/shop/shop_catalog.dart';
 import 'package:timokid/features/shop/shop_service.dart';
 
@@ -42,13 +43,13 @@ void main() {
 
   group('danh mục', () {
     test(
-      'mỗi dáng có bộ đồ để mua (3 cơ bản + bộ 04–07) + 5 phụ kiện đúng giá',
+      'mỗi dáng có bộ đồ để mua (3 cơ bản + bộ 04–08) + 5 phụ kiện đúng giá',
       () {
         for (final g in ['girl', 'boy']) {
           final items = shopItemsFor(g);
           expect(
             items.where((i) => i.category == ShopCategory.outfits),
-            hasLength(7),
+            hasLength(kidBasicOutfitCount + kidPremiumOutfitsDrawn),
           );
           expect(
             items.firstWhere((i) => i.id == glassesItemId).priceXu,
@@ -62,7 +63,7 @@ void main() {
             items
                 .where((i) => i.kind == ShopItemKind.outfit)
                 .map((i) => i.priceXu),
-            [80, 80, 80, 150, 300, 600, 0],
+            [80, 80, 80, 150, 300, 600, 0, 200],
           );
         }
       },

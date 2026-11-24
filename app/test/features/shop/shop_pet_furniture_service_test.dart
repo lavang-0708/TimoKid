@@ -204,13 +204,15 @@ void main() {
   });
 
   group('bộ đồ cao cấp (xu hoặc kim cương)', () {
-    test('có đủ hình bộ 04–07: bán 7 bộ', () async {
+    test('có đủ hình bộ 04–08: bán 8 bộ', () async {
       expect(premiumOutfitsArtReady, isFalse);
-      expect(kidPremiumOutfitsDrawn, 4);
+      expect(kidPremiumOutfitsDrawn, 5); // lô 14: thêm bộ 08
       expect(
         shopItemsFor('girl').where((i) => i.category == ShopCategory.outfits),
-        hasLength(7),
+        hasLength(8),
       );
+      expect(kidOutfitNumber('girl_top_08'), 8);
+      expect(kidOutfitNumber('girl_top_09'), 1); // 09 chưa có hình
       expect(kidOutfitNumber('girl_top_04'), 4);
       expect(kidOutfitNumber('girl_top_05'), 5);
       expect(kidOutfitNumber('girl_top_06'), 6);
@@ -228,14 +230,27 @@ void main() {
           g,
           premiumOutfitsReady: true,
         ).where((i) => i.category == ShopCategory.outfits).toList();
-        expect(outfits, hasLength(7));
-        expect(outfits.map((i) => i.priceXu), [80, 80, 80, 150, 300, 600, 0]);
-        expect(outfits.map((i) => i.priceGems), [0, 0, 0, 0, 0, 0, 30]);
+        // Lô 14 (24/11): thêm 08–11 khi đủ hình.
+        expect(outfits, hasLength(11));
+        expect(outfits.map((i) => i.priceXu), [
+          80, 80, 80, 150, 300, 600, 0, 200, 450, 800, 0, //
+        ]);
+        expect(outfits.map((i) => i.priceGems), [
+          0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 50, //
+        ]);
+        expect(outfits[6].usesGems, isTrue);
         expect(outfits.last.usesGems, isTrue);
         expect(outfits.last.currency, Currency.gem);
         expect(outfits.first.currency, Currency.xu);
       }
       expect(kidOutfitNumber('boy_outfit_07', premiumReady: true), 7);
+      expect(kidOutfitNumber('boy_outfit_11', premiumReady: true), 11);
+      // Tên file 2 chữ số.
+      expect(kidFullAsset('girl', 11), endsWith('girl_full_11.png'));
+      expect(
+        kidFullAsset('boy', 8, wave: true),
+        endsWith('boy_full_08_wave.png'),
+      );
     });
 
     test('mua bộ 04 bằng xu: trừ đúng 150 xu, không đụng kim cương', () async {
@@ -309,7 +324,7 @@ void main() {
   group('kid_assets mở rộng 7 bộ', () {
     test('bộ 1–3 không đổi; tên đủ 14 mã', () {
       expect(kidOutfitIds['girl'], hasLength(3));
-      expect(kidAllOutfitIds['girl'], hasLength(7));
+      expect(kidAllOutfitIds['girl'], hasLength(11)); // lô 14: 08–11
       expect(kidAllOutfitIds['boy']!.first, 'boy_outfit_01');
       for (final g in ['girl', 'boy']) {
         for (final id in kidAllOutfitIds[g]!) {
