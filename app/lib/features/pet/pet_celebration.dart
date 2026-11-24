@@ -72,6 +72,32 @@ class _PetGrowCelebrationState extends State<PetGrowCelebration>
       color: const Color(0xCC2A1B4D),
       child: Stack(
         children: [
+          // Pháo giấy + tia sáng vẽ tay (Muse lô 13), xoay chậm + phóng
+          // nhẹ theo hiệu ứng; dưới lớp hạt vẽ bằng code.
+          if (petUiArtReady)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: AnimatedBuilder(
+                  animation: _ctl,
+                  builder: (context, child) {
+                    final t = AnimationGate.enabled ? _ctl.value : 1.0;
+                    return Opacity(
+                      opacity: (t * 3).clamp(0.0, 1.0),
+                      child: Transform.scale(
+                        scale: 0.85 + 0.25 * t,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: Image.asset(
+                    petCelebrateBurstAsset,
+                    key: const Key('pet-celebration-burst'),
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                  ),
+                ),
+              ),
+            ),
           Positioned.fill(
             child: IgnorePointer(
               child: AnimatedBuilder(

@@ -96,7 +96,7 @@ const Map<String, bool> newPetArtReady = <String, bool>{
 
 /// Đã có hình emote (đói/buồn/vui) + suất ăn (Muse lô 13) chưa.
 /// `false` → dùng icon Material/emoji vẽ code.
-const bool petUiArtReady = false;
+const bool petUiArtReady = true;
 
 /// Tên hiển thị của mọi loài (khởi đầu + mua).
 const Map<String, String> petSpeciesDisplayNames = <String, String>{
@@ -137,6 +137,9 @@ String petDisplayName(String species) =>
 /// và `ui_pet_meal` ở `assets/images/ui/`.
 String petEmoteAsset(String mood) => 'assets/images/ui/ui_emote_$mood.png';
 const String petMealAsset = 'assets/images/ui/ui_pet_meal.png';
+
+/// Pháo giấy + tia sáng cho màn chúc mừng pet lớn (Muse lô 13).
+const String petCelebrateBurstAsset = 'assets/images/ui/ui_celebrate_burst.png';
 
 /// Ảnh trứng của [species] (loài mới theo đúng quy ước tên file).
 String petEggAsset(String species) => 'assets/images/pets/${species}_egg.png';

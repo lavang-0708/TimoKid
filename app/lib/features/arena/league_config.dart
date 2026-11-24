@@ -7,7 +7,7 @@ library;
 /// Cờ nghệ thuật: false thì dùng icon Material cho huy hiệu hạng và rương;
 /// true thì dùng ảnh `ui_league_<mã>.png`, `ui_chest_<mã>.png` khi họa sĩ
 /// vẽ xong và ảnh được thêm vào `assets/images/ui/` (+ manifest).
-const bool leagueArtReady = false;
+const bool leagueArtReady = true;
 
 /// Tiền tố khóa `settings` đánh dấu đã nhận rương tuần; đầy đủ là
 /// `arena_week_claimed.<yyyy-mm-dd của thứ Hai>` (theo bé).

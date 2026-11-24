@@ -67,7 +67,7 @@ void main() {
       expect(isPetSpeciesBuyable('squirrel'), isTrue);
       expect(isPetSpeciesBuyable('capybara'), isTrue);
       expect(isPetSpeciesBuyable('dragon'), isTrue);
-      expect(petUiArtReady, isFalse);
+      expect(petUiArtReady, isTrue); // lô 13 đã về (24/11)
       final items = shopPetEggItems();
       expect(items.map((i) => i.priceGems), [20, 60, 150]);
       expect(items.every((i) => i.usesGems), isTrue);

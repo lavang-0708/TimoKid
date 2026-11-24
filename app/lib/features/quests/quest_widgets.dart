@@ -261,7 +261,12 @@ class _QuestBoardDialogState extends ConsumerState<QuestBoardDialog> {
           const SizedBox(width: 8),
           if (s.claimed)
             questArtReady
-                ? Image.asset(QuestConfig.checkAsset, width: 32, height: 32)
+                ? Image.asset(
+                    QuestConfig.checkAsset,
+                    key: const Key('quest-claimed'),
+                    width: 32,
+                    height: 32,
+                  )
                 : const Icon(
                     Icons.check_circle_rounded,
                     key: Key('quest-claimed'),
