@@ -15,6 +15,7 @@
 /// transaction, không bao giờ xuống dưới 0.
 library;
 
+import '../room/room_themes.dart';
 import '../../core/database/app_database.dart';
 import '../../core/database/tables.dart' show Currency;
 import '../character/kid_assets.dart';
@@ -64,7 +65,11 @@ class ShopService {
     this.furnitureReady = furnitureShopArtReady,
     this.premiumOutfitsReady = premiumOutfitsArtReady,
     this.petArtReady = newPetArtReady,
+    this.roomThemesReady = roomThemeArtReady,
   });
+
+  /// Cờ hình phòng chủ đề; mặc định theo [roomThemeArtReady], chỉ test đổi.
+  final Map<String, bool> roomThemesReady;
 
   final AppDatabase db;
 
@@ -143,6 +148,7 @@ class ShopService {
       itemId,
       furnitureReady: furnitureReady,
       premiumOutfitsReady: premiumOutfitsReady,
+      roomThemesReady: roomThemesReady,
     );
     if (item == null) return BuyResult.unknownItem;
     return db.transaction(() async {

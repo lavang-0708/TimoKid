@@ -12,6 +12,7 @@
 /// Không có hộp quà may rủi, không mua bằng tiền thật (PLAN T2-06).
 library;
 
+import '../room/room_themes.dart';
 import '../../core/database/tables.dart';
 import '../character/kid_assets.dart';
 import '../pet/pet_config.dart';
@@ -97,6 +98,9 @@ enum ShopItemKind {
 
   /// Trứng pet mua bằng kim cương (D).
   petEgg,
+
+  /// Phòng chủ đề (lô 15): đổi cả nền phòng + kiểu 8 món nội thất.
+  roomTheme,
 }
 
 class ShopItem {
@@ -208,6 +212,7 @@ List<ShopItem> shopItemsFor(
   String gender, {
   bool furnitureReady = furnitureShopArtReady,
   bool premiumOutfitsReady = premiumOutfitsArtReady,
+  Map<String, bool> roomThemesReady = roomThemeArtReady,
 }) {
   final g = kidGender(gender);
   final heads = kidHeadAccessories[g]!;
@@ -283,6 +288,19 @@ List<ShopItem> shopItemsFor(
           priceXu: e.value.$2,
           asset: shopFurnitureAsset(e.key),
         ),
+    // Phòng chủ đề (lô 15): chỉ bán chủ đề đã có hình.
+    for (final t in roomThemes)
+      if (isRoomThemeReady(t.id, ready: roomThemesReady))
+        ShopItem(
+          id: roomThemeItemId(t.id),
+          category: ShopCategory.furniture,
+          kind: ShopItemKind.roomTheme,
+          name: t.name,
+          priceXu: t.priceXu,
+          priceGems: t.priceGems,
+          asset: roomThemeBackground(t.id),
+          rarity: t.rarity,
+        ),
   ];
 }
 
@@ -293,11 +311,13 @@ ShopItem? shopItemById(
   String itemId, {
   bool furnitureReady = furnitureShopArtReady,
   bool premiumOutfitsReady = premiumOutfitsArtReady,
+  Map<String, bool> roomThemesReady = roomThemeArtReady,
 }) {
   for (final item in shopItemsFor(
     gender,
     furnitureReady: furnitureReady,
     premiumOutfitsReady: premiumOutfitsReady,
+    roomThemesReady: roomThemesReady,
   )) {
     if (item.id == itemId) return item;
   }
