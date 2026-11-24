@@ -71,4 +71,26 @@ void main() {
       expect(find.byKey(const Key('next-screen')), findsOneWidget);
     },
   );
+
+  testWidgets('máy tính bảng ngang: ảnh nền phủ kín cả bề ngang (24/11)', (
+    tester,
+  ) async {
+    AnimationGate.enabled = true;
+    addTearDown(() => AnimationGate.enabled = false);
+    tester.view.physicalSize = const Size(1920, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router()));
+    await tester.pump();
+    final bg = find.byWidgetPredicate(
+      (w) =>
+          w is Container &&
+          w.decoration is BoxDecoration &&
+          (w.decoration! as BoxDecoration).image != null,
+    );
+    expect(bg, findsOneWidget);
+    expect(tester.getSize(bg), const Size(1920, 1200));
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pump();
+  });
 }

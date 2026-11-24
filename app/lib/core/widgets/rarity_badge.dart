@@ -14,13 +14,21 @@ import '../../features/pet/pet_config.dart';
 import '../animation/animation_gate.dart';
 
 class RarityBadge extends StatefulWidget {
-  const RarityBadge({super.key, required this.rarity, this.compact = false});
+  const RarityBadge({
+    super.key,
+    required this.rarity,
+    this.compact = false,
+    this.tilted = false,
+  });
 
   /// Độ hiếm; [PetRarity.common] thì không vẽ gì.
   final PetRarity rarity;
 
-  /// Bản nhỏ hơn cho danh sách chật (Tủ đồ, Pet của bé).
+  /// Bản nhỏ (chữ ~8–9 px) để đè chéo lên góc khung ảnh.
   final bool compact;
+
+  /// Xoay chéo ~ -14° như nhãn dán ở góc (góp ý 24/11).
+  final bool tilted;
 
   @override
   State<RarityBadge> createState() => _RarityBadgeState();
@@ -51,7 +59,7 @@ class _RarityBadgeState extends State<RarityBadge>
   Widget build(BuildContext context) {
     if (widget.rarity == PetRarity.common) return const SizedBox.shrink();
     final epic = widget.rarity == PetRarity.epic;
-    final fontSize = widget.compact ? 10.0 : 12.0;
+    final fontSize = widget.compact ? 10.5 : 12.0;
     final colors = epic
         ? const [Color(0xFFB57BFF), Color(0xFFFF8FD8), Color(0xFFFFC93C)]
         : const [Color(0xFF5BB8FF), Color(0xFF8FD8FF)];
@@ -59,7 +67,7 @@ class _RarityBadgeState extends State<RarityBadge>
     final stars = epic
         ? const [(0.06, 0.05, 0.0), (0.93, 0.15, 0.35), (0.55, 0.92, 0.7)]
         : const [(0.92, 0.1, 0.0)];
-    return Stack(
+    final badge = Stack(
       key: Key('rarity-${widget.rarity.name}'),
       clipBehavior: Clip.none,
       children: [
@@ -71,7 +79,10 @@ class _RarityBadgeState extends State<RarityBadge>
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: colors),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white, width: 2),
+            border: Border.all(
+              color: Colors.white,
+              width: widget.compact ? 1.5 : 2,
+            ),
             boxShadow: [
               BoxShadow(
                 color: colors.first.withValues(alpha: 0.55),
@@ -118,6 +129,7 @@ class _RarityBadgeState extends State<RarityBadge>
         ),
       ],
     );
+    return widget.tilted ? Transform.rotate(angle: -0.25, child: badge) : badge;
   }
 }
 

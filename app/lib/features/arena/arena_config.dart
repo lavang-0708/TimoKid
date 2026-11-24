@@ -158,5 +158,5 @@ const double arenaTownWidth = 374;
 const double arenaTownHeight = 234;
 
 /// Điểm đặt biển "Đấu trường" (tâm đáy biển, khung 1600x900).
-const double arenaTownSignX = 1378;
-const double arenaTownSignY = 740;
+const double arenaTownSignX = 1437;
+const double arenaTownSignY = 668;

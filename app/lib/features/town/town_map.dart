@@ -618,31 +618,30 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
   /// trắng). Bấm vào biển cũng vào khu như bấm công trình.
   List<Widget> _signs(double w, double h) {
     final scale = (w / 900).clamp(0.55, 1.3);
-    Widget place(int index, Widget sign, VoidCallback onTap, Key key) {
-      final a = townSignAnchors[index];
-      return Positioned(
-        left: a.dx / townFrameWidth * w - 150 * scale,
-        width: 300 * scale,
-        top: a.dy / townFrameHeight * h - 60 * scale,
-        height: 60 * scale,
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: GestureDetector(key: key, onTap: onTap, child: sign),
-        ),
-      );
-    }
+    // Biển gắn trên nhà: [townSignAnchors] là TÂM biển.
+    Widget at(Offset a, Widget sign, VoidCallback onTap, Key key) => Positioned(
+      left: a.dx / townFrameWidth * w - 120 * scale,
+      width: 240 * scale,
+      top: a.dy / townFrameHeight * h - 20 * scale,
+      height: 40 * scale,
+      child: Center(
+        child: GestureDetector(key: key, onTap: onTap, child: sign),
+      ),
+    );
+    Widget place(int index, Widget sign, VoidCallback onTap, Key key) =>
+        at(townSignAnchors[index], sign, onTap, key);
 
     return [
       for (var i = 0; i < townAreas.length; i++)
         place(
           i,
-          GameSign(
+          GamePlaque(
             text: townAreas[i].name,
             scale: scale,
             color: Color.lerp(
               const Color(0xFFC98F5A),
               Color(townAreas[i].color),
-              0.35,
+              0.85,
             )!,
             badge: switch (widget.statuses[i]) {
               StageStatus.done => 'Xong ✓',
@@ -658,7 +657,7 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
         ),
       place(
         townAreas.length,
-        GameSign(
+        GamePlaque(
           text: 'Phòng của bé',
           scale: scale,
           color: const Color(0xFFE58FB0),
@@ -667,23 +666,15 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
         const Key('town-room-sign'),
       ),
       if (widget.onArenaTap != null)
-        Positioned(
-          left: arenaTownSignX / townFrameWidth * w - 150 * scale,
-          width: 300 * scale,
-          top: arenaTownSignY / townFrameHeight * h - 60 * scale,
-          height: 60 * scale,
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: GestureDetector(
-              key: const Key('town-arena-sign'),
-              onTap: widget.onArenaTap,
-              child: GameSign(
-                text: 'Đấu trường',
-                scale: scale,
-                color: const Color(0xFFE0A93B),
-              ),
-            ),
+        at(
+          const Offset(arenaTownSignX, arenaTownSignY),
+          GamePlaque(
+            text: 'Đấu trường',
+            scale: scale,
+            color: const Color(0xFFE0A93B),
           ),
+          widget.onArenaTap!,
+          const Key('town-arena-sign'),
         ),
     ];
   }
@@ -768,14 +759,14 @@ const Map<String, double> townSpriteGroundRow = <String, double>{
   'assets/images/town/person_02_ur_b.png': 460,
 };
 
-/// Điểm đặt biển tên (tâm đáy biển, khung nền 1600x900) của 5 khu theo
+/// Điểm đặt biển tên (TÂM biển nhỏ gắn trên nhà, khung nền 1600x900) của 5 khu theo
 /// thứ tự [townAreas], rồi nhà của bé ở cuối. Đặt trên mặt tiền công
 /// trình như biển hiệu, không che lối vào.
 const List<Offset> townSignAnchors = <Offset>[
-  Offset(470, 250), // Lâu đài Lôgic
-  Offset(470, 395), // Tiệm bánh Số học
-  Offset(770, 300), // Tháp Con số
-  Offset(770, 700), // Vườn Hình học
-  Offset(1120, 230), // Hội chợ Tổ hợp
-  Offset(220, 600), // Phòng của bé
+  Offset(362, 196), // Lâu đài Lôgic — trên tường thành
+  Offset(412, 420), // Tiệm bánh Số học — mặt tiền trên mái hiên
+  Offset(756, 252), // Tháp Con số — thân tháp dưới mặt đồng hồ
+  Offset(762, 712), // Vườn Hình học — hàng rào trước vườn
+  Offset(1162, 132), // Hội chợ Tổ hợp — trước cửa lều
+  Offset(215, 612), // Phòng của bé — trên mái nhà
 ];

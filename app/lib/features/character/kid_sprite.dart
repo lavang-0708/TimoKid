@@ -176,7 +176,7 @@ class _KidSpriteState extends State<KidSprite> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final gender = kidGender(widget.gender);
-    final outfit = widget.outfit.clamp(1, 3);
+    final outfit = widget.outfit.clamp(1, kidTotalOutfitCount);
     final wave = widget.waving || (_autoWave && !widget.walking);
     final patch = kidEyePatch(gender, outfit, wave: wave);
     final accessory = kidHeadAccessoryAsset(gender, widget.headAccessory);
