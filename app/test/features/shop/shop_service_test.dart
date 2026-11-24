@@ -43,7 +43,7 @@ void main() {
 
   group('danh mục', () {
     test(
-      'mỗi dáng có bộ đồ để mua (3 cơ bản + bộ 04–08) + 5 phụ kiện đúng giá',
+      'mỗi dáng có bộ đồ để mua (3 cơ bản + bộ 04–09) + 5 phụ kiện đúng giá',
       () {
         for (final g in ['girl', 'boy']) {
           final items = shopItemsFor(g);
@@ -63,7 +63,7 @@ void main() {
             items
                 .where((i) => i.kind == ShopItemKind.outfit)
                 .map((i) => i.priceXu),
-            [80, 80, 80, 150, 300, 600, 0, 200],
+            [80, 80, 80, 150, 300, 600, 0, 200, 450],
           );
         }
       },
