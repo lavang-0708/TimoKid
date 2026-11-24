@@ -89,7 +89,7 @@ NAME_PATTERNS = {
     ),
     # Ảnh toàn thân 3 bộ × (nghỉ/vẫy) và phụ kiện phủ cùng khung (E).
     "character_full": re.compile(
-        r"^(girl|boy)_(full_0[1-7](_wave|_walk_(dr|ur)_[a-d])?(_backpack)?"
+        r"^(girl|boy)_(full_(0[1-9]|1[01])(_wave|_walk_(dr|ur)_[a-d])?(_backpack)?"
         r"|hat_01|bow_01|clip_01"
         r"|glasses_01|backpack_01|shoes_02)\.png$"
     ),
