@@ -20,10 +20,10 @@ import 'question_solvers.dart';
 ///   chứa đáp án.
 void main() {
   group('registry', () {
-    test('đủ 84 dạng bài, không trùng formId', () {
-      expect(allQuestionGenerators.length, 84);
+    test('đủ 90 dạng bài, không trùng formId', () {
+      expect(allQuestionGenerators.length, 90);
       final ids = allQuestionGenerators.map((g) => g.formId).toList();
-      expect(ids.toSet().length, 84);
+      expect(ids.toSet().length, 90);
       for (final entry in generatorCountByTopic.entries) {
         expect(
           allQuestionGenerators.where((g) => g.topic == entry.key).length,

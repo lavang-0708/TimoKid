@@ -471,26 +471,34 @@ void main() {
     }
 
     test('chọn dạng mới thì ưu tiên dạng ít gặp trong 7 ngày qua', () async {
-      // Hôm qua chặng comb đã gặp 5 dạng; 4 dạng mức 1 còn lại chưa gặp
-      // nên hôm nay phải có mặt cả 4.
-      await addPastSet('2026-11-17', [
+      // Hôm qua chặng comb đã gặp 5 dạng; còn 6 dạng mức 1 chưa gặp (đợt 4
+      // thêm comb.flag) nên hôm nay 5 dạng phải đều lấy từ nhóm chưa gặp.
+      const seen = [
         'comb.outfit',
         'comb.handshake',
         'comb.routes',
         'comb.choose2',
         'comb.makenumparity',
-      ]);
+      ];
+      await addPastSet('2026-11-17', seen);
 
       final set = await service.getOrCreateTodaySet(childId: childId);
       final combForms = stageQuestions(set, 4).map((q) => q.formId).toSet();
       expect(combForms, hasLength(5));
       expect(
-        combForms.containsAll([
+        combForms.intersection(seen.toSet()),
+        isEmpty,
+        reason: '$combForms',
+      );
+      expect(
+        {
           'comb.minsum2',
           'comb.freebie',
           'comb.vases',
           'comb.pick2',
-        ]),
+          'comb.dice',
+          'comb.flag',
+        }.containsAll(combForms),
         isTrue,
         reason: '$combForms',
       );
@@ -514,6 +522,7 @@ void main() {
         'comb.vases',
         'comb.pick2',
         'comb.dice',
+        'comb.flag',
       ]);
 
       final set = await service.getOrCreateTodaySet(childId: childId);

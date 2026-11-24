@@ -200,6 +200,27 @@ int solveQuestion(Question q) {
       return _solveBetween(q);
     case 'comb.dice':
       return _solveDice(q);
+    // Đợt 4 (timo4_generators.dart).
+    case 'logic.table':
+      return _solveTable(q);
+    case 'arith.pairsum':
+      var sum = 0;
+      for (var i = 0; i < _pInt(q, 'count'); i++) {
+        sum += _pInt(q, 'start') + _pInt(q, 'step') * i;
+      }
+      return sum;
+    case 'number.multiples':
+      var c = 0;
+      for (var x = _pInt(q, 'lo'); x <= _pInt(q, 'hi'); x++) {
+        if (x % _pInt(q, 'k') == 0) c++;
+      }
+      return c;
+    case 'geo.pyramid':
+      return _solvePolyhedron(q, prism: false);
+    case 'geo.prism':
+      return _solvePolyhedron(q, prism: true);
+    case 'comb.flag':
+      return _solveFlag(q);
     default:
       throw StateError('Chưa có hàm giải độc lập cho ${q.formId}');
   }
@@ -1018,4 +1039,61 @@ int _solveDice(Question q) {
     }
   }
   return count;
+}
+
+// ---------------------------------------------------------------- đợt 4
+
+/// Bảng số: thử xem hàng đủ là cộng hay nhân, rồi tìm ô thiếu ở hàng 4
+/// bằng cách thử mọi giá trị 1..100.
+int _solveTable(Question q) {
+  final v = _pInts(q, 'rows');
+  final miss = _pInt(q, 'missCol');
+  final mul = v[2] == v[0] * v[1] && v[5] == v[3] * v[4];
+  for (var x = 1; x <= 100; x++) {
+    final row = [v[9], v[10], v[11]];
+    row[miss] = x;
+    if ((mul ? row[0] * row[1] : row[0] + row[1]) == row[2]) return x;
+  }
+  throw StateError('Không tìm được ô thiếu');
+}
+
+/// Dựng khối bằng danh sách đỉnh/cạnh rồi đếm (không dùng công thức).
+int _solvePolyhedron(Question q, {required bool prism}) {
+  final ask = _pInt(q, 'ask');
+  final n = _pInt(q, 'n');
+  final vertices = <String>{};
+  final edges = <String>{};
+  void edge(String a, String b) =>
+      edges.add(a.compareTo(b) < 0 ? '$a-$b' : '$b-$a');
+  for (var i = 0; i < n; i++) {
+    final j = (i + 1) % n;
+    vertices.add('d$i');
+    edge('d$i', 'd$j');
+    if (prism) {
+      vertices.add('t$i');
+      edge('t$i', 't$j');
+      edge('d$i', 't$i');
+    } else {
+      vertices.add('top');
+      edge('d$i', 'top');
+    }
+  }
+  return ask == 1 ? vertices.length : edges.length;
+}
+
+/// Liệt kê mọi cách tô 3 sọc rồi lọc theo luật.
+int _solveFlag(Question q) {
+  final k = _pInt(q, 'k');
+  final allDiff = _pBool(q, 'allDiff');
+  var c = 0;
+  for (var a = 0; a < k; a++) {
+    for (var b = 0; b < k; b++) {
+      for (var d = 0; d < k; d++) {
+        if (a == b || b == d) continue;
+        if (allDiff && a == d) continue;
+        c++;
+      }
+    }
+  }
+  return c;
 }
