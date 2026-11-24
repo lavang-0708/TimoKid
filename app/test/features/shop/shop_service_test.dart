@@ -63,7 +63,7 @@ void main() {
             items
                 .where((i) => i.kind == ShopItemKind.outfit)
                 .map((i) => i.priceXu),
-            [80, 80, 80, 150, 300, 600, 0, 200, 450, 800],
+            [80, 80, 80, 150, 300, 600, 0, 200, 450, 800, 0],
           );
         }
       },
