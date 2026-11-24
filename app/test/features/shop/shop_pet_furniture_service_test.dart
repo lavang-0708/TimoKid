@@ -204,16 +204,17 @@ void main() {
   });
 
   group('bộ đồ cao cấp (xu hoặc kim cương)', () {
-    test('có đủ hình bộ 04–09: bán 9 bộ', () async {
+    test('có đủ hình bộ 04–10: bán 10 bộ', () async {
       expect(premiumOutfitsArtReady, isFalse);
-      expect(kidPremiumOutfitsDrawn, 6); // lô 14: thêm bộ 08, 09
+      expect(kidPremiumOutfitsDrawn, 7); // lô 14: thêm bộ 08–10
       expect(
         shopItemsFor('girl').where((i) => i.category == ShopCategory.outfits),
-        hasLength(9),
+        hasLength(10),
       );
       expect(kidOutfitNumber('girl_top_08'), 8);
       expect(kidOutfitNumber('girl_top_09'), 9);
-      expect(kidOutfitNumber('girl_top_10'), 1); // 10 chưa có hình
+      expect(kidOutfitNumber('girl_top_10'), 10);
+      expect(kidOutfitNumber('girl_top_11'), 1); // 11 chưa có hình
       expect(kidOutfitNumber('girl_top_04'), 4);
       expect(kidOutfitNumber('girl_top_05'), 5);
       expect(kidOutfitNumber('girl_top_06'), 6);
