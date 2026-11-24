@@ -3179,7 +3179,7 @@ mặt/dáng đầu và ảnh 07 làm mẫu tư thế; tách nền + chuẩn hoá
 Đường đích `app/assets/images/character/girl/` (10 file gái) và
 `app/assets/images/character/boy/` (10 file trai). Tỉ lệ bán trong suốt
 (0 < alpha < 255) đo bằng code, tất cả **0**. Mỗi file < 1 MB.
-Tổng 20 file = 11.092.911 byte; .b64 ≈ 14,79 MB (sau sửa F1/F2 trai 24/11;
+Tổng 20 file = 11.091.701 byte; .b64 ≈ 14,79 MB (sau sửa halo 3 file 24/11; trước sửa halo 11.096.158 byte; sau sửa F1/F2 trai 24/11;
 trước sửa 10.407.237 byte / 13,88 MB).
 
 | File | Vai trò | Cỡ (byte) | Chân y | Tâm mắt |
@@ -3190,12 +3190,12 @@ trước sửa 10.407.237 byte / 13,88 MB).
 | `girl_full_10_walk_dr_b.png` | Đi xuống-phải, khung b | 651,059 | 1428 | gần (717,7; 570,4) | `b6b4d4d98ead` |
 | `girl_full_10_walk_dr_c.png` | Đi xuống-phải, khung c | 635,332 | 1428 | gần (722,5; 577,5) | `20fc47c3e865` |
 | `girl_full_10_walk_dr_d.png` | Đi xuống-phải, khung d | 620,569 | 1428 | gần (724,0; 570,1) | `37d9acdf2664` |
-| `girl_full_10_walk_ur_a.png` | Đi lên-phải, khung a | 613,884 | 1428 | gần (728,6; 586,0) | `45bb0c417ee9` |
-| `girl_full_10_walk_ur_b.png` | Đi lên-phải, khung b | 641,127 | 1428 | gần (720,2; 529,4) | `e4177ed8d4c6` |
+| `girl_full_10_walk_ur_a.png` | Đi lên-phải, khung a | 612,220 | 1428 | gần (728,6; 586,0) | `947707efd546` |
+| `girl_full_10_walk_ur_b.png` | Đi lên-phải, khung b | 641,449 | 1428 | gần (720,2; 529,4) | `5f120e1a72a8` |
 | `girl_full_10_walk_ur_c.png` | Đi lên-phải, khung c | 665,328 | 1428 | gần (723,5; 555,2) | `a0a0d4c0c8fa` |
 | `girl_full_10_walk_ur_d.png` | Đi lên-phải, khung d | 589,836 | 1428 | gần (716,6; 571,6) | `77e678a45ecb` |
 | `boy_full_10.png` | Phi hành gia trắng, đứng | 356,510 | 1429 | (504,1; 629,8) ‡ | `8fc642f6b4a6` |
-| `boy_full_10_wave.png` | Phi hành gia, tay phải vẫy | 485,171 | 1428 | (504,9; 631,2) ‡ | `13e7f4766bd6` |
+| `boy_full_10_wave.png` | Phi hành gia, tay phải vẫy | 482,056 | 1428 | (504,9; 631,2) ‡ | `2d0f49dbc787` |
 | `boy_full_10_walk_dr_a.png` | Đi xuống-phải, khung a | 481,911 | 1428 | hcx 424,2 / hcy 370,9 | `8a1033710883` |
 | `boy_full_10_walk_dr_b.png` | Đi xuống-phải, khung b | 451,033 | 1428 | hcx 423,8 / hcy 371,9 | `834c3406a03b` |
 | `boy_full_10_walk_dr_c.png` | Đi xuống-phải, khung c | 468,400 | 1428 | hcx 423,8 / hcy 371,5 | `2aeb8cbcf345` |
@@ -3416,7 +3416,7 @@ app trong phòng v3b), `fix_ears_ur_4x.png` (tai xa 4 khung ur trước/sau, 4×
 
 ## Đẩy .b64 (kế hoạch — F1/F2 ĐÃ SỬA XONG 24/11, CHƯA ĐẨY, chờ duyệt đẩy)
 
-- Tổng PNG 20 file 11.092.911 byte → .b64 ≈ 14,79 MB. **Chia 4 lần × 5 file
+- Tổng PNG 20 file 11.091.701 byte → .b64 ≈ 14,79 MB (sau sửa halo 3 file 24/11; trước sửa halo 11.096.158 byte). **Chia 4 lần × 5 file
   TRỘN gái+trai theo byte (~3,66–3,74 MB .b64/lần, dưới trần HTTP đã đo
   5,02 MB thành công / 5,47 MB lỗi).** Đích
   `app/assets/_incoming/app/assets/images/character/girl/` và `.../boy/`.
@@ -3430,12 +3430,12 @@ gái girl_full_10_walk_dr_a `0daf017c25ee`
 gái girl_full_10_walk_dr_b `b6b4d4d98ead`
 gái girl_full_10_walk_dr_c `20fc47c3e865`
 gái girl_full_10_walk_dr_d `37d9acdf2664`
-gái girl_full_10_walk_ur_a `45bb0c417ee9`
-gái girl_full_10_walk_ur_b `e4177ed8d4c6`
+gái girl_full_10_walk_ur_a `947707efd546`
+gái girl_full_10_walk_ur_b `5f120e1a72a8`
 gái girl_full_10_walk_ur_c `a0a0d4c0c8fa`
 gái girl_full_10_walk_ur_d `77e678a45ecb`
 trai boy_full_10 `8fc642f6b4a6`
-trai boy_full_10_wave `13e7f4766bd6`
+trai boy_full_10_wave `2d0f49dbc787`
 trai boy_full_10_walk_dr_a `8a1033710883`
 trai boy_full_10_walk_dr_b `834c3406a03b`
 trai boy_full_10_walk_dr_c `2aeb8cbcf345`
