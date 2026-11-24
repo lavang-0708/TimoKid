@@ -91,7 +91,7 @@ const List<PetShopSpecies> petShopSpecies = <PetShopSpecies>[
 const Map<String, bool> newPetArtReady = <String, bool>{
   'squirrel': true,
   'capybara': true,
-  'dragon': false,
+  'dragon': true,
 };
 
 /// Đã có hình emote (đói/buồn/vui) + suất ăn (Muse lô 13) chưa.

@@ -34,6 +34,18 @@ const int petFoodPriceXu = 10;
 const int petToyPriceXu = 40;
 
 /// Giá bộ đồ cao cấp theo số bộ: (xu, kim cương); đúng một số khác 0.
+/// Độ hiếm của bộ đồ (chủ dự án 24/11: nhãn lấp lánh ở góc thẻ).
+/// Bộ thường (1–4) không có nhãn: 05, 06 Hiếm; 07 (mua bằng kim cương)
+/// Siêu hiếm.
+const Map<int, PetRarity> outfitRarity = <int, PetRarity>{
+  5: PetRarity.rare,
+  6: PetRarity.rare,
+  7: PetRarity.epic,
+};
+
+/// Độ hiếm của bộ đồ số [n] (thường nếu không có trong [outfitRarity]).
+PetRarity outfitRarityOf(int n) => outfitRarity[n] ?? PetRarity.common;
+
 const Map<int, (int, int)> premiumOutfitPrices = <int, (int, int)>{
   4: (150, 0),
   5: (300, 0),
@@ -97,7 +109,7 @@ class ShopItem {
   /// Loài pet (chỉ với [ShopItemKind.petEgg]).
   final String? species;
 
-  /// Độ hiếm (chỉ với [ShopItemKind.petEgg]).
+  /// Độ hiếm (trứng pet và bộ đồ hiếm; null = không nhãn).
   final PetRarity? rarity;
 
   final String id;
@@ -203,6 +215,7 @@ List<ShopItem> shopItemsFor(
             : premiumOutfitPrices[n]!.$1,
         priceGems: n <= kidBasicOutfitCount ? 0 : premiumOutfitPrices[n]!.$2,
         outfit: n,
+        rarity: outfitRarity[n],
       ),
     for (final entry in heads.entries)
       ShopItem(

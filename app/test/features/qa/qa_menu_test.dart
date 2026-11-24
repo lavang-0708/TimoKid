@@ -314,5 +314,23 @@ void main() {
 
       await gesture.up();
     });
+
+    testWidgets('nút "Xem thử hiệu ứng rồng" mở màn xem thử, chạy được', (
+      tester,
+    ) async {
+      await pumpApp(tester);
+      final gesture = await openMenu(tester);
+      await tester.ensureVisible(find.byKey(const Key('qa-dragon-fx')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('qa-dragon-fx')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('dragon-fx-preview')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('dragon-fx-fire')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('dragon-preview-stage-newborn')));
+      await tester.pumpAndSettle();
+      expect(find.text('Lớn lên rồng sẽ phun lửa thật!'), findsOneWidget);
+      await gesture.up();
+    });
   });
 }
