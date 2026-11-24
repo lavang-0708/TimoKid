@@ -3467,3 +3467,327 @@ trai boy_full_10_walk_ur_d `e0542bcb892f`
   từng bị GitHub secret scanning chặn vì chuỗi base64 tình cờ trúng mẫu (dương
   tính giả); nếu trúng, mã lại PNG lossless đổi compress_level rồi đẩy lại.
   Chưa đẩy (F1/F2 đã sửa xong, chờ duyệt đẩy).**
+### Lô 14 — Bộ 11: Công chúa rồng / Hiệp sĩ rồng (20 file, 24/11/2026)
+
+Đích: `app/assets/images/character/girl/` và `app/assets/images/character/boy/`.
+Bộ 11 ĐỦ 20/20 file (10 gái + 10 trai). Bộ SIÊU HIẾM (50 kim cương) — đi kèm
+phòng Rồng (lô 15) và pet rồng. Mặt gái đã ghép dải mắt 01 như bộ 07/08/09/10
+(xem mục "Ghép dải mắt gái"); trai KHÔNG ghép mắt (như 07/08/09/10 — xem mục
+"Cổng mắt trai").
+
+✅ **F1 ĐÃ SỬA 24/11 (xem "Điểm chưa chắc"):** 3 chấm tai xa ur_b/c/d trai đã xóa
+bằng code, đo lại dark = 0 + soi 4× đạt; byte/SHA mới đã cập nhật ở bảng dưới và
+`report.json`. **CHƯA ĐẨY — chờ duyệt đẩy.**
+
+- Bé gái — Công chúa rồng: váy xòe vảy rồng mint-hồng óng ánh, cánh rồng nhỏ sau
+  lưng, vòng cổ sao, giày hồng có huy hiệu rồng vàng.
+- Bé trai — Hiệp sĩ rồng: giáp mint-vàng hoa văn vảy rồng, áo choàng đỏ, khiên
+  tròn xanh lục có rồng vàng đeo sau vai (lộ đúng như xem kiểu), giày giáp vàng.
+  Không đội mũ bảo hiểm, không đeo balo (phụ kiện rời của app).
+
+## Cách làm
+
+Vẽ từng ảnh toàn thân bằng AI trên nền magenta đặc, có ảnh bộ 01 làm tham chiếu khuôn
+mặt/dáng đầu và ảnh 07 làm mẫu tư thế; tách nền + chuẩn hoá + quantize bằng code
+(numpy + scipy + PIL), đúng quy trình bộ 04–10 (`key11.py` / `process11.py` /
+`measure11.py` / `measure_boy11.py` / `measure11_girl.py` trong
+`lot14/work/set11/`):
+
+- Key: nền = median góc; fg = dist ≥ 20; closing 3×3; chỉ giữ component > 20.000 px;
+  closing dọc 31×1 cầu nối cổ; edge-recovery mọc tối đa 3 px vào dải dist 10–40.
+  KHÔNG dùng `binary_fill_holes`.
+- Chuẩn hoá: scale theo chiều cao bbox, chân 1429, ky squash căn mắt/đầu, ox căn
+  mắt/đầu; quantize MAXCOVERAGE 256 màu + Floyd–Steinberg, giữ alpha; fill RGB trong
+  suốt bằng màu opaque gần nhất TRƯỚC khi quantize.
+- Khử viền magenta (stack bộ 04): ring-decon d<45; inpaint d<130 toàn ảnh;
+  inpaint d<170 trong vành 5 px; recolor magenta đậm; rim-recolor vành ngoài 3 px —
+  cả trước và sau quantize. Magenta đo = 0 px cả 20 file (3 thước: loose/std/m7);
+  semi = 0; 256 màu ở vùng opaque cả 20 file (trai full 201 màu — dưới 256, vẫn
+  hợp lệ).
+- **Ghép dải mắt gái (như bộ 07/08/09/10):** chép dải mắt 01 full
+  (x 355–640, y 510–595, feather 12 px) dán đúng tọa độ lên full + wave 11 gái.
+  Trên layers (trước quantize) blob full/wave KHỚP 01 gần tuyệt đối. Xem mốc dưới.
+- **Trai KHÔNG ghép mắt, KHÔNG CAL:** như 07/08/09/10 (07 cũng không ghép và vẫn duyệt).
+  Neo khung đi trai bằng head-centroid (hcx/hcy): dr (hcx ~424, hcy ~366–375), ur
+  (hcx ~525, hcy ~383–386 — dịch +40 so với 07, xem "Điểm chưa chắc" (a)). Neo gái bằng
+  blue-union mắt gần trong cửa sổ (680–780, 480–620).
+- **Áo choàng trai (quy tắc mới 24/11):** gen v1 áo choàng xòe cắt khung x=0 ở cả 8
+  khung đi → vẽ lại 7/8 khung bằng resume snapshot (áo choàng gom sát người).
+  Chỉ ur_a v1 không vẽ lại được (`invalid_resume_id`, runtime cấm thử lại) nên giữ v1
+  + dịch TOÀN BỘ chu trình ur +40 px (`key11.py` `UR_SHIFT`): ur_a xmin 8, ur_b xmax
+  1018, không khung nào chạm biên; đầu ur ổn định 525,0–525,2. Xem (a).
+- **Chấm tai trai (quyết Claude 24/11 ~20:24):** chấm đen tai GẦN là chi tiết thiết kế
+  gốc (01 full 47 px, 07 full 64 px) — GIỮ NGUYÊN: full 40 px, wave ~68 px, dr_b 70 px
+  (đo lại bằng ô agent, khớp). Chấm tai XA (khung ur, 07 = 0 px) thì xóa bằng code —
+  **verifier phát hiện còn 3 chấm ở ur_b/c/d (F1, xem dưới), agent báo nhầm là 0.**
+- **Quy tắc miếng mắt nhắm (Claude chốt 22/11): app dùng CHUNG miếng mắt nhắm
+  của bộ 01 cho cả full/wave 11** — mắt đứng VÀ vẫy phải trùng bộ 01 trong ±3 px.
+  Từ bộ 05 trở đi KHÔNG làm miếng riêng, dùng miếng 01.
+- **Kiểm chứng độc lập của verifier 24/11 (`/tmp/verify11_mine.py`,
+  `set11/report.json`):** đo lại 20/20 bằng code viết mới (cùng định nghĩa detector
+  như bộ 09 + thước đỏ sẫm 2 pass + thước halo mép tóc + ô chấm tai đúng vị trí);
+  SHA-256 và byte khớp `girl_report.json` / `boy_report.json` / `verify11.json` cả
+  20 file. Ảnh ghép của verifier ở `lot14/work/set11/composites/` (tiền tố
+  `verify11_mine_*`): `verify11_mine_girl_dark.png`, `verify11_mine_boy_dark.png`,
+  `verify11_mine_room20.png`, `verify11_mine_faces_3x_girl.png`,
+  `verify11_mine_faces_3x_boy.png`, `verify11_mine_walk_faces_2x.png`,
+  `verify11_mine_girl_shoes_4x.png`, `verify11_mine_seam_3x_girl.png`,
+  `verify11_mine_ears_3x_boy.png`, `verify11_mine_shield_2x_boy.png`.
+
+## File (20/20 PNG đã xong, khung 1024×1536, PNG trong suốt, đã lượng tử)
+
+Đường đích `app/assets/images/character/girl/` (10 file gái) và
+`app/assets/images/character/boy/` (10 file trai). Tỉ lệ bán trong suốt
+(0 < alpha < 255) đo bằng code, tất cả **0**. Mỗi file < 1 MB.
+Tổng 20 file = 13,543,999 byte; .b64 ≈ 18,058,665 byte.
+
+| File | Vai trò | Cỡ (byte) | Chân y | Tâm mắt |
+| --- | --- | --- | --- | --- |
+| `girl_full_11.png` | Váy vảy rồng mint-hồng, đứng | 826,562 | 1429 | (491.2; 560.1) † | `bba8f04f4013` |
+| `girl_full_11_wave.png` | Váy rồng, tay phải vẫy | 874,377 | 1428 | (492.5; 561.6) † | `1d350671a59e` |
+| `girl_full_11_walk_dr_a.png` | Đi xuống-phải, khung a | 653,589 | 1428 | gần (732.2; 561.3) | `b490f1cee783` |
+| `girl_full_11_walk_dr_b.png` | Đi xuống-phải, khung b | 664,058 | 1428 | gần (745.5; 571.6) | `e400673d023f` |
+| `girl_full_11_walk_dr_c.png` | Đi xuống-phải, khung c | 695,260 | 1428 | gần (719.8; 557.7) | `5c6249b0aae5` |
+| `girl_full_11_walk_dr_d.png` | Đi xuống-phải, khung d | 727,889 | 1428 | gần (725.3; 560.6) | `faaa09b35bfe` |
+| `girl_full_11_walk_ur_a.png` | Đi lên-phải, khung a | 689,409 | 1428 | gần (700.3; 555.2) | `a38ffd59e767` |
+| `girl_full_11_walk_ur_b.png` | Đi lên-phải, khung b | 617,479 | 1428 | gần (748.5; 571.1) | `8a7c66cecb24` |
+| `girl_full_11_walk_ur_c.png` | Đi lên-phải, khung c | 649,542 | 1428 | gần (703.0; 560.5) | `49b051367158` |
+| `girl_full_11_walk_ur_d.png` | Đi lên-phải, khung d | 626,435 | 1428 | gần (709.3; 560.2) | `4d249b51c905` |
+| `boy_full_11.png` | Giáp rồng mint-vàng + áo choàng, đứng | 744,146 | 1429 | (504.0; 626.4) ‡ | `aa01348e9b10` |
+| `boy_full_11_wave.png` | Giáp rồng, tay phải vẫy | 747,966 | 1428 | (506.0; 636.1) ‡ | `ce779bfe0f83` |
+| `boy_full_11_walk_dr_a.png` | Đi xuống-phải, khung a | 655,066 | 1428 | hcx 424.2 / hcy 374.8 | `b4dc9a1efb4e` |
+| `boy_full_11_walk_dr_b.png` | Đi xuống-phải, khung b | 634,558 | 1428 | hcx 423.8 / hcy 374.0 | `435788c371c4` |
+| `boy_full_11_walk_dr_c.png` | Đi xuống-phải, khung c | 641,379 | 1428 | hcx 423.7 / hcy 365.6 | `dc30b2843dea` |
+| `boy_full_11_walk_dr_d.png` | Đi xuống-phải, khung d | 630,337 | 1428 | hcx 423.9 / hcy 369.7 | `4aeb4e8083ac` |
+| `boy_full_11_walk_ur_a.png` | Đi lên-phải, khung a | 660,176 | 1428 | hcx 525.0 / hcy 385.5 | `bd1c9f1d6d90` |
+| `boy_full_11_walk_ur_b.png` | Đi lên-phải, khung b | 653,034 | 1428 | hcx 525.1 / hcy 383.2 | `9ba2b757461b` |
+| `boy_full_11_walk_ur_c.png` | Đi lên-phải, khung c | 584,778 | 1428 | hcx 525.2 / hcy 383.4 | `a0f1632c0604` |
+| `boy_full_11_walk_ur_d.png` | Đi lên-phải, khung d | 567,959 | 1428 | hcx 525.2 / hcy 384.0 | `9424ba952a10` |
+
+† gái full/wave: tâm mắt = trung bình 2 mắt blob (iris) trên file final đã quantize:
+full L (387,5; 560,1), R (595,0; 560,1); wave L (387,8; 560,6), R (597,1; 562,6).
+‡ trai full/wave: tâm mắt = trung bình 2 mắt union (brown) trên file final:
+full L (401,7; 626,6), R (606,2; 626,1); wave L (406,8; 633,5), R (605,3; 638,7).
+"Mắt gần" ở khung đi gái = blue-union trong cửa sổ (680–780, 480–620) trên file
+final (verifier đo lại khớp agent đúng 8/8 khung).
+SHA-256 trên là bản final hiện tại (sau sửa F1); 17 file khớp `girl_report.json` /
+`boy_report.json` / `verify11.json` từng byte như lúc verifier đo, 3 file ur_b/c/d
+trai đã đổi byte/SHA do sửa F1 (xem "Điểm chưa chắc") và đo lại đạt hết các cổng.
+
+## Mốc khung đo được (khung 1024×1536, đo ĐỘC LẬP bằng code từ ảnh thật — xem
+`lot14/work/set11/report.json`; đối chiếu 3 chiều với `girl_report.json` /
+`boy_report.json` / `verify11.json` — khớp hết trừ F1, xem "Điểm chưa chắc")
+
+### Bé gái (so với bộ 01: blob L (387,5; 560,2), R (594,5; 560,7), span 207,0)
+
+- Tâm mắt full 11 **blob L (0,0; −0,1), R (+0,5; −0,6)** — worst 0,6 px, **ĐẠT
+  cổng ±3 VÀ mục tiêu ±1,5**; union worst 2,5 px (R y −2,5). Span blob 207,5 px
+  (01: 207,0). Lid-band y500–620: full **1 px** ngoài vùng; hộp 70×80 quanh mắt 01:
+  full **0 px** — miếng 01 che kín. Bbox full (34, 219, 987, 1430); cao bbox 1210.
+- Tâm mắt wave 11: **blob L (+0,3; +0,4), R (+2,6; +1,9)** — worst 2,6 px, **ĐẠT
+  cổng ±3 nhưng KHÔNG đạt mục tiêu ±1,5** (thiếu 1,1 px ở R x); union worst 1,8 px.
+  Span blob 209,3 px (01: 207,0). Lid-band 53 px — KHÔNG PHẢI mắt mở ngoài vùng
+  (xem (c) dưới); lid-box 3 px (07 wave 2, 01 wave 1). Bbox wave (50, 236, 972, 1429);
+  cao 1192. Soi mặt 3×: KHÔNG thấy vết ghép dải mắt (xem `verify11_mine_seam_3x_girl.png`).
+- Khung đi: mắt gần trung bình dr **(730,7; 562,8)** vs 07 **(719,2; 568,3)**; ur
+  **(715,3; 561,7)** vs 07 **(719,7; 559,1)** — cycle mean khớp trong ~11 px; riêng
+  ur_b x +26,3 / ur_a x −21,9 / ur_c x −19,2 (xem (b) — đầu lắc trong chu trình,
+  ur_d profile mạnh). Cao bbox khung đi 1158–1206 (đã chấp nhận, xem dưới).
+- **Vệt đỏ sẫm dưới giày gái — LÀ LÓT VÁY, CHẤP NHẬN (xem dưới):** thước đỏ sẫm
+  (R>90 rồi R>50, G<90, B>90, R−G>50, B−G>50, |R−B|<60, y≥1350) đo được 303–1058
+  px/file trên cả 10 file gái; trung vị màu (148,73,125) khác bóng bộ 09 ~(155,5,158);
+  cụm lớn nhất full 716 px nằm TRONG silhouette giữa 2 giày dưới gấu váy; preview đã
+  duyệt có nhiều hơn (1376 px); 07 đã duyệt cũng có 159/327 px cùng họ màu. KHÔNG tô lại.
+- 2 tấm xem kiểu dùng lại, không đổi nội dung: girl full = `preview/girl_11.png` +
+  ghép dải mắt + defringe + requantize (alpha khác 0 px — silhouette y hệt; RGB khác
+  >40 trên px opaque 13.163 px, trong đó 8.490 px trong vùng dải mắt ghép);
+  boy full = `preview/boy_11.png` + defringe + touchup 47 px (alpha khác 0 px,
+  RGB khác >40 trên px opaque 704 px). (Số RGB>40 thô 260k/913k px lần đầu đo là
+  RGB của px TRONG SUỐT, không nhìn thấy — đã đo lại chỉ trên px opaque.)
+
+### Bé trai (so với bộ 01: union L (395,9; 626,3), R (610,4; 626,2), span 214,5)
+
+- Tâm mắt full 11 **union L (+5,8; +0,3), R (−4,2; −0,1)** — worst 5,8 px vs 01;
+  vs 07 L (−0,5; −3,8), R (+1,0; −3,4) — worst 3,8 px; span 204,5 px nằm giữa
+  01 (214,5) và 07 (203,0). Lid-box 70×80: **0 px** — miếng 01 che kín.
+  Tâm mắt (eye-mid) 11 (504,0; 626,4). Bbox full (104, 190, 919, 1430); cao 1239.
+  Chấp nhận theo tiền lệ 07/08/09/10 (07 đã duyệt cũng lệch tương tự), không ghép mắt.
+- Tâm mắt wave 11: **union L (406,8; 633,5), R (605,3; 638,7), dy = 5,2 px** — vs 07
+  wave L (−3,6; +7,8), R (+5,2; +6,2), worst 7,8 px (tiền lệ wave 10: du vs 07 wave
+  tới −10,3/+6,9); dy 5,2 trong khoảng 01 wave (15,4) / 07 wave (6,8). **lid-box 0 px**
+  (07 wave = 5) — miếng 01 che kín. Soi 3× cạnh 01/07 wave: mặt thẳng, không biến dạng.
+  Bbox wave (102, 188, 879, 1429); cao 1240.
+- Khung đi dr: hcx 423,7–424,2 (07: 423,3–423,7), hcy 365,6–374,8
+  (07: 370,7–373,5) — khớp 07 gần như tuyệt đối. Khung đi ur: hcx 525,0–525,2
+  (07: 484,3–484,9 — dịch +40, xem (a)); hcy 383,2–385,5 (07: 392,2–393,2).
+  Cao bbox khung đi 1231–1252 (đã chấp nhận, xem dưới).
+- **Khiên rồng — CÓ ĐỦ, ĐÚNG XEM KIỂU (verifier soi 2×/3× cả 6 tấm):** khiên tròn
+  xanh lục có rồng vàng sau vai phải ở full/wave; cả 4 khung ur khiên lộ rõ sau lưng
+  (ur_c/ur_d rõ nhất); áo choàng đỏ không còn cắt khung (dr xmin 28–106, ur xmin 8–225).
+- **Chấm đen tai GẦN trai GIỮ ĐÚNG (quyết Claude 24/11 ~20:24):** verifier đo lại
+  bằng ô agent: full 40 px, wave 68 px, dr_b 70 px — khớp agent; soi 3× chấm tròn
+  đen trên dái tai, y hệt 01 (38 px) / 07 (52 px) ở cùng ô. dr_a/dr_c/dr_d không thấy
+  chấm (tai khuất sau tóc). **LƯU Ý: ô đo trong `verify11.py` bị lệch (wave y680–688,
+  dr_b y680–690) nên đọc nhầm 0 — đừng dùng số tai của `verify11.json` cho wave/dr_b.**
+- **Chấm đen tai XA trai — ĐÃ XÓA HẾT (F1, xem dưới):** ur_b 37 px, ur_c
+  107 px (chấm xanh-đen), ur_d 140 px — agent báo nhầm là 0 do ô đo sai vị trí;
+  đã sửa bằng code 24/11, dark = 0 trong ô đúng + soi 4× đạt.
+
+## Kiểm chứng (soi bằng mắt trên nền tối (60,60,80) + nền phòng v3b)
+
+Ảnh ghép của verifier `lot14/work/set11/composites/` (làm mới, độc lập với ảnh ghép
+của 2 agent vẽ): (a) `verify11_mine_girl_dark.png` (10 file gái);
+(b) `verify11_mine_boy_dark.png` (10 file trai); (c) `verify11_mine_room20.png`
+(20 file ở cỡ app trong phòng v3b); (d) `verify11_mine_faces_3x_girl.png` /
+`verify11_mine_faces_3x_boy.png` (01/07/11 × full/wave, 3×); mặt khung đi 2×
+`verify11_mine_walk_faces_2x.png`; tai 3× `verify11_mine_ears_3x_boy.png` (+ 4 crop
+tai xa ur 4× cạnh 07 — soi F1); khiên 2× `verify11_mine_shield_2x_boy.png`; giày gái
+`verify11_mine_girl_shoes_4x.png`; mối ghép mắt gái `verify11_mine_seam_3x_girl.png`.
+
+- Mặt/mắt gái 11 = mắt 01 (đã ghép dải mắt, không thấy đường ghép, không đường nối
+  đo được); mặt/mắt trai 11 full thẳng, khớp 07/01; wave trai dy 5,2 px như 07 wave.
+- Váy vảy rồng mint-hồng / giáp rồng mint-vàng đọc rõ đúng brief; chân vẫn thấy rõ,
+  chạm y = 1428–1429. Không lỗ alpha lạ, không mép thẳng (magenta 0 px cả 3 thước,
+  semi 0, 256 màu ở vùng opaque cả 20 file — trai full 201 màu, vẫn hợp lệ).
+- Miệng cười mím khép thống nhất cả 20 file (soi 3× full/wave + 2× 16 mặt khung đi;
+  detector miệng gái bắt nhầm dây chuyền sao, chỉ xác minh bằng mắt).
+- Chân luân phiên khung đi rõ: a/c tiếp đất đối nhau, b/d bước giữa (cả 4 dải);
+  tay vẫy ngược chân; đầu thẳng hàng trong chu kỳ (trừ ur trai dịch +40 và ur_d gái
+  profile / ur_d trai sau đầu — xem "Điểm chưa chắc").
+- Trong phòng v3b ở cỡ app: tỉ lệ tự nhiên, chân chạm sàn; gái sạch, không thấy
+  viền lạ; trai sạch, không viền trắng, khiên + áo choàng đọc rõ; không thấy bóng
+  đỏ sẫm dưới giày gái.
+
+### Điểm chưa chắc — nói thẳng
+
+- **F1 — CHẤM ĐEN TAI XA Ở 3 KHUNG ĐI UR TRAI — ĐÃ SỬA 24/11, KHÔNG CÒN CHẶN ĐẨY
+  (verifier phát hiện, agent báo nhầm là 0):** ur_b 37 px tại (457–462, 655–663),
+  ur_c 107 px tại (523–535, 665–677) — chấm tròn xanh-đen, ur_d 140 px tại
+  (666–677, 651–668) — chấm bầu dục tối; cả 3 đều trên dái tai xa, soi 4× thấy rõ;
+  07 ur_b/c/d = 0 px trong cùng vùng (đo bằng code + soi 4x tai trần). Nguyên nhân
+  agent sót: ô đo sai vị trí — ur_b (363,713,373,723) đo 0, ur_c (430,696,440,705)
+  nằm trong tóc nên đo 110 px = tóc (không phải chấm), ur_d (342,707,352,716) đo 0.
+  Cách sửa (đã làm, script `fix11_ears_far.py` + `fix11_ears_far_bc_final.py` /
+  `fix11_ears_far_urd_final.py`, log kèm theo; bản gốc ở `backup_fix_ears/`): mask =
+  chấm dilate 4 px, tô bằng màu da gần nhất trên file final (nearest-skin donor —
+  chỉ màu đã có trong palette, không requantize, alpha không đổi). Đo lại: dark = 0
+  trong ô ĐÚNG (ur_b (455,653,464,665), ur_c (521,663,537,679), ur_d
+  (664,649,679,670)); soi 4× (`composites/fix_ears_ur_4x.png`): da liền mạch,
+  không vết xám, không mép vá. Byte/SHA mới: ur_b 653.034 (`9ba2b757461b`), ur_c
+  584.778 (`a0f1632c0604`), ur_d 567.959 (`9424ba952a10`); 17 file còn lại SHA không
+  đổi 17/17; 3 file vẫn 1024×1536, semi 0, magenta 0 (3 thước), 256 màu, chân y
+  1428, hcx/hcy ur không đổi. Chấm tai GẦN (full 40, wave 68, dr_b 70) GIỮ NGUYÊN
+  theo quyết Claude — không chạm. Lưu ý 2 bài học trong lúc sửa: (1) bản sửa đầu
+  tô median phẳng trên layers + requantize để lại vệt hình chữ nhật nhạt ở ur_c
+  khi soi 4× nên làm lại bằng donor trên final; (2) requantize ur_d từ layers đổi
+  26/256 màu palette → 63.603 px đổi khắp ảnh nên đã phục hồi từ backup rồi sửa
+  trực tiếp trên final (chỉ 255 px trong mask) — từ giờ không requantize ur_d từ
+  layers khi chưa khóa palette.
+- **(a) Chu trình ur trai dịch +40 px — CHẤP NHẬN cho đợt đẩy này (không chặn); nợ
+  vẽ lại ur_a ở lượt sau:** hcx ur 525,0–525,2 (ổn định ±0,2 trong chu trình) vs 07
+  484,3–484,9 → +40,2..+40,9 px; hcy 383,2–385,5 vs 07 392,2–393,2; ur_a xmin 8,
+  ur_b xmax 1018 — không khung nào chạm biên (đây là mục đích của phép dịch: ur_a v1
+  không vẽ lại được do `invalid_resume_id`, runtime cấm thử lại). Hệ quả: khi đổi
+  hướng dr→ur hoặc dừng đi ur→đứng, nhân vật nhảy ngang ~40 px cỡ gốc (~12 px cỡ
+  app). Vẽ lại ur_a ở lượt sau (prompt mới, không resume) rồi bỏ `UR_SHIFT` trong
+  `key11.py`.
+- **(b) Đầu gái ur không đồng hướng — CHẤP NHẬN cho đợt đẩy này (không chặn); nợ vẽ
+  lại ur_d ở lượt sau:** neo mắt gần ur_a −21,9x / ur_b +26,3x / ur_c −19,2x /
+  ur_d −12,9x (dải x ur rộng 48,2 px vs 07 là 37,7 px; cycle mean khớp 07 trong ~4 px);
+  soi 2× cạnh 07 ur: 07 đều 3/4 thấy 2 mắt, 11 ur_a/ur_c 3/4, ur_b 3/4 mạnh, chỉ
+  ur_d PROFILE MẠNH (1 mắt + mép mắt thứ hai). Lắc ±25 px cỡ gốc ≈ 3–7 px cỡ app,
+  trong cùng bậc bob đã chấp nhận ở 07/10; chỉ ur_d lệch hướng thật — vẽ lại 1 khung
+  ở lượt sau (giữ váy/tư thế), KHÔNG cần vẽ lại ur_b.
+- **(c) Lid-band wave gái 53 px — KHÔNG CHẶN:** 41/53 px ở x>740 (mép phải cửa sổ
+  mắt, y584–619, median RGB (144,135,177)) = mép cánh rồng mint-teal lọt vào cửa sổ
+  — soi 4× vùng (680–860, 520–680) thấy cánh rồng, không phải mắt; 12 px còn lại là
+  vệt dither 1–2 px quanh mắt trái; lid-box 70×80 chỉ 3 px (07 wave 2, 01 wave 1).
+  Không phải mắt mở ngoài vùng miếng 01.
+- **F2 — Đầu trai ur_d là góc SAU ĐẦU (verifier) — không chặn, ghi nợ vẽ lại:**
+  boy ur_d không thấy mắt/mũi (chỉ tóc + tai + khiên), trong khi 07 ur_d thấy 2 mắt
+  3/4; ur_b cũng quay lưng nhiều (mắt ở mép phải). Trong phòng cỡ app, đầu trai ur
+  'biến mất' 1 nhịp/4 khung. Đề xuất vẽ lại ur_d trai cùng lượt với ur_a (xem (a))
+  để đồng nhất 3/4 như 07.
+- **Vệt đỏ sẫm gái — CHẤP NHẬN, KHÔNG TÔ LẠI (xem mốc gái):** trung vị màu G~73 (khác
+  bóng bộ 09 G~5); cụm lớn nhất nằm TRONG silhouette giữa 2 giày dưới gấu váy;
+  preview đã duyệt có nhiều hơn (1376 px); 07 đã duyệt cũng có 159/327 px cùng họ
+  màu. Tô lại sẽ đục lỗ lót váy.
+- **Halo mép tóc — SẠCH:** gái near-white 0–35 px (dưới baseline 01 là 36/205); trai
+  full 9 px rời rạc / wave 0 / đi 0–9 px — xa dưới lỗi bộ 10 (wave 96 px). 'Halo 89 px'
+  ở ur_c trai là dương tính giả: 0 px near-white, 115 px pale-warm median (228,206,193)
+  = da tai ở mép silhouette (soi 4× xác nhận); pale-warm 481 px ở ur_b là dải sáng dọc
+  mép áo choàng/giáp, không phải tóc. White-rim 5 px: gái 5–54, trai 0–12 — ngang
+  baseline 01, không có vỏ trắng như F1 bộ 10.
+- Mắt gái wave blob worst 2,6 px / union 1,8 px — ĐẠT cổng ±3 nhưng KHÔNG đạt mục
+  tiêu ±1,5 px (thiếu 1,1 px ở R x); trên layers khớp 01 gần tuyệt đối — nhiễu
+  quantize, không vẽ lại.
+- Mắt trai full KHÔNG ĐẠT cổng ±3 vs 01 (lệch tối đa +5,8 px) — nhưng 07 đã duyệt
+  cũng không đạt và lệch x lớn hơn; 11 khớp 07 trong ±3,8 px, lid-box 0. Chấp nhận
+  theo tiền lệ 07/08/09/10, không ghép mắt.
+- Chiều cao bbox 1158–1211 (gái) / 1231–1252 (trai), dưới spec 1287±10 —
+  ĐÃ CHẤP NHẬN theo quyết 24/11 (như 07/08/09/10); chân y 1428–1429 và mắt khớp chuẩn.
+- Viền tóc/váy còn ánh hồng rất nhạt ở một số mép ở 3–4×; ở cỡ app 360 px không thấy.
+
+## Việc còn lại cho giai đoạn code (E)
+
+- Entry manifest cho 20 file trên + cập nhật `source` thành "Muse vẽ AI 24/11
+  theo DESIGN.md".
+- Dùng CHUNG miếng mắt nhắm của bộ 01 cho cả full/wave 11 (quy tắc Claude chốt
+  22/11) — KHÔNG làm miếng riêng. `_eyeCenter` riêng theo nhân vật đã có
+  (gái y ≈ 560, trai y ≈ 627).
+- Test neo: chân nhân vật trong vùng sàn đã khai báo; khung đi 2 hướng × 4 khung
+  theo đúng thứ tự a→b→c→d. Mở PR sau khi Claude duyệt kiểu.
+- **F1 (verifier, 24/11) ĐÃ SỬA XONG — SẴN SÀNG ĐẨY (chờ duyệt đẩy):** 3 chấm tai xa
+  ur_b/c/d trai đã xóa bằng code (xem F1 trên), dark = 0 trong ô đúng + soi 4× đạt,
+  byte/SHA đã cập nhật ở report.json + doc. Gái 10/10 SẠCH, SHA không đổi. Trai 10/10
+  sẵn sàng.**
+- Nợ lượt sau (không chặn đẩy): vẽ lại ur_a trai (bỏ dịch +40) + ur_d trai (đồng
+  nhất 3/4) + ur_d gái (đồng nhất 3/4) — prompt mới, không resume.
+
+## Đẩy .b64 (kế hoạch — F1 ĐÃ SỬA, CHƯA ĐẨY, chờ duyệt đẩy)
+
+- Tổng PNG 20 file 13,543,999 byte → .b64 ≈ 18,058,665 byte. **Chia 5 lần
+  × 4 file TRỘN gái+trai theo byte (~3,56–3,72 MB .b64/lần, dưới trần HTTP đã đo
+  5,02 MB thành công / 5,47 MB lỗi).** (Brief ban đầu ghi 4 lần × 5 file ~3,5 MB/lần
+  nhưng tổng bộ 11 lớn hơn bộ 10 (13,55 MB PNG so với 11,09 MB) nên 4 lần sẽ là
+  ~4,5 MB/lần — vẫn dưới trần 5,02 MB nhưng sát hơn; chọn 5 lần cho an toàn.) Đích
+  `app/assets/_incoming/app/assets/images/character/girl/` và `.../boy/`.
+  **Danh sách 5 lần ĐÃ ĐỐI CHIẾU với `final/` bằng code — đủ 20 file, không trùng không
+  thiếu (20 tên, 20 unique, missing [] extra []).**
+  SHA-256 (12 ký tự đầu) của 20 file — BẢN FINAL HIỆN TẠI (verifier đo lại khớp
+  `girl_report.json` / `boy_report.json` / `verify11.json` từng byte):
+gái girl_full_11 `bba8f04f4013`
+gái girl_full_11_wave `1d350671a59e`
+gái girl_full_11_walk_dr_a `b490f1cee783`
+gái girl_full_11_walk_dr_b `e400673d023f`
+gái girl_full_11_walk_dr_c `5c6249b0aae5`
+gái girl_full_11_walk_dr_d `faaa09b35bfe`
+gái girl_full_11_walk_ur_a `a38ffd59e767`
+gái girl_full_11_walk_ur_b `8a7c66cecb24`
+gái girl_full_11_walk_ur_c `49b051367158`
+gái girl_full_11_walk_ur_d `4d249b51c905`
+trai boy_full_11 `aa01348e9b10`
+trai boy_full_11_wave `ce779bfe0f83`
+trai boy_full_11_walk_dr_a `b4dc9a1efb4e`
+trai boy_full_11_walk_dr_b `435788c371c4`
+trai boy_full_11_walk_dr_c `dc30b2843dea`
+trai boy_full_11_walk_dr_d `4aeb4e8083ac`
+trai boy_full_11_walk_ur_a `bd1c9f1d6d90`
+trai boy_full_11_walk_ur_b `9ba2b757461b`
+trai boy_full_11_walk_ur_c `a0f1632c0604`
+trai boy_full_11_walk_ur_d `9424ba952a10`
+  Lần 1 (~3.72 MB .b64, 4 file): boy_full_11_walk_dr_c, boy_full_11_walk_ur_b, girl_full_11_walk_ur_b, girl_full_11_wave.
+  Lần 2 (~3.66 MB .b64, 4 file): boy_full_11_walk_dr_a, boy_full_11_walk_dr_b, girl_full_11, girl_full_11_walk_ur_d.
+  Lần 3 (~3.56 MB .b64, 4 file): boy_full_11_walk_dr_d, boy_full_11_walk_ur_a, girl_full_11_walk_dr_d, girl_full_11_walk_ur_c.
+  Lần 4 (~3.57 MB .b64, 4 file): boy_full_11, boy_full_11_walk_ur_c, girl_full_11_walk_dr_a, girl_full_11_walk_dr_c.
+  Lần 5 (~3.56 MB .b64, 4 file): boy_full_11_walk_ur_d, boy_full_11_wave, girl_full_11_walk_dr_b, girl_full_11_walk_ur_a.
+  20/20 .b64 giải mã đúng từng byte PNG gốc trong vòng khứ hồi local (SHA-256 khớp)
+  — đo trên bản trước sửa F1; **khi tạo .b64 để đẩy phải chạy lại vòng khứ hồi cho
+  3 file mới (ur_b/c/d) và quét mẫu secret trước khi đẩy** — đối chiếu blob SHA
+  trên nhánh bị chặn (bảo vệ mã xác minh, giống bộ 04–10),
+  Claude kiểm lại bằng git khi decode.
+  **LƯU Ý TRƯỚC KHI ĐẨY (bài học bộ 09/10): quét file .b64 staged tìm mẫu secret
+  (chuỗi AKID + 32 ký tự, mẫu "Tencent Cloud Secret ID") TRƯỚC khi đẩy — bộ 09/10
+  từng bị GitHub secret scanning chặn vì chuỗi base64 tình cờ trúng mẫu (dương
+  tính giả); nếu trúng, mã lại PNG lossless đổi compress_level rồi đẩy lại.
+  Chưa đẩy (F1 đã sửa, chờ duyệt đẩy).
