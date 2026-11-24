@@ -364,3 +364,7 @@ Các mục trên là nhật ký quyết định theo thời điểm; mục này 
 ## Bản thử mở hết tính năng (24/11/2026)
 
 Chủ dự án chốt 24/11: khi thử thì mở hết, không khóa đề đầu ngày; cờ `TEST_UNLOCKS` (compile-time, mặc định tắt) để bản chính thức về như cũ. Tag `v0.0.x` build với cờ bật (xem docs/RELEASE.md). Khi bật: mở Phòng/Tủ đồ/Cửa hàng, tháp, vuốt ve pet không cần xong chặng; tặng 10.000 xu + 10.000 kim cương (refId `test_grant_v1`, nạp lại `test_topup_<n>` khi dưới 1.000); menu QA bật với nút đặt mốc pet, suất ăn, nở trứng, tua ngày; nhãn "BẢN THỬ" ở Thị trấn.
+
+## Phòng chủ đề (24/11/2026)
+
+Chủ dự án giao: vẽ nội thất hợp các bộ đồ hiếm/siêu hiếm mới để decor cả phòng phong cách mới, không ăn theo phòng gốc. Chốt: mỗi chủ đề (Tết hiếm 1200 xu, Ngân hà hiếm 1800 xu, Rồng siêu hiếm 80 kim cương) là một nền 1600x900 cùng bố cục `room_v3` có sẵn món nhỏ theo chủ đề (không vẽ 5 món nhỏ của phòng gốc) + bản chủ đề của 8 món nội thất mua (`furniture/<chủ đề>_<chỗ>.png`). Mua chủ đề ở tab Nội thất; đổi ở nút "Phong cách" trong Phòng (lưu `room_theme`). Món nội thất đã mua tự đổi kiểu theo chủ đề, không phải mua lại. Ẩn cho tới khi có hình (`roomThemeArtReady`).
