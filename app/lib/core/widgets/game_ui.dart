@@ -416,3 +416,92 @@ class GameSign extends StatelessWidget {
     );
   }
 }
+
+/// Biển tên nhỏ gắn thẳng lên mặt tiền công trình (góp ý 24/11: biển gỗ
+/// ngang to quá, thay bằng biển nhỏ gắn trên nhà). Viên bo tròn theo màu
+/// khu, viền trắng, hai đinh tán nhỏ; [badge] là nhãn trạng thái nhỏ ở
+/// góc dưới phải.
+class GamePlaque extends StatelessWidget {
+  const GamePlaque({
+    super.key,
+    required this.text,
+    required this.color,
+    this.badge,
+    this.badgeColor = const Color(0xFF7FB069),
+    this.scale = 1.0,
+  });
+
+  final String text;
+  final Color color;
+  final String? badge;
+  final Color badgeColor;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    final light = Color.lerp(color, Colors.white, 0.12)!;
+    final dark = Color.lerp(color, Colors.black, 0.22)!;
+    Widget rivet() => Container(
+      width: 4 * scale,
+      height: 4 * scale,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.9),
+        shape: BoxShape.circle,
+      ),
+    );
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: 7 * scale,
+            vertical: 2.5 * scale,
+          ),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [light, dark],
+            ),
+            borderRadius: BorderRadius.circular(9 * scale),
+            border: Border.all(color: Colors.white, width: 1.6 * scale),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x55000000),
+                blurRadius: 3,
+                offset: Offset(0, 1.5),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              rivet(),
+              SizedBox(width: 4 * scale),
+              Text(text, maxLines: 1, style: gameOutlinedText(10.5 * scale)),
+              SizedBox(width: 4 * scale),
+              rivet(),
+            ],
+          ),
+        ),
+        if (badge != null)
+          Positioned(
+            right: -6 * scale,
+            bottom: -9 * scale,
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: 4 * scale,
+                vertical: 0.5 * scale,
+              ),
+              decoration: BoxDecoration(
+                color: badgeColor,
+                borderRadius: BorderRadius.circular(7 * scale),
+                border: Border.all(color: Colors.white, width: 1.2),
+              ),
+              child: Text(badge!, style: gameOutlinedText(8 * scale)),
+            ),
+          ),
+      ],
+    );
+  }
+}

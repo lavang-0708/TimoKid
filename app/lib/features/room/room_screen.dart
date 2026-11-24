@@ -413,9 +413,16 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     await shop.grandfather(childId);
     final owned = await shop.owned(childId);
     if (!mounted) return;
+    // Góp ý 24/11: mở Tủ đồ là bảng to gần kín màn, ảnh to dễ nhìn.
+    final screenH = MediaQuery.sizeOf(context).height;
+    final sheetH = screenH * 0.94;
+    final tileH = ((sheetH - 200) / 2).clamp(92.0, 220.0);
+    final tileW = (tileH * 1.05 + 12).clamp(104.0, 250.0);
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
+      isScrollControlled: true,
+      constraints: BoxConstraints(maxHeight: sheetH, maxWidth: double.infinity),
       builder: (sheetContext) => StatefulBuilder(
         builder: (sheetContext, setSheet) {
           final current = _profile ?? profile;
@@ -436,7 +443,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                   : () => _openShopFromWardrobe(sheetContext),
               borderRadius: BorderRadius.circular(14),
               child: Container(
-                width: 104,
+                width: tileW,
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: selected ? const Color(0xFFEDE4FB) : Colors.white,
@@ -452,7 +459,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(
-                      height: 92,
+                      height: tileH,
                       child: lockedItemId == null
                           ? child
                           : Stack(
@@ -544,6 +551,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                               setSheet(() {});
                             },
                             child: Stack(
+                              clipBehavior: Clip.none,
                               children: [
                                 Positioned.fill(
                                   child: Image.asset(
@@ -552,12 +560,13 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                                   ),
                                 ),
                                 Positioned(
-                                  left: 0,
-                                  top: 0,
+                                  left: -12,
+                                  top: -10,
                                   child: RarityBadge(
                                     key: Key('room-wardrobe-rarity-$n'),
                                     rarity: outfitRarityOf(n),
                                     compact: true,
+                                    tilted: true,
                                   ),
                                 ),
                               ],
@@ -590,14 +599,21 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                               setState(() => _headAccessory = id);
                               setSheet(() {});
                             },
-                            child: KidSprite(
-                              gender: gender,
-                              outfit: outfit,
-                              headAccessory: id,
-                              glasses: _glasses,
-                              whiteShoes: _whiteShoes,
-                              backpack: _backpack,
-                              animationsEnabled: false,
+                            // Giữ đúng tỉ lệ khung 1024x1536 (góp ý 24/11:
+                            // ảnh phụ kiện bị méo khi kéo giãn theo ô).
+                            child: Center(
+                              child: AspectRatio(
+                                aspectRatio: kidFrameWidth / kidFrameHeight,
+                                child: KidSprite(
+                                  gender: gender,
+                                  outfit: outfit,
+                                  headAccessory: id,
+                                  glasses: _glasses,
+                                  whiteShoes: _whiteShoes,
+                                  backpack: _backpack,
+                                  animationsEnabled: false,
+                                ),
+                              ),
                             ),
                           ),
                       ],
@@ -1430,14 +1446,15 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                                   ),
                                 ),
                                 Positioned(
-                                  left: -6,
-                                  top: -6,
+                                  left: -14,
+                                  top: -10,
                                   child: RarityBadge(
                                     key: Key('room-pet-rarity-${p.species}'),
                                     rarity:
                                         petShopSpeciesById(p.species)?.rarity ??
                                         PetRarity.common,
                                     compact: true,
+                                    tilted: true,
                                   ),
                                 ),
                               ],

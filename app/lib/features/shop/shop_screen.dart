@@ -843,6 +843,7 @@ class _ItemCard extends StatelessWidget {
                   child: SizedBox(
                     width: double.infinity,
                     child: Stack(
+                      clipBehavior: Clip.none,
                       children: [
                         Positioned.fill(
                           child: ShopItemArt(
@@ -853,12 +854,16 @@ class _ItemCard extends StatelessWidget {
                         ),
                         if (item.rarity != null &&
                             item.rarity != PetRarity.common)
+                          // Nhãn nhỏ chéo đè góc khung (góp ý 24/11:
+                          // giữ cỡ ảnh như món thường, không che đầu).
                           Positioned(
-                            left: 0,
-                            top: 0,
+                            left: -14,
+                            top: -12,
                             child: RarityBadge(
                               key: Key('shop-rarity-${item.id}'),
                               rarity: item.rarity!,
+                              compact: true,
+                              tilted: true,
                             ),
                           ),
                         if (count != null)

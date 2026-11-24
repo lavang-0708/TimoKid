@@ -88,7 +88,12 @@ class _SplashScreenState extends State<SplashScreen>
     return Scaffold(
       key: const Key('splash-screen'),
       backgroundColor: const Color(0xFFFFE3F0),
+      // Góp ý 24/11 (máy tính bảng, "màn chia 2, nửa hồng"): Container có
+      // con là Column chỉ rộng bằng con rộng nhất (logo), nên ảnh nền chỉ
+      // phủ một dải giữa. Ép phủ kín màn.
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           color: Color(0xFFFFE3F0),
           image: DecorationImage(
@@ -103,6 +108,7 @@ class _SplashScreenState extends State<SplashScreen>
               final t = _c.value;
               final pop = Curves.elasticOut.transform((t / 0.45).clamp(0, 1));
               return Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Spacer(),
                   Transform.scale(scale: 0.6 + 0.4 * pop, child: const _Logo()),
