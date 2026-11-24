@@ -32,9 +32,9 @@ const double kidFeetFraction = kidFeetY / kidFrameHeight;
 const bool premiumOutfitsArtReady = false;
 
 /// Số bộ đồ cơ bản (bộ 1–3: chọn ở mở đầu / mua 80 xu) và tổng số bộ
-/// kể cả cao cấp (04–07).
+/// kể cả cao cấp (04–11; lô 14 thêm 08–11 ngày 24/11).
 const int kidBasicOutfitCount = 3;
-const int kidTotalOutfitCount = 7;
+const int kidTotalOutfitCount = 11;
 
 /// Số bộ cao cấp đã có hình, tính lần lượt từ bộ 04 (Muse vẽ theo thứ
 /// tự 04 → 07). 22/11: đủ bộ 04–07 hai dáng (lô 9, đứng, vẫy, 8 khung
@@ -64,6 +64,10 @@ const Map<String, List<String>> kidAllOutfitIds = <String, List<String>>{
     'girl_top_05',
     'girl_top_06',
     'girl_top_07',
+    'girl_top_08',
+    'girl_top_09',
+    'girl_top_10',
+    'girl_top_11',
   ],
   'boy': <String>[
     'boy_outfit_01',
@@ -73,10 +77,14 @@ const Map<String, List<String>> kidAllOutfitIds = <String, List<String>>{
     'boy_outfit_05',
     'boy_outfit_06',
     'boy_outfit_07',
+    'boy_outfit_08',
+    'boy_outfit_09',
+    'boy_outfit_10',
+    'boy_outfit_11',
   ],
 };
 
-/// Tên hiển thị của từng bộ đồ (cả 7 bộ mỗi dáng).
+/// Tên hiển thị của từng bộ đồ (cả 11 bộ mỗi dáng).
 const Map<String, String> kidOutfitNames = <String, String>{
   'girl_top_01': 'Váy hồng',
   'girl_top_02': 'Váy tím',
@@ -92,6 +100,15 @@ const Map<String, String> kidOutfitNames = <String, String>{
   'boy_outfit_05': 'Vest dạ hội',
   'boy_outfit_06': 'Hoàng tử',
   'boy_outfit_07': 'Hiệp sĩ hoàng gia',
+  // Lô 14 (24/11): 08 thường, 09–10 hiếm, 11 siêu hiếm.
+  'girl_top_08': 'Yếm jean dã ngoại',
+  'girl_top_09': 'Áo dài Tết',
+  'girl_top_10': 'Váy Ngân hà',
+  'girl_top_11': 'Công chúa rồng',
+  'boy_outfit_08': 'Polo dã ngoại',
+  'boy_outfit_09': 'Áo dài gấm',
+  'boy_outfit_10': 'Phi hành gia',
+  'boy_outfit_11': 'Hiệp sĩ rồng',
 };
 
 /// Phụ kiện đầu theo dáng: mã → (tên hiển thị, tên file không đuôi).
@@ -123,6 +140,9 @@ int kidOutfitNumber(
   return (n >= 1 && n <= kidOutfitLimit(premiumReady: premiumReady)) ? n : 1;
 }
 
+/// Số bộ 2 chữ số trong tên file (`7` → `07`, `11` → `11`).
+String kidOutfitCode(int outfit) => outfit.toString().padLeft(2, '0');
+
 /// Đường dẫn ảnh toàn thân. [backpack] = biến thể đeo balo (Muse vẽ
 /// cả người đeo balo vì balo lớp rời không khớp người).
 String kidFullAsset(
@@ -132,7 +152,7 @@ String kidFullAsset(
   bool backpack = false,
 }) {
   final g = kidGender(gender);
-  return 'assets/images/character/$g/${g}_full_0$outfit'
+  return 'assets/images/character/$g/${g}_full_${kidOutfitCode(outfit)}'
       '${wave ? '_wave' : ''}${backpack ? '_backpack' : ''}.png';
 }
 
@@ -199,7 +219,7 @@ List<String>? kidWalkFrames(String gender, int outfit, {required bool up}) {
   final dir = up ? 'ur' : 'dr';
   return <String>[
     for (final f in const ['a', 'b', 'c', 'd'])
-      'assets/images/character/$g/${g}_full_0${outfit}_walk_${dir}_$f.png',
+      'assets/images/character/$g/${g}_full_${kidOutfitCode(outfit)}_walk_${dir}_$f.png',
   ];
 }
 
