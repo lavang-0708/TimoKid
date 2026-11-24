@@ -2197,3 +2197,165 @@ Tổng .b64 ~5,27 MB; đích `app/assets/images/pets/`; mỗi lần ≤8 file, m
 Đã đẩy 4 lần .b64 (24/11/2026): `59ed0830` (7 file), `80b55fa7` (7 file),
 `e3ab1c92` (6 file), `7f453960` (7 file), 27/27 vòng khứ hồi local khớp từng
 byte. Chưa decode (chờ Claude decode).
+### Lô 12B — Hiệu ứng rồng (pet siêu hiếm): 13 file (24/11/2026)
+
+Rồng là pet siêu hiếm đầu tiên nên có hiệu ứng + tương tác riêng, khác biệt hoàn
+toàn. 4 tấm xem trước đã duyệt kiểu (24/11 ~02:20) **dùng lại nguyên bản, không
+vẽ lại**; vẽ mới 9 khung (fire_1/3/4, water_1/3/4, fly_b/c/d). 13 file vào
+`app/assets/images/pets/`, 512×512, PNG trong suốt, alpha sạch (semi 0, 0 px
+magenta cả thước chuẩn R>200/G<80/B>200 lẫn thước nới R>140/G<60/B>140),
+quantize 256 màu MAXCOVERAGE + Floyd–Steinberg. 13 khung dùng cho **RỒNG
+TRƯỞNG THÀNH** (lấy `dragon_adult` làm tham chiếu duy nhất, SHA `7eaaa6e9…`,
+bbox 54,40,457,439); mới nở/nhỡ chỉ tia lửa/bong bóng nhỏ + nhảy vỗ cánh bằng
+hiệu ứng code, không cần tranh. Tổng PNG 1.742.956 B (~2,32 MB .b64).
+
+#### Cách dùng (phía code, Claude chốt 24/11 ~00:45)
+(a) bé chạm rồng trong Phòng → hiện 3 nút Phun lửa / Phun nước / Bay; (b) rồng
+trưởng thành đi quãng dài sẽ tự bay; (c) hào quang luôn tỏa sau rồng (phập phồng)
+ở Phòng, Cửa hàng, Pet của bé.
+
+#### Quyết định đã chốt (Claude duyệt xem trước 24/11 ~02:20)
+1. Đốm hồng nhạt trong hào quang: **GIỮ** (hợp cánh hồng).
+2. Lửa dời trái 16,4 px: **CHẤP NHẬN** (trục thân lửa 239,1 vs adult 255,5; app bù
+   lệch theo từng loại khung để không nhảy).
+3. Bay 94% cỡ adult: **CHẤP NHẬN** (app phóng bù).
+4. Hai tọa độ miệng riêng: **OK** — lửa (279,7; 174,6), nước (322,2; 181,4), mỗi
+   loại dùng chung 1 miệng cho 4 khung của nó (xem bảng dưới).
+
+#### Bảng 13 file
+
+| file | byte | bbox (x0, y0, x1, y1) | đất y / đáy y | SHA-256 (12 ký tự đầu) | lần vẽ |
+|---|---|---|---|---|---|
+| dragon_fire_1.png | 116571 | 10, 40, 391, 439 | 439 | ab5c1c68635e | 2 |
+| dragon_fire_2.png | 156945 | 27, 40, 505, 439 | 439 | bf2193f9b2c7 | 2 |
+| dragon_fire_3.png | 135843 | 22, 40, 502, 439 | 439 | e1579ee23c51 | 2 |
+| dragon_fire_4.png | 125480 | 26, 40, 454, 439 | 439 | fb3601bac65b | 1 |
+| dragon_water_1.png | 145892 | 32, 40, 451, 439 | 439 | 6f1f115d098d | 2 |
+| dragon_water_2.png | 153703 | 36, 40, 485, 439 | 439 | 7337715baa15 | 3 |
+| dragon_water_3.png | 156878 | 27, 40, 505, 439 | 439 | 869ade13cd22 | 3 |
+| dragon_water_4.png | 144946 | 31, 40, 488, 439 | 439 | de7ab04f8667 | 1 |
+| dragon_fly_a.png | 143007 | 72, 19, 438, 388 | 388 | 1222327243b8 | 1 |
+| dragon_fly_b.png | 110326 | 7, 94, 458, 341 | 341 | ea3051cf1e95 | 3 |
+| dragon_fly_c.png | 130619 | 72, 88, 438, 459 | 459 | 778c05db522b | 2 |
+| dragon_fly_d.png | 145726 | 74, 19, 436, 388 | 388 | 01b9892e271e | 3 |
+| dragon_aura.png | 77020 | 25, 11, 484, 467 | — | 77697b891f67 | 2 |
+
+#### Mốc đo (đo bằng code từ ảnh thật)
+
+- **Miệng = gốc tia** (centroid 100 px thô đầu tiên của tia, đối chiếu bằng cụm
+  đỏ-xám miệng mở). Hai miệng riêng, mỗi loại dùng chung cho 4 khung của nó:
+  - Lửa: **(279,7; 174,6)** (đo trên fire_2). fire_1 effect-root (313,1; 176,1),
+    fire_3 (285,9; 173,7), fire_4 không có tia nên đo bằng cụm đỏ miệng
+    (283,4; 165,7) — xem "Điểm chưa chắc" số 1.
+  - Nước: **(322,2; 181,4)** (đo trên water_2). water_1 (325,0; 180,8),
+    water_3 (320,8; 180,8) — cả hai trong ±3 px; water_4 không có tia, cụm
+    đỏ-xám (325,4; 169,3), mép trái bbox 322,9 ≈ đúng 322,2.
+  - **Miệng thật (cụm đỏ-xám trong miệng):** lửa x≈262–268 ở cả 4 khung (fire_2
+    là 268,4); nước x≈298–302 (water_2 là 299,5) — mặt rồng khớp nhau, xem
+    "Điểm chưa chắc" số 1.
+- **Neo ngang fire/water:** trục thân (tâm mặt vùng quanh miệng) → lửa 239,1
+  (dời trái 16,4 px để đủ đốm lửa), nước 255,5 như adult; rồng cao 400, chân
+  y=439; KHÔNG neo tâm bbox tổng (bbox tổng lệch phải do tia). Rồng-phần sau
+  đặt: lửa (26,7–22,0; 40; 359,5–391,1; 439,6), nước (27,1–36,4; 40;
+  398,3–407,4; 439,6) — cùng cao/đáy với adult, hẹp hơn do tư thế 3/4.
+- **Chuỗi lửa** (độ dài tia đặc / effect px): 1: 65 px ≈ 0,29× fire_2 (quả cầu
+  lửa trong miệng + tia ngoài nhỏ) → 2: 163,4 px / 117.546 px → 3: lớn nhất,
+  dài nhất, đầu tia x=503, effect 138.039 px → 4: tàn (effect 963 px, khói nhẹ,
+  miệng hé khép). Chuỗi tăng rồi tàn rõ bằng mắt.
+- **Chuỗi nước** (độ dài vòi đặc / effect px): 1: 113,6 px = 0,70× water_2 /
+  24.563 px → 2: 163,4 px / 66.919 px → 3: 184,4 px / 71.091 px, đầu vòi x=505
+  → 4: không tia, chỉ giọt rơi/bong bóng (15.407 px), miệng hé khép. Chuỗi
+  tăng rồi tàn rõ bằng mắt.
+- **Chu kỳ bay** (đầu cánh gần, y): a 43 (cao nhất) → b 169 (ngang) → c 455
+  (thấp nhất) → d 44 (vỗ lên) → lặp lại a. Dài thân (mũi→chóp đuôi) 373–377 px
+  ở cả 4 khung (mắt cy 174–178, mũi x 436–442, đuôi x 67–74) — thân khóa chặt,
+  chỉ cánh đổi vị trí. **Lưu ý:** d ≈ a (xem "Điểm chưa chắc" số 3).
+- **Bay — độ cao thân:** a đáy 388 (nhấc 51 px), b chân y=342 (nhấc 97 px),
+  c chân y=439 (nhấc 0 px, cánh cụp thõng xuống dưới, đáy bbox 459 là đầu
+  cánh), d đáy 388 (nhấc 51 px). App thay khung tại chỗ (cùng gốc 512),
+  KHÔNG căn theo đáy bbox — xem "Điểm chưa chắc" số 4.
+- **Aura:** tâm đo được (254,5; 239,0), khớp tâm thân adult (255,5; 239,5); lỗ
+  trống r=201,2; 0 px alpha trong r<150 quanh (256,240); vành cách mép 11–44 px.
+  Đầu cánh rồng adult (r≈201) chạm nhẹ vành trong ở cỡ app — nhìn như rồng nằm
+  trong hào quang, chấp nhận được.
+- **Màu vảy mint** (median): adult (175,216,193); lửa (166,215,188); nước
+  (162,209,195); bay (174,212,180) — cùng họ mint, cùng con v2.
+
+#### Cách làm
+
+- Vẽ từng tấm bằng media generation trên nền magenta #FF00FF, lấy tấm xem trước
+  cùng loại làm tham chiếu (fire_2 / water_2 / fly_a); aura chỉ 1 file, dùng
+  lại bản xem trước. Tổng 24 lần gọi vẽ (13 file: 4 xem trước + 9 mới, kể cả
+  vẽ lại).
+- Tách nền + quantize bằng code (`dragon_fx/process_fx.py`, tái dùng
+  `extract_fg`/`finish` của `lot12/work/dragon/process_dragon.py`: key median
+  góc + flood-fill nền từ biên qua pixel magenta-hued, KHÔNG `binary_fill_holes`;
+  m2/m3 chỉ trong 3 px quanh magenta thật; rim-recolor; quantize 256 màu
+  MAXCOVERAGE + Floyd–Steinberg). Đặt vị trí bằng trục thân (fire/water) hoặc
+  neo-theo-thân (fly_b/c: dài thân khớp fly_a 376,9 px, mắt cy → y=177).
+- Sửa tàn dư magenta sau quantize bằng cách tô màu palette an toàn gần nhất,
+  KHÔNG thêm màu mới (fire_1: 67 px, fire_3: 82 px, fire_4: 58 px, water_1:
+  4 px, water_3: 1 px, fly_b: 24 px, fly_d: 1 px; đo lại 0/0). Aura riêng:
+  recolor 5.281 px magenta + 11.861 px hồng (thước mở) → màu lân cận
+  vàng/trắng/mint; đốm hồng nhạt còn lại GIỮ theo quyết định duyệt.
+- water_3 gọn khung bằng cách cắt mask ở x=505 (cắt 1.948 px thô = 3% đầu quạt)
+  thay vì dời rồng trái (dời sẽ lệch miệng 10,2 px).
+
+#### Kiểm chứng
+
+- Đo bằng code ĐẠT 13/13: 512×512, semi 0, magenta 0 (cả 2 thước), ≤256 màu;
+  fire/water chân y=439; fly đáy y 341–459 (xem "Điểm chưa chắc" số 4).
+- Soi bằng mắt trên nền tối (60,60,80) + nền phòng v3b ở cỡ app (rồng 72%
+  chiều cao bé 360 px) + phóng 3× mặt/miệng/cánh: không lỗ alpha, không mép
+  thẳng, không tàn dư magenta; lửa đọc là lửa, nước đọc là nước ở cả cỡ app;
+  cánh bay không bị keying ăn mất (màng cánh hồng còn nguyên).
+- Ảnh ghép: dải lửa 1..4, dải nước 1..4, chu kỳ bay a..d, 13 file ở cỡ app
+  trong phòng v3b (`dragon_fx/composites/strip_fire.png`, `strip_water.png`,
+  `strip_fly.png`, `d_room_13.png`).
+- 4 file xem trước đối chiếu SHA-256 khớp nguyên bản (fire_2 `bf2193f9b2c7…`,
+  water_2 `7337715baa15…`, fly_a `1222327243b8…`, aura `77697b891f67…`).
+
+#### Điểm chưa chắc — nói thẳng
+
+1. **Cổng miệng ±3 px theo thước effect-root KHÔNG đạt ở dãy lửa** (fire_1
+   +33,4; fire_3 +6,2; fire_4 +3,7/−8,9 so với (279,7; 174,6)). Đây là nhiễu
+   của thước đo, không phải rồng lệch: gốc tia = centroid 100 px đầu của tia,
+   mà độ rộng gốc tia thay đổi theo từng lần vẽ. Bằng chứng: sau khi neo trục
+   thân về 239,1, miệng thật (cụm đỏ-xám) của cả 4 khung lửa gom ở x≈262–268
+   (bản thân fire_2 là 268,4), chân/trục/cỡ khớp hẳn — mặt rồng không nhảy khi
+   đổi khung. Đã chọn neo trục thay vì dịch rồng để ép số effect-root. Dãy
+   nước ĐẠT cổng (water_1 +2,8/−0,6; water_3 −1,4/−0,6).
+2. **Miệng fire_4 cao hơn ~9 px** (y=165,7 so với 174,6) — khác biệt vẽ thật
+   (miệng cười hé vẽ cao hơn, đầu hơi ngẩng), không sửa được bằng đặt vị trí
+   mà không làm chân chìm xuống 448. Ở cỡ app ≈ 4–5 px, soi zoom 3× mới thấy.
+   Tàn lửa fire_4 hơi ánh hồng/tím ở vài đốm (soi dải lửa mới thấy).
+3. **fly_d ≈ fly_a — KHÔNG đạt "giữa ngang và cao".** Đầu cánh gần d y=44 so
+   với a y=43 (chênh 1 px); cả 2 lần vẽ lại đều trả về gần như đúng fly_a
+   (v1 và v3 có cùng số đo cánh tới từng px). Chu kỳ vẫn đọc đúng cao→ngang→
+   thấp→cao, nhưng d thực chất là giữ khung cao thêm 1 nhịp rồi mới lặp lại a.
+   Cần Claude chốt: chấp nhận, hay vẽ lại với brief khác.
+4. **Độ cao thân bay không đều (b/c lệch spec fit-tối-đa).** Fit tối đa từng
+   khung làm đầu nhảy 132 px và với fly_b là bất khả thi hình học (raw w/h
+   1,56 → fit cao cho rộng 578 > 512, cánh bị cắt cả 2 mép ở v1) nên b/c dùng
+   neo-theo-thân: dài thân khớp fly_a, mắt cy → y=177. Hệ quả: chân b y=342
+   (nhấc 97 px), chân c y=439 (nhấc 0 px). App phải thay khung tại chỗ (cùng
+   gốc 512), KHÔNG căn theo đáy bbox. Ở cỡ app chu kỳ đọc là vỗ cánh + thân
+   nhún theo (nhấc 0→97 px), không phải bay lơ lửng đều.
+5. **fly_b sát mép trái:** đầu cánh trái x=7 (không chạm, lề chỉ 7 px).
+6. **water_1 vòi dài hơn brief:** vòi đặc 113,6 px = 0,70× water_2 (brief ~1/3),
+   nhưng effect px chỉ 0,37× và nhìn rõ là nhỏ nhất trong dãy. Bản vẽ lại v2
+   ngắn hơn (0,46×) đã LOẠI vì miệng lệch +8,0 px + mõm ngắn hơn 17 px thô.
+7. **water_3 cắt mask ở x=505:** mép cắt hơi thấy ở zoom 3× trên 2–3 đầu gai
+   (đầu gai bị cắt phẳng), không thấy ở cỡ app.
+8. **water_4 mõm ngắn hơn water_2 ~49 px** (rồng-phần x1 349,4 vs 398,3) vì
+   hàm khép làm hàm dưới thụt vào — mắt/má/vị trí miệng vẫn khớp, nhìn trong
+   dải vẫn là cùng con rồng đang khép miệng, nhưng đổi khung 3→4 sẽ thấy mõm
+   thụt nhẹ.
+
+#### Kế hoạch đẩy (2 lần .b64, CHỈ NHÁP — parent đẩy)
+
+- Đợt 1 (7 file, PNG 1.037.048 B, .b64 ~1.382.731 B): dragon_fire_2.png, dragon_water_3.png, dragon_water_2.png, dragon_fly_d.png, dragon_water_4.png, dragon_fly_a.png, dragon_fire_3.png
+- Đợt 2 (6 file, PNG 705.908 B, .b64 ~941.211 B): dragon_water_1.png, dragon_fly_c.png, dragon_fire_4.png, dragon_fire_1.png, dragon_fly_b.png, dragon_aura.png
+Tổng .b64 ~2,32 MB; đích `app/assets/images/pets/`; mỗi lần ≤8 file, mỗi file
+.b64 <1.217.688 B. Mục này do parent gộp vào `docs/E_IMAGES.md` cùng đợt đẩy
+(xem cuối mục); Claude decode + kiểm bằng git (đối chiếu blob SHA) sau đó.
