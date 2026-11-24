@@ -102,6 +102,7 @@ NAME_PATTERNS = {
         r"egg|newborn|teen|adult"
         r"|egg_crack_[1-3]|shell_(top|bottom)"
         r"|(newborn|teen|adult)_(walk_[a-d]|happy|sit)"
+        r"|(fire|water)_[1-4]|fly_[a-d]|aura"
         r")\.png$"
     ),
     "item": re.compile(r"^[a-z0-9_]+\.png$"),

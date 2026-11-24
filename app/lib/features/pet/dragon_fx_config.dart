@@ -14,7 +14,7 @@ library;
 import 'dart:ui';
 
 /// Đã có hình hiệu ứng rồng của Muse chưa (`false` → vẽ bằng code).
-const bool dragonFxArtReady = false;
+const bool dragonFxArtReady = true;
 
 /// Mã loài rồng.
 const String dragonSpecies = 'dragon';
@@ -61,9 +61,18 @@ const int dragonFlyFrameMs = 110;
 
 // --- Miệng + hình học trong khung 512 ---------------------------------
 
-/// Miệng rồng (khung 512x512, rồng quay phải). TẠM đoán, sẽ cập nhật
-/// khi Muse ghi tọa độ thật.
-const Offset dragonMouth = Offset(360, 200);
+/// Miệng rồng (khung 512x512, rồng quay phải) cho hạt vẽ bằng code
+/// (rồng nhỏ). Muse ghi (lô 12B): miệng lửa (279,7; 174,6) trong khung
+/// lửa đã dời trái 16,4 px → trên ảnh đứng ≈ (296, 175); miệng nước
+/// (322,2; 181,4).
+const Offset dragonMouth = Offset(296, 175);
+
+/// Khung phun lửa Muse dời rồng sang trái 16,4 px (để đủ chỗ cho lửa):
+/// app dời lại sang phải chừng ấy để đổi ảnh đứng → lửa không nhảy.
+const double dragonFireArtShiftX = 16.4;
+
+/// Khung bay chỉ bằng 94% cỡ rồng trưởng thành: app phóng bù.
+const double dragonFlyArtScale = 1 / 0.94;
 
 /// Tâm vầng sáng trong khung 512 (khớp `dragon_aura.png`).
 const Offset dragonAuraCenter = Offset(256, 240);
