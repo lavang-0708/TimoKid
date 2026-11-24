@@ -93,7 +93,8 @@ void main() {
     expect(find.byKey(const Key('building-tower')), findsOneWidget);
     expect(find.byKey(const Key('tower-floor-1')), findsOneWidget);
     expect(find.byKey(const Key('tower-boss-5')), findsOneWidget);
-    expect(find.byIcon(Icons.shield), findsWidgets);
+    // Lô 13: huy hiệu boss là ảnh vẽ tay (towerArtReady).
+    expect(find.byKey(const Key('tower-boss-5')), findsOneWidget);
     // Chưa xong chặng ngày: nút vẫn là Thử thách.
     expect(find.text('Thử thách'), findsOneWidget);
   });

@@ -19,7 +19,7 @@ library;
 /// Cờ ảnh tháp: `ui_tower_lock`, `ui_tower_boss` chưa có (Muse đang
 /// vẽ lô 13). Tắt thì màn Tòa nhà dùng icon Material tạm. Khi ảnh về:
 /// thêm file vào `assets/` + `manifest.json`, đặt cờ `true`.
-const bool towerArtReady = false;
+const bool towerArtReady = true;
 
 /// Toàn bộ hằng số của tháp, ở một chỗ duy nhất.
 class TowerConfig {

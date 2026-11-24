@@ -2359,3 +2359,180 @@ trưởng thành đi quãng dài sẽ tự bay; (c) hào quang luôn tỏa sau r
 Tổng .b64 ~2,32 MB; đích `app/assets/images/pets/`; mỗi lần ≤8 file, mỗi file
 .b64 <1.217.688 B. Mục này do parent gộp vào `docs/E_IMAGES.md` cùng đợt đẩy
 (xem cuối mục); Claude decode + kiểm bằng git (đối chiếu blob SHA) sau đó.
+### Lô 13 — Icon giao diện (UI): 19 file (24/11/2026)
+
+19 icon giao diện cho app: 3 emote trạng thái pet, 1 khay ăn, 4 huy hiệu hạng
+tuần, 4 rương quà cuối tuần, bảng nhiệm vụ + dấu tick, lửa + rương streak,
+khóa tháp + trùm tháp, khung ăn mừng. 19 file vào `app/assets/images/ui/`,
+512×512 (burst 1024×1024), PNG trong suốt, alpha sạch (semi 0, 0 px magenta
+thước chuẩn R>200/G<80/B>200; thước key13 R>170/G<90/B>140 chỉ còn 163 px
+tím đậm thật của mái tháp ở tower_boss), quantize 256 màu MAXCOVERAGE +
+Floyd–Steinberg. Tổng PNG 2.391.194 B (~3,19 MB .b64).
+
+#### Cách dùng (phía code)
+- 3 emote hiện cạnh pet trong Phòng/Cửa hàng/Pet của bé: đói = bát trống +
+  giọt mồ hôi, buồn = mây xám + giọt mưa, vui = tim hồng + lấp lánh. Chỉ có
+  biểu tượng trong bong bóng trắng, KHÔNG mặt, KHÔNG loài pet (quyết định
+  duyệt 24/11 ~14:01).
+- Huy hiệu hạng tuần (league bronze→diamond) + rương cuối tuần (chest
+  bronze→diamond): càng cao càng sáng/lộng lẫy dần (xem "Mốc đo" dưới).
+- `ui_celebrate_burst.png` là khung phủ kín màn (tia chạm mép khung, tâm
+  trống hoàn toàn: 0 px alpha trong r<205, tức 40% khung) — dùng làm overlay
+  toàn màn, KHÔNG dùng làm icon nhỏ.
+- `ui_tower_boss.png` là trùm tháp (đánh boss mở tháp), `ui_tower_lock.png`
+  là tháp đang khóa; `ui_streak_chest.png` là rương thưởng streak 7 ngày,
+  cố ý hoành tráng hơn `ui_chest_gold.png` (to hơn, dải vàng, bùng sáng +
+  2 lửa bên, không tràn xu/ngọc) để không lẫn với rương gold thường.
+
+#### Quyết định đã chốt (Claude duyệt xem trước 24/11 ~14:01)
+1. Tia gold/diamond còn viền oải hương: **CHẤP NHẬN** (giữ nguyên, đọc như
+   tia lấp lánh, không phải tàn dư magenta; magenta_px = 0).
+2. Burst tia chạm mép: **CHẤP NHẬN** (app dùng phủ kín màn, giữ nguyên).
+3. Emote **ĐỔI — bỏ mặt mèo**: vẽ lại 3 emote thành bong bóng trắng CHỈ CÓ
+   biểu tượng (đói = bát trống + giọt mồ hôi, buồn = mây xám + giọt mưa,
+   vui = tim hồng + lấp lánh). Bản xem trước có mặt mèo đã LOẠI, không vào app.
+4. `ui_tower_boss.png`: **rim-recolor 101 px** viền hồng-magenta (236,98,238)
+   ở mép → màu palette gần nhất, không thêm màu mới; sau recolor 0 px theo
+   đúng thước đếm 101 px đó.
+5. Vệt hồng 1–2 px trên mép sticker trắng: **BỎ QUA** (không sửa; ở cỡ app
+   100 px không thấy).
+
+#### Bảng 19 file
+
+| file | byte | bbox (x0, y0, x1, y1) | SHA-256 (12 ký tự đầu) | lần vẽ |
+|---|---|---|---|---|
+| ui_emote_hungry.png | 94166 | 26, 49, 485, 462 | 4c0b75761700 | 1 |
+| ui_emote_sad.png | 78621 | 26, 40, 485, 470 | 114233940c46 | 1 |
+| ui_emote_happy.png | 65957 | 26, 43, 485, 467 | e7ec80491fe2 | 1 |
+| ui_pet_meal.png | 69900 | 26, 84, 485, 426 | d01bde761caf | 1 |
+| ui_league_bronze.png | 101994 | 83, 26, 428, 485 | 73c2d3ecc9ec | 1 |
+| ui_league_silver.png | 117354 | 83, 26, 428, 485 | 3367215ff042 | 1 |
+| ui_league_gold.png | 114997 | 50, 26, 460, 485 | d3afc1e044b3 | 1 |
+| ui_league_diamond.png | 178534 | 48, 26, 463, 485 | 36f70afb256d | 1 |
+| ui_chest_bronze.png | 117080 | 26, 42, 485, 468 | ad72cb5a315e | 1 |
+| ui_chest_silver.png | 127028 | 36, 26, 475, 485 | c4eb0eee458c | 1 |
+| ui_chest_gold.png | 133819 | 26, 50, 485, 461 | f369deeebfc3 | 1 |
+| ui_chest_diamond.png | 190941 | 26, 52, 485, 458 | f23d094aa8fb | 1 |
+| ui_quest_board.png | 109938 | 35, 26, 475, 485 | 2eeafb65852f | 1 |
+| ui_quest_check.png | 123561 | 27, 26, 484, 485 | 906d963845d8 | 1 |
+| ui_streak_flame.png | 74070 | 57, 26, 454, 485 | bd9f97a10a06 | 1 |
+| ui_streak_chest.png | 147586 | 26, 39, 485, 471 | f6d43b6408d8 | 1 |
+| ui_tower_lock.png | 79251 | 69, 26, 441, 485 | 5e81266e49b0 | 1 |
+| ui_tower_boss.png | 91080 | 62, 26, 449, 485 | 98fbd15f77d2 | 1 |
+| ui_celebrate_burst.png | 375317 | 0, 0, 1023, 1023 | 5df9c7a406dc | 1 |
+
+#### Mốc đo (đo bằng code từ ảnh thật)
+
+- **3 emote mới** (bong bóng trắng, KHÔNG mặt): hungry = bát xanh pastel
+  trống ở giữa + 2 giọt mồ hôi xanh nhạt 2 bên; sad = mây xám nhỏ ở giữa +
+  3 giọt mưa xanh nhạt rơi bên dưới; happy = tim hồng lớn ở giữa + 3 tia
+  lấp lánh vàng. Cả 3 cùng một kiểu bong bóng oval ngang, viền ống trắng,
+  đuôi ở dưới-trái; bbox 26,37–49 → 485,462–474 (fit 460 như 16 icon còn
+  lại). Phân biệt rõ nhau ở 100 px và ở cỡ app trong phòng v3b (xem ảnh
+  ghép): bát xanh / mây xám / tim hồng.
+- **Tier progression** (đo lại trên bản final, tỉ lệ px sáng lum>180):
+  league bronze 0,243 → silver 0,459 → gold 0,473 → diamond 0,476 (mean
+  lum 153,7 → 189,2 → 180,0 → 190,3); chest bronze 0,191 → silver 0,272 →
+  gold 0,294 → diamond 0,379 (mean lum 129,0 → 158,2 → 164,8 → 173,0).
+  Tăng dần rõ cả 2 dãy; league gold/silver gần nhau (0,473 vs 0,459) nhưng
+  khác màu rõ (gold vàng vs silver xám).
+- **Tower_boss rim-recolor:** 101 px đúng thước r>210, g<120, b>210,
+  r−g>90, b−g>90 (tâm họ màu (236,98,238)), TẤT CẢ nằm trong 2 px từ mép
+  trong suốt, rải quanh viền. Sơn lại bằng màu palette gần nhất trong cửa
+  sổ 7 px (không thêm màu): (247,120,249)×36, (231,131,233)×40,
+  (213,133,202)×13, (195,122,218)×4, (218,145,220)×3, (238,186,235)×2,
+  (250,171,248)/(241,152,239)/(228,164,227)×1. Sau recolor: đúng 101 px
+  đổi, alpha không đổi, thước 101 px = 0. Tím đậm thật của mái/khiên
+  (172,80,154) 154 px vẫn còn (key13 = 163) — là màu tím của tháp, không
+  phải tàn dư nền.
+- **Burst:** tâm trống 0 px alpha trong r<205 (40%) và r<154 (30%); lỗ
+  trống 4.887 px là khoảng hở giữa các mảnh confetti trong vòng, không
+  phải lỗ alpha trên thân.
+
+#### Cách làm
+
+- Vẽ từng tấm bằng media generation trên nền magenta #FF00FF (6 tấm sheet
+  2×2 + 1 tấm tower 1×2 + 1 burst full-frame cho bản xem trước; 3 emote mới
+  vẽ riêng từng tấm full-frame 1600×1600). Tổng 9 lần gọi vẽ cho 19 file
+  cuối (19 xem trước + 3 vẽ lại emote, kể cả vẽ lại).
+- Tách nền + quantize bằng code (`lot13/work/key13.py`: key median góc +
+  m2/m3 chỉ trong 3 px quanh magenta thật; `finish()` zero leftover vivid
+  magenta r>170, g<90, b>140; quantize 256 màu MAXCOVERAGE +
+  Floyd–Steinberg). **Riêng 3 emote mới:** keying kiểu key13 để lại dải
+  viền magenta dưới bong bóng (sad: 2.125 px thước nới) nên key lại bằng
+  flood-fill từ biên qua pixel magenta-hued (`lot12/work/process_v2.py`,
+  KHÔNG `binary_fill_holes`) — sau đó 0 px magenta cả 4 thước, không cần
+  rim-recolor.
+- Sửa tàn dư magenta sau keying bằng cách tô màu palette an toàn gần nhất,
+  KHÔNG thêm màu mới (xem "Mốc đo" tower_boss; halo magenta quanh tia
+  gold/diamond ở bản xem trước đã xử lý bằng recolor về gold/xanh băng/đào
+  ấm trước khi chốt — xem notes trong `lot13/work/report.json`).
+- 15 file còn lại dùng lại NGUYÊN BẢN từ xem trước (copy byte-identical,
+  đối chiếu SHA-256 với `lot13/work/report.json`, 15/15 khớp). Lưu ý: nhiệm
+  vụ ghi "16 file" nhưng 19 − 3 emote − 1 tower_boss (recolor) = 15 file
+  không đổi; tower_boss là file không phải emote thứ 16 và đã sửa theo
+  mục 4.
+
+#### Kiểm chứng
+
+- Đo bằng code ĐẠT 19/19: 512×512 (burst 1024×1024), semi 0, ≤256 màu;
+  thước chuẩn R>200/G<80/B>200 = 0 ở cả 19 file; thước key13 = 0 ở 18/19
+  (tower_boss 163 px tím thật, xem trên); thước 101 px của tower_boss =
+  0 sau recolor.
+- Soi bằng mắt trên nền tối (60,60,80) + nền phòng v3b ở cỡ app 100 px +
+  phóng 3× mép tower_boss: không lỗ alpha, không mép thẳng, không tàn dư
+  magenta sáng; 3 emote mới đọc rõ đói/buồn/vui ở 100 px; tier bronze →
+  diamond tăng dần rõ.
+- Ảnh ghép (`lot13/work/composites/`): `b_final_19_dark.png` (19 icon
+  trên nền tối), `b_emotes_100px.png` (3 emote mới ở 100 px cạnh nhau),
+  `b_emotes_in_room.png` (3 emote mới ở cỡ app trong phòng v3b),
+  `c_tower_boss_cluster_3x.png` + `c_tower_boss_bottom_3x.png`
+  (tower_boss trước/sau recolor phóng 3× ở mép, có khoanh đỏ vị trí 101 px).
+- 15 file không đổi đối chiếu SHA-256 khớp nguyên bản xem trước; bản gốc
+  tower_boss giữ trong `lot13/work/backup/ui_tower_boss_orig.png` (SHA
+  `795c65814233…`); tower_boss cuối SHA `98fbd15f77d2…`, đúng 101 px đổi,
+  alpha không đổi.
+
+#### Điểm chưa chắc — nói thẳng
+
+1. **Viền magenta sẫm ở mép dưới tower_boss CÒN, chỉ hết đốm sáng.** Sau
+   recolor, thước 101 px = 0 và các đốm hồng-magenta sáng quanh viền đã
+   hết (soi zoom 3× vùng crown thấy rõ). Nhưng dải viền tím-magenta sẫm
+   (170,0,169) 353 px + (157,30,156) 94 px, tất cả trong 2 px từ mép trong
+   suốt, vẫn còn dọc mép dưới — thấy ở zoom 3×, KHÔNG thấy ở cỡ app 100 px.
+   Để nguyên vì ngoài phạm vi 101 px đã duyệt và trùng vùng "bỏ qua" của
+   quyết định (5). Cần Claude/chủ dự án chốt: chấp nhận, hay mở rộng
+   recolor sang dải sẫm này (sẽ cần sơn ~450 px nữa).
+2. **Thước nới R>140/G<60/B>140 KHÔNG thể = 0 cho toàn lô.** Tím thật của
+   tháp (147,55,199) 950 px + (145,53,141) 464 px ở trong thân tháp, và
+   tím/violet thật ở huy hiệu/rương/bảng nhiệm vụ cũng đếm vào thước này.
+   Thước này chỉ có nghĩa khi xét riêng từng file không có màu tím (như
+   lô 12B). Đã ghi rõ số đo từng thước trong `report.json` để Claude đối
+   chiếu.
+3. **Số đo cũ trong `report.json` không khớp hoàn toàn với đo lại.** File
+   xem trước trên đĩa của tower_boss là 91.332 B nhưng report cũ ghi
+   91.148 B, magenta cũ 542 vs đo lại 163 (cùng thước key13) — file đã
+   xử lý lại sau khi report cũ viết mà report không cập nhật. Đo lại 15
+   file không đổi cũng cho `enclosed_holes_px`/bbox khác report cũ ở vài
+   file (league_bronze holes 96 vs 0, quest_board 390 vs 7, burst 5.432 vs
+   4.887; quest_board y1 483 vs 485) dù byte giống hệt — số cũ hẳn đo
+   bằng bản script khác. Số cũ giữ nguyên theo yêu cầu; số đo lại ở
+   `lot13/work/verify_final.json`.
+4. **Bong bóng emote mới khác kiểu bong bóng cũ.** Emote mới dùng bong
+   bóng oval ngang, viền ống trắng (cũ: bong bóng tròn kiểu mây). Cả 3
+   emote mới thống nhất với nhau và hợp phong cách set; bong bóng cũ đã
+   loại hết nên không còn lệch trong bộ cuối. Nếu Claude muốn đúng kiểu
+   bong bóng cũ thì phải vẽ lại cả 3.
+5. **Giọt mồ hôi của hungry ở 100 px hơi nhỏ.** Bát đọc rõ, 2 giọt 2 bên
+   vẫn thấy nhưng nhỏ; ở cỡ app trong phòng vẫn phân biệt được với mây
+   mưa của sad nhờ màu xanh + hình bát. Không vẽ lại trừ khi Claude yêu cầu.
+
+#### Kế hoạch đẩy (3 lần .b64, CHỈ NHÁP — parent đẩy)
+
+- Đợt 1 (7 file, PNG 957.923 B, .b64 ~1.278.254 B): ui_celebrate_burst.png, ui_chest_silver.png, ui_quest_check.png, ui_league_bronze.png, ui_emote_hungry.png, ui_pet_meal.png, ui_emote_happy.png
+- Đợt 2 (6 file, PNG 717.202 B, .b64 ~957.293 B): ui_chest_diamond.png, ui_chest_gold.png, ui_league_silver.png, ui_quest_board.png, ui_tower_boss.png, ui_streak_flame.png
+- Đợt 3 (6 file, PNG 716.069 B, .b64 ~955.782 B): ui_league_diamond.png, ui_streak_chest.png, ui_chest_bronze.png, ui_league_gold.png, ui_tower_lock.png, ui_emote_sad.png
+Tổng PNG 2.391.194 B, .b64 ~3,19 MB; đích `app/assets/images/ui/`; mỗi lần
+≤8 file, mỗi file .b64 <1.217.688 B. Mục này do parent gộp vào
+`docs/E_IMAGES.md` cùng đợt đẩy; Claude decode + kiểm bằng git (đối chiếu
+blob SHA) sau đó.

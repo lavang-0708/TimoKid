@@ -16,7 +16,7 @@ library;
 /// `ui_streak_chest` chưa có (Muse đang vẽ lô 13). Tắt thì dùng icon
 /// Material tạm. Khi ảnh về: thêm file vào `assets/` + `manifest.json`,
 /// đặt cờ `true`.
-const bool questArtReady = false;
+const bool questArtReady = true;
 
 /// Loại nhiệm vụ trong kho.
 enum QuestType {
