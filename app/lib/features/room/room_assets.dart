@@ -297,6 +297,7 @@ class RoomPlaceable {
     required this.item,
     required this.kind,
     this.shopId,
+    this.tier = RoomItemTier.small,
   });
 
   /// Mã ổn định, khóa lưu vị trí trong settings.
@@ -310,6 +311,9 @@ class RoomPlaceable {
   /// đã mua, và ảnh đổi theo chủ đề ([roomThemeFurnitureAsset]).
   final String? shopId;
 
+  /// Cỡ món: quyết định giá món lẻ của từng chủ đề.
+  final RoomItemTier tier;
+
   bool get wall => kind == RoomPlaceKind.wall;
 
   /// Góc trên-trái mặc định (khung 1600x900).
@@ -320,16 +324,32 @@ class RoomPlaceable {
   /// Điểm neo đáy so với góc trên-trái.
   Offset get anchorOffset => item.anchor - defaultPos;
 
-  /// Ảnh của món theo chủ đề phòng [themeId].
-  String assetFor(String themeId) =>
-      shopId == null ? item.asset : roomThemeFurnitureAsset(themeId, shopId!);
+  /// Ảnh của món ở biến thể [variant] (`classic` hoặc mã chủ đề). Mọi món
+  /// (cả 4 món nhỏ có sẵn) đều có thể có biến thể.
+  String assetFor(String variant) => variant == roomThemeClassic
+      ? item.asset
+      : roomThemeFurnitureAsset(variant, shopId ?? id);
 
   /// Dấu chân chặn đường đi khi món nằm với góc trên-trái [pos].
   Rect? footprintAt(Offset pos) => item.footprint?.shift(pos - defaultPos);
 }
 
+/// Cỡ từng món Cửa hàng (món nhỏ có sẵn đều cỡ nhỏ). Món mới (giường, tủ,
+/// bàn...) chỉ cần thêm dòng ở đây hoặc đặt `tier` khi tạo [RoomPlaceable].
+const Map<String, RoomItemTier> roomShopFurnitureTier = {
+  'noi_nha_pet': RoomItemTier.medium,
+  'noi_ke_sach': RoomItemTier.large,
+  'noi_be_ca': RoomItemTier.medium,
+  'noi_cay_cao': RoomItemTier.medium,
+  'noi_ghe_luoi': RoomItemTier.medium,
+  'noi_leu': RoomItemTier.large,
+  'noi_den_trang': RoomItemTier.small,
+  'noi_tranh': RoomItemTier.small,
+};
+
 /// Mọi món kéo thả được: 4 món nhỏ vẽ bằng ảnh rời trên nền sạch (chậu
-/// cây còn vẽ sẵn trong nền nên không kéo được) + 8 món Cửa hàng.
+/// cây còn vẽ sẵn trong nền nên không kéo được) + 8 món Cửa hàng. Mỗi món
+/// có thể có biến thể theo chủ đề (xem `room_variants.dart`).
 final List<RoomPlaceable> roomPlaceables = List.unmodifiable([
   for (final f in roomFurniture)
     if (!f.inCleanBackground)
@@ -344,6 +364,7 @@ final List<RoomPlaceable> roomPlaceables = List.unmodifiable([
       item: f,
       kind: f.wall ? RoomPlaceKind.wall : RoomPlaceKind.floor,
       shopId: roomShopFurnitureId(f),
+      tier: roomShopFurnitureTier[roomShopFurnitureId(f)] ?? RoomItemTier.small,
     ),
 ]);
 
@@ -553,8 +574,13 @@ Offset roomClampPlaceable(RoomPlaceable p, Offset topLeft) {
   return clamped - off;
 }
 
-/// Khóa settings (theo bé) lưu vị trí đồ của phòng chủ đề [themeId].
-String roomLayoutSettingsKey(String themeId) => 'room_layout_$themeId';
+/// Khóa settings (theo bé) lưu vị trí đồ. MỘT bố cục chung: món giữ chỗ
+/// khi đổi biến thể.
+const String roomLayoutSettingsKey = 'room_layout';
+
+/// Khóa CŨ: mỗi chủ đề phòng một bố cục (`room_layout_<chủ đề>`). Chỉ đọc
+/// để chuyển sang [roomLayoutSettingsKey].
+String roomLegacyLayoutSettingsKey(String themeId) => 'room_layout_$themeId';
 
 /// Mã hóa vị trí (mã món -> góc trên-trái, khung 1600x900) thành JSON.
 String encodeRoomLayout(Map<String, Offset> layout) => jsonEncode({

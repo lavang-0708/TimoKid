@@ -83,6 +83,7 @@ import 'pet_growth.dart';
 import 'pet_sprite.dart';
 import 'room_assets.dart';
 import 'room_themes.dart';
+import 'room_variants.dart';
 import 'room_service.dart';
 import 'room_walk.dart';
 
@@ -147,13 +148,14 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   Set<String> _ownedToys = const {};
   Set<String> _ownedFurniture = const {};
 
-  /// Phòng chủ đề đang dùng ([roomThemeClassic] = phòng gốc) và các chủ
-  /// đề bé đã mua (đã có hình).
-  String _roomTheme = roomThemeClassic;
-  List<RoomTheme> _ownedThemes = const [];
+  /// MỘT phòng: biến thể của nền ([roomThemeClassic] = gốc) và của từng
+  /// món (mã món -> biến thể; thiếu = gốc), cùng quyền sở hữu biến thể.
+  String _background = roomThemeClassic;
+  Map<String, String> _variants = const {};
+  RoomOwnership _ownership = const RoomOwnership({});
 
-  /// Chế độ Sắp xếp: bé kéo thả đồ; [_layout] = vị trí đã đổi của phòng
-  /// chủ đề hiện tại (mã món -> góc trên-trái, khung 1600x900).
+  /// Chế độ Sắp xếp: bé kéo thả đồ; [_layout] = vị trí đã đổi (mã món ->
+  /// góc trên-trái, khung 1600x900), chung cho mọi biến thể.
   bool _arranging = false;
   Map<String, Offset> _layout = const {};
   String? _dragId;
@@ -229,20 +231,23 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       final shop = ShopService(db: db);
       final ownedItems = await shop.owned(childId);
       final foodCounts = await shop.foodCounts(childId);
-      final ownedThemes = [
-        for (final t in roomThemes)
-          if (isRoomThemeReady(t.id, ready: widget.roomThemesReady) &&
-              ownedItems.contains(roomThemeItemId(t.id)))
-            t,
-      ];
-      final savedTheme = await db.settingsDao.getValue(
-        childId: childId,
-        key: roomThemeSettingsKey,
+      final ownership = RoomOwnership(
+        ownedItems,
+        ready: widget.roomThemesReady,
       );
-      final roomTheme = ownedThemes.any((t) => t.id == savedTheme)
-          ? savedTheme!
+      final look = await RoomLookStore(db).load(childId);
+      // Biến thể đã lưu mà bé không còn dùng được (chưa có hình / chưa
+      // có) thì về gốc.
+      final background = ownership.hasBackground(look.background)
+          ? look.background
           : roomThemeClassic;
-      final layout = await _loadLayout(childId, roomTheme);
+      final variants = {
+        for (final p in roomPlaceables)
+          if (look.variantOf(p.id) != roomThemeClassic &&
+              ownership.hasItemVariant(look.variantOf(p.id), p.id))
+            p.id: look.variantOf(p.id),
+      };
+      final layout = look.layout;
       final petStage = activePet?.stage ?? PetStage.egg;
       // Pet lớn lên từ lần bé thấy trước → màn ăn mừng (bấm "Tuyệt vời"
       // mới ghi giai đoạn đã thấy). Giá trị lạ/trứng: ghi lặng lẽ.
@@ -290,8 +295,9 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
           for (final id in shopFurniture.keys)
             if (ownedItems.contains(id)) id,
         };
-        _ownedThemes = ownedThemes;
-        _roomTheme = roomTheme;
+        _ownership = ownership;
+        _background = background;
+        _variants = variants;
         _layout = layout;
         _petXp = activePet?.xp ?? 0;
         _petStage = petStage;
@@ -724,7 +730,9 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     return item.usesGems ? '${item.price} kim cương' : '${item.price} xu';
   }
 
-  /// Chọn phong cách phòng: phòng gốc hoặc một chủ đề đã mua.
+  /// "Thay cả bộ": chọn phòng gốc hoặc một bộ chủ đề bé có nền. Chọn bộ =
+  /// đổi nền + MỌI món bé có biến thể của bộ đó (món chưa có giữ nguyên);
+  /// "Phòng gốc" = nền và mọi món về gốc. Vị trí đồ không đổi.
   Future<void> _openThemePicker() async {
     final childId = _childId;
     if (childId == null) return;
@@ -733,13 +741,22 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       showDragHandle: true,
       builder: (sheetContext) => SafeArea(
         child: SingleChildScrollView(
+          key: const Key('room-theme-sheet'),
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           child: Row(
             children: [
+              const Padding(
+                padding: EdgeInsets.only(right: 12),
+                child: Text(
+                  'Thay\ncả bộ',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                ),
+              ),
               for (final (id, name, bg) in [
                 (roomThemeClassic, 'Phòng gốc', roomCleanBackgroundAsset),
-                for (final t in _ownedThemes)
+                for (final t in _ownership.backgroundThemes)
                   (t.id, t.name, roomThemeBackground(t.id)),
               ])
                 Padding(
@@ -755,7 +772,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: id == _roomTheme
+                          color: id == _background
                               ? const Color(0xFFE58FB0)
                               : const Color(0xFFE3DAF5),
                           width: 3,
@@ -795,36 +812,113 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       ),
     );
     if (choice == null || !mounted) return;
-    final db = ref.read(databaseProvider);
-    await db.settingsDao.setValue(
-      childId: childId,
-      key: roomThemeSettingsKey,
-      value: choice,
-    );
-    final layout = await _loadLayout(childId, choice);
+    final variants = roomApplySet(_ownership, _variants, choice);
+    final store = RoomLookStore(ref.read(databaseProvider));
+    await store.saveBackground(childId, choice);
+    await store.saveVariants(childId, variants);
     if (mounted) {
       setState(() {
-        _roomTheme = choice;
-        _layout = layout;
+        _background = choice;
+        _variants = variants;
       });
       _fixWalkers();
     }
   }
 
-  Future<Map<String, Offset>> _loadLayout(String childId, String theme) async {
-    final json = await ref
-        .read(databaseProvider)
-        .settingsDao
-        .getValue(childId: childId, key: roomLayoutSettingsKey(theme));
-    return decodeRoomLayout(json);
+  /// Biến thể đang dùng của món [p].
+  String _variantOf(RoomPlaceable p) => _variants[p.id] ?? roomThemeClassic;
+
+  /// Chế độ Sắp xếp, chạm một món (không kéo): chọn biến thể riêng món đó
+  /// (gốc + mọi biến thể bé có). Món chưa có biến thể nào thì không mở.
+  Future<void> _openVariantSheet(RoomPlaceable p) async {
+    final childId = _childId;
+    if (childId == null) return;
+    final options = _ownership.variantsOf(p.id);
+    if (options.length < 2) return;
+    final current = _variantOf(p);
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: SingleChildScrollView(
+          key: const Key('room-variant-sheet'),
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Row(
+            children: [
+              for (final v in options)
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: GestureDetector(
+                    key: Key('room-variant-$v'),
+                    onTap: () => Navigator.of(sheetContext).pop(v),
+                    child: Container(
+                      width: 110,
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: v == current
+                              ? const Color(0xFFE58FB0)
+                              : const Color(0xFFE3DAF5),
+                          width: 3,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox.square(
+                            dimension: 90,
+                            child: Image.asset(
+                              p.assetFor(v),
+                              fit: BoxFit.contain,
+                              // Thiếu ảnh biến thể: hiện ảnh gốc.
+                              errorBuilder: (_, _, _) => Image.asset(
+                                p.item.asset,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, _, _) =>
+                                    const SizedBox.shrink(),
+                              ),
+                            ),
+                          ),
+                          Text(
+                            v == roomThemeClassic
+                                ? 'Gốc'
+                                : (roomThemeById(v)?.shortName ?? v),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (choice == null || choice == current || !mounted) return;
+    final variants = {..._variants};
+    if (choice == roomThemeClassic) {
+      variants.remove(p.id);
+    } else {
+      variants[p.id] = choice;
+    }
+    setState(() => _variants = variants);
+    await RoomLookStore(ref.read(databaseProvider))
+        .saveVariants(childId, variants);
   }
 
-  /// Món kéo thả đang vẽ trong phòng: món nhỏ của phòng gốc (nền sạch,
-  /// phòng gốc) + nội thất mua (khi cờ hình bật).
+  /// Món kéo thả đang vẽ trong phòng: món nhỏ có sẵn (nền sạch; vẽ ở mọi
+  /// biến thể nền) + nội thất mua (khi cờ hình bật).
   List<RoomPlaceable> get _activePlaceables => [
     for (final p in roomPlaceables)
       if (p.shopId == null
-          ? widget.cleanBackground && _roomTheme == roomThemeClassic
+          ? widget.cleanBackground
           : widget.furnitureArtReady && _ownedFurniture.contains(p.shopId))
         p,
   ];
@@ -865,17 +959,11 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   Future<void> _saveLayout() async {
     final childId = _childId;
     if (childId == null) return;
-    await ref
-        .read(databaseProvider)
-        .settingsDao
-        .setValue(
-          childId: childId,
-          key: roomLayoutSettingsKey(_roomTheme),
-          value: encodeRoomLayout(_layout),
-        );
+    await RoomLookStore(ref.read(databaseProvider))
+        .saveLayout(childId, _layout);
   }
 
-  /// "Xếp lại như cũ": xóa vị trí đã lưu của phòng chủ đề hiện tại.
+  /// "Xếp lại như cũ": xóa vị trí đã lưu (biến thể từng món giữ nguyên).
   Future<void> _resetLayout() async {
     setState(() {
       _layout = const {};
@@ -884,13 +972,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     _fixWalkers();
     final childId = _childId;
     if (childId == null) return;
-    await ref
-        .read(databaseProvider)
-        .settingsDao
-        .deleteSetting(
-          childId: childId,
-          key: roomLayoutSettingsKey(_roomTheme),
-        );
+    await RoomLookStore(ref.read(databaseProvider)).resetLayout(childId);
   }
 
   /// Món vừa đặt chặn chỗ nhân vật/pet đang đứng: dời họ ra chỗ đứng được.
@@ -1385,7 +1467,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                         onPressed: _toggleArranging,
                       ),
                     ] else ...[
-                      if (_ownedThemes.isNotEmpty) ...[
+                      if (_ownership.hasAnyTheme) ...[
                         GameRoundButton(
                           key: const Key('room-theme-button'),
                           icon: Icons.wallpaper_rounded,
@@ -1842,7 +1924,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
         alignment: const Alignment(0, 0.9),
         builder: (context, w, h) {
           final clean = widget.cleanBackground;
-          final themed = _roomTheme != roomThemeClassic;
+          final themed = _background != roomThemeClassic;
           double fx(double x) => x / roomFrameWidth * w;
           double fy(double y) => y / roomFrameHeight * h;
 
@@ -1911,10 +1993,11 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
               child: _RoomItemSlot(
                 item: p.item,
                 showImage: true,
-                asset: p.assetFor(_roomTheme),
+                asset: p.assetFor(_variantOf(p)),
                 arranging: _arranging,
                 dragging: _dragId == p.id,
                 onTap: () => _showBubble(p.item.reaction),
+                onArrangeTap: () => _openVariantSheet(p),
                 onDragStart: () => _onDragStart(p),
                 onDragUpdate: (d) => _onDragUpdate(
                   p,
@@ -2073,7 +2156,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                   ),
                   child: Image.asset(
                     themed
-                        ? roomThemeBackground(_roomTheme)
+                        ? roomThemeBackground(_background)
                         : clean
                         ? roomCleanBackgroundAsset
                         : roomBackgroundAsset,
@@ -2092,8 +2175,8 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
               ),
               // Món còn vẽ sẵn trong nền (chậu cây; cả 5 món khi dùng nền
               // cũ): chỉ đặt vùng chạm vô hình đúng chỗ món trong nền, không
-              // vẽ PNG rời → không hình đôi. Phòng chủ đề: nền đã vẽ sẵn món
-              // nhỏ theo chủ đề, bỏ 5 món của phòng gốc.
+              // vẽ PNG rời → không hình đôi. Nền chủ đề (biến thể nền khác gốc)
+              // không vẽ sẵn chậu cây của phòng gốc nên bỏ vùng chạm này.
               for (final item in themed ? const <RoomFurniture>[] : itemsByFeet)
                 if (!clean || item.inCleanBackground)
                   Positioned(
@@ -2162,6 +2245,7 @@ class _RoomItemSlot extends StatefulWidget {
     this.asset,
     this.arranging = false,
     this.dragging = false,
+    this.onArrangeTap,
     this.onDragStart,
     this.onDragUpdate,
     this.onDragEnd,
@@ -2169,7 +2253,11 @@ class _RoomItemSlot extends StatefulWidget {
 
   final RoomFurniture item;
 
-  /// Ảnh thay ảnh gốc (phòng chủ đề); null = `item.asset`.
+  /// Chế độ Sắp xếp: chạm (không kéo) vào món, ví dụ mở bảng chọn biến thể.
+  final VoidCallback? onArrangeTap;
+
+  /// Ảnh biến thể chủ đề thay ảnh gốc; null = `item.asset`. Lỗi ảnh thì
+  /// về `item.asset`.
   final String? asset;
   final VoidCallback onTap;
   final bool showImage;
@@ -2201,7 +2289,10 @@ class _RoomItemSlotState extends State<_RoomItemSlot>
   }
 
   void _onTap() {
-    if (widget.arranging) return;
+    if (widget.arranging) {
+      widget.onArrangeTap?.call();
+      return;
+    }
     // Hiệu ứng một lần, tắt khi chạy test (cổng AnimationGate) để ảnh
     // chụp xác định.
     if (AnimationGate.enabled) _pop.forward(from: 0);
@@ -2228,8 +2319,16 @@ class _RoomItemSlotState extends State<_RoomItemSlot>
             Image.asset(
               widget.asset ?? widget.item.asset,
               fit: BoxFit.fill,
-              // Hình nội thất mua có thể chưa về: bỏ trống thay vì lỗi.
-              errorBuilder: (_, _, _) => const SizedBox.shrink(),
+              // Ảnh biến thể chủ đề chưa về: dùng ảnh gốc của món (như nền
+              // chủ đề lỗi thì về nền gốc); ảnh gốc cũng chưa về thì bỏ trống.
+              errorBuilder: (_, _, _) =>
+                  widget.asset == null || widget.asset == widget.item.asset
+                  ? const SizedBox.shrink()
+                  : Image.asset(
+                      widget.item.asset,
+                      fit: BoxFit.fill,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    ),
             ),
           if (widget.arranging && widget.showImage)
             // Viền mờ quanh phần nhìn thấy của ảnh (~68% x 70% ô ảnh).

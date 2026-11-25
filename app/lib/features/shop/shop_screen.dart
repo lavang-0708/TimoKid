@@ -38,6 +38,8 @@ import '../pet/dragon_fx.dart';
 import '../pet/pet_config.dart';
 import '../pet/pet_service.dart';
 import '../room/room_screen.dart';
+import '../room/room_themes.dart';
+import '../room/room_variants.dart';
 import 'shop_catalog.dart';
 import 'shop_service.dart';
 
@@ -49,7 +51,11 @@ class ShopScreen extends ConsumerStatefulWidget {
     this.furnitureReady = furnitureShopArtReady,
     this.premiumOutfitsReady = premiumOutfitsArtReady,
     this.petArtReady = newPetArtReady,
+    this.roomThemesReady = roomThemeArtReady,
   });
+
+  /// Cờ hình bộ phòng chủ đề; mặc định theo [roomThemeArtReady], chỉ test đổi.
+  final Map<String, bool> roomThemesReady;
 
   final bool furnitureReady;
   final bool premiumOutfitsReady;
@@ -114,6 +120,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     furnitureReady: widget.furnitureReady,
     premiumOutfitsReady: widget.premiumOutfitsReady,
     petArtReady: widget.petArtReady,
+    roomThemesReady: widget.roomThemesReady,
   );
 
   Future<void> _refresh() async {
@@ -151,6 +158,19 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
         _loading = false;
       });
     }
+  }
+
+  static bool _isRoomThemeKind(ShopItemKind k) =>
+      k == ShopItemKind.roomTheme || k == ShopItemKind.roomThemeItem;
+
+  /// Bộ/món lẻ phòng đã có: có bộ thì món lẻ coi như đã có; đủ mọi món
+  /// lẻ thì bộ coi như đã có.
+  bool _roomOwned(ShopItem item) {
+    final own = RoomOwnership(_owned, ready: widget.roomThemesReady);
+    final themeId = item.roomThemeId!;
+    return item.kind == ShopItemKind.roomTheme
+        ? own.setComplete(themeId)
+        : own.hasItemVariant(themeId, item.placeableId!);
   }
 
   void _back() {
@@ -239,6 +259,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
               _gender,
               furnitureReady: widget.furnitureReady,
               premiumOutfitsReady: widget.premiumOutfitsReady,
+              roomThemesReady: widget.roomThemesReady,
             ))
               if (i.category == _category) i,
           ];
@@ -412,6 +433,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           outfit: _outfit,
                           owned: item.kind == ShopItemKind.petEgg
                               ? _ownedSpecies.contains(item.species)
+                              : _isRoomThemeKind(item.kind)
+                              ? _roomOwned(item)
                               : !item.consumable && _owned.contains(item.id),
                           comingSoon:
                               item.kind == ShopItemKind.petEgg &&
