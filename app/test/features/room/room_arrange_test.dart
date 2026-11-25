@@ -105,10 +105,8 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Future<String?> saved(String theme) => db.settingsDao.getValue(
-    childId: childId,
-    key: roomLayoutSettingsKey(theme),
-  );
+  Future<String?> saved() =>
+      db.settingsDao.getValue(childId: childId, key: roomLayoutSettingsKey);
 
   testWidgets('nút Sắp xếp vào chế độ; Xong / Xếp lại như cũ; Xong thoát', (
     tester,
@@ -156,7 +154,7 @@ void main() {
     final before = framePos(tester, house);
     await drag(tester, house, const Offset(-120, -30));
     expect(framePos(tester, house), before);
-    expect(await saved('classic'), isNull);
+    expect(await saved(), isNull);
 
     await tester.tap(find.byKey(house));
     await tester.pump();
@@ -193,7 +191,7 @@ void main() {
     expect(after.dx, lessThan(before.dx - 120));
     expect(after.dy, lessThan(before.dy - 20));
 
-    final json = await saved('classic');
+    final json = await saved();
     expect(json, isNotNull);
     final stored = decodeRoomLayout(json);
     expect(stored.keys, ['noi_nha_pet']);
@@ -236,7 +234,7 @@ void main() {
     expect(a.dy, lessThanOrEqualTo(roomFloorTopAt(a.dx) - 4 + 0.5));
     expect(roomPointInFloor(a), isFalse);
     // Đã lưu đúng chỗ đã kẹp.
-    final stored = decodeRoomLayout(await saved('classic'))['noi_tranh']!;
+    final stored = decodeRoomLayout(await saved())['noi_tranh']!;
     expect((stored + p.anchorOffset - a).distance, lessThan(0.5));
   });
 
@@ -246,7 +244,7 @@ void main() {
     final before = framePos(tester, bear);
     await drag(tester, bear, const Offset(60, 60));
     expect(framePos(tester, bear), isNot(before));
-    expect(decodeRoomLayout(await saved('classic')).keys, ['gau-bong']);
+    expect(decodeRoomLayout(await saved()).keys, ['gau-bong']);
   });
 
   testWidgets('Xếp lại như cũ: về mặc định, xóa lưu, mở lại vẫn mặc định', (
@@ -256,7 +254,7 @@ void main() {
     await arrange(tester);
     await drag(tester, house, const Offset(-150, -30));
     await drag(tester, painting, const Offset(100, 40));
-    expect(await saved('classic'), isNotNull);
+    expect(await saved(), isNotNull);
 
     await tester.tap(find.byKey(const Key('room-arrange-reset')));
     await tester.pumpAndSettle();
@@ -268,7 +266,8 @@ void main() {
         reason: id,
       );
     }
-    expect(await saved('classic'), isNull);
+    // Bố cục rỗng (không xóa khóa, để không chuyển lại từ khóa cũ).
+    expect(decodeRoomLayout(await saved()), isEmpty);
 
     await reopen(tester);
     expect(
@@ -277,7 +276,9 @@ void main() {
     );
   });
 
-  testWidgets('bố cục lưu riêng từng chủ đề phòng', (tester) async {
+  testWidgets('một bố cục chung: đổi bộ phòng không đổi vị trí món', (
+    tester,
+  ) async {
     await db.inventoryDao.grant(
       childId: childId,
       itemId: roomThemeItemId('tet'),
@@ -286,7 +287,7 @@ void main() {
     await pumpRoom(tester);
     await arrange(tester);
     await drag(tester, house, const Offset(-150, -30));
-    final classic = framePos(tester, house);
+    final before = framePos(tester, house);
     await tester.tap(find.byKey(const Key('room-arrange-done')));
     await tester.pumpAndSettle();
 
@@ -294,24 +295,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('room-theme-tet')));
     await tester.pumpAndSettle();
-    // Phòng Tết chưa sắp xếp: món về mặc định, phòng gốc vẫn giữ.
-    expect(
-      (framePos(tester, house) - placeable('noi_nha_pet').defaultPos).distance,
-      lessThan(0.5),
-    );
-    await arrange(tester);
-    await drag(tester, house, const Offset(100, 0));
-    final tet = framePos(tester, house);
-    expect(await saved('tet'), isNotNull);
-    expect(await saved('classic'), isNotNull);
-    expect(
-      (decodeRoomLayout(await saved('classic'))['noi_nha_pet']! - classic)
-          .distance,
-      lessThan(0.5),
-    );
+    expect((framePos(tester, house) - before).distance, lessThan(0.5));
+    expect(decodeRoomLayout(await saved()).keys, ['noi_nha_pet']);
 
-    // Mở lại: phòng Tết (đang dùng) giữ vị trí của nó.
     await reopen(tester);
-    expect((framePos(tester, house) - tet).distance, lessThan(0.5));
+    expect((framePos(tester, house) - before).distance, lessThan(0.5));
   });
 }

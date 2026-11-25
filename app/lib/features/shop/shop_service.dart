@@ -16,6 +16,7 @@
 library;
 
 import '../room/room_themes.dart';
+import '../room/room_variants.dart';
 import '../../core/database/app_database.dart';
 import '../../core/database/tables.dart' show Currency;
 import '../character/kid_assets.dart';
@@ -101,6 +102,10 @@ class ShopService {
     for (final row in await db.inventoryDao.getAll(childId)) row.itemId,
   };
 
+  /// Quyền sở hữu biến thể phòng của bé (bộ, món lẻ, quà tặng nền).
+  Future<RoomOwnership> roomOwnership(String childId) async =>
+      RoomOwnership(await owned(childId), ready: roomThemesReady);
+
   /// Bé có món này không.
   Future<bool> isOwned(String childId, String itemId) =>
       db.inventoryDao.has(childId, itemId);
@@ -154,6 +159,18 @@ class ShopService {
     return db.transaction(() async {
       if (!item.consumable && await db.inventoryDao.has(childId, itemId)) {
         return BuyResult.alreadyOwned;
+      }
+      // Bộ phòng: có bộ thì món lẻ của chủ đề đó coi như đã có; đủ mọi
+      // món lẻ thì bộ coi như đã có (giá bộ giữ nguyên, không trừ phần
+      // đã mua lẻ cho đơn giản).
+      if (item.kind == ShopItemKind.roomTheme ||
+          item.kind == ShopItemKind.roomThemeItem) {
+        final own = await roomOwnership(childId);
+        final themeId = item.roomThemeId!;
+        final covered = item.kind == ShopItemKind.roomTheme
+            ? own.setComplete(themeId)
+            : own.hasItemVariant(themeId, item.placeableId!);
+        if (covered) return BuyResult.alreadyOwned;
       }
       final balance = await db.walletDao.balance(
         childId: childId,

@@ -67,12 +67,13 @@ void main() {
       );
     });
 
-    test('ảnh theo chủ đề: món Cửa hàng đổi tiền tố, món nhỏ giữ nguyên', () {
+    test('ảnh theo biến thể: món Cửa hàng và món nhỏ đều đổi tiền tố', () {
       final leu = roomPlaceables.firstWhere((p) => p.id == 'noi_leu');
       expect(leu.assetFor('classic'), 'assets/images/furniture/noi_leu.webp');
       expect(leu.assetFor('tet'), 'assets/images/furniture/tet_leu.webp');
       final gau = roomPlaceables.firstWhere((p) => p.id == 'gau-bong');
-      expect(gau.assetFor('tet'), gau.item.asset);
+      expect(gau.assetFor('classic'), gau.item.asset);
+      expect(gau.assetFor('tet'), 'assets/images/furniture/tet_gau_bong.webp');
     });
   });
 
@@ -172,8 +173,9 @@ void main() {
   });
 
   group('lưu bố cục', () {
-    test('khóa theo chủ đề', () {
-      expect(roomLayoutSettingsKey('rong'), 'room_layout_rong');
+    test('một khóa chung; khóa cũ theo chủ đề chỉ để chuyển dữ liệu', () {
+      expect(roomLayoutSettingsKey, 'room_layout');
+      expect(roomLegacyLayoutSettingsKey('rong'), 'room_layout_rong');
     });
 
     test('mã hóa rồi giải mã giữ nguyên', () {

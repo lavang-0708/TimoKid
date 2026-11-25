@@ -12,7 +12,9 @@
 /// Không có hộp quà may rủi, không mua bằng tiền thật (PLAN T2-06).
 library;
 
+import '../room/room_assets.dart';
 import '../room/room_themes.dart';
+import '../room/room_variants.dart';
 import '../../core/database/tables.dart';
 import '../character/kid_assets.dart';
 import '../pet/pet_config.dart';
@@ -99,8 +101,11 @@ enum ShopItemKind {
   /// Trứng pet mua bằng kim cương (D).
   petEgg,
 
-  /// Phòng chủ đề (lô 15): đổi cả nền phòng + kiểu 8 món nội thất.
+  /// Bộ phòng chủ đề (lô 15): mở nền + MỌI món của chủ đề.
   roomTheme,
+
+  /// Món lẻ của bộ phòng: mở biến thể chủ đề của MỘT món đồ.
+  roomThemeItem,
 }
 
 class ShopItem {
@@ -116,7 +121,16 @@ class ShopItem {
     this.asset,
     this.species,
     this.rarity,
+    this.roomThemeId,
+    this.placeableId,
   });
+
+  /// Chủ đề của bộ/món lẻ phòng ([ShopItemKind.roomTheme] và
+  /// [ShopItemKind.roomThemeItem]).
+  final String? roomThemeId;
+
+  /// Mã món đồ của món lẻ ([ShopItemKind.roomThemeItem]).
+  final String? placeableId;
 
   /// Loài pet (chỉ với [ShopItemKind.petEgg]).
   final String? species;
@@ -300,7 +314,24 @@ List<ShopItem> shopItemsFor(
           priceGems: t.priceGems,
           asset: roomThemeBackground(t.id),
           rarity: t.rarity,
+          roomThemeId: t.id,
         ),
+    // Món lẻ của bộ phòng (mỗi món một biến thể theo chủ đề).
+    for (final t in roomThemes)
+      if (isRoomThemeReady(t.id, ready: roomThemesReady))
+        for (final p in roomPlaceables)
+          ShopItem(
+            id: roomThemeVariantItemId(t.id, p.id),
+            category: ShopCategory.furniture,
+            kind: ShopItemKind.roomThemeItem,
+            name: '${p.item.label} ${t.shortName}',
+            priceXu: t.usesGems ? 0 : t.itemPrice(p.tier),
+            priceGems: t.usesGems ? t.itemPrice(p.tier) : 0,
+            asset: p.assetFor(t.id),
+            rarity: t.rarity,
+            roomThemeId: t.id,
+            placeableId: p.id,
+          ),
   ];
 }
 
