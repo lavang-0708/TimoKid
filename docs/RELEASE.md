@@ -1,15 +1,11 @@
 # Phát hành APK TimoKid
 
 Mỗi lần gắn tag `v*` (ví dụ `v0.1.0`) lên `main`, workflow `.github/workflows/release.yml`
-tự build APK release đã ký bằng keystore riêng (tách mỗi kiến trúc CPU một APK, `--split-per-abi`
-để file nhỏ hơn) và tạo GitHub Release kèm 2 file APK.
+tự build APK release đã ký bằng keystore riêng và tạo GitHub Release kèm 1 file APK.
 
-## Chọn APK nào để cài
-
-- `TimoKid-vX.Y.Z-arm64.apk`: **chọn file này** cho hầu hết điện thoại, máy tính bảng
-  đời trong khoảng 8 năm gần đây (64-bit).
-- `TimoKid-vX.Y.Z-arm32.apk`: chỉ dùng cho máy rất cũ (32-bit). Cài nhầm file không
-  hợp máy thì Android báo lỗi không tương thích, thử file còn lại.
+APK chỉ build cho chip **arm64** (`--target-platform android-arm64`) để file nhỏ hơn:
+chạy trên gần như mọi điện thoại, máy tính bảng Android 8 năm gần đây. Chủ dự án chọn
+bỏ bản arm32 (máy rất cũ 32-bit) vì không dùng tới.
 
 ## Chuẩn bị một lần: keystore và 4 secrets
 
@@ -65,7 +61,7 @@ keystore này nữa.** Không commit file keystore hay `key.properties` lên rep
    (bản thử thì tích **Set as a pre-release**). Hoặc dùng git:
    `git tag v0.1.0 && git push origin v0.1.0`. Claude không tạo tag được (proxy chặn).
 3. Chờ workflow `Release` chạy xong (tab **Actions** của repo), rồi vào
-   **Releases** tải file `TimoKid-vX.Y.Z-arm64.apk` (hoặc `-arm32.apk` cho máy rất cũ) về cài lên máy.
+   **Releases** tải file `TimoKid-vX.Y.Z.apk` về cài lên máy.
 
 Bản thử đầu tiên sau khi nạp secrets sẽ dùng tag `v0.0.1`.
 

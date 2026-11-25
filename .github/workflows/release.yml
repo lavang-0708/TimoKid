@@ -89,14 +89,11 @@ jobs:
             defines="--dart-define=TEST_UNLOCKS=true --dart-define=QA_MENU=true"
             echo "Bản thử: $defines"
           fi
-          flutter build apk --release --split-per-abi --build-name="$name" --build-number="$code" $defines
+          flutter build apk --release --target-platform android-arm64 --build-name="$name" --build-number="$code" $defines
 
-      # Mỗi ABI một APK; bỏ x86_64 (chỉ dùng cho máy ảo).
+      # Chỉ build cho chip arm64 (gần như mọi máy Android 8 năm gần đây).
       - name: Đổi tên APK theo tag
-        run: |
-          out=build/app/outputs/flutter-apk
-          cp "$out/app-arm64-v8a-release.apk" "build/TimoKid-${GITHUB_REF_NAME}-arm64.apk"
-          cp "$out/app-armeabi-v7a-release.apk" "build/TimoKid-${GITHUB_REF_NAME}-arm32.apk"
+        run: cp build/app/outputs/flutter-apk/app-release.apk "build/TimoKid-${GITHUB_REF_NAME}.apk"
 
       - name: Xóa keystore khỏi máy chạy
         if: always()
@@ -105,7 +102,5 @@ jobs:
 
       - uses: softprops/action-gh-release@v2
         with:
-          files: |
-            app/build/TimoKid-${{ github.ref_name }}-arm64.apk
-            app/build/TimoKid-${{ github.ref_name }}-arm32.apk
+          files: app/build/TimoKid-${{ github.ref_name }}.apk
           generate_release_notes: true
