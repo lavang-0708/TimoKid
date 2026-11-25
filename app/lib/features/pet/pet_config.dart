@@ -139,7 +139,8 @@ String petEmoteAsset(String mood) => 'assets/images/ui/ui_emote_$mood.webp';
 const String petMealAsset = 'assets/images/ui/ui_pet_meal.webp';
 
 /// Pháo giấy + tia sáng cho màn chúc mừng pet lớn (Muse lô 13).
-const String petCelebrateBurstAsset = 'assets/images/ui/ui_celebrate_burst.webp';
+const String petCelebrateBurstAsset =
+    'assets/images/ui/ui_celebrate_burst.webp';
 
 /// Ảnh trứng của [species] (loài mới theo đúng quy ước tên file).
 String petEggAsset(String species) => 'assets/images/pets/${species}_egg.webp';
