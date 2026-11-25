@@ -3791,3 +3791,454 @@ trai boy_full_11_walk_ur_d `9424ba952a10`
   từng bị GitHub secret scanning chặn vì chuỗi base64 tình cờ trúng mẫu (dương
   tính giả); nếu trúng, mã lại PNG lossless đổi compress_level rồi đẩy lại.
   Chưa đẩy (F1 đã sửa, chờ duyệt đẩy).
+
+### Lô 15 — Phòng gốc v4: nền trống + 7 sprite lớn mới (25/11/2026, ĐÃ SỬA theo 9 quyết định Claude ~21:30)
+
+Đích: nền `app/assets/images/backgrounds/room_v4.webp`; 7 sprite lớn
+`app/assets/images/furniture/noi_<giuong|tu_dau_giuong|tu_ao|ban_hoc|ghe|ke_lon|tham>.webp`;
+5 món nhỏ bản _v3 DÙNG LẠI NGUYÊN BẢN (đã sạch magenta sẵn trên nhánh,
+không dọn, không đẩy lại — xem mục "Đồ dùng lại" và bài học sai nguồn).
+Phòng gốc làm theo BRIEF MỚI (25/11): nền TRỐNG hoàn toàn (không đồ đứng trên
+sàn, không bóng đổ của đồ — app tự vẽ bóng mềm dưới chân từng món), đồ là
+SPRITE RỜI để bé kéo-thả tự sắp xếp; món mua về THAY VÀO chỗ món cũ chứ không
+đè lên đồ vẽ sẵn trong nền như trước. Bước đầu CHỈ phòng gốc; 3 phòng chủ đề
+(Tết / Ngân hà / Rồng) làm sau, cũng theo cách nền trống + sprite.
+**Sửa theo 9 quyết định của Claude (25/11 ~21:30):** bỏ két sưởi khỏi nền;
+tủ áo hiển thị 320 rộng đúng tỉ lệ + kệ treo dời trái; bàn học sprite trơn
+(bỏ bình tím + cốc bút vẽ sẵn, giữ sách); 5 món nhỏ _v3 dùng lại nguyên bản
+(đã sạch magenta sẵn, không dọn, không đẩy lại); bình hoa hiển thị cao
+~128 px; bố cục mặc định xếp lại (không chồng nhau, lối đi trống). Kệ 2 mây + shading tím, gấu rèm ngắn, chân
+tường/sàn cong nhẹ ở góc: CHẤP NHẬN, không sửa.
+
+- Nền trống: giữ phối cảnh, góc nhìn và vùng sàn như room_v3 (cửa sổ giữa,
+  tường sau xanh nhạt, tường 2 bên kem, sàn gỗ); chỉ có tường, sàn, cửa sổ +
+  rèm, trần, đèn trần mây, kệ mây + 2 khung nhỏ trên tường trái. **Két sưởi
+  ĐÃ BỎ** (quyết định 1) — tường dưới cửa sổ để trống, tô lại liền mạch.
+- 7 sprite lớn vẽ mới, thiết kế Y HỆT đồ trong room_v3, cùng phối cảnh 3/4
+  và cùng hướng sáng trên-trái với nền để ghép vào trông liền khối.
+- 8 món mua thêm `noi_*` (lô 10) và 5 món nhỏ bản _v3 DÙNG LẠI, không vẽ mới
+  — đã đo lại để ghi doc (xem mục "Đồ dùng lại").
+
+## Cách làm
+
+- Nền (`room_v4.webp`, 1600×900, opaque, MEDIANCUT 256 màu): vẽ gen1 bằng
+  media.generate_image từ room_v3, rồi grid-warp toàn bộ gen1 về đúng lưới
+  mốc room_v3 (nút lưới: góc tường sau, khung cửa sổ, thanh rèm, két sưởi,
+  kệ mây + 2 khung tranh, đèn trần mây, mép sàn y625). Các hướng xóa đồ bằng
+  code / dán pixel room_v3 đều thất bại (palette room_v3 trùng nhau giữa
+  rèm–chăn–két–lá nên mặt nạ màu lem; tường sau dựng từ field bị phẳng) — đã
+  bỏ. Một lần thử sửa két/gấu rèm bằng code làm hỏng ảnh (két bị cắt phẳng,
+  gấu rèm thành mảng chữ nhật) — đã hoàn tác về đúng bản grid-warp.
+- **Bỏ két sưởi bằng code (fix_rad7.py, 7 lần thử):** mask rounded-rect
+  x583–995/y473–568 r=18, dilate 3 px; fill = lerp ngang theo hàng của tường
+  2 bên (median mỗi hàng, smooth sigma 3) + fade bóng gờ cửa sổ (smoothstep
+  y473–500) + mottle tường (noise Gaussian sigma 25, biên độ đo từ tường phải)
+  + grain mịn std 1,6 + feather ra ngoài 15 px (chỉ alpha, không chạm pixel
+  ngoài mask). Ánh xạ palette chính xác bằng cKDTree — LƯU Ý: PIL
+  `quantize(palette=orig)` KHÔNG giữ nguyên pixel (lần thử 1 đổi 590.531 px
+  tới 14 mức). Vùng lấp đầy trung bình (194,7, 158,4, 133,1) khớp tường 2 bên;
+  bước màu ở mép 0–19 (tường sạch ~3). Soi phóng 2×: tường liền mạch, két
+  biến mất, bóng gờ cửa sổ mờ dần tự nhiên. Bản gốc trước khi bỏ két lưu ở
+  `lot15/work/v4/backup_fix_v4b/room_v4.webp` (422.332 byte, SHA
+  `67ad119b58da`).
+- **Bàn học trơn (fix_desk4.py, 4 lần thử):** xóa bình tím vẽ sẵn (~21k px)
+  + cốc bút vẽ sẵn bằng code — tô lại mặt bàn bằng Laplace repaint với biên
+  valid-only (chỉ tính pixel kề hợp lệ, bỏ qua pixel trong suốt/vật thể),
+  bảo vệ tẩy + sách; mặt bàn sạch, **sách GIỮ NGUYÊN** (3 cuốn chồng, đỉnh
+  y268) + tẩy + bóng tẩy. Magenta 0/0/0 (3 thước), semi 0, 255 màu. Màu cốc
+  0 px + màu bình lavender 0 px trong vùng cũ. 2 px viền lot10 ở mép chân
+  ((255,0,150) + (231,61,143)) tô lại theo màu kề → 3 thước = 0. Bản gốc
+  (có bình + cốc) lưu ở `lot15/work/v4/backup_fix_v4b/noi_ban_hoc.webp`.
+- **5 món nhỏ _v3 — KIỂM TRÊN FILE NHÁNH, ĐÃ SẠCH, KHÔNG DỌN (25/11 ~22:15,
+  sửa sai nguồn):** agent trước dọn 5 món từ file PLAIN v2 ở a1-phong-v2 —
+  SAI NGUỒN (plain và _v3 là 2 ảnh khác nhau hoàn toàn: binh_hoa plain
+  126.329 byte vs _v3 242.783 byte, khác 100% pixel). Bản dọn sai nguồn đã
+  bỏ, không dùng. Kiểm lại trên file _v3 của nhánh: 4 file tải về
+  `lot15/work/v4/small_v3_branch/` (git blob SHA-1 khớp listing nhánh);
+  `gau_bong_v3.webp` tải lại bị bảo vệ mã xác minh chặn 5 lần — dùng bản
+  local `lot8c/work/raw/gau_bong_v3.webp` đã kiểm git blob SHA-1 khớp
+  listing nhánh (306.655 byte, `6436e46d9eb9`), byte-identical với file
+  nhánh; Claude kiểm bằng git khi decode. Kết quả: magenta loose/strict =
+  0/0 ở cả 5 món, trừ binh_hoa có 282 px loose — toàn là chi tiết hoa ở
+  TRONG (bbox x206–281/y166–251, 0 px trong 3 px sát mép trong suốt,
+  khoảng cách tới mép tối thiểu 5,4 px, màu trung vị (183,65,142)) nên là
+  thiết kế, KHÔNG dọn; semi = 0 ở cả 5 món; số màu ~18k–40k (đếm RGB khác
+  nhau trong px alpha>0, file không quantize — repo giờ lưu WebP không
+  mất dữ liệu). Bbox đo bằng code khớp `docs/D_IMAGES.md` cả 5 món (sai
+  số 0 px). **Kết luận: 5 món _v3 dùng lại nguyên bản, không dọn, không
+  đẩy lại.** BÀI HỌC: trước khi dọn/đẩy file dùng lại, đối chiếu tên file
+  + byte + SHA với listing nhánh và D_IMAGES.md — file plain và file _v3
+  cùng tên gốc nhưng là 2 ảnh khác nhau.
+- Sprite lớn: vẽ từng món bằng AI trên nền magenta đặc, tách nền + quantize
+  bằng code (pipeline lô 10: key median góc + flood-fill nền từ biên, KHÔNG
+  `binary_fill_holes`; m2/m3 chỉ trong 3 px quanh magenta thật; quantize 256
+  màu MAXCOVERAGE + Floyd–Steinberg; defringe viền hồng trước khi đo cổng
+  cuối). LƯU Ý: key của lô này phải đổi sang khoảng cách VUÔNG GÓC với tia
+  magenta (R=B, G=0) vì bóng sàn magenta đậm chạm tới mép ảnh làm hỏng
+  flood-fill Euclid (bóng perp ~16, khe cửa tủ ~50, chăn hồng ~122 — ngưỡng
+  30 tách sạch). Khe cửa + nếp chăn key thủng thành lỗ trong (tủ áo 5.875 px
+  ở cỡ gốc): khôi phục bằng màu gốc + median-fill 5×5 sau resize/strip → lỗ
+  trong = 0 ở cả 7 file. Canvas 1024×1024 (thảm 1024×512); chân đồ chạm đáy
+  ảnh (y = chiều cao − 1).
+- Grade hue (điều phối viên làm bằng code, 25/11): 4 món tím (tủ áo, ghế,
+  kệ lớn, thảm) đo được H≈279–292° (tím thật) trong khi đồ tương ứng trong
+  room_v3 là hồng-mauve H≈350°, S thấp — trên ảnh ghép trông như "sticker"
+  tím dán lên phòng nhạt. Đã grade: hue 260–315° dịch 85% về 348°, S×0,9,
+  alpha không đổi, requantize 256 màu (PIL MEDIANCUT — lệch quy trình
+  MAXCOVERAGE thường dùng cho sprite, cổng vẫn là ≤256 màu nên đạt). Kết quả:
+  tủ áo H 290→340, ghế 279→338, kệ 287→339, thảm 292→348; bbox/chân không
+  đổi; bản gốc giữ ở `lot15/work/v4/backup_pre_grade/`. Giường (H=348),
+  tủ đầu giường (H=46, ấm), bàn học (H=28, ấm) đã đúng tông nên không grade.
+- Đo vị trí bằng code trên ảnh thật; ảnh ghép soi bằng mắt (nền tối/trắng/
+  xám 128/phòng thật, mép ngoài phóng 3×). Lỗi nhỏ sửa bằng code, không hỏi.
+
+## Nền trống room_v4.webp
+
+| Món | Đích | PNG | SHA-12 | Mốc bố cục so với room_v3 |
+|---|---|---|---|---|
+| Nền trống | `app/assets/images/backgrounds/room_v4.webp` | 427.754 byte | `77db44ad28cd` | khung kính x625–911/y128–438 (v3 x633–917/y136–446, lệch ≤8 px); đỉnh thanh rèm y65 (v3 y75); mép sàn giữa y625 (khớp); góc tường x335/1150 (khớp); **két sưởi ĐÃ BỎ** — tường dưới cửa sổ trống, tô lại liền mạch (soi 2× sạch) |
+
+- Sàn soi phóng 2× sạch: không còn dấu giường/tủ/bàn/thảm/chậu cây/bóng đồ
+  (vùng sàn y>630: pink chăn 0 px, lilac 0 px — room_v3 có 10.461 px chăn).
+- Gấu rèm ngắn hơn v3 ~50 px (v4 ~610, v3 ~660) — CHẤP NHẬN (quyết định 4).
+  Chân tường + vân sàn cong nhẹ ở 2 góc dưới do warp (hiệu ứng góc rộng) —
+  CHẤP NHẬN (quyết định 5).
+
+## 7 sprite lớn mới
+
+| Món | Đích | PNG | SHA-12 | Cỡ hiển thị (khung 1600×900) | Điểm chân |
+|---|---|---|---|---|---|
+| Giường | `app/assets/images/furniture/noi_giuong.webp` | 78.466 byte | `873ac9442f84` | 500×340, x160–660, y375–715 | (410, 715) |
+| Tủ đầu giường | `app/assets/images/furniture/noi_tu_dau_giuong.webp` | 25.243 byte | `02d31ce47fa2` | 194×190, x70–264, y590–780 | (167, 780) |
+| Tủ áo | `app/assets/images/furniture/noi_tu_ao.webp` | 98.256 byte | `c4bf1657da4b` | **320×820, x1280–1600, y65–885** (đúng tỉ lệ, quyết định 2) | (1440, 885) |
+| Bàn học | `app/assets/images/furniture/noi_ban_hoc.webp` | 110.551 byte | `3c5253c16bd6` | **320×269, x1050–1370, y506–775** (sprite TRƠN, quyết định 8) | (1210, 775) |
+| Ghế | `app/assets/images/furniture/noi_ghe.webp` | 100.382 byte | `980dc9a5a005` | 160×240, x990–1150, y505–745 | (1070, 745) |
+| Kệ sách lớn | `app/assets/images/furniture/noi_ke_lon.webp` | 193.377 byte | `bb6b6871c7e7` | 270×360, **x990–1260, y30–390** (dời trái 110 px, quyết định 2) | (1125, 390) — treo tường |
+| Thảm tròn | `app/assets/images/furniture/noi_tham.webp` | 204.771 byte | `7f4d432636ac` | 590×160, x410–1000, y695–855 | (705, 855) |
+
+- Cổng: magenta 0 (3 thước) ở cả 7 file (bàn trơn: 0/0/0, semi 0, 255 màu;
+  tủ áo thước 2 = 0 sau grade — 414 px tím nội thất cửa tủ đã xác minh là màu
+  thật, không phải dư magenta). Semi = 0 ở cả 7 file; ≤256 màu.
+- Giường: hồng, gối + chăn gấp, đúng thiết kế room_v3; KHÔNG có gấu bông
+  (gấu là món rời). Tủ đầu giường: vàng nhạt 2 ngăn, núm gỗ.
+- Tủ áo: hiển thị **320 rộng ĐÚNG TỈ LỆ** (quyết định 2) — file sprite đã
+  rộng 320 trong bbox nên không sửa file, chỉ đổi rect hiển thị; núm tròn.
+  Kệ treo dời sang trái để khỏi đè tủ (khe 20 px).
+- Bàn học: **sprite TRƠN** (quyết định 8) — bỏ bình tím + cốc bút vẽ sẵn,
+  **sách GIỮ NGUYÊN** (3 cuốn chồng) + tẩy + bóng tẩy; mép trên mặt bàn
+  (back edge) ở y~553 trong khung phòng; thân bàn hiển thị cao 269 px.
+- Ghế: lưng hơi cao hơn gốc (tỉ lệ lưng/ghế ~40/60 vs gốc ~35/65); vệt tối
+  ~1 px ở mép trong 2 chân trước (chỉ thấy ở zoom 512 px, <0,5 px ở cỡ app).
+- Kệ sách lớn: kệ TREO TƯỜNG — neo = mép dưới kệ, KHÔNG phải chân sàn;
+  trong suốt giữa các sách (tường lộ qua khe, như room_v3); 2 quả địa cầu +
+  2 đám mây (gốc: 2 địa cầu + 1 mây); dải tối tím bên trong (~37k px,
+  shading của ảnh gen — mờ 1–2 px ở cỡ app). **2 mây + shading tím:
+  CHẤP NHẬN** (quyết định 3), không sửa.
+- Thảm tròn: ellipse nằm phẳng trên sàn, sao + mây; bị squash dọc 0,58× về
+  tỉ lệ thật 3,69:1 (sao/mây hơi dẹt ngang nhưng tự nhiên).
+
+## Đồ dùng lại (đã đo, không vẽ mới)
+
+### 8 món mua thêm lô 10 (512×512, chân y=440) — đã có trong app
+
+| Món | PNG | SHA-12 | Bbox (khung 512) | Điểm chân | Cỡ hiển thị đề xuất (tỉ lệ 0,45) | Vị trí mặc định mới (khung 1600×900) |
+|---|---|---|---|---|---|---|
+| Nhà pet | `furniture/noi_nha_pet.webp` | `997f74ced65f` | (98,141,415,440) 318×300 | (219, 440) | 143×135 (đo 148×140) | sàn phải, trước bàn (950, 880) |
+| Kệ sách nhỏ | `furniture/noi_ke_sach.webp` | `9b58c057e33b` | (85,81,427,440) 343×360 | (138, 440) | 154×162 (đo 159×167) | sàn trái, trước giường (400, 875) |
+| Bể cá | `furniture/noi_be_ca.webp` | `6cbecc45c2b1` | (110,121,403,440) 294×320 | (167, 440) | 132×144 (đo 137×149) | sàn phải, trước bàn (1150, 880) |
+| Cây cao | `furniture/noi_cay_cao.webp` | `968aff79e6e8` | (124,61,389,440) 266×380 | (255, 440) | 120×171 (đo 125×176) | khe tường sau giữa giường và bàn, dưới cửa sổ (720, 745) — KHÔNG che cửa sổ |
+| Ghế lưới | `furniture/noi_ghe_luoi.webp` | `f4f9d128c79c` | (121,212,392,440) 272×229 | (255, 440) | 122×103 (đo 127×108) | sàn trái, trước tủ đầu giường (260, 880) |
+| Lều | `furniture/noi_leu.webp` | `d870d9285c41` | (82,102,431,440) 350×339 | (171, 440) | 158×153 (đo 163×158) | góc trái phòng, trước tủ đầu giường (100, 880) — XA chân tủ áo |
+| Đèn trăng | `furniture/noi_den_trang.webp` | `89b9e3c712a5` | (138,141,374,440) 237×300 | (259, 440) | 107×135 (đo 112×140) | trên kệ treo (1090, 380) |
+| Tranh | `furniture/noi_tranh.webp` | `fcbbdf2a3533` | (116,141,396,440) 281×300 | (257, 440) | 126×135 (đo 131×140) | tường trái, phải khung nhỏ vẽ sẵn (380, 300) |
+
+- Cổng còn đạt: magenta 0/0, semi 0, 255–256 màu ở cả 8 món (đo lại 25/11).
+- Điểm chân = tâm x của hàng pixel đáy (y=440). "Đo" = kích thước bbox hiển
+  thị đo bằng code trên ảnh ghép (lớn hơn cỡ tính theo tỉ lệ ~3–5 px do
+  LANCZOS + viền alpha mềm).
+
+### 5 món nhỏ bản _v3 — DÙNG LẠI NGUYÊN BẢN (đã có trên nhánh, không đẩy lại)
+
+| Món | Đích (đã có trên nhánh) | PNG nhánh | SHA-12 (SHA-256 nội dung) | Bbox (khung 512) | Điểm chân | Neo trong phòng | Tỉ lệ |
+|---|---|---|---|---|---|---|---|
+| Gấu bông | `furniture/gau_bong_v3.webp` | 306.655 byte | `c5e56a4e37c6` | (125,95,388,444) 264×350 | (187, 444) | trên giường (415, 548) | 0,466 |
+| Đèn sao | `furniture/den_sao_v3.webp` | 242.411 byte | `fc50089f22e4` | (96,91,418,449) 323×359 | (256, 449) | trên tủ đầu giường (150, 578) | 0,383 |
+| Chậu cây | `furniture/chau_cay_v3.webp` | 222.629 byte | `2124c2fd85ce` | (99,119,373,440) 275×322 | (234, 440) | sàn dưới cửa sổ (842, 686) | 0,70 |
+| Bình hoa | `furniture/binh_hoa_v3.webp` | 242.783 byte | `1a24cd49b614` | (156,106,360,429) 205×324 | (278, 429) | **trên bàn học (1105, 575)** | **0,395 → cao 128 px** |
+| Cốc sao | `furniture/coc_sao_v3.webp` | 238.805 byte | `814bff936abe` | (100,83,354,433) 255×351 | (261, 433) | **trên bậu cửa sổ (700, 465)** | 0,315 |
+
+- 5 món _v3 đã sạch magenta sẵn trên nhánh (kiểm trên file nhánh, xem mục
+  "Cách làm"): **magenta loose/strict = 0/0** ở gấu, đèn sao, chậu cây,
+  cốc sao; bình hoa loose 282 px là chi tiết hoa nội bộ (0 px sát mép),
+  strict 0; semi = 0 ở cả 5 món; **KHÔNG quantize 256 màu** (quyết định 6
+  — repo giờ lưu WebP không mất dữ liệu; số màu ~18k–40k, đếm RGB khác
+  nhau trong px alpha>0). **Không dọn, không đẩy lại** — file _v3 đã có
+  trên nhánh, git blob SHA-1 khớp listing nhánh (gấu `6436e46d9eb9`, đèn
+  sao `65e758b8de48`, chậu cây `2eab0dbd948e`, bình hoa `4c6a406ce9c1`,
+  cốc sao `d38b7d705975`).
+- Cỡ hiển thị = bbox × tỉ lệ (gấu 123×163, đèn sao 124×138, chậu cây
+  193×225, bình hoa **81×128**, cốc sao 80×111). Trên ảnh ghép, LANCZOS +
+  viền alpha mềm làm cỡ đo lớn hơn cỡ lý thuyết ~4–5 px ở cả 5 món
+  (bình hoa đo 86×133) — cùng hiệu ứng, tỉ lệ vẫn đúng.
+- **Bình hoa: hiển thị cao 128 px** (quyết định 7) — scale 128/324 =
+  0,395 (cũ 0,553), đặt trên bàn ở (1105, 575); không vẽ lại sprite.
+- **Cốc sao: đặt trên bậu cửa sổ** (700, 465) thay vì trên bàn — mặt bàn đã
+  đầy (bình hoa + sách), cốc trên bậu cửa là chỗ tự nhiên, không che cửa sổ.
+
+## Ảnh ghép xem trước (lot15/work/v4/composites/)
+
+- `v4_default_layout.webp` (1.220.987 byte, SHA-12 `b4ea1a270c8a`, làm lại
+  theo bố cục mới, vẽ lại 25/11 ~22:15 bằng file _v3 nguyên bản cho 5 món
+  nhỏ): nền trống (đã bỏ két) + 7 sprite lớn + 8 món noi_* + 5 món nhỏ _v3
+  nguyên bản + bé gái 08 (cao 360 px, chân (630,810)). Bố cục mặc định
+  mới: giường trái, tủ đầu giường cạnh giường, tủ áo phải 320 rộng, bàn học
+  trơn + ghế ở bàn, kệ sách lớn dời trái trên tường, thảm tròn giữa sàn;
+  món nhỏ: gấu trên giường, đèn sao trên tủ đầu giường, chậu cây sàn dưới
+  cửa sổ, bình hoa 128 px trên bàn, cốc sao trên bậu cửa sổ, đèn trăng trên
+  kệ, tranh cầu vồng trên tường trái; 8 món noi_*: lều góc trái, ghế lưới +
+  kệ sách nhỏ sàn trái, cây cao khe tường sau (không che cửa sổ), nhà pet +
+  bể cá sàn phải.
+- Kiểm bằng code (bbox hiển thị): chỉ còn **2 chồng CÙNG ĐỘ SÂU, đều là cặp
+  cố ý** — (1) ghế↔bàn (ghế kê ở bàn, như room_v3); (2) đèn trăng↔kệ (đèn
+  đặt trên kệ, cố ý qua DRAW_AFTER). Còn lại đều depth-ok (món trước che món
+  sau đúng thứ tự chân: tủ áo trước bàn, bàn trước bể cá/lều, giường trước
+  kệ sách/lều/bé, cây cao trước chậu cây) hoặc đứng trên thảm phẳng. LƯU Ý:
+  checker tính bbox từng sprite riêng (chưa tính che khuất) nên vài chồng
+  depth-ok nhìn lớn trên số liệu nhưng thực tế món sau đã bị món trước che
+  đúng — đã soi mắt, không món nào bị che mất. Thứ tự vẽ theo foot-y tăng
+  dần (sau ra trước); ngoại lệ: lều và đèn trăng vẽ sau do chân-y của đồ
+  tường cao hơn; món nhỏ (reused) vẽ sau 7 sprite lớn nên nằm đúng trên mặt
+  bàn/giường/tủ/bậu cửa.
+- Lối đi: dải x450–850, y750–860 không có chân đồ nào (trừ thảm phẳng + bé
+  gái) — lối đi trống, bé đứng giữa thảm ở (630, 810).
+- `v4_empty.webp` (775.350 byte, SHA-12 `7ed05fca22df`): chỉ nền trống sau
+  khi bỏ két — tường dưới cửa sổ liền mạch, sàn trống.
+- `v4_sprites_dark.webp` (527.767 byte, SHA-12 `cb73d2f36d91`): 7 sprite lớn
+  trên nền tối (60,60,80) — không lỗ alpha, không viền magenta/trắng; bàn
+  trơn mới không dấu bình/cốc.
+- Cận cảnh: `closeup_wall_no_radiator.webp` (2× vùng tường đã bỏ két) +
+  `closeup_desk_top_{dark,white,grey}.webp` (2× mặt bàn trơn trên 3 nền) —
+  đã soi, sạch.
+- Soi bằng mắt: ghép liền khối (cùng phối cảnh 3/4 + sáng trên-trái), tỉ lệ
+  các món với nhau + với cửa sổ đúng (bé 360 px đứng ngang giường, tủ áo
+  cao gần bằng trần); không món nào trông như "dán đè" lên đồ vẽ sẵn — vì
+  nền đã trống, mọi món đều là sprite rời có thứ tự sâu đúng.
+
+## 9 quyết định của Claude (25/11 ~21:30) — ĐÃ LÀM XONG
+
+1. **Két sưởi: BỎ khỏi nền** — XONG. Tường dưới cửa sổ liền mạch, soi 2×
+   sạch; mốc bố cục còn lại khớp room_v3 như trước.
+2. **Tủ áo: hiển thị 320 rộng đúng tỉ lệ** — XONG (chỉ đổi rect hiển thị +
+   doc, không sửa file). **Kệ treo dời sang trái** x990–1260 (khe 20 px với
+   tủ), không đè nhau.
+3. **Kệ treo 2 mây + shading tím: CHẤP NHẬN** — không sửa (chỉ dời trái
+   theo điểm 2).
+4. **Gấu rèm ngắn (~50 px so với room_v3): CHẤP NHẬN** — không sửa.
+5. **Chân tường + sàn cong nhẹ ở 2 góc dưới: CHẤP NHẬN** — không sửa.
+6. **5 món nhỏ: _v3 ĐÃ SẠCH magenta sẵn, không dọn, không đẩy lại** — SỬA
+   25/11 ~22:15: agent trước dọn sai nguồn (plain v2), bản dọn đã bỏ.
+   Kiểm trên file nhánh: magenta 0/0 (bình hoa 282 px loose là hoa nội bộ),
+   semi 0, không quantize; 5 món _v3 đã có trên nhánh.
+7. **Bình hoa: hiển thị cao 128 px** — XONG (scale 0,395 = 128/324, trên bàn
+   (1105, 575); không vẽ lại sprite).
+8. **Bàn học: sprite TRƠN** — XONG (bỏ bình tím + cốc bút, GIỮ sách +
+   tẩy; magenta 0/0/0, semi 0, 255 màu; soi 3 nền sạch).
+9. **Bố cục mặc định xếp lại** — XONG (không chồng cùng độ sâu ngoài 2 cặp
+   cố ý; lối đi x450–850/y750–860 trống; cây cao khỏi giữa phòng, không che
+   cửa sổ; lều ra góc trái, xa chân tủ áo).
+
+Chưa decode (chờ Claude decode).
+
+### Lô 15 — Phòng Rồng: nền trống + 7 sprite lớn mới + 8 món mua thêm (25/11/2026)
+
+Đích: nền `app/assets/images/backgrounds/room_rong.webp`; 7 sprite lớn
+`app/assets/images/furniture/rong_<giuong|tu_dau_giuong|tu_ao|ban_hoc|ghe|ke_lon|tham>.webp`;
+8 món mua thêm `app/assets/images/furniture/rong_<nha_pet|ke_sach|be_ca|cay_cao|ghe_luoi|leu|den_trang|tranh>.webp`;
+5 món nhỏ bản _v3 DÙNG LẠI NGUYÊN BẢN (đã có trên nhánh, không đẩy lại).
+Phòng Rồng làm theo BRIEF MỚI (25/11) như phòng gốc v4: nền TRỐNG hoàn toàn
+(không đồ đứng trên sàn, không bóng đổ của đồ — app tự vẽ bóng mềm dưới chân
+từng món), đồ là SPRITE RỜI để bé kéo-thả tự sắp xếp. Hướng màu sắc/đồ đạc lấy
+từ bản xem kiểu đã duyệt (25/11 ~20:47): lâu đài rồng mint-vàng, lộng lẫy nhất
+trong 3 phòng chủ đề. **Đèn ngọc vẽ sẵn trên tủ đầu giường ở nền xem kiểu ĐÃ
+BỎ** (tránh 2 đèn chồng nhau khi đặt đèn rời); rồng bay + tháp lâu đài ngoài
+cửa sổ GIỮ NGUYÊN.
+
+- Nền trống: giữ phối cảnh, góc nhìn và vùng sàn như room_v3/v4 (cửa sổ giữa,
+  tường sau mint, tường 2 bên, sàn gỗ); chỉ có tường gạch lâu đài mint + viền
+  vàng, tường sau mint, cửa sổ + rèm mint dây buộc vàng, trần, đèn chùm ngọc
+  rồng vàng, kệ mây + 2 khung tranh rồng viền vàng trên tường trái, viền vàng
+  hình rồng trên tường trái cửa sổ. **Tường dưới cửa sổ trống** (không két
+  sưởi/tấm ốp — như quyết định 1 của phòng v4).
+- 7 sprite lớn vẽ mới, thiết kế theo phòng Rồng xem kiểu, cùng phối cảnh 3/4
+  và cùng hướng sáng trên-trái với nền để ghép vào trông liền khối.
+- 8 món mua thêm: 6 vẽ mới (nhà pet vẽ lại cao gần bằng gốc theo quyết định
+  duyệt kiểu), cây pha lê + đèn ngọc DÙNG LẠI nguyên bản xem kiểu đã duyệt.
+- 5 món nhỏ bản _v3 DÙNG LẠI nguyên bản (đã kiểm byte + SHA với doc v4).
+
+## Cách làm
+
+- Nền (`room_rong.webp`, 1600×900, opaque, MEDIANCUT 256 màu): sửa từ
+  room_v4.webp bằng media.generate_image (1 lần, đạt ngay), rồi grid-warp về
+  đúng lưới room_v4 (cột tách riêng + hàng tròn tâm/biên, nội suy song tuyến)
+  theo đúng cách v4. Script: `lot15/work/rong/grid_warp_rong.py`.
+- Sprite lớn + món mua thêm: vẽ từng món bằng AI trên nền magenta đặc, tách
+  nền + quantize bằng code (pipeline lô 10: key median góc + flood-fill nền
+  từ biên, KHÔNG `binary_fill_holes`; m2/m3 chỉ trong 3 px quanh magenta
+  thật; quantize 256 màu MAXCOVERAGE + Floyd–Steinberg; defringe viền hồng
+  trước khi đo cổng cuối). Khe nhìn xuyên thật (ghế ngai: 526 px giữa tay
+  vịn/mặt ghế) giữ trong suốt, không lấp.
+- Hue: không món nào tím nên KHÔNG cần grade (bài học v4) — hue median pixel
+  bão hòa 31–67° (vàng gold) + tủ đầu giường 152,7° (mint), khớp phòng xem
+  kiểu (34–57°).
+- Đo vị trí bằng code trên ảnh thật; ảnh ghép soi bằng mắt (nền tối/phòng
+  thật, cận cảnh 2×). Lỗi nhỏ sửa bằng code, không hỏi.
+
+## Nền trống room_rong.webp
+
+| Món | Đích | PNG | SHA-12 | Mốc bố cục so với room_v4 |
+|---|---|---|---|---|
+| Nền trống | `app/assets/images/backgrounds/room_rong.webp` | 506.815 byte | `4cc38facc620` | khung kính x640–910/y120–459 (v4 625–911/128–438: trái +15, phải −1, trên −8, dưới +21); đỉnh thanh rèm y79 (v4 y65, +14); mép sàn giữa y635–640 (v4 y625, +10–15); góc tường x335/1150 (khớp); **không két sưởi/tấm ốp** — tường dưới cửa sổ trống; **không đèn ngọc trên tủ đầu giường** (không có tủ) |
+
+- Sàn soi sạch: không dấu giường/tủ/bàn/thảm/chậu cây/bóng đồ (vùng sàn y>630:
+  pink 0, lilac 0, dark 0; 715 px mint là chân tường trái mint dốc xuống tới
+  y~790 ở mép trái theo phối cảnh + vài px đầu gấu rèm).
+- Đáy kính cửa sổ y~459, hơn v4 +21 px (vượt cổng 20 chút ít) — phần lớn là
+  ánh sáng mặt trời trên bệ cửa sổ; khung cửa đã đúng nút lưới (455).
+- Đỉnh đèn chùm ngọc rồng bị cắt sát mép trên ảnh (kế thừa từ gen1) — ở góc
+  trên, khó thấy trong app.
+- Gấu rèm y~610–640, dài hơn v4 (~610) một chút, gần bằng room_v3 (~660).
+
+## 7 sprite lớn mới
+
+| Món | Đích | PNG | SHA-12 | Cỡ hiển thị (khung 1600×900) | Điểm chân |
+|---|---|---|---|---|---|
+| Giường vỏ trứng | `app/assets/images/furniture/rong_giuong.webp` | 124.324 byte | `2b9e3d32481b` | 560×380, x130–690, y360–740 | (410, 740) |
+| Tủ đầu giường | `app/assets/images/furniture/rong_tu_dau_giuong.webp` | 41.041 byte | `b5e58923f632` | 195×199, x40–235, y591–790 | (137, 790) |
+| Tủ áo | `app/assets/images/furniture/rong_tu_ao.webp` | 176.069 byte | `8c8189ea3067` | 320×820, x1280–1600, y65–885 (đúng tỉ lệ) | (1440, 885) |
+| Bàn học | `app/assets/images/furniture/rong_ban_hoc.webp` | 46.228 byte | `3880085e664e` | 320×262, x1050–1370, y513–775 (bàn TRƠN, giữ sách) | (1210, 775) |
+| Ghế ngai | `app/assets/images/furniture/rong_ghe.webp` | 60.628 byte | `28fc9a81d151` | 160×240, x1030–1190, y505–745 | (1110, 745) |
+| Kệ sách lớn | `app/assets/images/furniture/rong_ke_lon.webp` | 171.797 byte | `5e6c097b5fea` | 240×712, x1155–1395, y48–760 (ĐỨNG TRÊN SÀN) | (1275, 760) |
+| Thảm tròn | `app/assets/images/furniture/rong_tham.webp` | 120.107 byte | `e1ebeb147fa5` | 590×160, x410–1000, y695–855 | (705, 855) |
+
+- Cổng: magenta 0 (3 thước strict/lot10/loose) + bright-rim 0 + semi 0 ở cả 7
+  file; 177–245 màu. Lỗ kín 0 (trừ ghế: 526 px khe nhìn xuyên thật, giữ).
+- Giường: vỏ trứng vảy mint-hồng + viền vàng, gối + chăn; hiển thị 560×380
+  (uniform 1,12× từ bbox 500×340, theo gợi ý của agent sprite). KHÔNG có
+  gấu bông (gấu là món rời). Tủ đầu giường: mint 2 ngăn, huy hiệu rồng vàng,
+  nóc trống (không đèn).
+- Tủ áo: lâu đài mint, tay nắm rồng vàng, hiển thị 320 rộng đúng tỉ lệ; mặt
+  trước sáng hơn tủ trong preview (tủ preview nằm trong bóng râm) — hue
+  đúng, chỉ sáng hơn.
+- Bàn học: **sprite TRƠN** (như quyết định 8 phòng v4) — không bình hoa/không
+  cốc bút vẽ sẵn, **sách GIỮ NGUYÊN** (3 cuốn chồng) + huy hiệu rồng vàng.
+- Ghế ngai: vàng, chạm khắc; khe giữa tay vịn/mặt ghế trong suốt đúng thiết
+  kế.
+- Kệ sách lớn: lâu đài mint, sách vàng + địa cầu + tượng rồng nhỏ, **ĐỨNG
+  TRÊN SÀN** (khác kệ treo tường của v4 — neo = chân sàn, không phải mép
+  dưới kệ); hiển thị 240×712 (uniform 0,89×). Thứ tự vẽ: kệ TRƯỚC ghế/bàn/tủ
+  áo (kệ sát tường sau) để ghế/bàn/tủ áo ở trước đúng.
+- Thảm tròn: ellipse nằm phẳng trên sàn, hoa văn rồng vàng.
+
+## 8 món mua thêm theo chủ đề Rồng
+
+| Món | Đích | PNG | SHA-12 | Bbox (khung 512) | Điểm chân | Cỡ hiển thị đề xuất | Vị trí mặc định (khung 1600×900) |
+|---|---|---|---|---|---|---|---|
+| Nhà pet (hang rồng + kho báu) | `furniture/rong_nha_pet.webp` | 100.515 byte | `6fc1ae1be7a1` | (113,141,400,440) 288×300 | (276, 440) | 158×165 (tỉ lệ 0,55) | sàn phải, trước bàn (950, 880) |
+| Kệ sách nhỏ (tháp lâu đài) | `furniture/rong_ke_sach.webp` | 80.526 byte | `47e48963f26d` | (85,86,427,440) 343×355 | (249, 440) | 154×160 (0,45) | sàn trái, trước giường (400, 875) |
+| Bể cá (pha lê, cá vàng) | `furniture/rong_be_ca.webp` | 76.696 byte | `d2010aee61e8` | (121,121,391,440) 271×320 | (256, 440) | 122×144 (0,45) | sàn phải, trước bàn (1150, 880) |
+| Cây cao (cây pha lê) | `furniture/rong_cay_cao.webp` | 114.105 byte | `82da1b14dadf` | (136,61,376,440) 241×380 | (257, 440) | 108×171 (0,45) | khe tường sau dưới cửa sổ (720, 745) |
+| Ghế lưới (vảy rồng) | `furniture/rong_ghe_luoi.webp` | 42.293 byte | `e67fd6cf2181` | (151,212,362,440) 212×229 | (200, 440) | 95×103 (0,45) | sàn trái (260, 880) |
+| Lều (hang rồng) | `furniture/rong_leu.webp` | 68.594 byte | `b0401875278f` | (92,102,420,440) 329×339 | (262, 440) | 148×153 (0,45) | góc trái phòng (100, 880) |
+| Đèn trăng (đèn ngọc rồng) | `furniture/rong_den_trang.webp` | 57.421 byte | `4dc1031538bb` | (175,141,335,440) 161×300 | (255, 440) | 72×135 (0,45) | trên tủ đầu giường (137, 605) |
+| Tranh rồng | `furniture/rong_tranh.webp` | 97.218 byte | `9933feff9c88` | (117,141,394,440) 278×300 | (254, 440) | 125×135 (0,45) | CHƯA ĐẶT trong bố cục mặc định (xem dưới) |
+
+- Cổng: magenta 0/0/0 ở ke_sach, leu, tranh, cay_cao, den_trang; be_ca
+  loose 7 (strict/bright 0); ghe_luoi loose 14 (strict/bright 0); nha_pet
+  loose 85 / strict 23 / bright 0; semi 0, 256 màu ở cả 8 món; chân y=440,
+  tâm-x 255–256,5.
+- Nhà pet VẼ LẠI (không dùng nguyên bản xem kiểu chỉ cao 221 px): cao 300 px
+  = đúng gốc, trong app 0,55 cao ~165 px (Claude quyết: cao gần bằng gốc,
+  không 122 px). Rộng 288 (gốc 318) do contain-fit theo chiều cao.
+- Cây pha lê + đèn ngọc DÙNG LẠI nguyên bản xem kiểu (byte + SHA khớp
+  `rong_notes.json`): cây cao đúng 380 px (khe lá trong suốt là đúng); đèn
+  hẹp hơn gốc, Claude đã chấp nhận ở duyệt kiểu.
+- Nhà pet: ngọc tím trong kho báu loose 85 / strict 23, bright 0, trung vị
+  (223,51,204), 0 px trong 3 px sát mép — màu thiết kế, KHÔNG tô (quy tắc
+  skill: màu tím thật thì lấy bright-rim = 0 làm thước; tiền lệ binh_hoa
+  282 px loose).
+- Bể cá: dải hồng trên miệng bể là kính nhiễm magenta (loose 7); bản gốc
+  lô 10 cũng có và còn mạnh hơn (7.090 px) — tiền lệ đã duyệt, không tô.
+- Ghế lưới hẹp hơn gốc (rộng 212 vs 272, cao đúng 229); loose 14 px là ánh
+  hồng nhạt trên vải (strict/bright 0).
+- Tranh rồng CHƯA ĐẶT trong bố cục mặc định: không còn tường trống (tường
+  trái đã có 2 khung vẽ sẵn + kệ mây; tường sau 2 bên cửa sổ đã có viền rồng
+  + rèm — rèm phải tới x~1084; tường phải đã có tủ áo + kệ). Bé treo bằng
+  kéo-thả; vị trí gợi ý: tường sau bên phải rèm nếu dời kệ, hoặc tường trái
+  nếu dời giường.
+
+## 5 món nhỏ bản _v3 — DÙNG LẠI NGUYÊN BẢN (đã có trên nhánh, không đẩy lại)
+
+| Món | Đích (đã có trên nhánh) | PNG nhánh | SHA-12 | Bbox (khung 512) | Điểm chân | Neo trong phòng | Tỉ lệ |
+|---|---|---|---|---|---|---|---|
+| Gấu bông | `furniture/gau_bong_v3.webp` | 306.655 byte | `c5e56a4e37c6` | (125,95,388,444) 264×350 | (187, 444) | trên giường (415, 548) | 0,466 |
+| Đèn sao | `furniture/den_sao_v3.webp` | 242.411 byte | `fc50089f22e4` | (96,91,418,449) 323×359 | (256, 449) | trên bàn học (1220, 575) | 0,383 |
+| Chậu cây | `furniture/chau_cay_v3.webp` | 222.629 byte | `2124c2fd85ce` | (99,119,373,440) 275×322 | (234, 440) | sàn dưới cửa sổ (842, 686) | 0,70 |
+| Bình hoa | `furniture/binh_hoa_v3.webp` | 242.783 byte | `1a24cd49b614` | (156,106,360,429) 205×324 | (278, 429) | trên bàn học (1105, 575) | 0,395 → cao 128 px |
+| Cốc sao | `furniture/coc_sao_v3.webp` | 238.805 byte | `814bff936abe` | (100,83,354,433) 255×351 | (261, 433) | trên bậu cửa sổ (700, 465) | 0,315 |
+
+- 5 món _v3 đã kiểm lại byte + SHA khớp doc v4 (file nhánh
+  `lot15/work/v4/small_v3_branch/`, KHÔNG dùng `small_cleaned/` sai nguồn).
+  **Không dọn, không đẩy lại.**
+- Đèn sao ĐỔI CHỖ so với phòng v4: v4 đặt trên bậu cửa sổ, phòng Rồng đặt
+  trên bàn học (1220, 575), giữa bình hoa và sách — vì trên bậu cửa sổ ngôi
+  sao sáng choán hết cửa sổ và che mất rồng bay ngoài cửa sổ; đèn bàn là chỗ
+  tự nhiên của đèn bàn. Cốc sao vẫn trên bậu cửa sổ (700, 465).
+
+## Ảnh ghép xem trước (lot15/work/rong/composites/)
+
+- `rong_default_layout.webp` (1.755.181 byte, SHA-12 `572fb3e30eb0`): nền trống
+  + 7 sprite lớn + 7 món rong (trừ tranh) + 5 món nhỏ _v3 + bé gái 11 (Công
+  chúa rồng, cao 360 px, chân (630,810)). Bố cục mặc định: giường vỏ trứng
+  trái, tủ đầu giường cạnh giường (đèn ngọc trên tủ), tủ áo phải 320 rộng,
+  bàn học trơn + ghế ngai ở bàn (bình hoa + đèn sao + sách trên bàn), kệ sách
+  lớn đứng sàn sau bàn, thảm tròn giữa sàn; món nhỏ: gấu trên giường, chậu
+  cây sàn dưới cửa sổ, cốc sao trên bậu cửa sổ; 7 món rong: lều góc trái,
+  ghế lưới + kệ sách nhỏ sàn trái, cây pha lê khe tường sau (sau bé gái),
+  nhà pet + bể cá sàn phải.
+- Kiểm bằng code (bbox hiển thị): chỉ còn chồng CÙNG ĐỘ SÂU theo thước chân
+  (kệ↔ghế, kệ↔bàn, ghế↔bàn, giường↔cây) — nhưng thứ tự vẽ đã sửa đúng: kệ vẽ
+  TRƯỚC (sát tường sau) nên ghế/bàn/tủ áo ở trước đúng; ghế↔bàn là cặp cố ý
+  (ghế kê ở bàn, như room_v3/v4); cây pha lê trước giường (khe tường sau).
+  Còn lại đều depth-ok (món trước che món sau đúng thứ tự chân: tủ áo trước
+  kệ/bàn, bàn trước bể cá, giường trước kệ sách/lều/bé, cây trước chậu cây)
+  hoặc đứng trên thảm phẳng, hoặc đặt trên đồ (gấu trên giường, bình hoa +
+  đèn sao trên bàn, đèn ngọc trên tủ đầu giường, cốc sao trên bậu cửa).
+  Đã soi mắt 2× (cận cảnh giữa, giường, bàn): không món nào bị che mất,
+  không món nào đè sai.
+- Lối đi: dải x450–850, y750–860 không có chân đồ nào (trừ thảm phẳng + bé
+  gái) — lối đi trống, bé đứng giữa thảm ở (630, 810).
+- Cây pha lê đứng sau bé gái (như phòng v4) — chỉ lộ chậu + ngọn pha lê;
+  chấp nhận được, bé kéo ra khi chơi.
+- `rong_empty.webp` (969.108 byte, SHA-12 `8904f3610034`): chỉ nền trống.
+- `rong_sprites_dark.webp` (768.568 byte, SHA-12 `0432dc8dc57c`): 7 sprite lớn
+  trên nền tối (60,60,80) — không lỗ alpha, không viền magenta/trắng.
+- Cận cảnh: `zoom_center.webp`, `zoom_bed.webp`, `zoom_desk2.webp` — đã soi.
+
+## Điểm chưa chắc (cho Claude quyết khi decode)
+
+1. Nền: đáy kính cửa sổ +21 px so với v4 (vượt cổng 20 chút ít, chủ yếu là
+   ánh sáng mặt trời trên bệ cửa sổ; khung cửa đã đúng nút lưới).
+2. Nền: đỉnh đèn chùm ngọc rồng bị cắt sát mép trên ảnh (kế thừa từ gen1).
+3. Nền: gấu rèm dài hơn v4 một chút (y610–640, gần bằng room_v3 ~660).
+4. Tủ áo mặt trước sáng hơn tủ trong preview (tủ preview nằm trong bóng râm).
+5. Kệ lớn đứng sàn (khác kệ treo của v4), hiển thị 240×712.
+6. Nhà pet: ngọc tím loose 85 / strict 23, bright 0 — màu thiết kế, không tô.
+7. Bể cá: dải hồng trên miệng bể (loose 7) — tiền lệ lô 10 đã duyệt.
+8. Ghế lưới hẹp hơn gốc (212 vs 272); đèn trăng hẹp hơn gốc (đã chấp nhận).
+9. Tranh rồng chưa đặt trong bố cục mặc định (không còn tường trống).
+10. Đèn sao dời từ bậu cửa sổ sang bàn học (che rồng bay).
+11. Cây pha lê đứng sau bé gái, chỉ lộ chậu + ngọn.
+
+Chưa decode (chờ Claude decode).
+
+> Nốt: file `.b64` của nền `room_rong` trúng mẫu secret scanning của GitHub (chuỗi base64 tình cờ chứa `AKID` + 32 ký tự, dương tính giả) nên đã mã lại PNG lossless `compress_level` 3 — pixel y hệt, byte 459.869 → 506.815, SHA-256 mới `4cc38facc620…` (bản gốc ở `backup_secret_scan/room_rong.webp`).
