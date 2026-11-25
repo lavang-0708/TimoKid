@@ -5,7 +5,8 @@
 /// chạm mép. Bé chạm vào đâu trên sàn thì nhân vật đi tới đó; chạm
 /// ngoài sàn (tường, giường) thì đi tới điểm sàn gần nhất ngay bên
 /// dưới chỗ chạm. Đường đi thẳng; nếu cắt qua dấu chân đồ đạc thì
-/// vòng xuống phía trước món đó (đi xuống, đi ngang, rồi đi lên).
+/// vòng xuống phía trước món đó (đi xuống, đi ngang, rồi đi lên); hàng đồ
+/// phía trước kín thì vòng lên phía sau.
 ///
 /// Tỉ lệ theo chiều sâu: càng xa (chân y nhỏ) càng nhỏ, đứng ở chân
 /// y = 810 (chỗ đứng mặc định) thì đúng cỡ gốc.
@@ -169,7 +170,13 @@ List<Offset> roomWalkPath(
   List<Rect> extra = const [],
 }) {
   if (!_segmentBlocked(from, to, extra)) return <Offset>[to];
-  for (var y = math.max(from.dy, to.dy); y <= roomWalkMaxY; y += 6) {
+  // Vòng xuống trước đồ đạc trước, rồi (nếu hàng đồ phía trước kín) vòng
+  // lên phía sau.
+  final rows = <double>[
+    for (var y = math.max(from.dy, to.dy); y <= roomWalkMaxY; y += 6) y,
+    for (var y = math.min(from.dy, to.dy) - 6; y >= roomWalkMinY; y -= 6) y,
+  ];
+  for (final y in rows) {
     final a = Offset(from.dx, y);
     final b = Offset(to.dx, y);
     if (_segmentBlocked(from, a, extra)) continue;
@@ -177,7 +184,92 @@ List<Offset> roomWalkPath(
     if (_segmentBlocked(b, to, extra)) continue;
     return <Offset>[if (a != from) a, b, to];
   }
-  return <Offset>[to];
+  // Bị kẹp giữa các món (bố cục kín): dò lưới tìm đường vòng.
+  return _gridDetour(from, to, extra) ?? <Offset>[to];
+}
+
+/// Tìm đường vòng bằng lưới (bước 5 px, Dijkstra 8 hướng) khi đường vòng
+/// theo hàng không có — ví dụ đứng giữa các món xếp sát nhau. Trả về điểm
+/// đi qua (không gồm [from], cuối là [to]) đã làm thẳng bớt; null nếu
+/// không có đường.
+List<Offset>? _gridDetour(Offset from, Offset to, List<Rect> extra) {
+  const step = 5.0;
+  final x0 = roomWalkMargin + 1;
+  final cols = ((1600 - 2 * (roomWalkMargin + 1)) / step).floor() + 1;
+  final rows = ((roomWalkMaxY - roomWalkMinY) / step).floor() + 1;
+  Offset node(int i) =>
+      Offset(x0 + (i % cols) * step, roomWalkMinY + (i ~/ cols) * step);
+  final ok = List<bool>.generate(
+    cols * rows,
+    (i) => roomWalkable(node(i), extra: extra),
+  );
+  // Ô lưới gần [p] nhất mà đi thẳng từ [p] tới được.
+  int? attach(Offset p) {
+    int? best;
+    var bestD = double.infinity;
+    for (var i = 0; i < ok.length; i++) {
+      if (!ok[i]) continue;
+      final d = (node(i) - p).distance;
+      if (d < bestD && d <= 60 && !_segmentBlocked(p, node(i), extra)) {
+        best = i;
+        bestD = d;
+      }
+    }
+    return best;
+  }
+
+  final start = attach(from);
+  final goal = attach(to);
+  if (start == null || goal == null) return null;
+  final dist = List<double>.filled(ok.length, double.infinity);
+  final prev = List<int>.filled(ok.length, -1);
+  final open = <int>{start};
+  dist[start] = 0;
+  while (open.isNotEmpty) {
+    var cur = open.first;
+    for (final i in open) {
+      if (dist[i] < dist[cur]) cur = i;
+    }
+    open.remove(cur);
+    if (cur == goal) break;
+    final cx = cur % cols;
+    final cy = cur ~/ cols;
+    for (var dy = -1; dy <= 1; dy++) {
+      for (var dx = -1; dx <= 1; dx++) {
+        if (dx == 0 && dy == 0) continue;
+        final nx = cx + dx;
+        final ny = cy + dy;
+        if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) continue;
+        final n = ny * cols + nx;
+        if (!ok[n]) continue;
+        if (_segmentBlocked(node(cur), node(n), extra)) continue;
+        final d = dist[cur] + (node(n) - node(cur)).distance;
+        if (d < dist[n]) {
+          dist[n] = d;
+          prev[n] = cur;
+          open.add(n);
+        }
+      }
+    }
+  }
+  if (prev[goal] == -1 && goal != start) return null;
+  final cells = <Offset>[to];
+  for (var i = goal; i != -1; i = prev[i]) {
+    cells.add(node(i));
+  }
+  final pts = [from, ...cells.reversed];
+  // Làm thẳng: từ điểm hiện tại nhảy tới điểm xa nhất nhìn thẳng được.
+  final out = <Offset>[];
+  var i = 0;
+  while (i < pts.length - 1) {
+    var j = pts.length - 1;
+    while (j > i + 1 && _segmentBlocked(pts[i], pts[j], extra)) {
+      j--;
+    }
+    out.add(pts[j]);
+    i = j;
+  }
+  return out;
 }
 
 /// Tỉ lệ cỡ nhân vật/pet theo chân y: y = 810 → 1.0; xa hơn nhỏ dần.

@@ -79,6 +79,7 @@ import '../shop/shop_catalog.dart';
 import '../shop/shop_screen.dart';
 import '../shop/shop_service.dart';
 import '../town/town_screen.dart';
+import 'cropped_asset_image.dart';
 import 'pet_growth.dart';
 import 'pet_sprite.dart';
 import 'room_assets.dart';
@@ -160,6 +161,10 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   Map<String, Offset> _layout = const {};
   String? _dragId;
   Offset _dragRaw = Offset.zero;
+  Offset _dragStart = Offset.zero;
+
+  /// Món nhỏ đi theo món chủ đang kéo (mã món -> vị trí lúc bắt đầu kéo).
+  Map<String, Offset> _carried = const {};
   String? _petMenu; // 'food' | 'toy': bảng chọn đang mở
   bool _petBusy = false;
   _PetProp? _prop;
@@ -755,7 +760,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                 ),
               ),
               for (final (id, name, bg) in [
-                (roomThemeClassic, 'Phòng gốc', roomCleanBackgroundAsset),
+                (roomThemeClassic, 'Phòng gốc', roomClassicBackgroundAsset),
                 for (final t in _ownership.backgroundThemes)
                   (t.id, t.name, roomThemeBackground(t.id)),
               ])
@@ -821,6 +826,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
         _background = choice;
         _variants = variants;
       });
+      await _reclampLayout();
       _fixWalkers();
     }
   }
@@ -870,17 +876,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                         children: [
                           SizedBox.square(
                             dimension: 90,
-                            child: Image.asset(
-                              p.assetFor(v),
-                              fit: BoxFit.contain,
-                              // Thiếu ảnh biến thể: hiện ảnh gốc.
-                              errorBuilder: (_, _, _) => Image.asset(
-                                p.item.asset,
-                                fit: BoxFit.contain,
-                                errorBuilder: (_, _, _) =>
-                                    const SizedBox.shrink(),
-                              ),
-                            ),
+                            child: _variantThumb(p, v),
                           ),
                           Text(
                             v == roomThemeClassic
@@ -911,6 +907,45 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     setState(() => _variants = variants);
     await RoomLookStore(ref.read(databaseProvider))
         .saveVariants(childId, variants);
+    // Biến thể mới có thể khác loại chỗ đặt/cỡ (kệ lớn treo tường <-> đứng
+    // sàn): kẹp lại vị trí vào vùng mới.
+    await _reclampLayout();
+    _fixWalkers();
+  }
+
+  /// Hình nhỏ của biến thể [v] của món [p] trong bảng chọn (món lớn chỉ
+  /// hiện phần hộp bao nhìn thấy).
+  Widget _variantThumb(RoomPlaceable p, String v) {
+    final art = p.artFor(v);
+    Widget fallback() => art.cropped
+        ? CroppedAssetImage(
+            asset: p.item.asset,
+            crop: art.crop,
+            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+          )
+        : Image.asset(
+            p.item.asset,
+            fit: BoxFit.contain,
+            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+          );
+    if (art.cropped) {
+      return Center(
+        child: AspectRatio(
+          aspectRatio: art.width / art.height,
+          // Thiếu ảnh biến thể: hiện ảnh gốc.
+          child: CroppedAssetImage(
+            asset: p.assetFor(v),
+            crop: art.crop,
+            errorBuilder: (_, _, _) => fallback(),
+          ),
+        ),
+      );
+    }
+    return Image.asset(
+      p.assetFor(v),
+      fit: BoxFit.contain,
+      errorBuilder: (_, _, _) => fallback(),
+    );
   }
 
   /// Món kéo thả đang vẽ trong phòng: món nhỏ có sẵn (nền sạch; vẽ ở mọi
@@ -923,10 +958,69 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
         p,
   ];
 
-  /// Góc trên-trái hiện tại của [p] (đã kẹp vào vùng hợp lệ).
-  Offset _posOf(RoomPlaceable p) {
-    final saved = _layout[p.id];
-    return saved == null ? p.defaultPos : roomClampPlaceable(p, saved);
+  /// Vị trí lưu của [p] trong [layout] (góc trên-trái của hộp phòng gốc,
+  /// đã kẹp vào vùng hợp lệ của loại món ở biến thể đang dùng). Chưa lưu
+  /// thì dùng vị trí mặc định của biến thể.
+  Offset _posIn(Map<String, Offset> layout, RoomPlaceable p) {
+    final v = _variantOf(p);
+    return roomClampPlaceable(
+      p,
+      layout[p.id] ?? p.defaultPosFor(v),
+      variant: v,
+      surfaces: p.kindFor(v) == RoomPlaceKind.surface
+          ? _surfacesIn(layout)
+          : null,
+    );
+  }
+
+  /// Mặt phẳng món nhỏ đặt lên được: mặt giường/tủ/bàn đi THEO món chủ (tính
+  /// theo hộp món chủ ở vị trí + biến thể hiện tại), cộng bậu cửa sổ.
+  List<Rect> _surfacesIn(Map<String, Offset> layout) {
+    if (!roomV4Ready) return roomSurfaces;
+    final active = _activePlaceables;
+    return roomSurfacesFor((id) {
+      final h = roomPlaceableById(id);
+      if (h == null || !active.contains(h)) return null;
+      return h.boxAt(_variantOf(h), _posIn(layout, h));
+    });
+  }
+
+  List<Rect> get _surfaces => _surfacesIn(_layout);
+
+  /// Góc trên-trái hiện tại (vị trí lưu) của [p], đã kẹp vào vùng hợp lệ.
+  Offset _posOf(RoomPlaceable p) => _posIn(_layout, p);
+
+  /// Điểm neo đáy hiện tại của [p] (khung 1600x900).
+  Offset _anchorOf(RoomPlaceable p) => _posOf(p) + p.anchorOffset;
+
+  /// Sau khi đổi biến thể: kẹp lại vị trí đã lưu vào vùng của loại món/cỡ
+  /// mới (kệ lớn treo tường -> đứng sàn và ngược lại), rồi kéo món nhỏ trên
+  /// mặt giường/tủ/bàn về mặt phẳng mới.
+  Future<void> _reclampLayout() async {
+    var next = {..._layout};
+    var changed = false;
+    for (final pass in [false, true]) {
+      for (final p in _activePlaceables) {
+        final isSurface = p.kindFor(_variantOf(p)) == RoomPlaceKind.surface;
+        if (isSurface != pass) continue;
+        final saved = next[p.id];
+        if (saved == null) continue;
+        final v = _variantOf(p);
+        final c = roomClampPlaceable(
+          p,
+          saved,
+          variant: v,
+          surfaces: isSurface ? _surfacesIn(next) : null,
+        );
+        if ((c - saved).distance > 0.5) {
+          next = {...next, p.id: c};
+          changed = true;
+        }
+      }
+    }
+    if (!changed || !mounted) return;
+    setState(() => _layout = next);
+    await _saveLayout();
   }
 
   void _toggleArranging() {
@@ -940,18 +1034,43 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
 
   void _onDragStart(RoomPlaceable p) {
     _dragRaw = _posOf(p);
+    _dragStart = _dragRaw;
+    // Món nhỏ đang đặt trên mặt giường/tủ/bàn của món này đi theo nó.
+    final hostBox = p.boxAt(_variantOf(p), _dragRaw);
+    final mine = [
+      for (final s in roomSurfaceSpecs)
+        if (s.hostId == p.id) s.within(hostBox),
+    ];
+    _carried = {
+      if (mine.isNotEmpty)
+        for (final q in _activePlaceables)
+          if (q != p &&
+              q.kindFor(_variantOf(q)) == RoomPlaceKind.surface &&
+              roomSurfaceUnder(_anchorOf(q), mine) != null)
+            q.id: _posOf(q),
+    };
     setState(() => _dragId = p.id);
   }
 
   /// [frameDelta]: độ dời ngón tay đã đổi sang khung 1600x900.
   void _onDragUpdate(RoomPlaceable p, Offset frameDelta) {
     _dragRaw += frameDelta;
-    final clamped = roomClampPlaceable(p, _dragRaw);
-    setState(() => _layout = {..._layout, p.id: clamped});
+    final clamped = roomClampPlaceable(p, _dragRaw, variant: _variantOf(p));
+    final moved = clamped - _dragStart;
+    setState(
+      () => _layout = {
+        ..._layout,
+        p.id: clamped,
+        for (final e in _carried.entries) e.key: e.value + moved,
+      },
+    );
   }
 
   Future<void> _onDragEnd() async {
-    setState(() => _dragId = null);
+    setState(() {
+      _dragId = null;
+      _carried = const {};
+    });
     _fixWalkers();
     await _saveLayout();
   }
@@ -1025,7 +1144,8 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   /// Dấu chân nội thất mua trên sàn (chặn đường đi như đồ có sẵn),
   /// dời theo chỗ bé đã kéo món tới.
   List<Rect> get _extraObstacles => [
-    for (final p in _activePlaceables) ?p.footprintAt(_posOf(p)),
+    for (final p in _activePlaceables)
+      ?p.footprintAt(_posOf(p), variant: _variantOf(p)),
   ];
 
   bool get _petInteractive => _eggSpecies != null && !_loading;
@@ -1982,18 +2102,25 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
           final petScale = roomDepthScale(_petFeet.dy);
           final petBox = petBoxSize(_petStage, species: _eggSpecies) * petScale;
           final placeables = _activePlaceables;
+          final surfaces = _surfaces;
           Widget placeableSlot(RoomPlaceable p) {
-            final pos = _posOf(p);
+            final v = _variantOf(p);
+            final art = p.artFor(v);
+            final pos = p.topLeftFor(v, _posOf(p));
             return Positioned(
               key: ValueKey('place-${p.id}'),
               left: fx(pos.dx),
               top: fy(pos.dy),
-              width: fx(p.size),
-              height: fy(p.size),
+              width: fx(art.width),
+              height: fy(art.height),
+              // Thảm phẳng: ngoài chế độ Sắp xếp chạm xuyên qua để bé đi
+              // lên thảm (không chặn đường đi, không chặn chạm sàn).
               child: _RoomItemSlot(
                 item: p.item,
                 showImage: true,
-                asset: p.assetFor(_variantOf(p)),
+                passThrough: p.flat && !_arranging,
+                crop: art.crop,
+                asset: p.assetFor(v),
                 arranging: _arranging,
                 dragging: _dragId == p.id,
                 onTap: () => _showBubble(p.item.reaction),
@@ -2008,17 +2135,48 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
             );
           }
 
+          // Thứ tự vẽ của đồ: theo chân y như nhân vật/pet; ghế kê ở bàn vẽ
+          // sau bàn ([RoomPlaceable.drawAfter]); món nhỏ đặt trên giường/tủ/
+          // bàn vẽ ngay sau món chủ để không bị mặt bàn che.
+          final baseDepth = <String, double>{
+            for (final p in placeables) p.id: _anchorOf(p).dy,
+          };
+          double depthOf(RoomPlaceable p) {
+            var d = baseDepth[p.id]!;
+            final after = p.drawAfter;
+            if (after != null && baseDepth.containsKey(after)) {
+              d = math.max(d, baseDepth[after]! + 0.25);
+            }
+            if (p.kindFor(_variantOf(p)) == RoomPlaceKind.surface) {
+              final on = roomSurfaceUnder(_anchorOf(p), surfaces);
+              if (on != null) {
+                for (final spec in roomSurfaceSpecs) {
+                  final host = roomPlaceableById(spec.hostId);
+                  if (host == null || !baseDepth.containsKey(host.id)) continue;
+                  final box = host.boxAt(_variantOf(host), _posOf(host));
+                  if (spec.within(box) == on) {
+                    d = math.max(d, baseDepth[host.id]! + 0.5);
+                  }
+                }
+              }
+            }
+            return d;
+          }
+
+          bool isWallItem(RoomPlaceable p) =>
+              p.kindFor(_variantOf(p)) == RoomPlaceKind.wall;
+
           final actors = <(double, List<Widget>)>[
-            // Đồ trên sàn/mặt phẳng: xếp theo chân y như nhân vật/pet
-            // (món gắn tường vẽ riêng, luôn ở sau).
+            // Đồ trên sàn/mặt phẳng (trừ thảm phẳng, vẽ riêng ở dưới cùng;
+            // món gắn tường vẽ riêng, luôn ở sau).
             for (final p in placeables)
-              if (!p.wall)
+              if (!isWallItem(p) && !p.flat)
                 (
-                  _posOf(p).dy + p.anchorOffset.dy,
+                  depthOf(p),
                   [
                     frameShadow(
-                      _posOf(p) + p.anchorOffset,
-                      p.size,
+                      _anchorOf(p),
+                      p.artFor(_variantOf(p)).width,
                       key: ValueKey('shadow-${p.id}'),
                     ),
                     placeableSlot(p),
@@ -2158,14 +2316,14 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                     themed
                         ? roomThemeBackground(_background)
                         : clean
-                        ? roomCleanBackgroundAsset
+                        ? roomClassicBackgroundAsset
                         : roomBackgroundAsset,
                     fit: BoxFit.fill,
                     width: w,
                     height: h,
                     // Nền chủ đề lỗi/chưa có: về nền gốc thay vì trống.
                     errorBuilder: (_, _, _) => Image.asset(
-                      roomCleanBackgroundAsset,
+                      roomClassicBackgroundAsset,
                       fit: BoxFit.fill,
                       width: w,
                       height: h,
@@ -2177,7 +2335,11 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
               // cũ): chỉ đặt vùng chạm vô hình đúng chỗ món trong nền, không
               // vẽ PNG rời → không hình đôi. Nền chủ đề (biến thể nền khác gốc)
               // không vẽ sẵn chậu cây của phòng gốc nên bỏ vùng chạm này.
-              for (final item in themed ? const <RoomFurniture>[] : itemsByFeet)
+              // Phòng v4 ([roomV4Ready]) có nền trống: không còn món vẽ sẵn.
+              for (final item
+                  in themed || (clean && roomV4Ready)
+                      ? const <RoomFurniture>[]
+                      : itemsByFeet)
                 if (!clean || item.inCleanBackground)
                   Positioned(
                     left: fx(item.bakedRect.left),
@@ -2192,7 +2354,10 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                   ),
               // Món gắn tường (dưới nhân vật/pet và đồ trên sàn).
               for (final p in placeables)
-                if (p.wall) placeableSlot(p),
+                if (isWallItem(p)) placeableSlot(p),
+              // Thảm phẳng: dưới mọi đồ trên sàn và nhân vật/pet.
+              for (final p in placeables)
+                if (p.flat && !isWallItem(p)) placeableSlot(p),
               for (final actor in actors) ...actor.$2,
               if (_bubbleText != null)
                 Positioned(
@@ -2243,6 +2408,8 @@ class _RoomItemSlot extends StatefulWidget {
     required this.onTap,
     required this.showImage,
     this.asset,
+    this.crop = roomFullCrop,
+    this.passThrough = false,
     this.arranging = false,
     this.dragging = false,
     this.onArrangeTap,
@@ -2259,6 +2426,13 @@ class _RoomItemSlot extends StatefulWidget {
   /// Ảnh biến thể chủ đề thay ảnh gốc; null = `item.asset`. Lỗi ảnh thì
   /// về `item.asset`.
   final String? asset;
+
+  /// Phần ảnh được hiện (món lớn cắt theo hộp bao nhìn thấy); mặc định cả
+  /// ảnh.
+  final Rect crop;
+
+  /// Chạm xuyên qua món (thảm phẳng ngoài chế độ Sắp xếp): nhường cho nền.
+  final bool passThrough;
   final VoidCallback onTap;
   final bool showImage;
 
@@ -2299,77 +2473,88 @@ class _RoomItemSlotState extends State<_RoomItemSlot>
     widget.onTap();
   }
 
+  /// Ảnh món (cả ảnh hoặc phần [_RoomItemSlot.crop]). Ảnh biến thể chủ đề
+  /// chưa về: dùng ảnh gốc của món (như nền chủ đề lỗi thì về nền gốc);
+  /// ảnh gốc cũng chưa về thì bỏ trống.
+  Widget _image() {
+    Widget load(String asset, ImageErrorWidgetBuilder onError) =>
+        widget.crop == roomFullCrop
+        ? Image.asset(asset, fit: BoxFit.fill, errorBuilder: onError)
+        : CroppedAssetImage(
+            asset: asset,
+            crop: widget.crop,
+            errorBuilder: onError,
+          );
+    return load(
+      widget.asset ?? widget.item.asset,
+      (_, _, _) => widget.asset == null || widget.asset == widget.item.asset
+          ? const SizedBox.shrink()
+          : load(widget.item.asset, (_, _, _) => const SizedBox.shrink()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      key: Key(widget.item.key),
-      behavior: HitTestBehavior.opaque,
-      onTap: _onTap,
-      onPanStart: widget.arranging ? (_) => widget.onDragStart?.call() : null,
-      onPanUpdate: widget.arranging
-          ? (d) => widget.onDragUpdate?.call(d.delta)
-          : null,
-      onPanEnd: widget.arranging ? (_) => widget.onDragEnd?.call() : null,
-      onPanCancel: widget.arranging ? () => widget.onDragEnd?.call() : null,
-      child: Stack(
-        clipBehavior: Clip.none,
-        fit: StackFit.expand,
-        children: [
-          if (widget.showImage)
-            Image.asset(
-              widget.asset ?? widget.item.asset,
-              fit: BoxFit.fill,
-              // Ảnh biến thể chủ đề chưa về: dùng ảnh gốc của món (như nền
-              // chủ đề lỗi thì về nền gốc); ảnh gốc cũng chưa về thì bỏ trống.
-              errorBuilder: (_, _, _) =>
-                  widget.asset == null || widget.asset == widget.item.asset
-                  ? const SizedBox.shrink()
-                  : Image.asset(
-                      widget.item.asset,
-                      fit: BoxFit.fill,
-                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                    ),
-            ),
-          if (widget.arranging && widget.showImage)
-            // Viền mờ quanh phần nhìn thấy của ảnh (~68% x 70% ô ảnh).
-            Positioned.fill(
-              child: IgnorePointer(
-                child: FractionallySizedBox(
-                  key: Key('${widget.item.key}-outline'),
-                  widthFactor: 0.68,
-                  heightFactor: 0.70,
-                  alignment: const Alignment(0, 0.03),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: widget.dragging
-                          ? const Color(0x33FFE08A)
-                          : const Color(0x14FFFFFF),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
+    final trimmed = widget.crop != roomFullCrop;
+    return IgnorePointer(
+      ignoring: widget.passThrough,
+      child: GestureDetector(
+        key: Key(widget.item.key),
+        behavior: HitTestBehavior.opaque,
+        onTap: _onTap,
+        onPanStart: widget.arranging ? (_) => widget.onDragStart?.call() : null,
+        onPanUpdate: widget.arranging
+            ? (d) => widget.onDragUpdate?.call(d.delta)
+            : null,
+        onPanEnd: widget.arranging ? (_) => widget.onDragEnd?.call() : null,
+        onPanCancel: widget.arranging ? () => widget.onDragEnd?.call() : null,
+        child: Stack(
+          clipBehavior: Clip.none,
+          fit: StackFit.expand,
+          children: [
+            if (widget.showImage) _image(),
+            if (widget.arranging && widget.showImage)
+              // Viền mờ quanh phần nhìn thấy của ảnh (~68% x 70% ô ảnh; ảnh đã
+              // cắt theo hộp bao thì cả ô).
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: FractionallySizedBox(
+                    key: Key('${widget.item.key}-outline'),
+                    widthFactor: trimmed ? 1 : 0.68,
+                    heightFactor: trimmed ? 1 : 0.70,
+                    alignment: Alignment(0, trimmed ? 0 : 0.03),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
                         color: widget.dragging
-                            ? const Color(0xFFFFC93C)
-                            : const Color(0xB3FFFFFF),
-                        width: widget.dragging ? 3 : 2,
+                            ? const Color(0x33FFE08A)
+                            : const Color(0x14FFFFFF),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: widget.dragging
+                              ? const Color(0xFFFFC93C)
+                              : const Color(0xB3FFFFFF),
+                          width: widget.dragging ? 3 : 2,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
+            AnimatedBuilder(
+              animation: _pop,
+              builder: (context, _) {
+                final t = _pop.value;
+                if (t <= 0 || t >= 1) return const SizedBox.shrink();
+                return IgnorePointer(
+                  child: CustomPaint(
+                    key: Key('${widget.item.key}-pop'),
+                    painter: _PopPainter(t),
+                  ),
+                );
+              },
             ),
-          AnimatedBuilder(
-            animation: _pop,
-            builder: (context, _) {
-              final t = _pop.value;
-              if (t <= 0 || t >= 1) return const SizedBox.shrink();
-              return IgnorePointer(
-                child: CustomPaint(
-                  key: Key('${widget.item.key}-pop'),
-                  painter: _PopPainter(t),
-                ),
-              );
-            },
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

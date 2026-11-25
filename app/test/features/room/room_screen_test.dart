@@ -28,6 +28,7 @@ import 'package:timokid/features/pet/pet_care_service.dart';
 import 'package:timokid/features/pet/pet_config.dart';
 import 'package:timokid/features/room/coming_soon_screen.dart';
 import 'package:timokid/features/room/room_assets.dart';
+import 'package:timokid/features/room/room_themes.dart';
 import 'package:timokid/features/room/room_screen.dart';
 import 'package:timokid/features/shop/shop_screen.dart';
 import 'package:timokid/features/town/town_screen.dart';
@@ -691,7 +692,7 @@ void main() {
     expect(find.byType(SvgPicture), findsNothing);
   });
 
-  testWidgets('có nền sạch (lô 8C): dùng room_v3_clean + vẽ lại 4 PNG rời', (
+  testWidgets('phòng v4: nền trống room_v4 + 7 món lớn + 5 món nhỏ vẽ rời', (
     tester,
   ) async {
     await completeOnboardingGirl();
@@ -703,23 +704,114 @@ void main() {
         .whereType<AssetImage>()
         .map((p) => p.assetName)
         .toList();
-    expect(assetNames, contains(roomCleanBackgroundAsset));
+    expect(roomV4Ready, isTrue);
+    expect(
+      roomClassicBackgroundAsset,
+      'assets/images/backgrounds/room_v4.webp',
+    );
+    expect(assetNames, contains(roomClassicBackgroundAsset));
     expect(
       assetNames,
       isNot(contains('assets/images/backgrounds/room_v3.webp')),
     );
+    expect(assetNames, isNot(contains(roomCleanBackgroundAsset)));
     for (final name in [
+      // 7 món lớn.
+      'noi_giuong',
+      'noi_tu_dau_giuong',
+      'noi_tu_ao',
+      'noi_ban_hoc',
+      'noi_ghe',
+      'noi_ke_lon',
+      'noi_tham',
+      // 5 món nhỏ (chậu cây cũng vẽ rời, không còn vẽ sẵn trong nền).
       'gau_bong_v3',
       'den_sao_v3',
       'binh_hoa_v3',
       'coc_sao_v3',
+      'chau_cay_v3',
     ]) {
       expect(assetNames, contains('assets/images/furniture/$name.webp'));
     }
-    // Chậu cây vẫn vẽ trong nền sạch: không vẽ PNG rời (tránh hình đôi).
+  });
+
+  testWidgets('phòng v4: ô món lớn đúng hộp bao, chậu cây chạm ra bong bóng', (
+    tester,
+  ) async {
+    await completeOnboardingGirl();
+    await pumpRoom(tester, clean: true);
+    final floor = tester.getRect(find.byKey(const Key('room-floor')));
+    for (final p in roomPlaceables.where((p) => p.item.crop != roomFullCrop)) {
+      final box = p.boxAt(roomThemeClassic, p.defaultPos);
+      final r = tester.getRect(find.byKey(Key(p.item.key)));
+      expect(r.left, closeTo(floor.left + box.left / 1600 * floor.width, 0.6));
+      expect(r.top, closeTo(floor.top + box.top / 900 * floor.height, 0.6));
+      expect(
+        r.width,
+        closeTo(box.width / 1600 * floor.width, 0.6),
+        reason: p.id,
+      );
+      expect(r.height, closeTo(box.height / 900 * floor.height, 0.6));
+    }
+    // Chậu cây là món kéo thả bình thường: chạm ra phản ứng của nó.
+    await tester.tap(find.byKey(const Key('room-furniture-chau-cay')));
+    await tester.pump();
+    expect(find.text('Cây lớn nhanh nhé!'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 2));
+  });
+
+  testWidgets('phòng v4: thảm vẽ dưới mọi món sàn và nhân vật, không chặn đi', (
+    tester,
+  ) async {
+    await completeOnboardingGirl();
+    await pumpRoom(tester, clean: true);
+    // Thứ tự dựng trong Stack = thứ tự vẽ: thảm đứng trước (dưới) mọi món
+    // sàn/mặt phẳng, nhân vật.
+    final keys = [
+      for (final e in tester.elementList(
+        find.byWidgetPredicate(
+          (w) =>
+              w.key is ValueKey<String> &&
+              ((w.key! as ValueKey<String>).value.startsWith(
+                    'room-furniture-',
+                  ) ||
+                  (w.key! as ValueKey<String>).value == 'room-character'),
+        ),
+      ))
+        (e.widget.key! as ValueKey<String>).value,
+    ];
+    final rug = keys.indexOf('room-furniture-noi_tham');
+    expect(rug, isNonNegative);
+    for (final p in roomPlaceables) {
+      if (p.flat || p.wall) continue;
+      final i = keys.indexOf(p.item.key);
+      if (i < 0) continue; // món cửa hàng chưa mua thì không vẽ
+      expect(i, greaterThan(rug), reason: p.id);
+    }
+    expect(keys.indexOf('room-character'), greaterThan(rug));
+
+    // Chạm giữa thảm: nhân vật đi tới đó (thảm không chặn đường đi).
+    final r = roomPlaceableById('noi_tham')!
+        .boxAt(roomThemeClassic, roomPlaceableById('noi_tham')!.defaultPos);
+    final box = tester.getRect(find.byKey(const Key('room-floor')));
+    final before = tester.getRect(find.byKey(const Key('room-character')));
+    // Điểm ở mép dưới thảm, ngay dưới chỗ nhân vật đứng (không chạm nhân
+    // vật hay món nào khác).
+    final target = Offset(640, 848);
+    expect(r.contains(target), isTrue);
+    await tester.tapAt(
+      Offset(
+        box.left + target.dx / 1600 * box.width,
+        box.top + target.dy / 900 * box.height,
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+    final kid = tester.getRect(find.byKey(const Key('room-character')));
+    expect(kid.bottom, greaterThan(before.bottom + 5)); // đã đi xuống thảm
     expect(
-      assetNames,
-      isNot(contains('assets/images/furniture/chau_cay_v3.webp')),
+      kid.center.dx,
+      closeTo(box.left + target.dx / 1600 * box.width, box.width * 0.02),
     );
   });
 

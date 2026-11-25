@@ -2,52 +2,77 @@
 /// 1600x900 đã đo trên nền thật (`docs/ASSETS.md` mục "Phòng v3b").
 library;
 
+import 'dart:ui';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timokid/features/room/pet_growth.dart';
 import 'package:timokid/features/room/room_assets.dart';
 import 'package:timokid/features/room/room_walk.dart';
+
+/// Dấu chân đồ rời ở bố cục mặc định phòng gốc v4 (phòng không còn đồ vẽ
+/// sẵn nên [roomObstacleFootprints] rỗng): giường, tủ, bàn, ghế, thảm
+/// phẳng (không chặn)...
+final List<Rect> _extra = [
+  for (final p in roomPlaceables) ?p.footprintAt(p.defaultPos),
+];
 
 void main() {
   group('vùng đi được', () {
     test('chỗ đứng mặc định của nhân vật và pet đứng được', () {
       expect(roomWalkable(roomCharacterFeet), isTrue);
       expect(roomWalkable(roomPetFeet), isTrue);
+      expect(roomWalkable(roomCharacterFeet, extra: _extra), isTrue);
+      expect(roomWalkable(roomPetFeet, extra: _extra), isTrue);
+    });
+
+    test('phòng v4 không có đồ vẽ sẵn trong nền: không dấu chân cố định', () {
+      expect(roomObstacleFootprints, isEmpty);
     });
 
     test('không đứng lên đồ đạc, tường, hay ngoài khung', () {
-      for (final r in roomObstacleFootprints.values) {
-        expect(roomWalkable(r.center), isFalse, reason: '$r');
+      for (final r in _extra) {
+        expect(roomWalkable(r.center, extra: _extra), isFalse, reason: '$r');
       }
+      // Thảm phẳng không chặn: đứng được giữa thảm.
+      expect(roomWalkable(const Offset(705, 840), extra: _extra), isTrue);
       expect(roomWalkable(const Offset(800, 400)), isFalse); // tường
       expect(roomWalkable(const Offset(800, 899)), isFalse); // mép dưới
       expect(roomWalkable(const Offset(5, 850)), isFalse); // mép trái
     });
 
     test('chạm vào tường/giường thì đi tới sàn ngay phía trước', () {
-      final onWall = roomWalkTarget(const Offset(820, 300));
-      expect(roomWalkable(onWall), isTrue);
+      final onWall = roomWalkTarget(const Offset(820, 300), extra: _extra);
+      expect(roomWalkable(onWall, extra: _extra), isTrue);
       expect((onWall.dx - 820).abs(), lessThan(1));
-      final onBed = roomWalkTarget(const Offset(450, 600));
-      expect(roomWalkable(onBed), isTrue);
+      final onBed = roomWalkTarget(const Offset(450, 600), extra: _extra);
+      expect(roomWalkable(onBed, extra: _extra), isTrue);
       expect(onBed.dy, greaterThan(700)); // trước mặt giường
     });
 
     test('mọi điểm đích đều đứng được (lưới chạm khắp khung)', () {
       for (var x = 0.0; x <= 1600; x += 80) {
         for (var y = 0.0; y <= 900; y += 60) {
-          final t = roomWalkTarget(Offset(x, y));
-          expect(roomWalkable(t), isTrue, reason: '($x,$y) → $t');
+          final t = roomWalkTarget(Offset(x, y), extra: _extra);
+          expect(
+            roomWalkable(t, extra: _extra),
+            isTrue,
+            reason: '($x,$y) → $t',
+          );
         }
       }
     });
   });
 
   group('đường đi', () {
+    final tolerant = [for (final r in _extra) r.deflate(0.5)];
     bool pathClear(Offset from, List<Offset> path) {
       var a = from;
       for (final b in path) {
         for (var i = 1; i <= 50; i++) {
-          if (!roomWalkable(Offset.lerp(a, b, i / 50)!)) return false;
+          // Sượt đúng góc dấu chân (chạm mép) vẫn chấp nhận: co 0,5 px.
+          if (!roomWalkable(Offset.lerp(a, b, i / 50)!, extra: tolerant)) {
+            return false;
+          }
         }
         a = b;
       }
@@ -55,9 +80,10 @@ void main() {
     }
 
     test('đi vòng trước bàn học thay vì xuyên qua', () {
-      const from = Offset(1000, 720);
-      const to = Offset(1420, 840);
-      final path = roomWalkPath(from, to);
+      const from = Offset(900, 700);
+      const to = Offset(1250, 830);
+      final path = roomWalkPath(from, to, extra: _extra);
+      expect(path.length, greaterThan(1)); // có vòng, không đi thẳng
       expect(path.last, to);
       expect(pathClear(from, path), isTrue);
     });
@@ -66,11 +92,11 @@ void main() {
       final spots = <Offset>[
         for (var x = 40.0; x <= 1560; x += 140)
           for (var y = 680.0; y <= 880; y += 50)
-            if (roomWalkable(Offset(x, y))) Offset(x, y),
+            if (roomWalkable(Offset(x, y), extra: _extra)) Offset(x, y),
       ];
       for (final a in spots) {
         for (final b in spots) {
-          final path = roomWalkPath(a, b);
+          final path = roomWalkPath(a, b, extra: _extra);
           expect(path.last, b);
           expect(pathClear(a, path), isTrue, reason: '$a → $b: $path');
         }

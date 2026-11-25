@@ -27,6 +27,13 @@ import 'package:timokid/features/room/room_variants.dart';
 import 'package:timokid/features/room/room_themes.dart';
 import 'package:timokid/features/shop/shop_service.dart';
 
+RoomPlaceable _p(String id) => roomPlaceables.firstWhere((p) => p.id == id);
+
+List<RoomPlaceable> _variantsIn(String theme) => [
+  for (final p in roomPlaceables)
+    if (p.hasVariant(theme)) p,
+];
+
 void main() {
   late AppDatabase db;
   late String childId;
@@ -79,7 +86,11 @@ void main() {
     );
   }
 
-  Future<void> pumpRoom(WidgetTester tester, {bool animate = false}) async {
+  Future<void> pumpRoom(
+    WidgetTester tester, {
+    bool animate = false,
+    Map<String, bool> ready = const {'tet': true, 'ngan_ha': true},
+  }) async {
     AnimationGate.enabled = animate;
     addTearDown(() => AnimationGate.enabled = false);
     tester.view.physicalSize = const Size(800, 360);
@@ -91,8 +102,7 @@ void main() {
       routes: [
         GoRoute(
           path: RoomScreen.route,
-          builder: (context, state) =>
-              const RoomScreen(roomThemesReady: {'tet': true, 'ngan_ha': true}),
+          builder: (context, state) => RoomScreen(roomThemesReady: ready),
         ),
       ],
     );
@@ -176,13 +186,20 @@ void main() {
     expect(assetOf(bg(tester)!), roomThemeBackground('tet'));
     expect(await setting(roomBackgroundSettingsKey), 'tet');
     final variants = decodeRoomVariants(await setting(roomVariantsSettingsKey));
-    // Có bộ => mọi món (cả 4 món nhỏ) có biến thể Tết.
-    expect(variants.length, roomPlaceables.length);
+    // Có bộ => 7 món lớn/vừa có biến thể Tết; món nhỏ không có biến thể.
+    expect(variants.length, _variantsIn('tet').length);
+    expect(variants.length, 7);
     expect(variants.values.toSet(), {'tet'});
-    // Món nhỏ vẫn vẽ (nền chủ đề không còn "nướng" món nhỏ).
+    expect(variants.containsKey('gau-bong'), isFalse);
+    // Món nhỏ vẫn vẽ (nền chủ đề không "nướng" món nào).
     expect(find.byKey(const Key('room-furniture-gau-bong')), findsOneWidget);
-    expect(slotAssets(tester, 'gau-bong').first, contains('tet_gau_bong'));
-    expect(slotAssets(tester, 'noi_nha_pet').first, contains('tet_nha_pet'));
+    expect(slotAssets(tester, 'gau-bong').first, _p('gau-bong').item.asset);
+    expect(slotAssets(tester, 'noi_giuong').first, contains('tet_giuong'));
+    // Nhà cho pet chưa có bản Tết: vẫn ảnh gốc.
+    expect(
+      slotAssets(tester, 'noi_nha_pet').first,
+      _p('noi_nha_pet').item.asset,
+    );
     await teardown(tester);
   });
 
@@ -191,14 +208,14 @@ void main() {
   ) async {
     await setUpPet('dog', xp: 100);
     // Bộ Ngân hà (đủ nền) chỉ qua đủ món lẻ; Tết chỉ mua 1 món + nền qua bộ.
-    for (final p in roomPlaceables) {
+    for (final p in _variantsIn('ngan_ha')) {
       await grant(roomThemeVariantItemId('ngan_ha', p.id));
     }
-    await grant(roomThemeVariantItemId('tet', 'gau-bong'));
+    await grant(roomThemeVariantItemId('tet', 'noi_giuong'));
     await db.settingsDao.setValue(
       childId: childId,
       key: roomVariantsSettingsKey,
-      value: encodeRoomVariants({'gau-bong': 'tet'}),
+      value: encodeRoomVariants({'noi_giuong': 'tet'}),
     );
     await pumpRoom(tester);
     await openPicker(tester);
@@ -209,8 +226,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(assetOf(bg(tester)!), roomThemeBackground('ngan_ha'));
     final variants = decodeRoomVariants(await setting(roomVariantsSettingsKey));
-    expect(variants['gau-bong'], 'ngan_ha');
-    expect(variants.length, roomPlaceables.length);
+    expect(variants['noi_giuong'], 'ngan_ha');
+    expect(variants.length, _variantsIn('ngan_ha').length);
+    expect(variants.containsKey('gau-bong'), isFalse);
     await teardown(tester);
   });
 
@@ -227,29 +245,29 @@ void main() {
     await db.settingsDao.setValue(
       childId: childId,
       key: roomVariantsSettingsKey,
-      value: encodeRoomVariants({'gau-bong': 'tet', 'noi_tranh': 'tet'}),
+      value: encodeRoomVariants({'noi_giuong': 'tet', 'noi_tu_ao': 'tet'}),
     );
     await db.settingsDao.setValue(
       childId: childId,
       key: roomLayoutSettingsKey,
-      value: encodeRoomLayout({'gau-bong': const Offset(500, 560)}),
+      value: encodeRoomLayout({'noi_tu_ao': _p('noi_tu_ao').defaultPos}),
     );
     await pumpRoom(tester);
     expect(assetOf(bg(tester)!), roomThemeBackground('tet'));
-    expect(slotAssets(tester, 'gau-bong').first, contains('tet_gau_bong'));
+    expect(slotAssets(tester, 'noi_giuong').first, contains('tet_giuong'));
     final posBefore = tester.getTopLeft(
-      find.byKey(const Key('room-furniture-gau-bong')),
+      find.byKey(const Key('room-furniture-noi_tu_ao')),
     );
 
     await openPicker(tester);
     await tester.tap(find.byKey(const Key('room-theme-classic')));
     await tester.pumpAndSettle();
-    expect(assetOf(bg(tester)!), roomCleanBackgroundAsset);
+    expect(assetOf(bg(tester)!), roomClassicBackgroundAsset);
     expect(await setting(roomBackgroundSettingsKey), 'classic');
     expect(decodeRoomVariants(await setting(roomVariantsSettingsKey)), isEmpty);
-    expect(slotAssets(tester, 'gau-bong').first, roomFurniture[0].asset);
+    expect(slotAssets(tester, 'noi_giuong').first, _p('noi_giuong').item.asset);
     expect(
-      tester.getTopLeft(find.byKey(const Key('room-furniture-gau-bong'))),
+      tester.getTopLeft(find.byKey(const Key('room-furniture-noi_tu_ao'))),
       posBefore,
     );
     await teardown(tester);
@@ -259,7 +277,7 @@ void main() {
     tester,
   ) async {
     await setUpPet('dog', xp: 100);
-    await grant(roomThemeVariantItemId('tet', 'gau-bong'));
+    await grant(roomThemeVariantItemId('tet', 'noi_tu_ao'));
     await pumpRoom(tester);
     await tester.tap(find.byKey(const Key('room-arrange-button')));
     await tester.pumpAndSettle();
@@ -268,7 +286,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('room-variant-sheet')), findsNothing);
 
-    await tester.tap(find.byKey(const Key('room-furniture-gau-bong')));
+    await tester.tap(find.byKey(const Key('room-furniture-noi_tu_ao')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('room-variant-sheet')), findsOneWidget);
     expect(find.byKey(const Key('room-variant-classic')), findsOneWidget);
@@ -279,35 +297,80 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('room-variant-sheet')), findsNothing);
     expect(decodeRoomVariants(await setting(roomVariantsSettingsKey)), {
-      'gau-bong': 'tet',
+      'noi_tu_ao': 'tet',
     });
     // Nền không đổi.
-    expect(assetOf(bg(tester)!), roomCleanBackgroundAsset);
-    expect(slotAssets(tester, 'gau-bong').first, contains('tet_gau_bong'));
+    expect(assetOf(bg(tester)!), roomClassicBackgroundAsset);
+    expect(slotAssets(tester, 'noi_tu_ao').first, contains('tet_tu_ao'));
 
     // Chọn lại gốc.
-    await tester.tap(find.byKey(const Key('room-furniture-gau-bong')));
+    await tester.tap(find.byKey(const Key('room-furniture-noi_tu_ao')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('room-variant-classic')));
     await tester.pumpAndSettle();
     expect(decodeRoomVariants(await setting(roomVariantsSettingsKey)), isEmpty);
-    expect(slotAssets(tester, 'gau-bong').first, roomFurniture[0].asset);
+    expect(slotAssets(tester, 'noi_tu_ao').first, _p('noi_tu_ao').item.asset);
+    await teardown(tester);
+  });
+
+  testWidgets('kệ lớn đổi sang bản Rồng (đứng sàn): vị trí lưu kẹp lại', (
+    tester,
+  ) async {
+    await setUpPet('dog', xp: 100);
+    await grant(roomThemeVariantItemId('rong', 'noi_ke_lon'));
+    // Bé đã đặt kệ ở chỗ treo tường (vị trí lưu = góc trên-trái bản gốc).
+    await db.settingsDao.setValue(
+      childId: childId,
+      key: roomLayoutSettingsKey,
+      value: encodeRoomLayout({'noi_ke_lon': _p('noi_ke_lon').defaultPos}),
+    );
+    await pumpRoom(
+      tester,
+      ready: const {'tet': true, 'ngan_ha': true, 'rong': true},
+    );
+    final shelf = _p('noi_ke_lon');
+    expect(shelf.kindFor(roomThemeClassic), RoomPlaceKind.wall);
+    expect(shelf.kindFor('rong'), RoomPlaceKind.floor);
+    await tester.tap(find.byKey(const Key('room-arrange-button')));
+    await tester.pumpAndSettle();
+    // Chạm phần dưới kệ treo tường (phần trên bị thanh nút che) (khung 1600x900 -> màn hình).
+    final floor = tester.getRect(find.byKey(const Key('room-floor')));
+    await tester.tapAt(
+      Offset(
+        floor.left + 1125 / 1600 * floor.width,
+        floor.top + 360 / 900 * floor.height,
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('room-variant-rong')));
+    await tester.pumpAndSettle();
+    expect(decodeRoomVariants(await setting(roomVariantsSettingsKey)), {
+      'noi_ke_lon': 'rong',
+    });
+    // Treo tường -> đứng sàn: chân kệ phải nằm trên sàn, đỉnh trong khung.
+    final saved = decodeRoomLayout(
+      await setting(roomLayoutSettingsKey),
+    )['noi_ke_lon'];
+    expect(saved, isNotNull);
+    expect(saved, roomClampPlaceable(shelf, shelf.defaultPos, variant: 'rong'));
+    expect(roomPointInFloor(saved! + shelf.anchorOffset), isTrue);
+    expect(shelf.boxAt('rong', saved).top, greaterThanOrEqualTo(19.999));
     await teardown(tester);
   });
 
   testWidgets('thiếu ảnh biến thể: về ảnh gốc của món', (tester) async {
     await setUpPet('dog', xp: 100);
-    await grant(roomThemeVariantItemId('tet', 'gau-bong'));
+    await grant(roomThemeVariantItemId('tet', 'noi_tu_ao'));
     await db.settingsDao.setValue(
       childId: childId,
       key: roomVariantsSettingsKey,
-      value: encodeRoomVariants({'gau-bong': 'tet'}),
+      value: encodeRoomVariants({'noi_tu_ao': 'tet'}),
     );
     await pumpRoom(tester);
-    final assets = slotAssets(tester, 'gau-bong');
+    final assets = slotAssets(tester, 'noi_tu_ao');
     // Thử ảnh Tết (chưa có file), lỗi thì vẽ ảnh gốc.
-    expect(assets.first, 'assets/images/furniture/tet_gau_bong.webp');
-    expect(assets, contains(roomFurniture[0].asset));
+    expect(assets.first, 'assets/images/furniture/tet_tu_ao.webp');
+    expect(assets, contains(_p('noi_tu_ao').item.asset));
     await teardown(tester);
   });
 
@@ -321,11 +384,11 @@ void main() {
     await db.settingsDao.setValue(
       childId: childId,
       key: roomVariantsSettingsKey,
-      value: encodeRoomVariants({'gau-bong': 'tet'}),
+      value: encodeRoomVariants({'noi_tu_ao': 'tet'}),
     );
     await pumpRoom(tester);
-    expect(assetOf(bg(tester)!), roomCleanBackgroundAsset);
-    expect(slotAssets(tester, 'gau-bong'), [roomFurniture[0].asset]);
+    expect(assetOf(bg(tester)!), roomClassicBackgroundAsset);
+    expect(slotAssets(tester, 'noi_tu_ao'), [_p('noi_tu_ao').item.asset]);
     await teardown(tester);
   });
 
@@ -347,7 +410,11 @@ void main() {
     );
     await pumpRoom(tester);
     expect(assetOf(bg(tester)!), roomThemeBackground('tet'));
-    expect(slotAssets(tester, 'noi_nha_pet').first, contains('tet_nha_pet'));
+    // Tết chưa có bản vẽ riêng cho món cửa hàng: vẫn ảnh gốc.
+    expect(
+      slotAssets(tester, 'noi_nha_pet').first,
+      _p('noi_nha_pet').item.asset,
+    );
     expect(await setting(roomBackgroundSettingsKey), 'tet');
     expect(
       decodeRoomLayout(await setting(roomLayoutSettingsKey))['noi_nha_pet'],
@@ -369,8 +436,17 @@ void main() {
       roomThemeFurnitureAsset(roomThemeClassic, 'noi_nha_pet'),
       'assets/images/furniture/noi_nha_pet.webp',
     );
-    final bear = roomPlaceables.firstWhere((p) => p.id == 'gau-bong');
+    // Món nhỏ không có biến thể: mọi chủ đề đều ra ảnh gốc.
+    final bear = _p('gau-bong');
     expect(bear.assetFor(roomThemeClassic), bear.item.asset);
-    expect(bear.assetFor('rong'), 'assets/images/furniture/rong_gau_bong.webp');
+    expect(bear.assetFor('rong'), bear.item.asset);
+    expect(bear.hasVariant('rong'), isFalse);
+    // Món lớn: ảnh theo chủ đề; món cửa hàng chỉ có Rồng.
+    expect(
+      _p('noi_giuong').assetFor('rong'),
+      'assets/images/furniture/rong_giuong.webp',
+    );
+    expect(_p('noi_nha_pet').hasVariant('rong'), isTrue);
+    expect(_p('noi_nha_pet').hasVariant('tet'), isFalse);
   });
 }

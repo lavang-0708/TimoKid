@@ -158,7 +158,10 @@ void main() {
     test('cờ const đã bật (Muse lô 10): 8 món có trong danh mục', () async {
       expect(furnitureShopArtReady, isTrue);
       expect(
-        shopItemsFor('girl').where((i) => i.category == ShopCategory.furniture),
+        shopItemsFor(
+          'girl',
+          roomThemesReady: const {},
+        ).where((i) => i.category == ShopCategory.furniture),
         hasLength(8),
       );
     });
@@ -188,6 +191,7 @@ void main() {
       final items = shopItemsFor(
         'boy',
         furnitureReady: true,
+        roomThemesReady: const {},
       ).where((i) => i.category == ShopCategory.furniture).toList();
       expect(items, hasLength(8));
       for (final i in items) {

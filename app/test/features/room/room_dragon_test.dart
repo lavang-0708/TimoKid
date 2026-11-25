@@ -23,6 +23,7 @@ import 'package:timokid/features/pet/dragon_fx.dart';
 import 'package:timokid/features/pet/dragon_fx_config.dart';
 import 'package:timokid/features/pet/pet_config.dart';
 import 'package:timokid/features/room/pet_growth.dart';
+import 'package:timokid/features/room/room_assets.dart';
 import 'package:timokid/features/room/room_screen.dart';
 
 void main() {
@@ -112,6 +113,15 @@ void main() {
     for (var t = 0; t < ms; t += 50) {
       await tester.pump(const Duration(milliseconds: 50));
     }
+  }
+
+  /// Điểm màn hình ứng với điểm [f] trong khung phòng 1600x900.
+  Offset frameToScreen(WidgetTester tester, Offset f) {
+    final r = tester.getRect(find.byKey(const Key('room-floor')));
+    return Offset(
+      r.left + f.dx / roomFrameWidth * r.width,
+      r.top + f.dy / roomFrameHeight * r.height,
+    );
   }
 
   Future<void> teardown(WidgetTester tester) =>
@@ -238,7 +248,8 @@ void main() {
   ) async {
     await setUpPet(dragonSpecies, xp: petAdultXp);
     await pumpRoom(tester, animate: true);
-    await tester.tapAt(const Offset(770, 330)); // sàn xa bên phải
+    // Sàn xa bên phải (trống, không trúng đồ nào).
+    await tester.tapAt(frameToScreen(tester, const Offset(1240, 880)));
     await advance(tester, 2500);
     expect(find.byKey(const Key('dragon-fx-cruising')), findsOneWidget);
     await advance(tester, 9000);
@@ -249,7 +260,7 @@ void main() {
   testWidgets('rồng nhỏ đi quãng dài vẫn đi bộ (không bay)', (tester) async {
     await setUpPet(dragonSpecies, xp: petTeenXp);
     await pumpRoom(tester, animate: true);
-    await tester.tapAt(const Offset(770, 330));
+    await tester.tapAt(frameToScreen(tester, const Offset(1240, 880)));
     await advance(tester, 2500);
     expect(find.byKey(const Key('dragon-fx-cruising')), findsNothing);
     await advance(tester, 9000);

@@ -93,7 +93,7 @@ const List<RoomTheme> roomThemes = <RoomTheme>[
 const Map<String, bool> roomThemeArtReady = <String, bool>{
   'tet': false,
   'ngan_ha': false,
-  'rong': false,
+  'rong': true,
 };
 
 /// Mã phòng gốc (luôn có, không bán).

@@ -33,6 +33,16 @@ void main() {
       }
     });
 
+    test('bản v4 (phòng gốc mới): đủ 8 món, mã khớp danh mục Cửa hàng', () {
+      expect(roomShopFurnitureV4, hasLength(8));
+      expect({
+        for (final f in roomShopFurnitureV4) roomShopFurnitureId(f),
+      }, shopFurniture.keys.toSet());
+      for (final f in roomShopFurnitureV4) {
+        expect(f.asset, shopFurnitureAsset(roomShopFurnitureId(f)));
+      }
+    });
+
     test('ảnh nằm trong khung 1600x900 (sàn chạm đáy được)', () {
       for (final f in roomShopFurniture) {
         expect(f.placeX, greaterThanOrEqualTo(0), reason: f.key);
@@ -220,7 +230,7 @@ void main() {
 
       // Ô đặt: tỉ lệ khung nền (ảnh phủ vừa khung cảnh).
       final floor = tester.getRect(find.byKey(const Key('room-floor')));
-      final house = roomShopFurniture.firstWhere(
+      final house = roomShopFurnitureV4.firstWhere(
         (f) => f.key == 'room-furniture-noi_nha_pet',
       );
       final r = tester.getRect(
@@ -247,7 +257,7 @@ void main() {
     ) async {
       await pumpRoom(tester, ready: true);
       final floor = tester.getRect(find.byKey(const Key('room-floor')));
-      final fp = roomShopFurniture
+      final fp = roomShopFurnitureV4
           .firstWhere((f) => f.key == 'room-furniture-noi_nha_pet')
           .footprint!;
       Offset toScreen(Offset f) => Offset(

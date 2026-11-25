@@ -48,13 +48,27 @@ class RoomOwnership {
   bool boughtItem(String themeId, String placeableId) =>
       inventory.contains(roomThemeVariantItemId(themeId, placeableId));
 
+  /// Món [placeableId] có hình biến thể [themeId] không (món Muse dùng lại
+  /// nguyên bản ở chủ đề đó thì không; món lạ coi như có).
+  bool _drawnIn(String themeId, String placeableId) {
+    for (final p in _items) {
+      if (p.id == placeableId) return p.hasVariant(themeId);
+    }
+    return true;
+  }
+
   /// Có biến thể [themeId] của món [placeableId] (bộ hoặc mua lẻ).
   bool hasItemVariant(String themeId, String placeableId) =>
-      _ready(themeId) && (ownsSet(themeId) || boughtItem(themeId, placeableId));
+      _ready(themeId) &&
+      _drawnIn(themeId, placeableId) &&
+      (ownsSet(themeId) || boughtItem(themeId, placeableId));
 
-  /// Có đủ biến thể [themeId] của MỌI món.
+  /// Có đủ biến thể [themeId] của MỌI món có hình ở chủ đề đó.
   bool hasAllItems(String themeId) =>
-      _ready(themeId) && _items.every((p) => hasItemVariant(themeId, p.id));
+      _ready(themeId) &&
+      _items
+          .where((p) => p.hasVariant(themeId))
+          .every((p) => hasItemVariant(themeId, p.id));
 
   /// Có nền [themeId]: mua bộ, hoặc quà tặng khi đủ mọi món lẻ.
   bool hasBackground(String themeId) =>
@@ -181,7 +195,8 @@ class RoomLookStore {
       variants = {
         if (legacyTheme != null && legacyTheme != roomThemeClassic)
           for (final p in roomPlaceables)
-            if (p.shopId != null) p.id: legacyTheme,
+            if (p.shopId != null && p.hasVariant(legacyTheme))
+              p.id: legacyTheme,
       };
       if (variants.isNotEmpty) {
         await _set(
