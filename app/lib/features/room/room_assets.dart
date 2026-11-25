@@ -830,10 +830,10 @@ const List<RoomFurniture> roomFurnitureV4 = [
     asset: 'assets/images/furniture/coc_sao_v3.webp',
     label: 'Cốc bút',
     reaction: 'Cốc bút đựng bút chì gọn quá!',
-    placeX: 628.34,
-    placeY: 320.29,
+    placeX: 1069.36,
+    placeY: 443.29,
     placeSize: 161.28,
-    anchor: Offset(700, 457),
+    anchor: Offset(1150, 580),
     bakedRect: Rect.zero,
   ),
 ];
