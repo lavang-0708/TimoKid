@@ -192,7 +192,7 @@ void main() {
       expect(items, hasLength(8));
       for (final i in items) {
         expect(i.priceXu, prices[i.id], reason: i.id);
-        expect(i.asset, 'assets/images/furniture/${i.id}.png');
+        expect(i.asset, 'assets/images/furniture/${i.id}.webp');
       }
       await give(130);
       expect(await buy('noi_be_ca', s: on), BuyResult.bought);
@@ -249,10 +249,10 @@ void main() {
       expect(kidOutfitNumber('boy_outfit_07', premiumReady: true), 7);
       expect(kidOutfitNumber('boy_outfit_11', premiumReady: true), 11);
       // Tên file 2 chữ số.
-      expect(kidFullAsset('girl', 11), endsWith('girl_full_11.png'));
+      expect(kidFullAsset('girl', 11), endsWith('girl_full_11.webp'));
       expect(
         kidFullAsset('boy', 8, wave: true),
-        endsWith('boy_full_08_wave.png'),
+        endsWith('boy_full_08_wave.webp'),
       );
     });
 

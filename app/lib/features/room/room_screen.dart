@@ -25,7 +25,7 @@
 /// màn 608x248; tiêu đề + số dư + tiến độ nằm ở hàng đầu màn.
 ///
 /// Hình: nền phòng + nội thất là PNG thật phong cách v3b (D):
-/// nền `room_v3.png` (1600x900) + 5 món đồ rời 512x512 đặt khớp món
+/// nền `room_v3.webp` (1600x900) + 5 món đồ rời 512x512 đặt khớp món
 /// vẽ sẵn trong nền, xem `room_assets.dart` và `docs/ASSETS.md` mục
 /// "Phòng v3b" (vị trí đo từ PNG thật, đã hiệu chỉnh bằng code —
 /// xem `docs/D_IMAGES.md` mục 8). Bóng đổ dưới mỗi món đặt sàn do
@@ -103,8 +103,8 @@ class RoomScreen extends ConsumerStatefulWidget {
   /// Cờ hình phòng chủ đề (mặc định theo const; chỉ đổi trong test).
   final Map<String, bool> roomThemesReady;
 
-  /// true = dùng `room_v3_clean.png` + vẽ lại 5 PNG nội thất rời;
-  /// false = nền `room_v3.png` đã có sẵn 5 món, chỉ đặt vùng chạm.
+  /// true = dùng `room_v3_clean.webp` + vẽ lại 5 PNG nội thất rời;
+  /// false = nền `room_v3.webp` đã có sẵn 5 món, chỉ đặt vùng chạm.
   final bool cleanBackground;
 
   static const String route = '/room';
@@ -1191,7 +1191,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                         GameRoundButton(
                           key: const Key('room-town-button'),
                           icon: Icons.location_city_rounded,
-                          image: '$uiArt/ui_icon_town.png',
+                          image: '$uiArt/ui_icon_town.webp',
                           color: const Color(0xFFA07BE0),
                           label: 'Thị trấn',
                           onPressed: () => context.go(TownScreen.route),
@@ -1230,21 +1230,21 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                               ),
                             GameStat(
                               icon: Icons.monetization_on_rounded,
-                              image: '$uiArt/ui_coin.png',
+                              image: '$uiArt/ui_coin.webp',
                               color: const Color(0xFFF5B83D),
                               text: '$_xu',
                               textKey: const Key('room-xu-balance'),
                             ),
                             GameStat(
                               icon: Icons.diamond_rounded,
-                              image: '$uiArt/ui_gem.png',
+                              image: '$uiArt/ui_gem.webp',
                               color: const Color(0xFFA07BE0),
                               text: '$_gems',
                               textKey: const Key('room-gem-balance'),
                             ),
                             GameStat(
                               icon: Icons.star_rounded,
-                              image: '$uiArt/ui_star.png',
+                              image: '$uiArt/ui_star.webp',
                               color: const Color(0xFFFFC94D),
                               text: _unlocked
                                   ? '$total/$total'
@@ -1269,7 +1269,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                     GameRoundButton(
                       key: const Key('room-wardrobe-button'),
                       icon: Icons.checkroom_rounded,
-                      image: '$uiArt/ui_icon_wardrobe.png',
+                      image: '$uiArt/ui_icon_wardrobe.webp',
                       color: const Color(0xFFB48CF2),
                       label: 'Tủ đồ',
                       locked: !_unlocked,
@@ -1281,7 +1281,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                     GameRoundButton(
                       key: const Key('room-shop-button'),
                       icon: Icons.storefront_rounded,
-                      image: '$uiArt/ui_icon_shop.png',
+                      image: '$uiArt/ui_icon_shop.webp',
                       color: const Color(0xFF5DC3A8),
                       label: 'Cửa hàng',
                       locked: !_unlocked,
@@ -2015,7 +2015,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
 /// [showImage] = true (nền sạch): vẽ PNG 512x512 trong suốt đặt khớp
 /// ([RoomFurniture.placeX]/[placeY]/[placeSize]); bóng đổ do app vẽ ở
 /// tầng cảnh (xem `_buildScene`), không nướng trong PNG. [showImage]
-/// = false (nền `room_v3.png` đã vẽ sẵn món): chỉ là vùng chạm vô
+/// = false (nền `room_v3.webp` đã vẽ sẵn món): chỉ là vùng chạm vô
 /// hình phủ đúng món trong nền ([RoomFurniture.bakedRect]).
 /// Khóa widget giữ nguyên như bản v2 (`room-furniture-<tên>`) để
 /// test cũ vẫn tìm được món.

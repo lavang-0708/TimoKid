@@ -4,7 +4,7 @@
 /// băng phản hồi đã chốt. Pet vẽ mới cùng phong cách pastel mềm,
 /// viền trắng kiểu sticker của các tấm trong `assets/concept/`
 /// (PLAN điểm (k)): Muse không tải được PNG nhị phân qua MCP nên
-/// không cắt được pet từ tấm `pet_*.png`; pet SVG ở đây vẽ theo đúng
+/// không cắt được pet từ tấm `pet_*.webp`; pet SVG ở đây vẽ theo đúng
 /// tông đó (mèo Mũm Mĩm — phần thú cưng trong tấm nhân vật nữ chỉ có
 /// mèo, xem `assets/concept/README.md`).
 ///

@@ -3,7 +3,7 @@
 ///
 /// Hiệu ứng là một lượt rồi dừng (không lặp) nên `pumpAndSettle` vẫn
 /// dừng được; khi cổng [AnimationGate] tắt (test) thì chuyển ngay.
-/// Logo và nền là ảnh lô 6 (`ui_logo.png`, `ui_splash_bg.png`).
+/// Logo và nền là ảnh lô 6 (`ui_logo.webp`, `ui_splash_bg.webp`).
 library;
 
 import 'package:go_router/go_router.dart';
@@ -43,8 +43,8 @@ class _SplashScreenState extends State<SplashScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       for (final p in [
-        'assets/images/backgrounds/room_v3.png',
-        'assets/images/town/town_v3.png',
+        'assets/images/backgrounds/room_v3.webp',
+        'assets/images/town/town_v3.webp',
       ]) {
         precacheImage(AssetImage(p), context, onError: (_, _) {});
       }
@@ -97,7 +97,7 @@ class _SplashScreenState extends State<SplashScreen>
         decoration: const BoxDecoration(
           color: Color(0xFFFFE3F0),
           image: DecorationImage(
-            image: AssetImage('$uiArt/ui_splash_bg.png'),
+            image: AssetImage('$uiArt/ui_splash_bg.webp'),
             fit: BoxFit.cover,
           ),
         ),
@@ -149,7 +149,7 @@ class _Logo extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Image.asset(
-          '$uiArt/ui_logo.png',
+          '$uiArt/ui_logo.webp',
           key: const Key('splash-title'),
           height: 190,
           semanticLabel: 'TimoKid',

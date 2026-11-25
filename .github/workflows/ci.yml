@@ -28,6 +28,10 @@ jobs:
         working-directory: .
         run: python3 tools/question_bank/check.py
 
+      - name: Cài Pillow (đọc WebP cho script kiểm tra hình)
+        working-directory: .
+        run: python3 -m pip install --quiet pillow
+
       - name: Kiểm tra hình (manifest)
         working-directory: .
         run: python3 tools/assets/check_assets.py

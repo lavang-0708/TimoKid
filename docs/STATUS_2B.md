@@ -47,9 +47,9 @@
 
 1. Chờ Claude decode vòng 3 (6 file `.b64` mới) + commit PNG lên nhánh
    `task/A1-phong-v2`, xóa `.b64`.
-2. Code Phòng dùng nền `room_v2.png` + 8 PNG đồ rời (thay SVG tạm của T2-04),
+2. Code Phòng dùng nền `room_v2.webp` + 8 PNG đồ rời (thay SVG tạm của T2-04),
    vẽ bóng ellipse đen 20% dưới mỗi món như mục trên.
-3. Cập nhật `docs/ASSETS.md` (nền `room_v2.png` PNG thay vì JPEG; 8 món đồ
+3. Cập nhật `docs/ASSETS.md` (nền `room_v2.webp` PNG thay vì JPEG; 8 món đồ
    nguồn "Muse vẽ AI 20/11 theo DESIGN.md", alpha sạch, bóng do app vẽ)
    + `assets/manifest.json` (8 mục đồ rời → `ready`).
 4. Chạy đủ test (kể cả overflow 608x248 / 640x320), cập nhật

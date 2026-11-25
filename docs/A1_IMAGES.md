@@ -7,12 +7,12 @@ sau đó mới làm giai đoạn 2 (code + manifest + mở PR).
 
 ## Lưu ý định dạng nền
 
-- Nền phòng đẩy dạng **PNG** (`room_v2.png`), KHÔNG phải JPEG như `docs/ASSETS.md`
+- Nền phòng đẩy dạng **PNG** (`room_v2.webp`), KHÔNG phải JPEG như `docs/ASSETS.md`
   ghi cho loại `background`. Lý do: `tools/assets/decode_incoming.py` trên main
   chỉ chấp nhận PNG (kiểm tra signature PNG, báo lỗi với file khác).
 - PNG 1600x900 này chỉ 928.630 byte (< 1 MB) nên đẩy PNG là được, không cần
   đổi script. Giai đoạn 2 sẽ cập nhật `docs/ASSETS.md` + manifest cho đúng
-  (nền `room_v2.png`, khung 1600x900).
+  (nền `room_v2.webp`, khung 1600x900).
 
 ## Danh sách file
 
@@ -36,11 +36,11 @@ Tất cả ảnh gốc đều <= 1 MB. Đồ rời PNG trong suốt 512x512, n�
 Sau khi Claude decode + commit 9 PNG (commit `138c2b2`), kiểm tra thấy 8 PNG
 đồ rời đều dính vệt bóng màu loang dưới chân + mép răng cưa do tách nền.
 Giai đoạn 2a cắt lại 8 PNG đó từ tấm nguồn, **xóa sạch vệt bóng khỏi PNG**
-(alpha quanh món đồ sạch, không còn bóng nào trong ảnh). Nền `room_v2.png`
+(alpha quanh món đồ sạch, không còn bóng nào trong ảnh). Nền `room_v2.webp`
 không có lỗi này nên giữ nguyên, không đẩy lại.
 
 Cách làm (script ở `~/workspace/timokid-review/a1-phong-v2/work/cut9.py`,
-điểm đường chân đọc bằng mắt trên lưới tọa độ `grid_<tên>.png`):
+điểm đường chân đọc bằng mắt trên lưới tọa độ `grid_<tên>.webp`):
 flood-fill tách nền theo màu nền từng ô, rồi cắt theo **đường chân thủ công**
 (ground line) dọc mép dưới của món đồ — vì vệt bóng và phần shading dưới
 của món đồ cùng tông màu, nối nhau bằng gradient mượt nên không có ngưỡng
@@ -52,7 +52,7 @@ cắt flood-fill, chỉ mã hóa lại.
 Đã kiểm chứng từng PNG trên nền caro + đo số pixel mờ dưới đáy: cả 8 món
 đều nguyên vẹn (gối đủ 4 pom-pom, gấu đủ chân/tay, cốc đủ vành đáy, bình/chậu/
 khung đủ đáy), không còn vệt bóng, không răng cưa, 0 pixel mờ dưới 60 hàng
-cuối của ảnh 512x512. Xem `preview9_<tên>.png` trong `work/`.
+cuối của ảnh 512x512. Xem `preview9_<tên>.webp` trong `work/`.
 
 | File .b64 (đẩy lại) | Đường dẫn đích | Cỡ gốc mới (byte) | Ghi chú |
 | --- | --- | ---: | --- |
@@ -82,8 +82,8 @@ Vòng 3 làm lại từ bản cắt v5 (thân nguyên vẹn, chỉ còn vệt b�
 từ file vòng 2 (phần bị cắt đã mất). Cách làm (script
 `~/workspace/timokid-review/a1-phong-v2/work/cut10.py`): đường viền đáy
 theo BÓNG DÁNG THẬT của món — tức đường cong là mép dưới của món đồ, đọc
-bằng mắt trên lưới tọa độ + dải đáy phóng to 2x (`grid_<tên>.png`,
-`zoom_bottom_<tên>.png`), trải suốt bề rộng bóng dáng (hông bình, mép chậu,
+bằng mắt trên lưới tọa độ + dải đáy phóng to 2x (`grid_<tên>.webp`,
+`zoom_bottom_<tên>.webp`), trải suốt bề rộng bóng dáng (hông bình, mép chậu,
 quai cốc, mép gối, góc khung, tay/chân gấu); CHỈ xóa pixel nằm DƯỚI đường
 đó, tuyệt đối không xóa theo cột; ngoài khoảng x của đường thì kéo phẳng
 theo điểm đầu/cuối (chỉ xóa vệt bóng dưới, giữ nguyên mọi thứ phía trên).

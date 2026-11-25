@@ -2,7 +2,7 @@
 /// bay. Số liệu ở `dragon_fx_config.dart`.
 ///
 /// - [DragonAura]: vầng sáng sau rồng (Phòng, Cửa hàng, "Pet của bé").
-///   Có hình (`dragonFxArtReady`) thì dùng `dragon_aura.png` nhịp thở
+///   Có hình (`dragonFxArtReady`) thì dùng `dragon_aura.webp` nhịp thở
 ///   (co giãn + độ mờ); chưa có thì vẽ code: quầng xuyên tâm xanh bạc hà
 ///   - vàng + vài đốm lấp lánh.
 /// - [DragonPetView]: rồng trong Phòng = vầng sáng + [PetSprite] + hiệu

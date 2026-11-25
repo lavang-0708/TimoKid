@@ -180,7 +180,7 @@ void main() {
       expect(provider, isA<AssetImage>());
       expect(
         (provider as AssetImage).assetName,
-        'assets/images/pets/${species}_egg.png',
+        'assets/images/pets/${species}_egg.webp',
       );
     }
     expect(find.byType(SvgPicture), findsNothing);

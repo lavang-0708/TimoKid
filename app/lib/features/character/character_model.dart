@@ -8,7 +8,7 @@
 ///
 /// File hình thật thay thế fixture 1:1 tại đúng đường dẫn manifest,
 /// không cần sửa code: đường dẫn asset của mỗi lớp suy ra từ mã
-/// manifest (`assets/images/character/<dáng>/<mã>.png`).
+/// manifest (`assets/images/character/<dáng>/<mã>.webp`).
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -52,7 +52,7 @@ class CharacterLayerSpec {
   final String layer;
 
   /// Đường dẫn asset Flutter, vd
-  /// `assets/images/character/girl/girl_eyes_01.png`.
+  /// `assets/images/character/girl/girl_eyes_01.webp`.
   final String assetPath;
 
   /// Màu nhân (multiply) lên lớp xám; null = giữ nguyên màu file.
@@ -136,7 +136,7 @@ class CharacterOutfit {
         CharacterLayerSpec(
           id: id,
           layer: layer,
-          assetPath: 'assets/images/character/girl/$id.png',
+          assetPath: 'assets/images/character/girl/$id.webp',
           tint: line ? null : tint,
           isLine: line,
         ),
@@ -147,7 +147,7 @@ class CharacterOutfit {
           CharacterLayerSpec(
             id: '${id}_line',
             layer: layer,
-            assetPath: 'assets/images/character/girl/${id}_line.png',
+            assetPath: 'assets/images/character/girl/${id}_line.webp',
             isLine: true,
           ),
         );
@@ -193,24 +193,24 @@ class CharacterOutfit {
         CharacterLayerSpec(
           id: 'girl_hair_back_01',
           layer: 'hair_back',
-          assetPath: 'assets/images/character/girl/girl_hair_back_01.png',
+          assetPath: 'assets/images/character/girl/girl_hair_back_01.webp',
           tint: hairColor,
         ),
         const CharacterLayerSpec(
           id: 'girl_body_01',
           layer: 'body',
-          assetPath: 'assets/images/character/girl/girl_body_01.png',
+          assetPath: 'assets/images/character/girl/girl_body_01.webp',
         ),
         if (top != null)
           CharacterLayerSpec(
             id: top,
             layer: 'top',
-            assetPath: 'assets/images/character/girl/$top.png',
+            assetPath: 'assets/images/character/girl/$top.webp',
           ),
         CharacterLayerSpec(
           id: 'girl_hair_front_01',
           layer: 'hair_front',
-          assetPath: 'assets/images/character/girl/girl_hair_front_01.png',
+          assetPath: 'assets/images/character/girl/girl_hair_front_01.webp',
           tint: hairColor,
         ),
       ],

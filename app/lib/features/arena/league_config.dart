@@ -5,7 +5,7 @@
 library;
 
 /// Cờ nghệ thuật: false thì dùng icon Material cho huy hiệu hạng và rương;
-/// true thì dùng ảnh `ui_league_<mã>.png`, `ui_chest_<mã>.png` khi họa sĩ
+/// true thì dùng ảnh `ui_league_<mã>.webp`, `ui_chest_<mã>.webp` khi họa sĩ
 /// vẽ xong và ảnh được thêm vào `assets/images/ui/` (+ manifest).
 const bool leagueArtReady = true;
 

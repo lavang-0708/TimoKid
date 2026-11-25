@@ -39,6 +39,10 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - name: Cài Pillow (flutter test gọi script kiểm tra hình đọc WebP)
+        working-directory: .
+        run: python3 -m pip install --quiet pillow
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

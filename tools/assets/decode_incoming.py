@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Giải mã ảnh Muse đẩy dạng base64 thành PNG thật.
+"""Giải mã ảnh Muse đẩy dạng base64 thành WebP lossless thật.
 
 Muse không đẩy được file nhị phân qua MCP, nên mỗi ảnh được đẩy thành
 file text ``app/assets/_incoming/<đường dẫn đích>.b64`` (nội dung là một
-chuỗi base64 của PNG). Script này ghi PNG ra đúng ``<đường dẫn đích>``
-(tính từ gốc repo), kiểm tra đúng là PNG, rồi xóa file .b64.
+chuỗi base64 của PNG). Script này giải mã, kiểm tra đúng là PNG, đổi
+sang WebP lossless (cùng đường dẫn, đuôi ``.webp``; có kiểm giống hệt
+từng pixel, xem ``png_to_webp.py``), rồi xóa file .b64.
 
 Cách dùng (Claude chạy trên nhánh PR, rồi commit):
     python3 tools/assets/decode_incoming.py
@@ -12,6 +13,9 @@ Cách dùng (Claude chạy trên nhánh PR, rồi commit):
 import base64
 import pathlib
 import sys
+import tempfile
+
+from png_to_webp import convert_png_to_webp
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 INCOMING = ROOT / "app" / "assets" / "_incoming"
@@ -31,10 +35,21 @@ def main() -> int:
             print("LỖI không phải PNG:", f.relative_to(ROOT))
             bad += 1
             continue
+        target = target.with_suffix(".webp")
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(data)
+        with tempfile.TemporaryDirectory() as tmp:
+            src = pathlib.Path(tmp) / "decoded.png"
+            src.write_bytes(data)
+            try:
+                convert_png_to_webp(src, target)
+            except Exception as exc:  # noqa: BLE001
+                print("LỖI không đổi được sang WebP:", f.relative_to(ROOT), exc)
+                target.unlink(missing_ok=True)
+                bad += 1
+                continue
         f.unlink()
-        print(f"OK {target.relative_to(ROOT)} ({len(data)} byte)")
+        print(f"OK {target.relative_to(ROOT)} ({len(data)} byte PNG -> "
+              f"{target.stat().st_size} byte WebP)")
     for d in sorted(INCOMING.rglob("*"), reverse=True):
         if d.is_dir() and not any(d.iterdir()):
             d.rmdir()

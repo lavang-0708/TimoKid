@@ -9,7 +9,7 @@
 /// - [GameRoundButton]: nút tròn nổi khối (gradient + gờ dưới) có icon,
 ///   chữ nhỏ bên dưới (tuỳ chọn), nảy khi bấm.
 /// - [GameSign]: biển gỗ tên nhà (vẽ bằng code; đổi sang ảnh Muse vẽ khi
-///   có `assets/images/ui/ui_sign_board.png`).
+///   có `assets/images/ui/ui_sign_board.webp`).
 ///
 /// Icon dùng `Icons` của Material (font có trên máy thật; golden test nạp
 /// font MaterialIcons khi có).
@@ -374,7 +374,7 @@ class GameSign extends StatelessWidget {
                 color.withValues(alpha: 0.25),
                 BlendMode.srcATop,
               ),
-              child: Image.asset('$uiArt/ui_sign_board.png', fit: BoxFit.fill),
+              child: Image.asset('$uiArt/ui_sign_board.webp', fit: BoxFit.fill),
             ),
           ),
           // Mặt gỗ chiếm khoảng 6–94% ngang, 38–88% dọc của ảnh.

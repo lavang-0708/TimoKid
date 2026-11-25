@@ -7,7 +7,7 @@ mềm khối tròn pastel, hướng sáng trên-trái. Mọi tọa độ dưới
 
 ## 1. Nền
 
-- Đích: `app/assets/images/backgrounds/room_v3.png`
+- Đích: `app/assets/images/backgrounds/room_v3.webp`
 - Khung 1600x900, PNG RGB, **694.028 byte** (≤ 1 MB).
 - Ảnh gốc 2048x1152 resize về 1600x900, lượng tử hóa 256 màu + dithering
   Floyd–Steinberg (PNG đủ màu 2.243.101 byte vượt 1 MB — cùng cách làm PR #26
@@ -27,11 +27,11 @@ chroma-key, đặt đúng vị trí để phủ khít món đã vẽ sẵn trong
 
 | Món | Đích | PNG | Content bbox trong khung 512 | Ảnh 512 đặt tại (cỡ) | Rect hiển thị | Điểm neo (đáy) | Tỉ lệ |
 |---|---|---|---|---|---|---|---|
-| Gấu bông | `app/assets/images/furniture/gau_bong_v3.png` | 306.655 byte | (125,95,388,444) 264x350 | (296,343) 239x239 | x[354,477] y[387,550] | (415,550) | 0,466 |
-| Đèn sao | `app/assets/images/furniture/den_sao_v3.png` | 242.411 byte | (96,91,418,449) 323x359 | (49,408) 196x196 | x[86,209] y[443,580] | (150,580) | 0,383 |
-| Chậu cây | `app/assets/images/furniture/chau_cay_v3.png` | 222.629 byte | (99,119,373,440) 275x322 | (678,378) 358x358 | x[747,939] y[461,686] | (842,686) | 0,70 |
-| Bình hoa | `app/assets/images/furniture/binh_hoa_v3.png` | 242.783 byte | (156,106,360,429) 205x324 | (1162,273) 283x283 | x[1248,1361] y[332,510] | (1305,510) | 0,553 |
-| Cốc bút | `app/assets/images/furniture/coc_sao_v3.png` | 238.805 byte | (100,83,354,433) 255x351 | (1027,378) 161x161 | x[1058,1138] y[404,514] | (1099,515) | 0,315 |
+| Gấu bông | `app/assets/images/furniture/gau_bong_v3.webp` | 306.655 byte | (125,95,388,444) 264x350 | (296,343) 239x239 | x[354,477] y[387,550] | (415,550) | 0,466 |
+| Đèn sao | `app/assets/images/furniture/den_sao_v3.webp` | 242.411 byte | (96,91,418,449) 323x359 | (49,408) 196x196 | x[86,209] y[443,580] | (150,580) | 0,383 |
+| Chậu cây | `app/assets/images/furniture/chau_cay_v3.webp` | 222.629 byte | (99,119,373,440) 275x322 | (678,378) 358x358 | x[747,939] y[461,686] | (842,686) | 0,70 |
+| Bình hoa | `app/assets/images/furniture/binh_hoa_v3.webp` | 242.783 byte | (156,106,360,429) 205x324 | (1162,273) 283x283 | x[1248,1361] y[332,510] | (1305,510) | 0,553 |
+| Cốc bút | `app/assets/images/furniture/coc_sao_v3.webp` | 238.805 byte | (100,83,354,433) 255x351 | (1027,378) 161x161 | x[1058,1138] y[404,514] | (1099,515) | 0,315 |
 
 Rect món vẽ sẵn trong nền (để đối chiếu — lớp rời phủ khít các rect này):
 
@@ -123,7 +123,7 @@ trong Phòng (G)").*
   sat > 0,35) — trừ bình hoa (thân lavender + cánh hồng là màu thật, không
   dọn).
 - Kiểm chứng: ghép thử cả 5 món lên nền ở đúng vị trí + xem bằng mắt (file
-  kiểm chứng local `work/check_room_composite.png`, không đẩy lên) — không
+  kiểm chứng local `work/check_room_composite.webp`, không đẩy lên) — không
   hình đôi, món nằm đúng mặt phẳng, đúng phối cảnh, không nổi, không lệch.
 - Đồng bộ theo quy tắc chủ dự án 21/11: cùng phong cách 3D mềm, cùng hướng
   sáng trên-trái, cùng tỉ lệ — nhân vật đứng trong phòng phải đúng cỡ so với
@@ -132,7 +132,7 @@ trong Phòng (G)").*
 ## 8. Hiệu chỉnh bằng code ở giai đoạn 2 (21/11, sau bài học PR #31)
 
 Mọi điểm neo/đa giác/dấu chân trên đây đã kiểm chứng lại bằng code
-trên ảnh `room_v3.png` thật (mẫu màu pixel + quét hàng/cột), không
+trên ảnh `room_v3.webp` thật (mẫu màu pixel + quét hàng/cột), không
 tin mắt. Kết quả: bbox alpha 5 món khớp khai báo; bán trong suốt
 0,00% cả 5; 5 điểm neo đúng mặt phẳng; đa giác sàn + 4 dấu chân +
 ghế đúng; đa số mốc tỉ lệ đúng. **Đã sửa 3 chỗ khai báo sai:**

@@ -15,14 +15,14 @@ cắt cụt, tỉ lệ hợp lý so với công trình.
 
 ## Lưu ý định dạng nền
 
-- Nền thị trấn đẩy dạng **PNG** (`town_v3.png`), KHÔNG phải JPEG như
+- Nền thị trấn đẩy dạng **PNG** (`town_v3.webp`), KHÔNG phải JPEG như
   `docs/ASSETS.md` ghi cho loại `background`. Lý do: `tools/assets/decode_incoming.py`
   trên main chỉ chấp nhận PNG (kiểm tra signature PNG, báo lỗi với file khác).
 - PNG 1600x900 đủ màu là 2.243.101 byte (> 1 MB) nên đã lượng tử hóa 256 màu
   + dithering Floyd-Steinberg: còn **678.089 byte** (< 1 MB), xem bằng mắt
   không thấy nhiễu dithering ở cỡ hiển thị, đủ 6 công trình, không cắt cụt.
 - Giai đoạn 2 sẽ cập nhật `docs/ASSETS.md` + manifest cho đúng
-  (nền `town_v3.png`, khung 1600x900).
+  (nền `town_v3.webp`, khung 1600x900).
 
 ## Đài phun nước: KHÔNG có
 
@@ -82,7 +82,7 @@ chỉnh theo ảnh nếu lệch.
 | D6 | ↘ | (1150,680) → (1300,760) → (1500,850) → (1600,900) | Dưới hồ |
 
 > **Ghi chú (đã làm trong code, PR #34 — sau khi nhật ký này viết):** app
-> KHÔNG dùng 6 đoạn D1–D6 dưới đây nữa. Đường nền `town_v3.png` chỉ có hai
+> KHÔNG dùng 6 đoạn D1–D6 dưới đây nữa. Đường nền `town_v3.webp` chỉ có hai
 > đường chéo cắt nhau ở ngã tư lớn nên code dùng hai đoạn **C1**
 > (700,459)→(1600,904) và **C2** (770,810)→(1560,416), nửa rộng vùng đường
 > 60 px, người lệch vỉa hè 46 px; xe/người chạy theo `car1Route`,
@@ -111,7 +111,7 @@ Lớp động vẽ rời nên app có thể đặt/animate độc lập trên n�
 
 ## Giai đoạn 1b: sửa 4 lớp lỗi (21/11, sau decode lần 1 commit `9e09cdd`)
 
-Nền `town_v3.png` ĐẠT (đường trống, đủ 6 công trình). 4 lớp lỗi, làm lại:
+Nền `town_v3.webp` ĐẠT (đường trống, đủ 6 công trình). 4 lớp lỗi, làm lại:
 
 - `person_01`, `person_02`: da mặt/tay/chân trong suốt loang — đo lại
   bằng code: person_01 **30,37%**, person_02 **23,64%** điểm ảnh bán trong
@@ -176,19 +176,19 @@ vẫn giữ lại sau khi thu nhỏ — vẫn dưới 5%.
 `push-files` không xóa được file. Sau khi decode 13 file 1b, xóa trên nhánh
 `task/C-thi-tran-v3b` bằng git (đã bị thay bằng file hướng/khung mới):
 
-- `app/assets/images/town/car_01.png`
-- `app/assets/images/town/car_02.png`
-- `app/assets/images/town/person_01.png`
-- `app/assets/images/town/person_02.png`
+- `app/assets/images/town/car_01.webp`
+- `app/assets/images/town/car_02.webp`
+- `app/assets/images/town/person_01.webp`
+- `app/assets/images/town/person_02.webp`
 
-`tree_02.png` ghi đè cùng tên nên không cần xóa. Các file còn lại của giai
-đoạn 1 (`town_v3.png`, `cloud_01/02/03.png`, `tree_01.png`) giữ nguyên.
+`tree_02.webp` ghi đè cùng tên nên không cần xóa. Các file còn lại của giai
+đoạn 1 (`town_v3.webp`, `cloud_01/02/03.webp`, `tree_01.webp`) giữ nguyên.
 
 ## Vòng sửa PR #31 (21/11) — D2 đo lại từ nền thật
 
 D2 cũ (880, 70) → (1120, 220) → (1420, 380) → (1600, 470) là đoạn
 thẳng cắt qua khối lều Hội chợ; xe hồng ở t = 0 nằm trên cỏ (990, 90).
-Đo lại tâm làn thật từ `town_v3.png` (quét điểm ảnh nhựa: R 125–180,
+Đo lại tâm làn thật từ `town_v3.webp` (quét điểm ảnh nhựa: R 125–180,
 G 130–180, B 155–205, max-min ≤ 40; xem ảnh phóng to có lưới 50 px):
 
 - Ngã giao D1×D2 thật ở (865, 125) (điểm cũ (880, 70) nằm trên cỏ,

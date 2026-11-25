@@ -2,7 +2,7 @@
 /// và mở (5/5 chặng, pet đã nở) ở 800x360.
 ///
 /// Dùng hồ sơ NAM để lớp nhân vật là lớp tạm xám (ổn định tuyệt đối
-/// khi chạy local lẫn CI); hồ sơ nữ dùng hình thật `girl_body_01.png`
+/// khi chạy local lẫn CI); hồ sơ nữ dùng hình thật `girl_body_01.webp`
 /// — máy local không có file PNG thật (chỉ có ảnh thay thế trong
 /// suốt) nên ảnh sẽ lệch với CI. Xem chú thích ở
 /// `test/goldens/room_golden_data.dart` để sinh lại ảnh.

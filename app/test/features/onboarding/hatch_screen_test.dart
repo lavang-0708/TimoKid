@@ -58,9 +58,9 @@ void main() {
         .map((p) => p.assetName)
         .toList();
     // Sau khi nở: hai nửa vỏ là hình Muse vẽ (lô 8A) + pet mới nở.
-    expect(paths, contains('assets/images/pets/dog_shell_bottom.png'));
-    expect(paths, contains('assets/images/pets/dog_shell_top.png'));
-    expect(paths, contains('assets/images/pets/dog_newborn.png'));
+    expect(paths, contains('assets/images/pets/dog_shell_bottom.webp'));
+    expect(paths, contains('assets/images/pets/dog_shell_top.webp'));
+    expect(paths, contains('assets/images/pets/dog_newborn.webp'));
     expect(find.byType(SvgPicture), findsNothing);
     expect(find.byKey(const Key('hatch-continue-button')), findsOneWidget);
 
@@ -178,11 +178,11 @@ void main() {
 
   test('hình trứng nứt Muse (lô 8A) đã bật, đường dẫn đúng quy ước', () {
     expect(eggCrackArtReady, isTrue);
-    expect(eggCrackAsset('dog', 2), 'assets/images/pets/dog_egg_crack_2.png');
-    expect(shellTopAsset('cat'), 'assets/images/pets/cat_shell_top.png');
+    expect(eggCrackAsset('dog', 2), 'assets/images/pets/dog_egg_crack_2.webp');
+    expect(shellTopAsset('cat'), 'assets/images/pets/cat_shell_top.webp');
     expect(
       shellBottomAsset('rabbit'),
-      'assets/images/pets/rabbit_shell_bottom.png',
+      'assets/images/pets/rabbit_shell_bottom.webp',
     );
   });
 

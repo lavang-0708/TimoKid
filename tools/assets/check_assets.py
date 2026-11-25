@@ -2,16 +2,16 @@
 """Kiểm tra hình đầu vào theo hợp đồng trong ``assets/manifest.json``.
 
 Hợp đồng (xem ``docs/ASSETS.md``): khung nhân vật 1024x1536, pet/đồ vật/
-nội thất/lớp động thị trấn 512x512, nền JPEG hoặc PNG, tên file
-``<dáng>_<lớp>_<tên món>.png``,
+nội thất/lớp động thị trấn 512x512, nền JPEG hoặc WebP, tên file
+``<dáng>_<lớp>_<tên món>.webp``,
 lớp đổi màu tô xám để app nhân màu, chi tiết không đổi màu đi file
 riêng đuôi ``_line``, thứ tự chồng 8 lớp từ tóc sau lên phụ kiện.
 
 Script kiểm tra:
   - manifest đúng lược đồ (lớp, trường bắt buộc, tên file khớp mã);
-  - file trạng thái ``ready`` phải tồn tại và đúng nội dung: PNG đúng
+  - file trạng thái ``ready`` phải tồn tại và đúng nội dung: WebP đúng
     kích thước khung, có kênh alpha, có ít nhất một pixel trong suốt
-    (kể cả ở viền), lớp đổi màu phải tô xám; riêng nền PNG thì không
+    (kể cả ở viền), lớp đổi màu phải tô xám; riêng nền WebP thì không
     yêu cầu alpha (nền đặc, không chồng lớp);
   - file trạng thái ``planned`` chưa được có mặt (có rồi thì đổi
     status thành ``ready``);
@@ -20,17 +20,20 @@ Script kiểm tra:
 
 Cách dùng:
     python3 tools/assets/check_assets.py [--root <gốc repo>]
-Trả 0 khi mọi kiểm tra qua, 1 khi có lỗi. Chỉ dùng thư viện chuẩn.
+Trả 0 khi mọi kiểm tra qua, 1 khi có lỗi. Cần Pillow để đọc điểm ảnh WebP
+(ảnh trong app/assets/images/ là WebP lossless, xem png_to_webp.py).
 """
 
 import argparse
 import json
 import pathlib
 import re
-import struct
 import sys
-import zlib
-from itertools import accumulate
+
+try:  # Pillow chỉ cần để đọc điểm ảnh WebP
+    from PIL import Image, ImageChops
+except ImportError:  # pragma: no cover
+    Image = ImageChops = None
 
 # --- Hợp đồng cố định (khớp docs/ASSETS.md) -------------------------------
 
@@ -85,16 +88,16 @@ NAME_PATTERNS = {
         r"^(girl|boy)_"
         r"(hair_back|body|shoes|bottom|top|eyes|mouth|hair_front"
         r"|accessory_head|accessory_hand)"
-        r"_[a-z0-9]+(_line)?\.png$"
+        r"_[a-z0-9]+(_line)?\.webp$"
     ),
     # Ảnh toàn thân 3 bộ × (nghỉ/vẫy) và phụ kiện phủ cùng khung (E).
     "character_full": re.compile(
         r"^(girl|boy)_(full_(0[1-9]|1[01])(_wave|_walk_(dr|ur)_[a-d])?(_backpack)?"
         r"|hat_01|bow_01|clip_01"
-        r"|glasses_01|backpack_01|shoes_02)\.png$"
+        r"|glasses_01|backpack_01|shoes_02)\.webp$"
     ),
     "character_patch": re.compile(
-        r"^(girl|boy)_eyes_closed_patch(_0[1-3]_wave)?\.png$"
+        r"^(girl|boy)_eyes_closed_patch(_0[1-3]_wave)?\.webp$"
     ),
     # Ảnh giai đoạn + trứng nứt/vỏ (lô 8A) + khung đi/vui/ngồi (lô 8B).
     "pet": re.compile(
@@ -103,20 +106,20 @@ NAME_PATTERNS = {
         r"|egg_crack_[1-3]|shell_(top|bottom)"
         r"|(newborn|teen|adult)_(walk_[a-d]|happy|sit)"
         r"|(fire|water)_[1-4]|fly_[a-d]|aura"
-        r")\.png$"
+        r")\.webp$"
     ),
-    "item": re.compile(r"^[a-z0-9_]+\.png$"),
-    "furniture": re.compile(r"^[a-z0-9_]+\.png$"),
-    "background": re.compile(r"^[a-z0-9_]+\.(jpg|jpeg|png)$"),
+    "item": re.compile(r"^[a-z0-9_]+\.webp$"),
+    "furniture": re.compile(r"^[a-z0-9_]+\.webp$"),
+    "background": re.compile(r"^[a-z0-9_]+\.(jpg|jpeg|webp)$"),
     "icon": re.compile(r"^[a-z0-9_]+\.svg$"),
-    "town_layer": re.compile(r"^[a-z0-9_]+\.png$"),
+    "town_layer": re.compile(r"^[a-z0-9_]+\.webp$"),
     # Hình giao diện kiểu game (lô 6, 21/11): nút, icon, biển, logo,
     # nền màn chờ/mở đầu; mỗi hình một cỡ riêng nên không kiểm khung.
     # Công trình thêm lên bản đồ Thị trấn (lô 11: Đấu trường), mỗi
     # tòa một cỡ nên không kiểm khung.
-    "town_building": re.compile(r"^[a-z0-9_]+_building\.png$"),
+    "town_building": re.compile(r"^[a-z0-9_]+_building\.webp$"),
     # Huy chương Đấu trường (lô 11) cũng thuộc loại ui.
-    "ui": re.compile(r"^(ui|medal)_[a-z0-9_]+\.png$"),
+    "ui": re.compile(r"^(ui|medal)_[a-z0-9_]+\.webp$"),
 }
 
 # Thư mục con cho từng loại (tính từ app/assets/images/); icon không
@@ -135,18 +138,12 @@ KIND_DIRS = {
     "town_building": "town",
 }
 
-IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".svg"}
+IMAGE_EXTS = {".png", ".webp", ".jpg", ".jpeg", ".svg"}
 
 # Pixel đổi màu phải gần như xám tuyệt đối (R, G, B lệch nhau tối đa
 # chừng này mới nhân màu không bị ám màu).
 GRAY_TOLERANCE = 8
 
-def _add8(x: int, y: int) -> int:
-    """Cộng hai byte theo modulo 256 (dùng cho bộ lọc Up)."""
-    return (x + y) & 0xFF
-
-
-PNG_SIG = b"\x89PNG\r\n\x1a\n"
 JPEG_SOI = b"\xff\xd8\xff"
 
 
@@ -163,170 +160,38 @@ class Checker:
     def fail(self, where: str, msg: str) -> None:
         self.errors.append(f"LỖI {where}: {msg}")
 
-    # -- PNG (chỉ dùng thư viện chuẩn) ------------------------------------
+    # -- WebP (cần Pillow để giải mã điểm ảnh) ------------------------------
 
-    def _read_png(self, path: pathlib.Path, where: str):
-        """Đọc PNG, trả (rộng, cao, loại màu, dữ liệu thô đã inflate).
-
-        Chỉ hỗ trợ PNG 8-bit không interlaced, loại màu 4 (xám+alpha)
-        hoặc 6 (RGBA). Các trường hợp khác báo lỗi rõ ràng. Chưa gỡ
-        bộ lọc từng dòng ở đây (xem ``_scan_rows`` / ``_unfilter``):
-        phần lớn ảnh chỉ cần nhìn vài pixel, giải đủ cả ảnh rất chậm
-        trong Python thuần.
-        """
+    def _open_webp(self, path: pathlib.Path, where: str):
+        """Mở ảnh WebP, trả về ảnh RGBA đã nạp; lỗi thì ghi và trả None."""
+        if Image is None:
+            raise SystemExit(
+                "Thiếu Pillow để đọc WebP: pip install pillow"
+            )
         data = path.read_bytes()
-        if not data.startswith(PNG_SIG):
-            raise CheckError(f"{where}: không phải file PNG")
-        pos = 8
-        width = height = bit_depth = color_type = interlace = None
-        idat = bytearray()
-        has_trns = False
-        while pos + 8 <= len(data):
-            length = struct.unpack(">I", data[pos:pos + 4])[0]
-            ctype = data[pos + 4:pos + 8].decode("latin-1")
-            chunk = data[pos + 8:pos + 8 + length]
-            if ctype == "IHDR":
-                width, height, bit_depth, color_type, _, _, interlace = (
-                    struct.unpack(">IIBBBBB", chunk)
-                )
-            elif ctype == "IDAT":
-                idat += chunk
-            elif ctype == "tRNS":
-                has_trns = True
-            elif ctype == "IEND":
-                break
-            pos += 12 + length
-        if width is None:
-            raise CheckError(f"{where}: thiếu khối IHDR")
-        if bit_depth != 8:
-            raise CheckError(
-                f"{where}: chỉ hỗ trợ PNG 8-bit (đang là {bit_depth}-bit)"
-            )
-        if interlace != 0:
-            raise CheckError(f"{where}: không dùng PNG interlaced")
-        if color_type not in (4, 6):
-            raise CheckError(
-                f"{where}: PNG phải có kênh alpha (loại màu 4 hoặc 6, "
-                f"đang là {color_type})"
-            )
-        if has_trns:
-            raise CheckError(
-                f"{where}: không dùng khối tRNS, hãy xuất PNG có kênh "
-                "alpha thật (loại màu 4 hoặc 6)"
-            )
+        if data[:4] != b"RIFF" or data[8:12] != b"WEBP":
+            self.fail(where, "không phải file WebP thật")
+            return None, None
         try:
-            raw = zlib.decompress(bytes(idat))
-        except zlib.error:
-            raise CheckError(f"{where}: không giải nén được dữ liệu IDAT")
-        return width, height, color_type, raw
+            with Image.open(path) as im:
+                if im.format != "WEBP":
+                    self.fail(where, "không phải file WebP thật")
+                    return None, None
+                has_alpha = "A" in im.getbands() or im.mode == "P"
+                rgba = im.convert("RGBA")
+                rgba.load()
+        except Exception as exc:  # noqa: BLE001
+            self.fail(where, f"không giải mã được WebP: {exc}")
+            return None, None
+        return rgba, has_alpha
 
-    def _check_rows(self, raw, width: int, height: int, bpp: int,
-                    where: str) -> None:
-        """Mỗi dòng phải đủ dữ liệu và có loại lọc hợp lệ (0-4)."""
-        row_len = 1 + width * bpp
-        for y in range(height):
-            if y * row_len + row_len > len(raw):
-                raise CheckError(f"{where}: dữ liệu ảnh ngắn hơn khai báo")
-            if raw[y * row_len] > 4:
-                raise CheckError(
-                    f"{where}: loại lọc PNG lạ ({raw[y * row_len]})"
-                )
-
-    def _unfilter(self, raw, width: int, height: int, bpp: int,
-                  where: str) -> bytes:
-        """Gỡ bộ lọc mọi dòng, trả bytes pixel (chậm: chỉ dùng khi cần).
-
-        Mỗi kênh được lọc độc lập (hàng xóm cách đúng ``bpp`` byte)
-        nên Sub/Up chạy bằng slicing và cộng dồn ở tốc độ C; chỉ
-        Average và Paeth mới phải lặp từng byte.
-        """
-        self._check_rows(raw, width, height, bpp, where)
-        stride = width * bpp
-        pixels = bytearray(width * height * bpp)
-        prev = bytearray(stride)
-        offset = 0
-        for y in range(height):
-            ftype = raw[offset]
-            line = bytearray(raw[offset + 1:offset + 1 + stride])
-            offset += 1 + stride
-            if ftype == 0:
-                pass
-            elif ftype == 1:
-                # Sub: cộng dồn theo từng kênh (cách nhau bpp byte).
-                for c in range(bpp):
-                    line[c::bpp] = bytes(
-                        v & 0xFF for v in accumulate(line[c::bpp])
-                    )
-            elif ftype == 2:
-                # Up: cộng với dòng trước, từng byte nhưng qua map (C).
-                line = bytearray(map(_add8, line, prev))
-            elif ftype == 3:
-                for i in range(stride):
-                    left = line[i - bpp] if i >= bpp else 0
-                    line[i] = (line[i] + (left + prev[i]) // 2) & 0xFF
-            else:
-                for i in range(stride):
-                    a = line[i - bpp] if i >= bpp else 0
-                    b = prev[i]
-                    c = prev[i - bpp] if i >= bpp else 0
-                    p = a + b - c
-                    pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
-                    pred = a if (pa <= pb and pa <= pc) else (
-                        b if pb <= pc else c
-                    )
-                    line[i] = (line[i] + pred) & 0xFF
-            pixels[y * stride:(y + 1) * stride] = line
-            prev = line
-        return bytes(pixels)
-
-    def _quick_transparent_edge(self, raw, width: int, height: int,
-                                bpp: int) -> bool:
-        """True nếu dòng đầu hoặc cột đầu có pixel alpha < 255.
-
-        Chỉ giải đúng chỗ cần: dòng đầu (trước đó chưa có dòng nào nên
-        giải rẻ) và cột đầu (pixel x = 0 không có hàng xóm trái, nên
-        giá trị chỉ phụ thuộc cột đầu của dòng trên). Gặp một pixel
-        trong suốt ở viền là đủ chứng minh cả hai điều kiện "có pixel
-        trong suốt" và "có pixel trong suốt ở viền", khỏi giải cả ảnh.
-        Trả False nghĩa là chưa kết luận (phải giải đủ).
-        """
-        row_len = 1 + width * bpp
-        alpha_at = bpp - 1
-        # Dòng đầu: giải đủ một dòng, prev toàn 0.
-        first = self._unfilter(
-            raw[:row_len], width, 1, bpp, ""
-        )
-        if min(first[alpha_at::bpp]) < 255:
-            return True
-        up = first[alpha_at]  # alpha cột đầu của dòng trước
-        for y in range(1, height):
-            base = y * row_len
-            ftype = raw[base]
-            v = raw[base + 1 + alpha_at]
-            if ftype == 0:
-                up = v
-            elif ftype == 1:
-                up = v  # Sub: hàng xóm trái = 0
-            elif ftype == 2:
-                up = (v + up) & 0xFF
-            elif ftype == 3:
-                up = (v + up // 2) & 0xFF
-            else:
-                up = (v + up) & 0xFF  # Paeth: a = c = 0 nên đoán = b
-            if up < 255:
-                return True
-        return False
-
-    def _check_png(self, entry: dict, path: pathlib.Path) -> None:
+    def _check_webp(self, entry: dict, path: pathlib.Path,
+                    require_alpha: bool = True) -> None:
         where = entry["file"]
-        try:
-            width, height, color_type, raw = self._read_png(path, where)
-            bpp = 2 if color_type == 4 else 4
-            # Kiểm dòng/lọc cho cả ảnh trước (giữ nguyên lỗi như cũ).
-            self._check_rows(raw, width, height, bpp, where)
-        except CheckError as exc:
-            self.fail(where, str(exc).removeprefix(f"{where}: "))
+        rgba, has_alpha = self._open_webp(path, where)
+        if rgba is None:
             return
+        width, height = rgba.size
         frame = FRAMES.get(entry["kind"])
         if frame is not None and (width, height) != frame:
             # Ghi lỗi nhưng vẫn kiểm tiếp độ trong suốt/xám để người
@@ -336,80 +201,61 @@ class Checker:
                 f"sai kích thước khung: {width}x{height}, "
                 f"loại {entry['kind']} phải là {frame[0]}x{frame[1]}",
             )
-        alpha_at = bpp - 1
-        pixels = None  # chỉ giải đủ cả ảnh khi thật sự cần
-
+        if not require_alpha:
+            return  # nền đặc: không cần kênh alpha
+        if not has_alpha:
+            self.fail(
+                where,
+                "WebP không có pixel trong suốt nào (nền đặc, không có "
+                "kênh alpha)",
+            )
+            return
+        alpha = rgba.getchannel("A")
         # Ít nhất một pixel trong suốt (ảnh không được là nền đặc) và
         # ít nhất một pixel trong suốt ở viền (lớp phải nằm trong khung,
-        # không chạm mép an toàn). Đường nhanh: ảnh thường có góc trong
-        # suốt nên dòng đầu/cột đầu đã đủ; không thì giải đủ rồi kiểm.
-        if not self._quick_transparent_edge(raw, width, height, bpp):
-            pixels = self._unfilter(raw, width, height, bpp, where)
-            alphas = pixels[alpha_at::bpp]
-            if min(alphas) == 255:
-                self.fail(where, "PNG không có pixel trong suốt nào (nền đặc)")
-                return
-            border = (
-                alphas[:width]
-                + alphas[(height - 1) * width:]
-                + alphas[::width]
-                + alphas[width - 1::width]
+        # không chạm mép an toàn).
+        if alpha.getextrema()[0] == 255:
+            self.fail(where, "WebP không có pixel trong suốt nào (nền đặc)")
+            return
+        edges = (
+            alpha.crop((0, 0, width, 1)),
+            alpha.crop((0, height - 1, width, height)),
+            alpha.crop((0, 0, 1, height)),
+            alpha.crop((width - 1, 0, width, height)),
+        )
+        if min(e.getextrema()[0] for e in edges) == 255:
+            self.fail(
+                where,
+                "WebP không có pixel trong suốt ở viền — hình chạm mép "
+                "khung, xem lại mép an toàn trong assets/templates/",
             )
-            if min(border) == 255:
+            return
+        # Lớp đổi màu phải tô xám (app nhân màu lên lớp xám): mọi pixel
+        # còn thấy được (alpha > 0) có R, G, B lệch nhau tối đa
+        # GRAY_TOLERANCE.
+        if entry.get("recolorable"):
+            r, g, b, _ = rgba.split()
+            spread = ImageChops.lighter(
+                ImageChops.lighter(
+                    ImageChops.difference(r, g), ImageChops.difference(g, b)
+                ),
+                ImageChops.difference(r, b),
+            )
+            visible = alpha.point(lambda v: 255 if v > 0 else 0)
+            bad = ImageChops.multiply(
+                spread.point(lambda v: 255 if v > GRAY_TOLERANCE else 0),
+                visible,
+            )
+            if bad.getbbox() is not None:
+                i = bad.tobytes().find(b"\xff")
+                x, y = i % width, i // width
+                pr, pg, pb, _ = rgba.getpixel((x, y))
                 self.fail(
                     where,
-                    "PNG không có pixel trong suốt ở viền — hình chạm mép "
-                    "khung, xem lại mép an toàn trong assets/templates/",
+                    "lớp đổi màu phải tô xám (R, G, B gần bằng nhau) "
+                    f"để app nhân màu được; pixel ({x}, {y}) có màu "
+                    f"({pr}, {pg}, {pb})",
                 )
-                return
-        # Lớp đổi màu phải tô xám (app nhân màu lên lớp xám). Loại màu 4
-        # (xám+alpha) mặc nhiên thỏa; loại màu 6 kiểm từng pixel còn
-        # thấy được (alpha > 0). Chỉ lớp recolorable mới tốn công này.
-        if entry.get("recolorable") and color_type == 6:
-            if pixels is None:
-                pixels = self._unfilter(raw, width, height, bpp, where)
-            alphas = pixels[3::4]
-            reds = pixels[0::4]
-            greens = pixels[1::4]
-            blues = pixels[2::4]
-            for i, (r, g, b, a) in enumerate(
-                zip(reds, greens, blues, alphas)
-            ):
-                if a == 0:
-                    continue
-                if max(r, g, b) - min(r, g, b) > GRAY_TOLERANCE:
-                    self.fail(
-                        where,
-                        "lớp đổi màu phải tô xám (R, G, B gần bằng nhau) "
-                        "để app nhân màu được; pixel "
-                        f"({i % width}, {i // width}) có màu ({r}, {g}, {b})",
-                    )
-                    return
-
-    def _check_png_background(self, entry: dict, path: pathlib.Path) -> None:
-        """Nền PNG: chỉ cần là PNG 8-bit thật, không yêu cầu alpha.
-
-        Nền là ảnh đặc (không chồng lớp) nên không cần pixel trong
-        suốt ở viền như lớp nhân vật/pet/nội thất, và được phép là
-        RGB không kênh alpha (loại màu 2). Nền PNG được phép từ A1
-        vì đường đưa ảnh base64 chỉ nhận PNG (xem docs/ASSETS.md).
-        """
-        where = entry["file"]
-        data = path.read_bytes()
-        if not data.startswith(PNG_SIG) or len(data) < 26:
-            self.fail(where, "không phải file PNG")
-            return
-        width, height, bit_depth, color_type, _, _, interlace = (
-            struct.unpack(">IIBBBBB", data[16:29])
-        )
-        if bit_depth != 8:
-            self.fail(where, f"chỉ hỗ trợ PNG 8-bit (đang là {bit_depth}-bit)")
-        if interlace != 0:
-            self.fail(where, "không dùng PNG interlaced")
-        if color_type not in (0, 2, 3, 4, 6):
-            self.fail(where, f"loại màu PNG lạ ({color_type})")
-        if width <= 0 or height <= 0:
-            self.fail(where, "kích thước PNG không hợp lệ")
 
     # -- Manifest -----------------------------------------------------------
 
@@ -623,15 +469,13 @@ class Checker:
             if not path.exists():
                 self.fail(entry["file"], "manifest ghi ready nhưng thiếu file")
                 continue
-            if entry["file"].endswith(".png"):
+            if entry["file"].endswith(".webp"):
                 # Nền màn chờ/mở đầu của lô 6 (ui_*_bg) là ảnh nền kín
                 # như nền phòng: kiểm như background (không cần alpha).
-                if entry["kind"] == "background" or (
+                solid = entry["kind"] == "background" or (
                     entry["kind"] == "ui" and entry["id"].endswith("_bg")
-                ):
-                    self._check_png_background(entry, path)
-                else:
-                    self._check_png(entry, path)
+                )
+                self._check_webp(entry, path, require_alpha=not solid)
             elif entry["file"].endswith((".jpg", ".jpeg")):
                 if not path.read_bytes().startswith(JPEG_SOI):
                     self.fail(entry["file"], "không phải file JPEG thật")

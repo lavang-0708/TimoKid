@@ -24,9 +24,10 @@ xem `docs/DESIGN.md` mục "Hướng dẫn vẽ cho họa sĩ".
 | File | Vai trò |
 | --- | --- |
 | `assets/manifest.json` | Liệt kê mọi hình: mã, loại, dáng, lớp, có đổi màu không, giá, trạng thái. Đây là danh sách duy nhất app và script cùng đọc. |
-| `tools/assets/check_assets.py` | Script kiểm tra (Python, chỉ dùng thư viện chuẩn): khung, PNG trong suốt, tên file, manifest khớp file thật. |
-| `tools/assets/check_assets_test.py` | Test cho script (21 test): JPEG báo lỗi, PNG nền đặc báo lỗi (trừ nền), file đúng qua được. |
-| `tools/assets/decode_incoming.py` | Giải mã ảnh Muse đẩy dạng base64 (xem "Đường đưa ảnh lên repo"). |
+| `tools/assets/check_assets.py` | Script kiểm tra (Python + Pillow để đọc WebP): khung, WebP trong suốt, tên file, manifest khớp file thật. |
+| `tools/assets/check_assets_test.py` | Test cho script (JPEG báo lỗi, WebP nền đặc báo lỗi (trừ nền), file đúng qua được). |
+| `tools/assets/decode_incoming.py` | Giải mã ảnh Muse đẩy dạng base64 rồi đổi sang WebP lossless (xem "Đường đưa ảnh lên repo"). |
+| `tools/assets/png_to_webp.py` | Đổi PNG sang WebP lossless (kiểm giống hệt từng pixel) — đã chạy một lần cho cả `app/assets/images/` để giảm dung lượng APK. |
 | `app/test/assets_manifest_test.dart` | Test Dart gọi script kiểm tra trong lúc chạy `flutter test` (để CI kiểm tra mà không cần sửa workflow). |
 
 ## Nhân vật toàn thân (hiện hành, E — 21/11)
@@ -44,7 +45,7 @@ từng lô ở `docs/E_IMAGES.md`.
   dáng (nghỉ, vẫy tay). PNG trong suốt khung **1024 x 1536**
   (`kidFrameWidth`/`kidFrameHeight`); chân ở y = 1429 (`kidFeetY`), người
   cao 1287 px (`kidBodyHeight`) ở mọi ảnh. Tên file:
-  `<dáng>_full_0<bộ>[_wave][_backpack].png`
+  `<dáng>_full_0<bộ>[_wave][_backpack].webp`
   (`kidFullAsset`), thư mục `app/assets/images/character/<dáng>/`;
   `kind: character_full` trong manifest.
 - **Balo = biến thể ảnh toàn thân** `..._backpack` (Muse vẽ cả người đeo
@@ -55,9 +56,9 @@ từng lô ở `docs/E_IMAGES.md`.
 - **Mắt nhắm (chớp mắt)**: một miếng vá PNG đặt đè lên ảnh khi chớp
   (~0,25 giây mỗi ~3,6 giây), rect tính theo khung 1024x1536
   (`kidEyePatch`). Bé gái: một patch dùng chung cả 6 ảnh
-  (`girl_eyes_closed_patch.png`, rect 300,490,410x140). Bé trai: patch
-  chung cho 3 ảnh nghỉ (`boy_eyes_closed_patch.png`, rect 291,506,432x205);
-  mỗi ảnh vẫy một patch riêng (`boy_eyes_closed_patch_0<bộ>_wave.png`,
+  (`girl_eyes_closed_patch.webp`, rect 300,490,410x140). Bé trai: patch
+  chung cho 3 ảnh nghỉ (`boy_eyes_closed_patch.webp`, rect 291,506,432x205);
+  mỗi ảnh vẫy một patch riêng (`boy_eyes_closed_patch_0<bộ>_wave.webp`,
   rect riêng: 297,493,427x245 / 280,502,441x243 / 295,495,432x250) vì đầu
   vẽ lại lệch vài px. `kind: character_patch`.
 - **Phụ kiện đầu** (lớp phủ cùng khung, `kidHeadAccessories`): mã `hat`
@@ -70,7 +71,7 @@ từng lô ở `docs/E_IMAGES.md`.
   `kid_backpack`. Tất cả do `KidLookService` đọc/ghi theo từng bé; bộ đồ
   đổi qua `setOutfit` (ghi lại `CharacterProfile.dress`).
 - **Khung đi bộ**: mỗi bộ đồ 2 hướng × 4 khung (`kidWalkFrames`):
-  `<dáng>_full_0<bộ>_walk_(dr|ur)_(a|b|c|d).png`; `dr` = đi xuống/ngang,
+  `<dáng>_full_0<bộ>_walk_(dr|ur)_(a|b|c|d).webp`; `dr` = đi xuống/ngang,
   `ur` = đi lên (xa dần), vẽ hướng phải, app lật ngang khi đi sang trái
   (`facingLeft`). Cả gái và trai đều có (`kidGendersWithWalkFrames`). Mỗi
   khung là một ảnh toàn thân hoàn chỉnh; đổi khung theo chu kỳ 600 ms.
@@ -141,15 +142,15 @@ vai y = 716, mặt đất y = 1400, mép an toàn là hình chữ nhật
 
 Mã (`id`) của mỗi mục **trùng với tên file** (không tính đuôi):
 
-- Lớp nhân vật: `<dáng>_<lớp>_<tên món>.png`, ví dụ
-  `girl_hair_front_bob.png`, `girl_top_tshirt.png`. Thư mục:
+- Lớp nhân vật: `<dáng>_<lớp>_<tên món>.webp`, ví dụ
+  `girl_hair_front_bob.webp`, `girl_top_tshirt.webp`. Thư mục:
   `app/assets/images/character/<dáng>/` (`girl` hoặc `boy`).
-- Pet: `<loài>_<giai đoạn>.png` với loài `dog`/`cat`/`rabbit`, giai đoạn
-  `egg`/`newborn`/`teen`/`adult`, ví dụ `dog_egg.png`. Thư mục:
+- Pet: `<loài>_<giai đoạn>.webp` với loài `dog`/`cat`/`rabbit`, giai đoạn
+  `egg`/`newborn`/`teen`/`adult`, ví dụ `dog_egg.webp`. Thư mục:
   `app/assets/images/pets/`.
-- Đồ vật: `app/assets/images/items/<tên món>.png`.
-- Nội thất: `app/assets/images/furniture/<tên món>.png`.
-- Nền: `app/assets/images/backgrounds/<tên>.jpg` hoặc `.png`.
+- Đồ vật: `app/assets/images/items/<tên món>.webp`.
+- Nội thất: `app/assets/images/furniture/<tên món>.webp`.
+- Nền: `app/assets/images/backgrounds/<tên>.jpg` hoặc `.webp`.
 - Icon: `app/assets/images/icons/<tên>.svg` (icon cũ ở gốc
   `app/assets/images/` vẫn hợp lệ).
 
@@ -162,7 +163,7 @@ Mã (`id`) của mỗi mục **trùng với tên file** (không tính đuôi):
   (R, G, B lệch nhau tối đa 8).
 - Nét viền và chi tiết không đổi màu (khuy áo, họa tiết cố định, mi
   mắt, viền miệng) xuất thành file riêng, tên thêm đuôi `_line`, ví dụ
-  `girl_top_tshirt_line.png`. File `_line` cùng lớp và cùng z với file
+  `girl_top_tshirt_line.webp`. File `_line` cùng lớp và cùng z với file
   gốc, app vẽ ngay sau file gốc. Trong manifest, file `_line` là một
   mục riêng (`line: true`, `recolorable: false`); file gốc không bắt
   buộc phải có `_line` đi kèm — chỉ liệt kê khi món đó thật sự có nét
@@ -201,10 +202,10 @@ Mã (`id`) của mỗi mục **trùng với tên file** (không tính đuôi):
 - **Dáng nữ** (29 mục, `planned`): thân ×1 (+ viền), mắt ×3 (+ viền),
   miệng ×3 (+ viền), tóc ×3 kiểu (sau + trước), áo ×3, quần/váy ×2,
   giày ×1, phụ kiện đầu ×2 (nơ/kẹp tóc, mũ phù thủy), phụ kiện tay ×1
-  (ô dù). Tên món mắt/miệng lấy từ tấm `eyes_mouths_gray.png` đã xem:
+  (ô dù). Tên món mắt/miệng lấy từ tấm `eyes_mouths_gray.webp` đã xem:
   mắt mi dài (×2 kiểu) và mắt tròn; miệng cười, miệng cười hở,
   miệng chữ O. Tên món trang phục để dạng `top_01`… vì chưa xem tấm
-  `girl_outfits_gray.png` — người cắt giữ nguyên mã, chỉ điền tên
+  `girl_outfits_gray.webp` — người cắt giữ nguyên mã, chỉ điền tên
   hiển thị (`name_vi`) cho đúng món đã cắt.
 - **Pet** (12 mục, `planned`): 3 trứng (Chó Tinh Anh, Mèo Mũm Mĩm,
   Thỏ Bánh Bao) + 3 pet mới nở + 3 giai đoạn nhỡ + 3 giai đoạn lớn.
@@ -212,7 +213,7 @@ Mã (`id`) của mỗi mục **trùng với tên file** (không tính đuôi):
 - **Dáng nam** (24 mục, `planned`): thân, mắt, miệng, tóc ×2 kiểu,
   trang phục — vẽ dần sau dáng nữ.
 - **Nền** (2 mục, `planned`): `room_01.jpg`, `town_01.jpg`.
-- **Nền phòng v2 + nội thất (A1, 20/11, `ready`)**: `room_v2.png` +
+- **Nền phòng v2 + nội thất (A1, 20/11, `ready`)**: `room_v2.webp` +
   8 món đồ rời (xem mục "Phòng v2" cuối tài liệu).
 - **Icon khu Thị trấn** (5 mục, `ready`): `area_logic`,
   `area_arith`, `area_number`, `area_geo`, `area_comb` (SVG, T1-12).
@@ -226,6 +227,14 @@ Mã (`id`) của mỗi mục **trùng với tên file** (không tính đuôi):
    báo `OK`. Nếu báo lỗi, sửa file hoặc dòng manifest theo đúng
    thông báo (sai khung, thiếu alpha, tên sai, thiếu file…).
 
+## Định dạng ảnh trong repo
+
+Mọi ảnh trong `app/assets/images/` là **WebP lossless** (đuôi `.webp`),
+không còn PNG: giống hệt từng pixel (pixel trong suốt hoàn toàn có thể
+mất RGB, vô hình) nhưng nhỏ hơn nhiều. Muse vẫn vẽ và giao PNG; PNG
+chỉ là định dạng trung gian, `decode_incoming.py` đổi sang WebP. Chạy
+thủ công: `python3 tools/assets/png_to_webp.py` (cần Pillow).
+
 ## Đường đưa ảnh lên repo
 
 Muse không đẩy được file nhị phân qua GitHub MCP. Ảnh PNG đưa lên
@@ -235,7 +244,8 @@ bằng đường vòng base64 (chủ dự án chốt 19/11):
    <đường dẫn đích>.b64` (nội dung chỉ một chuỗi base64 của PNG),
    vài file mỗi lần push nếu file lớn.
 2. Claude chạy `python3 tools/assets/decode_incoming.py` trên nhánh
-   PR: script giải mã thành PNG đúng đường dẫn, xóa file `.b64` và
+   PR: script giải mã PNG, đổi sang WebP lossless (đuôi `.webp`) đúng
+   đường dẫn, xóa file `.b64` và
    commit lên cùng nhánh.
 3. Ảnh xem trước gửi qua chat cho Claude và chủ dự án duyệt mắt
    trước khi đẩy cả bộ.
@@ -278,14 +288,14 @@ Chủ dự án đã duyệt phong cách v2 ngày 20/11: 3D mềm (mặt sáng/t�
 1 điểm tụ. Nền + 8 đồ rời vẽ mới bằng AI theo `docs/DESIGN.md`,
 `source` trong manifest ghi "Muse vẽ AI 20/11 theo DESIGN.md".
 
-- **Nền** `app/assets/images/backgrounds/room_v2.png`: PNG 1600x900
+- **Nền** `app/assets/images/backgrounds/room_v2.webp`: PNG 1600x900
   (không phải JPEG — đường đưa ảnh base64 chỉ nhận PNG nên nền đẩy
   dạng PNG; script kiểm tra đã cho phép nền PNG từ A1, xem
   `tools/assets/check_assets.py`). Phòng trống, phối cảnh 1 điểm tụ:
   cửa sổ lớn ở tường sau (x ~480–1120, y ~190–610 trong ảnh 1600x900),
   sàn gỗ bắt đầu y ~620, hai tường bên hồng. App vẽ nền bằng
   `Image.asset` với `BoxFit.cover`.
-- **Đồ rời** `app/assets/images/furniture/<tên>.png`: PNG trong suốt
+- **Đồ rời** `app/assets/images/furniture/<tên>.webp`: PNG trong suốt
   512x512, `kind: furniture`, `status: ready`. Mép đáy của món
   (ground line) là mốc đặt đồ xuống sàn — app neo món đồ theo mép
   đáy rồi vẽ bóng ngay dưới mốc đó. Vị trí đáy trong ảnh 512x512
@@ -327,14 +337,14 @@ mềm, nhà xa mờ dần, đủ chi tiết (cây, hoa, đèn, xe, người nh�
 Nền + 10 lớp động vẽ mới bằng AI theo `docs/DESIGN.md`, `source`
 trong manifest ghi "Muse vẽ AI 20/11 theo DESIGN.md".
 
-- **Nền** `app/assets/images/backgrounds/town_v2.png`: PNG 1600x900
+- **Nền** `app/assets/images/backgrounds/town_v2.webp`: PNG 1600x900
   (đủ màu là 1.984.654 byte > 1 MB nên lượng tử hóa 256 màu +
   dithering Floyd-Steinberg, còn 581.584 byte; xem bằng mắt không
   thấy nhiễu ở cỡ hiển thị). Nền cũ `town_01.jpg` giữ `planned`
   trong manifest (chưa dùng). App vẽ nền bằng `Image.asset` với
   `BoxFit.fill` trong khung 16/9 — KHÔNG dùng `cover` như màn
   Phòng, vì `cover` cắt nền sẽ làm lệch vùng bấm.
-- **Lớp động** `app/assets/images/town/<tên>.png`: PNG trong suốt
+- **Lớp động** `app/assets/images/town/<tên>.webp`: PNG trong suốt
   512x512, `kind: town_layer` (loại mới thêm ở A2 — xem
   `tools/assets/check_assets.py`: `KINDS`, `FRAMES`, `NAME_PATTERNS`,
   `KIND_DIRS`), `status: ready`. 10 lớp: mây trắng ×3 (`cloud_01`,
@@ -417,23 +427,23 @@ trên đường để xe/người đi. Nền + 17 lớp động vẽ mới bằn
 `docs/DESIGN.md`, `source` trong manifest ghi "Muse vẽ AI 21/11
 theo DESIGN.md".
 
-- **Nền** `app/assets/images/backgrounds/town_v3.png`: PNG 1600x900
+- **Nền** `app/assets/images/backgrounds/town_v3.webp`: PNG 1600x900
   (678.089 byte — lượng tử hóa 256 màu + dithering Floyd-Steinberg
   vì đủ màu vượt 1 MB). Đường + vỉa hè TRỐNG (không vẽ sẵn xe hay
   người — app vẽ lớp động chạy theo đường); giữ đúng bố cục 6 công
-  trình như ảnh xem trước v3b đã duyệt. Nền v2 `town_v2.png` giữ
+  trình như ảnh xem trước v3b đã duyệt. Nền v2 `town_v2.webp` giữ
   `ready` trong manifest (file vẫn còn, không dùng nữa — như tiền
   lệ `town_01.jpg`). App vẽ nền bằng `Image.asset` với
   `BoxFit.fill` trong khung 16/9 — KHÔNG dùng `cover` như màn
   Phòng, vì `cover` cắt nền sẽ làm lệch vùng bấm.
-- **Lớp động** `app/assets/images/town/<tên>.png`: PNG trong suốt
+- **Lớp động** `app/assets/images/town/<tên>.webp`: PNG trong suốt
   512x512, `kind: town_layer`, `status: ready`. 17 lớp: mây trắng
   ×3 (`cloud_01`, `cloud_02`, `cloud_03`), xe hơi ×4 (`car_01_dr`,
   `car_01_ur`, `car_02_dr`, `car_02_ur`), người ×8 (`person_01`,
   `person_02` × `dr`/`ur` × khung bước chân `a`/`b`), cây ×2
   (`tree_01` xanh tán tròn, `tree_02` hoa anh đào). KHÔNG còn đài
   phun nước (thị trấn v3b có ao, không có đài phun) — file
-  `fountain.png` + dòng manifest giữ nguyên (file vẫn còn).
+  `fountain.webp` + dòng manifest giữ nguyên (file vẫn còn).
   4 file nhìn ngang cũ (`car_01`, `car_02`, `person_01`,
   `person_02`) không dùng nữa: đã XÓA KHỎI MANIFEST, file vẫn còn
   trên nhánh — Claude `git rm` (xem HANDOVER); tới lúc đó
@@ -495,7 +505,7 @@ Nhà hồng không phải khu toán: bấm vào thì về Phòng
 ### Đường đi C1/C2 (khung nền 1600x900)
 
 Khai báo trong `app/lib/features/town/town_roads.dart` (`townRoads`).
-Nền `town_v3.png` chỉ có **hai đường chéo cắt nhau ở ngã tư lớn
+Nền `town_v3.webp` chỉ có **hai đường chéo cắt nhau ở ngã tư lớn
 (~(1090, 650))**, nên app dùng đúng hai đoạn đường thẳng, đo từ mặt
 nhựa thật của nền (nửa rộng mặt nhựa ~32 px + vỉa hè ~28 px). Bộ 6
 đoạn D1–D6 từng khai báo ở PR #31 (và còn trong nhật ký
@@ -520,7 +530,7 @@ Tuyến xe/người (tới-lui ping-pong; tọa độ tâm chân/bánh):
 | Người 1 (bé gái) `walker1Route` | (820, 785) ↔ (1250, 570) | tâm C2 | vẽ lệch xuống vỉa hè 46 px |
 | Người 2 (bé trai) `walker2Route` | (1150, 681) ↔ (1540, 874) | tâm C1 | vẽ lệch xuống vỉa hè 46 px |
 
-Xe 1 đã đối chiếu từng điểm (mỗi 5 px) với mặt nhựa của `town_v3.png`:
+Xe 1 đã đối chiếu từng điểm (mỗi 5 px) với mặt nhựa của `town_v3.webp`:
 chỉ lệch ở vạch qua đường của ngã tư (chú thích `car1Route`). Tuyến
 được khóa bằng test `town_roads_test.dart` (điểm đầu/cuối từng tuyến,
 hướng ở t = 0, không cắt rect chân công trình).
@@ -647,13 +657,13 @@ bằng AI theo `docs/DESIGN.md`, `source` trong manifest ghi
 "Muse vẽ AI 21/11 theo DESIGN.md". Chi tiết từng món (vị trí, điểm
 neo, tỉ lệ, rect món trong nền) xem `docs/D_IMAGES.md`.
 
-- **Nền** `app/assets/images/backgrounds/room_v3.png`: PNG 1600x900
+- **Nền** `app/assets/images/backgrounds/room_v3.webp`: PNG 1600x900
   RGB, **694.028 byte** (ảnh gốc 2048x1152 resize về 1600x900,
   lượng tử hóa 256 màu + dithering Floyd–Steinberg — cùng cách làm
   PR #26 và PR (C)). Giường + gối + gấu, đèn sao, bàn học + cốc +
   bình hoa, kệ sách, tủ quần áo, thảm tròn, chậu cây, cửa sổ +
   bóng nắng trên sàn gỗ còn nguyên, không cắt cụt.
-- **Đồ rời** `app/assets/images/furniture/<tên>_v3.png`: PNG trong
+- **Đồ rời** `app/assets/images/furniture/<tên>_v3.webp`: PNG trong
   suốt 512x512, `kind: furniture`, `status: ready`, tỉ lệ bán trong
   suốt 0,00% cả 5 món. KHÔNG cắt từ nền (viền mềm/phát sáng/tương
   phản thấp nên cắt không sạch) — vẽ riêng rồi đặt đúng vị trí để
@@ -737,7 +747,7 @@ giai đoạn nên hộp vẽ = chiều cao thân × 512/400 (`petBoxSize`).
 - Nhỡ 58% là cỡ chủ dự án chốt "tạm thời để vậy xem sao". Bảng 33/43/58/69%
   trong `docs/E_IMAGES.md` là đề xuất của giai đoạn vẽ, đã bị thay bằng
   bảng này. Mã tên giai đoạn: `egg`/`newborn`/`teen`/`adult` (khớp tên
-  file `<loài>_<giai đoạn>.png`).
+  file `<loài>_<giai đoạn>.webp`).
 
 ### Đi lại trong Phòng (G, `app/lib/features/room/room_walk.dart`)
 
@@ -784,7 +794,7 @@ room_walk_test.dart`; `room_screen.dart` chỉ gọi `roomWalkTarget` /
   món trong nền (dung sai 2 px), chân nhân vật/pet trên sàn, dấu
   chân chạm sàn.
 - **Manifest**: thêm 6 mục v3b (nền + 5 món) → 107 mục lúc đó (nay 192, sau các lô nhân vật toàn thân);
-  `check_assets.py` xanh. File + mục manifest v2 (`room_v2.png` +
-  8 món, không dùng nữa) GIỮ NGUYÊN như tiền lệ `town_v2.png`
+  `check_assets.py` xanh. File + mục manifest v2 (`room_v2.webp` +
+  8 món, không dùng nữa) GIỮ NGUYÊN như tiền lệ `town_v2.webp`
   (xóa mục khi file còn sẽ làm check fail); Claude có thể `git rm`
   file + mục v2 sau (xem "Việc còn lại" trong PR (D)).

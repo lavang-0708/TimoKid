@@ -82,8 +82,8 @@ class QuestConfig {
   static const int maxStreakLookbackDays = 400;
 
   /// Ảnh, chỉ dùng khi [questArtReady].
-  static const String boardAsset = 'assets/images/ui/ui_quest_board.png';
-  static const String checkAsset = 'assets/images/ui/ui_quest_check.png';
-  static const String flameAsset = 'assets/images/ui/ui_streak_flame.png';
-  static const String chestAsset = 'assets/images/ui/ui_streak_chest.png';
+  static const String boardAsset = 'assets/images/ui/ui_quest_board.webp';
+  static const String checkAsset = 'assets/images/ui/ui_quest_check.webp';
+  static const String flameAsset = 'assets/images/ui/ui_streak_flame.webp';
+  static const String chestAsset = 'assets/images/ui/ui_streak_chest.webp';
 }

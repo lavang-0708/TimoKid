@@ -43,7 +43,7 @@ double petBoxSize(PetStage stage, {String? species}) =>
 
 /// Đường dẫn ảnh pet theo loài + giai đoạn.
 String petAsset(String species, PetStage stage) =>
-    'assets/images/pets/${species}_${stage.name}.png';
+    'assets/images/pets/${species}_${stage.name}.webp';
 
 /// Giai đoạn của pet ĐÃ NỞ theo số câu đúng tích lũy [xp].
 PetStage petStageForXp(int xp) {

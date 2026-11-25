@@ -54,18 +54,18 @@ void main() {
       expect(dragonUsesArt(PetStage.teen, artReady: true), isFalse);
       expect(
         dragonFxAssets(DragonAction.fire).first,
-        endsWith('dragon_fire_1.png'),
+        endsWith('dragon_fire_1.webp'),
       );
       expect(
         dragonFxAssets(DragonAction.water).last,
-        endsWith('dragon_water_4.png'),
+        endsWith('dragon_water_4.webp'),
       );
       expect(dragonFxAssets(DragonAction.fly), hasLength(4));
       expect(
         dragonFxAssets(DragonAction.fly).first,
-        endsWith('dragon_fly_a.png'),
+        endsWith('dragon_fly_a.webp'),
       );
-      expect(dragonAuraAsset, endsWith('dragon_aura.png'));
+      expect(dragonAuraAsset, endsWith('dragon_aura.webp'));
     });
 
     test('khung phun 120 ms, khung 3 giữ thêm', () {

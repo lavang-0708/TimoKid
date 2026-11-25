@@ -6,12 +6,12 @@
 /// (kèm dòng manifest) rồi đổi cờ tương ứng thành `true`; không phải
 /// sửa chỗ khác.
 ///
-/// - [eggCrackArtReady]: `{loài}_egg_crack_1..3.png` (trứng nứt 3
-///   bước), `{loài}_shell_bottom.png`, `{loài}_shell_top.png`
-///   (512x512, cùng khung `{loài}_egg.png`). Màn nở dùng chúng thay
+/// - [eggCrackArtReady]: `{loài}_egg_crack_1..3.webp` (trứng nứt 3
+///   bước), `{loài}_shell_bottom.webp`, `{loài}_shell_top.webp`
+///   (512x512, cùng khung `{loài}_egg.webp`). Màn nở dùng chúng thay
 ///   cho vết nứt vẽ bằng CustomPaint + hai nửa vỏ cắt từ ảnh trứng.
-/// - [petMotionArtReady]: `{loài}_{giai đoạn}_walk_a..d.png` (4 khung
-///   đi), `_happy.png` (vui khi bấm), `_sit.png` (ngồi), giai đoạn là
+/// - [petMotionArtReady]: `{loài}_{giai đoạn}_walk_a..d.webp` (4 khung
+///   đi), `_happy.webp` (vui khi bấm), `_sit.webp` (ngồi), giai đoạn là
 ///   newborn/teen/adult, 512x512 cùng khung ảnh đứng `petAsset`. Pet
 ///   trong Phòng dùng khung thật thay cho nhún bằng code.
 library;
@@ -35,13 +35,13 @@ bool petHasMotionArt(String species, PetStage stage) =>
 
 /// Trứng nứt bước [step] (1–3).
 String eggCrackAsset(String species, int step) =>
-    'assets/images/pets/${species}_egg_crack_$step.png';
+    'assets/images/pets/${species}_egg_crack_$step.webp';
 
 /// Nửa vỏ trên (bay đi) / nửa vỏ dưới (ở lại rồi mờ).
 String shellTopAsset(String species) =>
-    'assets/images/pets/${species}_shell_top.png';
+    'assets/images/pets/${species}_shell_top.webp';
 String shellBottomAsset(String species) =>
-    'assets/images/pets/${species}_shell_bottom.png';
+    'assets/images/pets/${species}_shell_bottom.webp';
 
 String _petBase(String species, PetStage stage) =>
     'assets/images/pets/${species}_${stage.name}';
@@ -49,11 +49,11 @@ String _petBase(String species, PetStage stage) =>
 /// 4 khung đi a..d của pet.
 List<String> petWalkAssets(String species, PetStage stage) => [
   for (final f in const ['a', 'b', 'c', 'd'])
-    '${_petBase(species, stage)}_walk_$f.png',
+    '${_petBase(species, stage)}_walk_$f.webp',
 ];
 
 String petHappyAsset(String species, PetStage stage) =>
-    '${_petBase(species, stage)}_happy.png';
+    '${_petBase(species, stage)}_happy.webp';
 
 String petSitAsset(String species, PetStage stage) =>
-    '${_petBase(species, stage)}_sit.png';
+    '${_petBase(species, stage)}_sit.webp';

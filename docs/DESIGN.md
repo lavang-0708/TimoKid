@@ -216,7 +216,7 @@ Mọi lớp của nhân vật được vẽ trên cùng một khung hình và xu
 - Mỗi lớp là một file PNG nền trong suốt, đúng kích thước khung, chỉ chứa phần của lớp đó ở đúng vị trí. JPEG chỉ dùng cho hình nền phòng và thị trấn, vì JPEG không có nền trong suốt nên không chồng lớp được.
 - Phần cần đổi màu (da, tóc, mắt, miệng, vải quần áo) tô một màu xám sáng duy nhất, bóng đổ dùng xám đậm hơn. App nhân màu lên lớp xám này.
 - Nét viền và chi tiết không đổi màu (khuy áo, họa tiết cố định) xuất thành file riêng đặt tên thêm đuôi `_line`.
-- Tên file: `<dáng>_<lớp>_<tên món>.png`, ví dụ `girl_hair_front_bob.png`, `girl_top_tshirt.png`, `girl_top_tshirt_line.png`.
+- Tên file: `<dáng>_<lớp>_<tên món>.webp`, ví dụ `girl_hair_front_bob.webp`, `girl_top_tshirt.webp`, `girl_top_tshirt_line.webp`.
 - Pet và đồ vật: 512 x 512 px, PNG nền trong suốt, mỗi hình một file.
 
 ### Thứ tự lớp, từ dưới lên

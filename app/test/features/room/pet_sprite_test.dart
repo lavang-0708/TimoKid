@@ -202,18 +202,18 @@ void main() {
     expect(petHasMotionArt('dog', PetStage.newborn), isTrue);
     expect(petHasMotionArt('dog', PetStage.teen), isTrue);
     expect(petWalkAssets('cat', PetStage.teen), [
-      'assets/images/pets/cat_teen_walk_a.png',
-      'assets/images/pets/cat_teen_walk_b.png',
-      'assets/images/pets/cat_teen_walk_c.png',
-      'assets/images/pets/cat_teen_walk_d.png',
+      'assets/images/pets/cat_teen_walk_a.webp',
+      'assets/images/pets/cat_teen_walk_b.webp',
+      'assets/images/pets/cat_teen_walk_c.webp',
+      'assets/images/pets/cat_teen_walk_d.webp',
     ]);
     expect(
       petHappyAsset('rabbit', PetStage.adult),
-      'assets/images/pets/rabbit_adult_happy.png',
+      'assets/images/pets/rabbit_adult_happy.webp',
     );
     expect(
       petSitAsset('dog', PetStage.newborn),
-      'assets/images/pets/dog_newborn_sit.png',
+      'assets/images/pets/dog_newborn_sit.webp',
     );
   });
 }

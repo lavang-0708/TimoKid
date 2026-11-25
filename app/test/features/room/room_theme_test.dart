@@ -162,11 +162,11 @@ void main() {
   test('ảnh nội thất theo chủ đề', () {
     expect(
       roomThemeFurnitureAsset('tet', 'noi_nha_pet'),
-      'assets/images/furniture/tet_nha_pet.png',
+      'assets/images/furniture/tet_nha_pet.webp',
     );
     expect(
       roomThemeFurnitureAsset(roomThemeClassic, 'noi_nha_pet'),
-      'assets/images/furniture/noi_nha_pet.png',
+      'assets/images/furniture/noi_nha_pet.webp',
     );
   });
 }

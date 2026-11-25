@@ -251,7 +251,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
             child: DecoratedBox(
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/images/backgrounds/shop_bg.png'),
+                  image: AssetImage('assets/images/backgrounds/shop_bg.webp'),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -298,14 +298,14 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
           children: [
             GameStat(
               icon: Icons.monetization_on_rounded,
-              image: '$uiArt/ui_coin.png',
+              image: '$uiArt/ui_coin.webp',
               color: const Color(0xFFF5B83D),
               text: '$_xu',
               textKey: const Key('shop-xu-balance'),
             ),
             GameStat(
               icon: Icons.diamond_rounded,
-              image: '$uiArt/ui_gem.png',
+              image: '$uiArt/ui_gem.webp',
               color: const Color(0xFFA07BE0),
               text: '$_gems',
               textKey: const Key('shop-gem-balance'),
@@ -449,12 +449,12 @@ class _TabPill extends StatelessWidget {
     final iconColor = selected ? gameInk : const Color(0xFF8E6FD8);
     final icon = switch (category) {
       ShopCategory.outfits => Image.asset(
-        '$uiArt/ui_icon_clothes.png',
+        '$uiArt/ui_icon_clothes.webp',
         width: 30,
         height: 30,
       ),
       ShopCategory.pet => Image.asset(
-        '$uiArt/ui_icon_pet_items.png',
+        '$uiArt/ui_icon_pet_items.webp',
         width: 30,
         height: 30,
       ),
@@ -558,7 +558,7 @@ class ShopItemArt extends StatelessWidget {
       final ready = newPetArtReady[item.species] ?? false;
       final egg = ready
           ? Image.asset(
-              'assets/images/pets/${item.species}_egg.png',
+              'assets/images/pets/${item.species}_egg.webp',
               fit: BoxFit.contain,
               errorBuilder: (_, _, _) => const _EggIcon(),
             )
@@ -644,7 +644,7 @@ class _Price extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Image.asset(
-          item.usesGems ? '$uiArt/ui_gem.png' : '$uiArt/ui_coin.png',
+          item.usesGems ? '$uiArt/ui_gem.webp' : '$uiArt/ui_coin.webp',
           width: size + 6,
           height: size + 6,
         ),
@@ -831,7 +831,7 @@ class _ItemCard extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Image.asset(
-              owned ? '$uiArt/ui_card_selected.png' : '$uiArt/ui_card.png',
+              owned ? '$uiArt/ui_card_selected.webp' : '$uiArt/ui_card.webp',
               fit: BoxFit.fill,
             ),
           ),
@@ -1045,7 +1045,7 @@ class _BoughtBanner extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset('$uiArt/ui_star.png', width: 36, height: 36),
+          Image.asset('$uiArt/ui_star.webp', width: 36, height: 36),
           const SizedBox(width: 8),
           Flexible(
             child: Text('Mua xong!', maxLines: 1, style: gameOutlinedText(30)),

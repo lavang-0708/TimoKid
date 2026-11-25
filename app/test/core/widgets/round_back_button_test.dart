@@ -53,7 +53,7 @@ void main() {
     );
     expect(
       (image.image as AssetImage).assetName,
-      'assets/images/ui/ui_btn_back.png',
+      'assets/images/ui/ui_btn_back.webp',
     );
   });
 
