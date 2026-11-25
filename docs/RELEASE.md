@@ -1,7 +1,11 @@
 # Phát hành APK TimoKid
 
 Mỗi lần gắn tag `v*` (ví dụ `v0.1.0`) lên `main`, workflow `.github/workflows/release.yml`
-tự build APK release đã ký bằng keystore riêng và tạo GitHub Release kèm file APK.
+tự build APK release đã ký bằng keystore riêng và tạo GitHub Release kèm 1 file APK.
+
+APK chỉ build cho chip **arm64** (`--target-platform android-arm64`) để file nhỏ hơn:
+chạy trên gần như mọi điện thoại, máy tính bảng Android 8 năm gần đây. Chủ dự án chọn
+bỏ bản arm32 (máy rất cũ 32-bit) vì không dùng tới.
 
 ## Chuẩn bị một lần: keystore và 4 secrets
 

@@ -89,8 +89,9 @@ jobs:
             defines="--dart-define=TEST_UNLOCKS=true --dart-define=QA_MENU=true"
             echo "Bản thử: $defines"
           fi
-          flutter build apk --release --build-name="$name" --build-number="$code" $defines
+          flutter build apk --release --target-platform android-arm64 --build-name="$name" --build-number="$code" $defines
 
+      # Chỉ build cho chip arm64 (gần như mọi máy Android 8 năm gần đây).
       - name: Đổi tên APK theo tag
         run: cp build/app/outputs/flutter-apk/app-release.apk "build/TimoKid-${GITHUB_REF_NAME}.apk"
 
