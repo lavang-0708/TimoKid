@@ -4468,3 +4468,304 @@ lều tối như bản duyệt.
   (mục `files_to_push`).
 
 Chưa decode (chờ Claude decode).
+
+### Lô 15 — Phòng Tết: nền trống + 7 sprite lớn + 8 món mua thêm + 5 món nhỏ vẽ mới (25/11/2026, ĐÃ KIỂM TRA + GHÉP bởi điều phối viên, chưa đẩy GitHub, chưa chạm doc repo)
+
+Đích: nền `app/assets/images/backgrounds/room_tet.png`; 7 sprite lớn
+`app/assets/images/furniture/tet_<giuong|tu_dau_giuong|tu_ao|ban_hoc|ghe|ke_lon|tham>.png`;
+8 món mua thêm `app/assets/images/furniture/tet_<nha_pet|ke_sach|be_ca|cay_cao|ghe_luoi|leu|den_trang|tranh>.png`;
+5 món nhỏ `app/assets/images/furniture/tet_<gau_bong|den_sao|chau_cay|binh_hoa|coc_sao>.png`.
+Cả 21 file đều MỚI (không dùng lại file _v3 nào — khác phòng gốc v4, nơi 5 món
+nhỏ _v3 đã có sẵn trên nhánh nên không đẩy lại). Phòng Tết làm theo BRIEF MỚI
+(25/11) như phòng gốc: nền TRỐNG hoàn toàn (không đồ đứng trên sàn, không bóng
+đổ của đồ — app tự vẽ bóng mềm dưới chân từng món), đồ là SPRITE RỜI để bé
+kéo-thả tự sắp xếp; món mua về THAY VÀO chỗ món cũ chứ không đè lên đồ vẽ sẵn
+trong nền như trước. Bố cục mặc định theo phòng gốc đã sửa theo 9 quyết định
+Claude 25/11 ~21:30, với 5 điểm khác của Tết (xem mục "Ảnh ghép xem trước").
+**Kiểm tra độc lập:** điều phối viên đo lại toàn bộ 21 file bằng code
+(byte + SHA-256 + bbox + chân + magenta 4 thước + semi + số màu + lỗ kín):
+byte/SHA khớp 21/21, bbox khớp 21/21, magenta 0/0/0 ở cả 21 file, semi = 0 ở
+cả 21 file; chỉ còn 1 lệch duy nhất — dòng `white_rim_px=5` của tủ đầu giường
+trong `sprites_report.json` `_summary` là số cũ/sai (per-file = 0,
+`verify_large.json` = 0, đo lại = 0).
+
+- Nền trống: giữ phối cảnh, góc nhìn và vùng sàn như room_v3 (cửa sổ giữa,
+  tường sau kem ấm, tường 2 bên kem, sàn gỗ); chỉ có tường, sàn, cửa sổ +
+  rèm đỏ + voan trắng, trần, đèn trần mây + 4 đèn lồng đỏ, 2 câu đối, kệ mây
+  + bao lì xì trên tường trái. **Không** giường/tủ/bàn/ghế/kệ/thảm/cây mai/
+  tranh Đông Hồ/két sưởi vẽ sẵn — cây mai là sprite rời `tet_cay_cao`, tranh
+  là sprite rời `tet_tranh`.
+- 7 sprite lớn vẽ mới, thiết kế theo đồ trong room_v3 nhưng đổi tông đỏ–vàng
+  Tết, cùng phối cảnh 3/4 và cùng hướng sáng trên-trái với nền để ghép vào
+  trông liền khối.
+- 8 món mua thêm: 3 món copy nguyên bản preview đã duyệt (nhà pet, đèn
+  trăng, tranh — byte-identical, không vẽ lại) + 5 món vẽ mới (kệ sách, bể
+  cá, cây mai, ghế lưới, lều), khớp đúng bbox/chân món gốc lô 10 cùng chỗ.
+- 5 món nhỏ: VẼ MỚI hoàn toàn (gấu kem khăn đỏ, đèn lồng đỏ, chậu mai vàng,
+  bình đỏ hoa mai, cốc đỏ sao vàng) — rõ Tết hơn bản _v3, khớp đúng
+  bbox/chân bản _v3 cùng chỗ.
+
+## Cách làm
+
+- Nền (`room_tet.png`, 1600×900, opaque, MEDIANCUT 256 màu): vẽ gen1 bằng
+  media.generate_image từ preview/room_tet.png (bỏ hết đồ đạc, giữ cửa sổ/
+  rèm đỏ/câu đối/kệ mây/đèn lồng/đèn trần), rồi grid-warp toàn bộ về lưới mốc
+  room_v3 (phương pháp v4). Tường phải gen1 ĐỎ ĐẬM nguyên bức (không có trong
+  preview — phải preview bị tủ áo/kệ sách che kín) nên recolor bằng code về
+  kem ấm (205,182,152) × factor 0,85–1,05 theo độ sáng gốc, giữ biến thiên
+  sáng/tối; chân tường đỏ giữ lại làm phào đỏ. Thử mask theo MÀU thất bại
+  (vùng sáng tường đỏ có G~150 nên sót lại thành đảo đỏ loang lổ, đồng thời
+  vân gỗ sẫm trên sàn trùng test đỏ nên bị ăn mất) — đã bỏ, quay về mask HÌNH
+  HỌC. Mốc đo bằng code + soi mắt: khung kính x622–928/y135–461 (v3
+  x633–917/y136–446, lệch ≤15 px); đỉnh thanh rèm y~60–70; mép sàn giữa y625
+  (khớp v3 — đo lại gradient peak tại x800 = y625); góc tường trái x~333–335
+  (khớp), phải x~1165 (lệch +15 so với v3 x1150, ≤20 px, đạt); gấu rèm
+  ~y630–650. Sàn y>640: 0 px đỏ, 77 px tối là bóng vân gỗ (không phải đồ
+  đạc). LƯU Ý: 3 chỉ số detector trong `verify_room_tet.json` SAI (kính
+  x560–1250, góc phải 1097, đỉnh rèm 40 — bắt nhầm rèm voan sáng/đèn trần);
+  số đúng ở mục landmarks trong `room_notes.json` (đã đối chiếu).
+- Sprite lớn + món mua thêm + món nhỏ: vẽ từng món bằng AI trên nền magenta
+  đặc, tách nền + quantize bằng code (pipeline lô 10: key median góc +
+  flood-fill nền từ biên, KHÔNG `binary_fill_holes`; defringe chỉ trong 3 px
+  quanh magenta thật; quantize 256 màu MAXCOVERAGE + Floyd–Steinberg;
+  finish() strip vivid còn sót). LƯU Ý: key phải dùng khoảng cách VUÔNG GÓC
+  với tia magenta (perp≥30) vì bóng sàn magenta đậm nằm trên tia (perp ~14)
+  nên thước Euclid ăn cả bóng (69k–228k px). Canvas 1024×1024 (thảm
+  1024×512; món mua thêm/món nhỏ 512×512); chân đồ chạm đáy ảnh (y = chiều
+  cao − 1; riêng nha_pet chân y=439 do post-quantize strip ở bản preview đã
+  ăn 1 px hàng đáy).
+- Đo vị trí bằng code trên ảnh thật; ảnh ghép soi bằng mắt (nền tối/trắng/
+  xám 128/phòng thật). Lỗi nhỏ sửa bằng code, không hỏi. Điểm chân trong doc
+  này: sprite lớn = tâm x của dải 12 hàng đáy (theo `key_tet_large.py`); món
+  mua thêm = tâm x hàng pixel đáy; món nhỏ = median-x hàng pixel đáy (3 định
+  nghĩa khác nhau giữa các agent — đã đối chiếu, y chân thì giống nhau).
+
+## Nền trống room_tet.png
+
+| Món | Đích | PNG | SHA-12 | Mốc bố cục so với room_v3 |
+|---|---|---|---|---|
+| Nền trống | `app/assets/images/backgrounds/room_tet.png` | 596.005 byte | `2dc9450736d9` | khung kính x622–928/y135–461 (v3 x633–917/y136–446, lệch ≤15 px); đỉnh thanh rèm y~60–70; mép sàn giữa y625 (khớp); góc tường x333/1165 (phải lệch +15, đạt); **không cây mai, không tranh Đông Hồ, không két sưởi vẽ sẵn** |
+
+- Tường phải sau recolor kem ấm (214,4, 190,3, 158,9), phẳng hơn tường trái
+  (203,7, 148,1, 113,8) một chút; ở cỡ app không thấy rõ. Chân tường đỏ giữ
+  lại làm phào đỏ, hợp phòng Tết.
+- Câu đối trái "AN KHANG THỊNH VƯỢNG" đọc đủ; câu đối phải "VẠN SỰ NHƯ Ý" bị
+  rèm che ~1/2 (như bản gen1 gốc) — vẫn đọc được, chờ Claude quyết (giữ hay
+  dời rèm/câu đối).
+- Vệt đỏ mỏng ~4–6 px dọc mép góc tường phải x~1150 (biên feather của
+  recolor) — chỉ thấy ở zoom 2×, không thấy ở cỡ app; đã xác nhận bằng mắt
+  trên `zoom_right_wall_2x.png`.
+- Chân tường + vân sàn cong nhẹ ở 2 góc dưới do warp (giống v4, đã được chấp
+  nhận ở phòng gốc).
+
+## 7 sprite lớn mới
+
+| Món | Đích | PNG | SHA-12 | Cỡ hiển thị (khung 1600×900) | Điểm chân |
+|---|---|---|---|---|---|
+| Giường | `app/assets/images/furniture/tet_giuong.png` | 92.702 byte | `68e7adee0cea` | 500×339, x160–660, y376–715 | (619, 1023) |
+| Tủ đầu giường | `app/assets/images/furniture/tet_tu_dau_giuong.png` | 31.808 byte | `0d5c25f89157` | 194×189, x70–264, y591–780 | (484, 1023) |
+| Tủ áo | `app/assets/images/furniture/tet_tu_ao.png` | 114.617 byte | `ab5f3bdaea47` | **320×817, x1280–1600, y68–885** (đúng tỉ lệ) | (556, 1023) |
+| Bàn trà | `app/assets/images/furniture/tet_ban_hoc.png` | 276.573 byte | `8199dab3da40` | **320×256, x1050–1370, y519–775** (bàn trà thấp, không phải 320×360) | (462, 1023) |
+| Ghế | `app/assets/images/furniture/tet_ghe.png` | 125.917 byte | `b7b6c403a2eb` | 160×241, x990–1150, y504–745 | (497, 1023) |
+| Kệ sách lớn | `app/assets/images/furniture/tet_ke_lon.png` | 218.023 byte | `bfcb8c0b61e5` | **270×386, x990–1260, y400–786** (treo tường, không phải 270×360; v2 hạ xuống để khỏi che câu đối phải) | (316, 1023) — treo tường |
+| Thảm tròn | `app/assets/images/furniture/tet_tham.png` | 190.709 byte | `74db8edc7158` | 590×160, x410–1000, y695–855 | (551, 511) |
+
+- Cổng: magenta 0 (3 thước + strict exact 255,0,255) ở cả 7 file;
+  bright_rim (vivid) = 0 ở cả 7 file; vivid_left = 0; semi = 0; ≤246 màu.
+- Giường: gỗ đỏ sơn, chăn/ga đỏ thêu hoa mai vàng, gối đỏ; KHÔNG có gấu
+  bông (gấu là món rời). Tủ đầu giường: gỗ đỏ 2 ngăn, núm vàng.
+- Tủ áo: gỗ đỏ sơn 2 cánh, núm vàng, hoa mai vàng khắc trên cánh; hiển thị
+  320 rộng ĐÚNG TỈ LỆ (như quyết định 2 của v4).
+- Bàn trà: bàn trà khay mứt Tết + ấm trà + 2 chén; KHÔNG bình hoa, KHÔNG cốc
+  bút. **Ấm trà + 2 chén màu nâu sẫm rất tối (gần như đen ở cỡ app nhỏ)** —
+  có muốn đổi sang ấm trà đỏ/vàng cho sáng hơn không? (không vẽ lại nếu
+  không yêu cầu). Display 320×256 lệch brief 320×360 vì bàn trà THẤP (raw
+  ratio 1,64; kéo lên 360 cần aniso 1,9, méo rõ) — lấy aniso 1,315.
+- Ghế: ghế đôn gỗ đỏ, tựa lưng tròn thấp.
+- Kệ sách lớn: kệ TREO TƯỜNG — neo = mép dưới kệ, KHÔNG phải chân sàn; 2
+  tầng, sách đỏ/vàng + cam/quýt, 2 đám mây; dải tối tím bên trong là shading;
+  còn pink_rim_left 25 px (196,157,145) ở mép gỗ/mây — như v4 đã CHẤP NHẬN
+  (quyết định 3), không sửa. Display 270×386 lệch brief 270×360 vì kệ dọc
+  hẹp (raw ratio 0,505; giữ aniso 0,722 thì cao 386).
+- Thảm tròn: thảm tròn đỏ, hoa mai vàng/viền vàng; bị ép dọc aniso 0,392
+  (hoa mai dệt dọc, đúng phối cảnh thảm nằm sàn).
+- Lỗ kín là khe nhìn xuyên (thiết kế, KHÔNG lấp): kệ lớn 103.128 px (2 lòng
+  kệ mở), bàn trà 908 px (khe giữa chân bàn + quai ấm trà).
+
+## 8 món mua thêm (512×512, chân y=440, tỉ lệ 0,45)
+
+| Món | Đích | PNG | SHA-12 | Bbox (khung 512) | Điểm chân | Cỡ hiển thị (tỉ lệ 0,45) | Vị trí mặc định mới (khung 1600×900) |
+|---|---|---|---|---|---|---|---|
+| Nhà pet | `furniture/tet_nha_pet.png` | 59.409 byte | `e601150ba769` | (99,141,415,439) 317×299 | (219, 439) | 143×135 (đo 147×139) | sàn phải, trước bàn (1030, 880) |
+| Kệ sách nhỏ | `furniture/tet_ke_sach.png` | 58.311 byte | `169d5c26dca0` | (85,81,426,440) 342×360 | (137, 440) | 154×162 (đo 158×167) | sàn trái, trước giường (400, 875) |
+| Bể cá | `furniture/tet_be_ca.png` | 109.365 byte | `4398ad112153` | (110,121,403,440) 294×320 | (255, 440) | 132×144 (đo 137×149) | sàn phải, trước bàn (1200, 880) |
+| Cây mai cao | `furniture/tet_cay_cao.png` | 87.124 byte | `804030bca702` | (124,62,389,440) 266×379 | (261, 440) | 120×171 (đo 125×176) | **trước cửa sổ phải (920, 795)** — xem ghi chú |
+| Ghế lưới | `furniture/tet_ghe_luoi.png` | 38.669 byte | `d46529172cc9` | (122,212,392,440) 271×229 | (256, 440) | 122×103 (đo 127×108) | sàn trái, trước tủ đầu giường (260, 880) |
+| Lều | `furniture/tet_leu.png` | 100.143 byte | `8b87696846ed` | (82,103,431,440) 350×338 | (257, 440) | 158×153 (đo 163×157) | góc trái phòng, trước tủ đầu giường (100, 880) — XA chân tủ áo |
+| Đèn trăng | `furniture/tet_den_trang.png` | 40.012 byte | `e146fc29724a` | (138,141,373,440) 236×300 | (246, 440) | 107×135 (đo 112×140) | trên tủ đầu giường (215, 623) — theo preview |
+| Tranh | `furniture/tet_tranh.png` | 104.346 byte | `416010fd9f2f` | (116,141,395,440) 280×300 | (255, 440) | 126×135 (đo 130×140) | tường trái, TRÊN kệ mây (160, 185) — xem ghi chú |
+
+- Cổng: magenta 0/0/0, semi 0, 213–230 màu ở cả 8 món; bbox lệch mục tiêu
+  tối đa 1 px; chân y=440 (nhà pet 439, xem dưới).
+- Nguồn: nhà pet, đèn trăng, tranh = **copy nguyên bản preview đã duyệt**
+  (byte-identical, SHA khớp preview); kệ sách, bể cá, cây mai, ghế lưới,
+  lều = vẽ mới, khớp đúng bbox/chân món gốc lô 10 cùng chỗ.
+- Bright-rim 9/2/11 px ở 3 file preview-copy (nhà pet 9, đèn trăng 2, tranh
+  11) — toàn pixel rời rạc màu hồng/đỏ sẫm của chính thiết kế ở mép, 3 thước
+  magenta đều = 0, không thấy bằng mắt ở cỡ app; KHÔNG strip để giữ
+  byte-identical với bản preview đã duyệt (strip 22 px sẽ đổi SHA so với
+  preview).
+- Nhà pet: chân y=439 (không 440) vì post-quantize strip ở bản preview đã ăn
+  1 px hàng đáy; bbox đáy 440 (exclusive) vẫn đúng, lệch 1 px trong dung sai.
+- Cây mai cao: aniso 1,241 (kéo dọc 24% để khớp bbox gốc 266×380 trong khi
+  cây vẽ rộng hơn) — soi mắt không méo rõ. LƯU Ý BỐ CỤC: ở tỉ lệ 0,45 cây chỉ
+  cao 176 px (đỉnh y624), DƯỚI bậu cửa sổ (~y470) nên chỉ che tường + rèm
+  voan dưới ô kính phải, KHÔNG che được kính cửa sổ như bản xem kiểu (cây mai
+  vẽ sẵn trong nền preview cao tới ~y380). Muốn che kính phải tăng tỉ lệ cây
+  (~2×) hoặc vẽ lại cây cao hơn — Claude quyết.
+- Đèn trăng: 272 px lỗ kín = khe suốt giữa các sợi tua vàng + khe cánh hoa
+  mai ở đỉnh đèn (thiết kế, nhìn xuyên qua được). Bể cá: dải hồng nhạt ở phần
+  kính trên mặt nước là màu kính nhìn xuyên nền magenta lúc vẽ — trên nền
+  tối/xám/phòng đọc như kính hồng, không phải dư magenta (3 thước = 0).
+- Tranh: khung gỗ đỏ son có vết xước đen cố tình (kiểu đồ cũ). Vị trí mặc
+  định dời lên TRÊN kệ mây (160,185): vị trí cũ (380,300) che câu đối trái ở
+  nền trống mới; thử (110,480) dưới kệ thì đèn lồng đỏ che mất đáy tranh
+  36 px nên dời lên trên kệ (cách kệ mây ~40 px, treo cao như tranh v4).
+- Nhà pet (1030,880) + bể cá (1200,880) dời phải so với v4 (950/1150) để
+  khỏi che chậu cây mai (chậu ~x907–937) và khỏi chồng nhau.
+
+## 5 món nhỏ vẽ mới (512×512)
+
+| Món | Đích | PNG | SHA-12 | Bbox (khung 512) | Điểm chân | Neo trong phòng | Tỉ lệ |
+|---|---|---|---|---|---|---|---|
+| Gấu bông | `furniture/tet_gau_bong.png` | 73.425 byte | `4301c6a5b5cc` | (125,95,388,444) 264×350 | (248, 444) | trên giường (415, 548) | 0,466 |
+| Đèn sao | `furniture/tet_den_sao.png` | 55.624 byte | `3ab88e2ab365` | (97,92,418,449) 322×358 | (260, 449) | trên bậu cửa sổ (850, 465) | 0,383 |
+| Chậu cây | `furniture/tet_chau_cay.png` | 64.087 byte | `04a41f6143aa` | (99,119,373,440) 275×322 | (233, 440) | sàn dưới cửa sổ (760, 720) | 0,70 |
+| Bình hoa | `furniture/tet_binh_hoa.png` | 46.137 byte | `10c951a1b47c` | (155,106,360,429) 206×324 | (254, 429) | **trên bàn trà (1105, 575)** | **0,3951 → cao 128 px** |
+| Cốc sao | `furniture/tet_coc_sao.png` | 38.660 byte | `87b4a697881a` | (100,83,354,433) 255×351 | (259, 433) | **trên bậu cửa sổ (700, 465)** | 0,315 |
+
+- Cổng: magenta 0/0/0, vivid sát mép (mag_mask, ≤3 px) = 0, semi = 0,
+  195–217 màu, white_rim (>215) = 0, đỏ sẫm (155,5,158) = 0 ở cả 5 món;
+  bbox lệch bản _v3 tối đa 1 px. Cả 5 đều VẼ MỚI, khớp đúng bbox/chân bản
+  _v3 cùng chỗ (gấu kem khăn đỏ + đồng xu sao vàng; đèn lồng đỏ phát sáng +
+  tua vàng; chậu mai vàng trong chậu đỏ viền vàng; bình đỏ hoa văn vàng +
+  cành mai vàng; cốc đỏ + sao vàng + 3 bút chì màu).
+- White rim (lô 10 F1): ban đầu 48–629 px viền trắng sáng dọc silhouette —
+  đã tô lại từ donor, giờ 0 ở cả 5 file. Viền hồng-be nhạt ở mép lông gấu
+  (G~200) là shading lông thật, không phải blend magenta, không tô.
+- Aniso: đèn lồng 0,72 (hơi dẹt ngang), bình hoa 1,27 (cao/gầy hơn gốc) —
+  soi 2× trên nền tối vẫn đọc đúng dáng, không méo khó chịu. Chậu cây 1,11,
+  cốc sao 0,86, gấu bông 0,94.
+- Lỗ kín là khe NHÌN XUYÊN QUA được (thiết kế, như tiền lệ đèn trăng 272
+  px): chậu cây 6.903 px (khe cành/hoa), cốc sao 1.265 px (khe bút chì), bình
+  hoa 304 px, đèn sao 28 px, gấu bông 42 px — soi nền tối thấy khe sạch.
+- **Đèn lồng đỏ nhìn như LƠ LỬNG ~35–40 px trên mặt tủ đầu giường** (đáy
+  nhìn thấy y557, mặt tủ ~y590–600): THỪA HƯỞNG từ anchor v4 (150,578) —
+  anchor là chân-tâm của canvas 512, đáy nhìn thấy cao hơn vì bbox y1=450 <
+  512; y hệt ở bản v4 đã duyệt (đèn sao _v3 cũng lơ lửng vậy). Sửa anchor sẽ
+  đổi doc v4 — để Claude quyết chung cho cả 2 phòng.
+- **Chậu mai dời sang (760,720)** thay vì anchor v4 (842,686) để khỏi đè cây
+  mai cao (khe lý thuyết 3 px, đo thực 13 px) và khỏi đè góc giường (khe lý
+  thuyết 4 px — đo thực trên ảnh ghép thành chồng 12 px do LANCZOS, chậu vẽ
+  sau nên đè lên mép giường 12 px, trông như chậu đặt sát giường, chấp nhận
+  được).
+- **Bình hoa: hiển thị cao 128 px** (như quyết định 7 của v4) — scale
+  128/324 = 0,3951, đặt trên bàn trà ở (1105,575); không vẽ lại sprite.
+- **Cốc sao: đặt trên bậu cửa sổ** (700,465) thay vì trên bàn — mặt bàn đã
+  đầy (bình hoa + khay mứt), cốc trên bậu cửa là chỗ tự nhiên.
+- Cỡ hiển thị = bbox × tỉ lệ (gấu 123×163, đèn sao 123×137, chậu cây
+  193×225, bình hoa **81×128**, cốc sao 80×111). Trên ảnh ghép, LANCZOS +
+  viền alpha mềm làm cỡ đo lớn hơn cỡ lý thuyết ~4–5 px ở cả 5 món
+  (bình hoa đo 86×133) — cùng hiệu ứng, tỉ lệ vẫn đúng.
+
+## Ảnh ghép xem trước (lot15/work/tet/composites/)
+
+- `tet_default_layout.png` (1.532.385 byte, SHA-12 `2c1db15ea811`): nền trống
+  + 7 sprite lớn + 8 món mua thêm + 5 món nhỏ + bé gái 09 áo dài Tết (cao
+  360 px, chân (630,810), đứng trên thảm). Bố cục mặc định: giường trái, tủ
+  đầu giường cạnh giường, tủ áo phải 320 rộng, bàn trà + ghế ở bàn, kệ sách
+  lớn treo tường HẠ THẤP sau bàn trà (y400–786, để khỏi che câu đối phải),
+  thảm tròn giữa sàn; món nhỏ: gấu trên giường, đèn trăng trên tủ đầu giường,
+  chậu mai sàn dưới cửa sổ, bình hoa 128 px trên bàn trà, cốc sao + đèn sao
+  trên bậu cửa sổ, tranh Đông Hồ trên tường trái;
+  8 món mua thêm: lều góc trái, ghế lưới + kệ sách nhỏ sàn trái, cây mai cao
+  trước cửa sổ phải, nhà pet + bể cá sàn phải.
+- Kiểm bằng code (bbox hiển thị): chỉ còn **2 chồng CÙNG ĐỘ SÂU** — (1)
+  ghế↔bàn (ghế kê ở bàn, cố ý như room_v3/v4); (2) giường↔chậu mai 12×230 px,
+  chân lệch 5 px (chậu đứng sát góc chân giường). THÊM 1 chồng do thước đo gắn
+  nhãn same-depth nhưng thực chất là TƯỜNG-vs-SÀN: kệ treo↔bàn trà (215×259 px)
+  — kệ là đồ treo tường vẽ trước, bàn che phần dưới kệ đúng thứ tự sâu. Còn lại
+  đều depth-ok (món trước che món sau đúng thứ tự chân: tủ áo trước bàn, bàn
+  trước bể cá/lều, giường trước kệ sách/lều/bé, cây mai trước chậu mai, bé
+  trước chậu mai) hoặc đứng trên thảm phẳng. Thứ tự vẽ: kệ treo vẽ TRƯỚC (đồ
+  tường), rồi các món lớn khác theo foot-y tăng dần (sau ra trước); ngoại lệ:
+  lều vẽ sau; bé gái 09 vẽ cuối cùng.
+- Lối đi: dải x450–850, y750–860 không có chân đồ nào (trừ thảm phẳng + bé
+  gái) — lối đi trống, bé đứng giữa thảm ở (630, 810).
+- `tet_empty.png` (1.097.573 byte, SHA-12 `2db051ffb635`): chỉ nền trống —
+  tường dưới cửa sổ liền mạch, sàn trống.
+- `tet_sprites_dark.png` (653.403 byte, SHA-12 `5c9525a8676d`): 7 sprite lớn
+  trên nền tối (60,60,80) — không lỗ alpha, không viền magenta/trắng; kệ treo
+  ở vị trí hạ thấp nên chỉ thấy phần trên sau bàn trà (vẽ kệ trước); kệ còn
+  shading tím trong, ấm trà nâu sẫm gần như đen ở cỡ app.
+- Soi bằng mắt: ghép liền khối (cùng phối cảnh 3/4 + sáng trên-trái, tông
+  đỏ–vàng Tết), tỉ lệ các món với nhau + với cửa sổ đúng (bé 360 px đứng
+  ngang giường, tủ áo cao gần bằng trần); không món nào trông như "dán đè"
+  lên đồ vẽ sẵn — vì nền đã trống, mọi món đều là sprite rời có thứ tự sâu
+  đúng. Câu đối trái đọc đủ "AN KHANG THỊNH VƯỢNG" (dòng cuối "VƯỢNG" hơi
+  khuất sau đầu giường — như bản duyệt); câu đối phải "VẠN SỰ NHƯ Ý" ĐỌC ĐỦ
+  sau khi hạ kệ ở bố cục v2 (v1 bị kệ che mất), chỉ còn bị rèm che ~1/2
+  (đã ghi cờ).
+
+## Cờ cho Claude quyết (đừng tự sửa thiết kế, chỉ ghi)
+
+1. Nền — tường phải recolor kem ấm + phào đỏ: giữ cách này hay muốn tường
+   phải đỏ?
+2. Nền — câu đối phải bị rèm che ~1/2: chấp nhận hay dời rèm/câu đối?
+3. Nền — vệt đỏ mỏng ~4–6 px dọc góc tường phải (chỉ zoom 2×): chấp nhận hay
+   cần xóa?
+4. Bố cục — kệ treo che câu đối phải: ĐÃ SỬA ở bố cục v2 — kệ hạ xuống
+   (990,400,1260,786), câu đối "VẠN SỰ NHƯ Ý" đọc đủ trên ảnh ghép v2.
+5. Bố cục — cây mai cao ở tỉ lệ 0,45 chỉ che tường + rèm voan dưới ô kính
+   phải, KHÔNG che được kính cửa sổ: muốn che kính phải tăng tỉ lệ (~2×)
+   hoặc vẽ lại cây cao hơn?
+6. Bố cục — đèn lồng lơ lửng trên tủ đầu giường: ĐÃ SỬA ở bố cục v2 —
+   tet_den_sao dời lên bậu cửa sổ (850, 465), tet_den_trang lên tủ đầu giường
+   theo preview với anchor sửa (215, 623) — cả 2 ngồi khít mặt. Lưu ý: anchor
+   v4 (150, 578) có cùng vấn đề (bbox file kết y<512) nên đèn sao _v3 ở phòng
+   gốc cũng lơ lửng tương tự nếu đo kỹ.
+7. Bố cục — tranh treo cao trên tường trái (y16–156, trên kệ mây): giữ hay
+   muốn tranh thấp hơn (thì phải dời đèn lồng hoặc kệ mây)?
+8. Sprite lớn — ấm trà + 2 chén nâu sẫm gần như đen ở cỡ app: đổi sang ấm
+   trà đỏ/vàng cho sáng hơn không?
+9. Sprite lớn — kệ còn pink 25 px + shading tím bên trong: giữ như v4 (đã
+   chấp nhận) hay muốn xóa sạch?
+10. Món mua thêm — bright-rim 9/2/11 px ở 3 file preview-copy: giữ nguyên
+    byte-identical hay strip 22 px về 0 tuyệt đối (sẽ đổi SHA so với preview)?
+11. Món mua thêm — cây mai aniso 1,241 (kéo dọc 24%): nếu thấy cây gầy quá
+    thì vẽ lại cây hẹp hơn thay vì kéo dọc.
+12. Món nhỏ — aniso đèn lồng 0,72 / bình hoa 1,27: soi mắt vẫn đúng dáng,
+    chấp nhận hay vẽ lại đúng tỉ lệ?
+13. Kiểm tra — dòng `white_rim_px=5` của tủ đầu giường trong
+    `sprites_report.json` `_summary` là số cũ/sai (per-file = 0,
+    `verify_large.json` = 0, đo lại = 0); không ảnh hưởng file, chỉ sửa doc
+    khi gộp.
+
+## Bài học nguồn (đã xác minh lại)
+
+Brief lô 15 ghi 5 món _v3 ở `v4/small_cleaned/` — SAI NGUỒN.
+`small_cleaned/` chứa bản đã dọn từ file PLAIN v2 (bình hoa plain 126.329
+byte trước dọn → 126.422 byte sau dọn, SHA `d66d6d77...`), không phải _v3.
+Đo lại độc lập 25/11: `small_cleaned/` 0/5 khớp `reused_small`;
+`small_v3_branch/` 5/5 khớp cả SHA-256 và git blob SHA-1 với
+`v4/report.json` key `reused_small` (gấu `6436e46d9eb9`, đèn sao
+`65e758b8de48`, chậu cây `2eab0dbd948e`, bình hoa `4c6a406ce9c1`, cốc sao
+`d38b7d705975`). 5 món nhỏ Tết VẼ MỚI hoàn toàn nên không dùng file nào ở
+`small_cleaned/` hay `small_v3_branch/`. Bản dọn sai nguồn chỉ giữ trên đĩa
+làm bằng chứng, không đẩy. BÀI HỌC (như v4): trước khi dọn/đẩy file dùng
+lại, đối chiếu tên file + byte + SHA với listing nhánh và D_IMAGES.md — file
+plain và file _v3 cùng tên gốc nhưng là 2 ảnh khác nhau.
+
+Chưa decode (chờ Claude decode).
+
+> Nốt: file `.b64` của nền `room_tet` trúng mẫu secret scanning của GitHub (chuỗi base64 tình cờ chứa `AKID` + 32 ký tự, dương tính giả) nên đã mã lại PNG lossless `compress_level` 9 — pixel y hệt, byte 597.457 → 596.005, SHA-256 mới `2dc9450736d9…` (bản gốc ở `backup_secret_scan/room_tet.png`).
