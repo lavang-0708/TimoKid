@@ -12,7 +12,8 @@ import 'package:timokid/features/room/room_variants.dart';
 void main() {
   const ready = {'tet': true, 'ngan_ha': true, 'rong': true};
 
-  /// Món có biến thể ở chủ đề: 7 món lớn/vừa; Rồng thêm 8 món cửa hàng.
+  /// Món có biến thể ở chủ đề: 7 món lớn/vừa + 8 món cửa hàng (cả 3 chủ
+  /// đề) + món nhỏ vẽ riêng (Tết 5, Ngân hà 3, Rồng 0).
   List<RoomPlaceable> variantsIn(String theme) => [
     for (final p in roomPlaceables)
       if (p.hasVariant(theme)) p,
@@ -24,7 +25,11 @@ void main() {
 
   group('sở hữu', () {
     test('chủ đề chưa có hình: không có gì dù đã mua', () {
-      final own = RoomOwnership({roomThemeItemId('tet'), ...allItems('tet')});
+      const notReady = {'tet': false};
+      final own = RoomOwnership({
+        roomThemeItemId('tet'),
+        ...allItems('tet'),
+      }, ready: notReady);
       expect(own.hasBackground('tet'), isFalse);
       expect(own.hasItemVariant('tet', 'gau-bong'), isFalse);
       expect(own.variantsOf('gau-bong'), [roomThemeClassic]);
@@ -38,8 +43,16 @@ void main() {
         expect(own.hasItemVariant('tet', p.id), isTrue, reason: p.id);
         expect(own.hasItemVariant('ngan_ha', p.id), isFalse, reason: p.id);
       }
-      // Món nhỏ không có biến thể: không "có" dù có bộ.
-      expect(own.hasItemVariant('tet', 'gau-bong'), isFalse);
+      // Tết vẽ riêng cả 5 món nhỏ => có bộ là có luôn.
+      for (final id in [
+        'gau-bong',
+        'den-sao',
+        'chau-cay',
+        'binh-hoa',
+        'coc-sao',
+      ]) {
+        expect(own.hasItemVariant('tet', id), isTrue, reason: id);
+      }
       expect(own.setComplete('tet'), isTrue);
       expect(own.setComplete('ngan_ha'), isFalse);
       expect(own.backgroundThemes.map((t) => t.id), ['tet']);
@@ -79,6 +92,55 @@ void main() {
     });
   });
 
+  group('số món theo chủ đề', () {
+    test('Tết 20, Ngân hà 18, Rồng 15; món nhỏ theo chủ đề', () {
+      expect(variantsIn('tet').length, 20);
+      expect(variantsIn('ngan_ha').length, 18);
+      expect(variantsIn('rong').length, 15);
+      Set<String> smallIn(String t) => {
+        for (final p in variantsIn(t))
+          if (p.shopId == null && p.id.contains('-')) p.id,
+      };
+      expect(smallIn('tet'), {
+        'gau-bong',
+        'den-sao',
+        'chau-cay',
+        'binh-hoa',
+        'coc-sao',
+      });
+      expect(smallIn('ngan_ha'), {'gau-bong', 'chau-cay', 'binh-hoa'});
+      expect(smallIn('rong'), isEmpty);
+    });
+
+    test('mua lẻ món nhỏ: có biến thể món đó, chưa có nền', () {
+      final own = RoomOwnership({
+        roomThemeVariantItemId('ngan_ha', 'gau-bong'),
+      }, ready: ready);
+      expect(own.hasItemVariant('ngan_ha', 'gau-bong'), isTrue);
+      expect(own.variantsOf('gau-bong'), [roomThemeClassic, 'ngan_ha']);
+      expect(own.variantsOf('den-sao'), [roomThemeClassic]);
+      expect(own.hasBackground('ngan_ha'), isFalse);
+      // Đèn sao Ngân hà dùng lại bản gốc: mua "lẻ" cũng không có.
+      final lamp = RoomOwnership({
+        roomThemeVariantItemId('ngan_ha', 'den-sao'),
+      }, ready: ready);
+      expect(lamp.hasItemVariant('ngan_ha', 'den-sao'), isFalse);
+    });
+
+    test(
+      'có bộ: sở hữu cả món nhỏ có bản vẽ; setComplete không đòi món dùng lại',
+      () {
+        final own = RoomOwnership({roomThemeItemId('ngan_ha')}, ready: ready);
+        for (final id in ['gau-bong', 'chau-cay', 'binh-hoa']) {
+          expect(own.hasItemVariant('ngan_ha', id), isTrue, reason: id);
+        }
+        expect(own.hasItemVariant('ngan_ha', 'den-sao'), isFalse);
+        expect(own.hasItemVariant('ngan_ha', 'coc-sao'), isFalse);
+        expect(own.setComplete('ngan_ha'), isTrue);
+      },
+    );
+  });
+
   group('Thay cả bộ (roomApplySet)', () {
     test('món có biến thể đổi sang bộ, món chưa có giữ nguyên', () {
       final partial = RoomOwnership({
@@ -95,10 +157,33 @@ void main() {
       });
     });
 
+    test('Thay cả bộ đổi cả món nhỏ (Tết đủ 5, Ngân hà 3)', () {
+      final tet = roomApplySet(
+        RoomOwnership({roomThemeItemId('tet')}, ready: ready),
+        {},
+        'tet',
+      );
+      expect(tet.length, 20);
+      expect(tet['gau-bong'], 'tet');
+      expect(tet['coc-sao'], 'tet');
+      final ngan = roomApplySet(
+        RoomOwnership({roomThemeItemId('ngan_ha')}, ready: ready),
+        {'den-sao': 'tet'},
+        'ngan_ha',
+      );
+      expect(ngan.length, 19); // 18 món Ngân hà + đèn sao Tết giữ nguyên
+      expect(ngan['gau-bong'], 'ngan_ha');
+      expect(ngan['chau-cay'], 'ngan_ha');
+      expect(ngan['binh-hoa'], 'ngan_ha');
+      expect(ngan['den-sao'], 'tet');
+      expect(ngan.containsKey('coc-sao'), isFalse);
+    });
+
     test('có bộ: mọi món đổi sang bộ; về gốc: rỗng', () {
       final own = RoomOwnership({roomThemeItemId('rong')}, ready: ready);
       final out = roomApplySet(own, {'noi_tranh': 'tet'}, 'rong');
       expect(out.length, variantsIn('rong').length); // 7 lớn/vừa + 8 cửa hàng
+      expect(out.length, 15);
       expect(out.values.toSet(), {'rong'});
       expect(roomApplySet(own, out, roomThemeClassic), isEmpty);
     });

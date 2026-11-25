@@ -882,6 +882,8 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                             v == roomThemeClassic
                                 ? 'Gốc'
                                 : (roomThemeById(v)?.shortName ?? v),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 14,

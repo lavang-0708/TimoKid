@@ -91,6 +91,16 @@ void main() {
     );
   }
 
+  /// Đáy-giữa ô món (= điểm neo, mọi biến thể) trong khung 1600x900.
+  Offset frameBottom(WidgetTester tester, Key key) {
+    final floor = tester.getRect(find.byKey(const Key('room-floor')));
+    final r = tester.getRect(find.byKey(key));
+    return Offset(
+      (r.center.dx - floor.left) / floor.width * roomFrameWidth,
+      (r.bottom - floor.top) / floor.height * roomFrameHeight,
+    );
+  }
+
   /// Điểm neo đáy món trong khung.
   Offset frameAnchor(WidgetTester tester, Key key, RoomPlaceable p) =>
       framePos(tester, key) + p.anchorOffset;
@@ -290,7 +300,7 @@ void main() {
     await pumpRoom(tester);
     await arrange(tester);
     await drag(tester, house, const Offset(-150, -30));
-    final before = framePos(tester, house);
+    final before = frameBottom(tester, house);
     await tester.tap(find.byKey(const Key('room-arrange-done')));
     await tester.pumpAndSettle();
 
@@ -298,10 +308,11 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('room-theme-tet')));
     await tester.pumpAndSettle();
-    expect((framePos(tester, house) - before).distance, lessThan(0.5));
+    // Điểm neo giữ nguyên (góc trên-trái dời theo cỡ hộp bản Tết).
+    expect((frameBottom(tester, house) - before).distance, lessThan(1));
     expect(decodeRoomLayout(await saved()).keys, ['noi_nha_pet']);
 
     await reopen(tester);
-    expect((framePos(tester, house) - before).distance, lessThan(0.5));
+    expect((frameBottom(tester, house) - before).distance, lessThan(1));
   });
 }

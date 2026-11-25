@@ -88,11 +88,11 @@ const List<RoomTheme> roomThemes = <RoomTheme>[
   ),
 ];
 
-/// Đã có hình (nền + 8 món) của từng chủ đề chưa. Bật khi decode xong
-/// lô 15 của chủ đề đó.
+/// Đã có hình (nền + món) của từng chủ đề chưa. Bật khi decode xong lô 15
+/// của chủ đề đó (cả 3 chủ đề đã bật).
 const Map<String, bool> roomThemeArtReady = <String, bool>{
-  'tet': false,
-  'ngan_ha': false,
+  'tet': true,
+  'ngan_ha': true,
   'rong': true,
 };
 
