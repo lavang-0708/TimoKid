@@ -26,8 +26,8 @@ class TowerConfig {
   const TowerConfig._();
 
   /// Ảnh ổ khóa / huy hiệu boss, chỉ dùng khi [towerArtReady].
-  static const String lockAsset = 'assets/images/ui/ui_tower_lock.png';
-  static const String bossAsset = 'assets/images/ui/ui_tower_boss.png';
+  static const String lockAsset = 'assets/images/ui/ui_tower_lock.webp';
+  static const String bossAsset = 'assets/images/ui/ui_tower_boss.webp';
 
   /// Số tầng của mỗi tháp (mỗi mảng một tháp).
   static const int floorsPerTower = 30;

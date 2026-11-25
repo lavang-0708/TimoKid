@@ -3,7 +3,7 @@
 ///
 /// Khi [arenaArtReady] là false (ảnh họa sĩ chưa về) mọi thứ vẽ bằng
 /// code: nền chuyển màu, icon `emoji_events` cho huy chương, ảnh
-/// `ui_gem.png` có sẵn cho kim cương. Khi true thì dùng ảnh thật.
+/// `ui_gem.webp` có sẵn cho kim cương. Khi true thì dùng ảnh thật.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -12,7 +12,7 @@ import '../../core/widgets/game_ui.dart';
 import '../../core/widgets/press_bounce.dart';
 import 'arena_config.dart';
 
-/// Nền màn Đấu trường: ảnh `arena_bg.png` khi [arenaArtReady], không
+/// Nền màn Đấu trường: ảnh `arena_bg.webp` khi [arenaArtReady], không
 /// thì nền chuyển màu tím-xanh vẽ bằng code.
 class ArenaBackground extends StatelessWidget {
   const ArenaBackground({super.key});
@@ -115,7 +115,7 @@ Color arenaMedalColor(ArenaMedal medal) => switch (medal) {
   ArenaMedal.participant => const Color(0xFF8FB8DE),
 };
 
-/// Huy chương: ảnh `medal_<mã>.png` khi [arenaArtReady], không thì
+/// Huy chương: ảnh `medal_<mã>.webp` khi [arenaArtReady], không thì
 /// icon cúp `emoji_events` tô màu vàng/bạc/đồng.
 class ArenaMedalBadge extends StatelessWidget {
   const ArenaMedalBadge({super.key, required this.medal, this.size = 72});
@@ -127,7 +127,7 @@ class ArenaMedalBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     if (arenaArtReady) {
       return Image.asset(
-        'assets/images/ui/medal_${medal.code}.png',
+        'assets/images/ui/medal_${medal.code}.webp',
         width: size,
         height: size,
       );
@@ -156,7 +156,7 @@ class ArenaMedalBadge extends StatelessWidget {
   }
 }
 
-/// Hàng "+N" kèm viên kim cương (ảnh `ui_gem.png` có sẵn).
+/// Hàng "+N" kèm viên kim cương (ảnh `ui_gem.webp` có sẵn).
 class ArenaGemAmount extends StatelessWidget {
   const ArenaGemAmount({super.key, required this.amount, this.size = 28});
 
@@ -168,7 +168,7 @@ class ArenaGemAmount extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Image.asset('$uiArt/ui_gem.png', width: size, height: size),
+        Image.asset('$uiArt/ui_gem.webp', width: size, height: size),
         const SizedBox(width: 4),
         Text('+$amount', style: gameOutlinedText(size * 0.8)),
       ],
@@ -189,14 +189,14 @@ class ArenaWalletHud extends StatelessWidget {
       children: [
         GameStat(
           icon: Icons.monetization_on_rounded,
-          image: '$uiArt/ui_coin.png',
+          image: '$uiArt/ui_coin.webp',
           color: const Color(0xFFF5B83D),
           text: '$xu',
           textKey: const Key('arena-xu-balance'),
         ),
         GameStat(
           icon: Icons.diamond_rounded,
-          image: '$uiArt/ui_gem.png',
+          image: '$uiArt/ui_gem.webp',
           color: const Color(0xFFA07BE0),
           text: '$gems',
           textKey: const Key('arena-gem-balance'),

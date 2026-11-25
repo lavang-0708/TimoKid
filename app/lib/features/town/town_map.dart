@@ -1,6 +1,6 @@
 /// Bản đồ Thị trấn phong cách v3b (C): nền + lớp động + vùng bấm.
 ///
-/// Nền `town_v3.png` (1600x900, isometric) vẽ đủ 6 công trình; 5 khu
+/// Nền `town_v3.webp` (1600x900, isometric) vẽ đủ 6 công trình; 5 khu
 /// toán là vùng bấm đặt đúng hình chữ nhật công trình (xem
 /// [townAreas] trong `town_assets.dart`), nhà hồng là nút về Phòng.
 /// 17 lớp động (mây, xe, cây, người đi bộ) là PNG trong suốt
@@ -113,7 +113,7 @@ const List<_CloudSpec> _clouds = [
   // ≈ 112; mây 3: 0 + 0,803*0,07*1600 ≈ 90 — đều < 120. Nhãn dán ở
   // cuối vùng bấm (y ≥ 250) nên mây không bao giờ chạm nhãn.
   _CloudSpec(
-    asset: 'assets/images/town/cloud_01.png',
+    asset: 'assets/images/town/cloud_01.webp',
     top: 0.00,
     width: 0.09,
     rightward: true,
@@ -122,7 +122,7 @@ const List<_CloudSpec> _clouds = [
     opacity: 0.75,
   ),
   _CloudSpec(
-    asset: 'assets/images/town/cloud_02.png',
+    asset: 'assets/images/town/cloud_02.webp',
     top: 0.02,
     width: 0.085,
     rightward: false,
@@ -131,7 +131,7 @@ const List<_CloudSpec> _clouds = [
     opacity: 0.75,
   ),
   _CloudSpec(
-    asset: 'assets/images/town/cloud_03.png',
+    asset: 'assets/images/town/cloud_03.webp',
     top: 0.00,
     width: 0.07,
     rightward: true,
@@ -259,7 +259,7 @@ class _TreeSpec {
 
 const List<_TreeSpec> _trees = [
   _TreeSpec(
-    asset: 'assets/images/town/tree_01.png',
+    asset: 'assets/images/town/tree_01.webp',
     // Cây xanh ở góc cỏ trên-trái, đè khít cây vẽ sẵn (gốc thân ở
     // (130, 230)) — vòng sửa PR #31: chân cũ (72, 200) đặt trên
     // mép lối đi sáng màu, không bóng đổ nên nhìn như nổi trên vỉa
@@ -271,7 +271,7 @@ const List<_TreeSpec> _trees = [
     phase: 0.0,
   ),
   _TreeSpec(
-    asset: 'assets/images/town/tree_02.png',
+    asset: 'assets/images/town/tree_02.webp',
     // Cây anh đào ở dải cỏ đáy, giữa đường D5 và mép dưới —
     // không chồng công trình, không chặn đường xe/người.
     feet: Offset(1000, 865),
@@ -745,18 +745,18 @@ class _SoftShadowPainter extends CustomPainter {
 /// từ alpha của PNG thật: hàng cuối còn ≥ 25 px đặc (bánh xe/đế giày),
 /// bỏ đường viền mảnh và vệt bóng nhạt bên dưới.
 const Map<String, double> townSpriteGroundRow = <String, double>{
-  'assets/images/town/car_01_dr.png': 357,
-  'assets/images/town/car_01_ur.png': 359,
-  'assets/images/town/car_02_dr.png': 372,
-  'assets/images/town/car_02_ur.png': 380,
-  'assets/images/town/person_01_dr_a.png': 461,
-  'assets/images/town/person_01_dr_b.png': 461,
-  'assets/images/town/person_01_ur_a.png': 461,
-  'assets/images/town/person_01_ur_b.png': 461,
-  'assets/images/town/person_02_dr_a.png': 460,
-  'assets/images/town/person_02_dr_b.png': 460,
-  'assets/images/town/person_02_ur_a.png': 460,
-  'assets/images/town/person_02_ur_b.png': 460,
+  'assets/images/town/car_01_dr.webp': 357,
+  'assets/images/town/car_01_ur.webp': 359,
+  'assets/images/town/car_02_dr.webp': 372,
+  'assets/images/town/car_02_ur.webp': 380,
+  'assets/images/town/person_01_dr_a.webp': 461,
+  'assets/images/town/person_01_dr_b.webp': 461,
+  'assets/images/town/person_01_ur_a.webp': 461,
+  'assets/images/town/person_01_ur_b.webp': 461,
+  'assets/images/town/person_02_dr_a.webp': 460,
+  'assets/images/town/person_02_dr_b.webp': 460,
+  'assets/images/town/person_02_ur_a.webp': 460,
+  'assets/images/town/person_02_ur_b.webp': 460,
 };
 
 /// Điểm đặt biển tên (TÂM biển nhỏ gắn trên nhà, khung nền 1600x900) của 5 khu theo

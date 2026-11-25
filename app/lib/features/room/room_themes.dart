@@ -1,11 +1,11 @@
 /// Phòng chủ đề (lô 15 của Muse, chủ dự án giao 24/11): đổi cả phong
 /// cách phòng theo bộ đồ hiếm/siêu hiếm mới, không ăn theo phòng gốc.
 ///
-/// Mỗi chủ đề là một nền 1600x900 cùng bố cục/phối cảnh `room_v3.png`
+/// Mỗi chủ đề là một nền 1600x900 cùng bố cục/phối cảnh `room_v3.webp`
 /// (vùng đi lại, chỗ đặt đồ giữ nguyên) và đã vẽ sẵn món nhỏ theo chủ đề
 /// trên bàn/kệ — nên khi bật chủ đề app KHÔNG vẽ 5 món nhỏ của phòng gốc.
 /// 8 món nội thất bé đã mua (ô `roomShopFurniture`) đổi sang bản cùng chủ
-/// đề `furniture/<chủ đề>_<chỗ>.png` (chỗ = hậu tố của `noi_<chỗ>`).
+/// đề `furniture/<chủ đề>_<chỗ>.webp` (chỗ = hậu tố của `noi_<chỗ>`).
 ///
 /// Mua chủ đề ở Cửa hàng (tab Nội thất); đổi qua lại ở nút "Phong cách"
 /// trong Phòng. Chủ đề chưa có hình (cờ [roomThemeArtReady]) thì ẩn.
@@ -71,15 +71,15 @@ String roomThemeItemId(String id) => 'room_theme_$id';
 
 /// Nền phòng của chủ đề [id].
 String roomThemeBackground(String id) =>
-    'assets/images/backgrounds/room_$id.png';
+    'assets/images/backgrounds/room_$id.webp';
 
 /// Ảnh món nội thất [baseId] (`noi_<chỗ>`) theo chủ đề [themeId]; phòng
 /// gốc thì giữ ảnh gốc.
 String roomThemeFurnitureAsset(String themeId, String baseId) {
   if (themeId == roomThemeClassic || !baseId.startsWith('noi_')) {
-    return 'assets/images/furniture/$baseId.png';
+    return 'assets/images/furniture/$baseId.webp';
   }
-  return 'assets/images/furniture/${themeId}_${baseId.substring(4)}.png';
+  return 'assets/images/furniture/${themeId}_${baseId.substring(4)}.webp';
 }
 
 /// Chủ đề theo mã; null nếu không có.

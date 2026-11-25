@@ -135,7 +135,7 @@ const Rect roomBuildingRect = Rect.fromLTWH(
 
 /// Đường dẫn asset PNG nền thị trấn v3b (C, 1600x900, đường + vỉa hè
 /// TRỐNG — không vẽ sẵn xe/người; app vẽ lớp động chạy theo đường).
-const String townBackgroundAsset = 'assets/images/backgrounds/town_v3.png';
+const String townBackgroundAsset = 'assets/images/backgrounds/town_v3.webp';
 
 /// Đường dẫn asset PNG 17 lớp động trên bản đồ thị trấn v3b (C):
 /// mây ×3, xe ×4 (2 xe × 2 hướng dr/ur), người ×8 (2 người × 2
@@ -148,24 +148,24 @@ const String townBackgroundAsset = 'assets/images/backgrounds/town_v3.png';
 /// `town_roads.dart`. Không còn đài phun nước (thị trấn v3b có ao,
 /// không có đài phun); 4 file nhìn ngang cũ (car_01, car_02,
 /// person_01, person_02) không dùng nữa — Claude git rm (xem
-/// HANDOVER), town_v2.png + fountain.png giữ lại trong manifest
+/// HANDOVER), town_v2.webp + fountain.webp giữ lại trong manifest
 /// vì file vẫn còn (như tiền lệ town_01.jpg).
 const List<String> townLayerAssets = [
-  'assets/images/town/cloud_01.png',
-  'assets/images/town/cloud_02.png',
-  'assets/images/town/cloud_03.png',
-  'assets/images/town/car_01_dr.png',
-  'assets/images/town/car_01_ur.png',
-  'assets/images/town/car_02_dr.png',
-  'assets/images/town/car_02_ur.png',
-  'assets/images/town/person_01_dr_a.png',
-  'assets/images/town/person_01_dr_b.png',
-  'assets/images/town/person_01_ur_a.png',
-  'assets/images/town/person_01_ur_b.png',
-  'assets/images/town/person_02_dr_a.png',
-  'assets/images/town/person_02_dr_b.png',
-  'assets/images/town/person_02_ur_a.png',
-  'assets/images/town/person_02_ur_b.png',
-  'assets/images/town/tree_01.png',
-  'assets/images/town/tree_02.png',
+  'assets/images/town/cloud_01.webp',
+  'assets/images/town/cloud_02.webp',
+  'assets/images/town/cloud_03.webp',
+  'assets/images/town/car_01_dr.webp',
+  'assets/images/town/car_01_ur.webp',
+  'assets/images/town/car_02_dr.webp',
+  'assets/images/town/car_02_ur.webp',
+  'assets/images/town/person_01_dr_a.webp',
+  'assets/images/town/person_01_dr_b.webp',
+  'assets/images/town/person_01_ur_a.webp',
+  'assets/images/town/person_01_ur_b.webp',
+  'assets/images/town/person_02_dr_a.webp',
+  'assets/images/town/person_02_dr_b.webp',
+  'assets/images/town/person_02_ur_a.webp',
+  'assets/images/town/person_02_ur_b.webp',
+  'assets/images/town/tree_01.webp',
+  'assets/images/town/tree_02.webp',
 ];

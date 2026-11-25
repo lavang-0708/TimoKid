@@ -5,7 +5,7 @@
 /// vị trí/cỡ `dragon_adult`, chân y ≈ 439):
 /// - `dragon_fire_1..4` (phun lửa sang phải), `dragon_water_1..4` (phun
 ///   nước), `dragon_fly_a..d` (bay, thân nâng 40–60 px, không bóng đất),
-///   `dragon_aura.png` (vầng sáng xanh bạc hà - vàng, tâm ≈ (256, 240)).
+///   `dragon_aura.webp` (vầng sáng xanh bạc hà - vàng, tâm ≈ (256, 240)).
 /// - Có đủ hình: thêm PNG vào `assets/images/pets/` + dòng manifest rồi
 ///   đổi [dragonFxArtReady] thành `true`. Chưa có thì mọi hiệu ứng vẽ
 ///   bằng code (CustomPainter hạt nhẹ), không phải sửa chỗ khác.
@@ -22,30 +22,30 @@ const String dragonSpecies = 'dragon';
 // --- Hình (chỉ dùng khi [dragonFxArtReady] = true) ---------------------
 
 const String _petsDir = 'assets/images/pets';
-const String dragonAuraAsset = '$_petsDir/dragon_aura.png';
+const String dragonAuraAsset = '$_petsDir/dragon_aura.webp';
 
 /// 4 khung phun lửa.
 const List<String> dragonFireAssets = <String>[
-  '$_petsDir/dragon_fire_1.png',
-  '$_petsDir/dragon_fire_2.png',
-  '$_petsDir/dragon_fire_3.png',
-  '$_petsDir/dragon_fire_4.png',
+  '$_petsDir/dragon_fire_1.webp',
+  '$_petsDir/dragon_fire_2.webp',
+  '$_petsDir/dragon_fire_3.webp',
+  '$_petsDir/dragon_fire_4.webp',
 ];
 
 /// 4 khung phun nước.
 const List<String> dragonWaterAssets = <String>[
-  '$_petsDir/dragon_water_1.png',
-  '$_petsDir/dragon_water_2.png',
-  '$_petsDir/dragon_water_3.png',
-  '$_petsDir/dragon_water_4.png',
+  '$_petsDir/dragon_water_1.webp',
+  '$_petsDir/dragon_water_2.webp',
+  '$_petsDir/dragon_water_3.webp',
+  '$_petsDir/dragon_water_4.webp',
 ];
 
 /// 4 khung bay (lặp khi bay).
 const List<String> dragonFlyAssets = <String>[
-  '$_petsDir/dragon_fly_a.png',
-  '$_petsDir/dragon_fly_b.png',
-  '$_petsDir/dragon_fly_c.png',
-  '$_petsDir/dragon_fly_d.png',
+  '$_petsDir/dragon_fly_a.webp',
+  '$_petsDir/dragon_fly_b.webp',
+  '$_petsDir/dragon_fly_c.webp',
+  '$_petsDir/dragon_fly_d.webp',
 ];
 
 // --- Thời gian khung hình thật ----------------------------------------
@@ -74,7 +74,7 @@ const double dragonFireArtShiftX = 16.4;
 /// Khung bay chỉ bằng 94% cỡ rồng trưởng thành: app phóng bù.
 const double dragonFlyArtScale = 1 / 0.94;
 
-/// Tâm vầng sáng trong khung 512 (khớp `dragon_aura.png`).
+/// Tâm vầng sáng trong khung 512 (khớp `dragon_aura.webp`).
 const Offset dragonAuraCenter = Offset(256, 240);
 
 /// Chân rồng trong khung 512 (y).

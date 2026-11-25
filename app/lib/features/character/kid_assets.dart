@@ -153,7 +153,7 @@ String kidFullAsset(
 }) {
   final g = kidGender(gender);
   return 'assets/images/character/$g/${g}_full_${kidOutfitCode(outfit)}'
-      '${wave ? '_wave' : ''}${backpack ? '_backpack' : ''}.png';
+      '${wave ? '_wave' : ''}${backpack ? '_backpack' : ''}.webp';
 }
 
 /// Miếng vá mắt nhắm: đường dẫn + rect trong khung 1024x1536.
@@ -170,13 +170,13 @@ class KidEyePatch {
 KidEyePatch kidEyePatch(String gender, int outfit, {bool wave = false}) {
   if (kidGender(gender) == 'girl') {
     return const KidEyePatch(
-      'assets/images/character/girl/girl_eyes_closed_patch.png',
+      'assets/images/character/girl/girl_eyes_closed_patch.webp',
       Rect.fromLTWH(300, 490, 410, 140),
     );
   }
   if (!wave) {
     return const KidEyePatch(
-      'assets/images/character/boy/boy_eyes_closed_patch.png',
+      'assets/images/character/boy/boy_eyes_closed_patch.webp',
       Rect.fromLTWH(291, 506, 432, 205),
     );
   }
@@ -188,7 +188,7 @@ KidEyePatch kidEyePatch(String gender, int outfit, {bool wave = false}) {
   // Bộ cao cấp 04–07 dùng lại miếng vá của bộ 1 (giả định đầu vẽ cùng vị trí).
   final patchOutfit = rects.containsKey(outfit) ? outfit : 1;
   return KidEyePatch(
-    'assets/images/character/boy/boy_eyes_closed_patch_0${patchOutfit}_wave.png',
+    'assets/images/character/boy/boy_eyes_closed_patch_0${patchOutfit}_wave.webp',
     rects[patchOutfit]!,
   );
 }
@@ -199,7 +199,7 @@ String? kidHeadAccessoryAsset(String gender, String? accessory) {
   final g = kidGender(gender);
   final entry = kidHeadAccessories[g]![accessory];
   if (entry == null) return null;
-  return 'assets/images/character/$g/${entry.$2}.png';
+  return 'assets/images/character/$g/${entry.$2}.webp';
 }
 
 /// Bộ đồ đã có khung đi bộ (lô 4 của Muse) theo dáng: bộ 1–3. Bộ cao
@@ -219,20 +219,20 @@ List<String>? kidWalkFrames(String gender, int outfit, {required bool up}) {
   final dir = up ? 'ur' : 'dr';
   return <String>[
     for (final f in const ['a', 'b', 'c', 'd'])
-      'assets/images/character/$g/${g}_full_${kidOutfitCode(outfit)}_walk_${dir}_$f.png',
+      'assets/images/character/$g/${g}_full_${kidOutfitCode(outfit)}_walk_${dir}_$f.webp',
   ];
 }
 
 /// Lớp phủ kính tròn (cùng khung, khớp ảnh đứng và vẫy).
 String kidGlassesAsset(String gender) {
   final g = kidGender(gender);
-  return 'assets/images/character/$g/${g}_glasses_01.png';
+  return 'assets/images/character/$g/${g}_glasses_01.webp';
 }
 
 /// Lớp phủ giày trắng thay giày màu của bộ đồ (cùng khung).
 String kidWhiteShoesAsset(String gender) {
   final g = kidGender(gender);
-  return 'assets/images/character/$g/${g}_shoes_02.png';
+  return 'assets/images/character/$g/${g}_shoes_02.webp';
 }
 
 /// Ảnh khung nhân vật 1024x1536 giải mã ở bề ngang [width] (mặc định

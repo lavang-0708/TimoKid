@@ -67,7 +67,7 @@ Mọi lớp phải chồng khít lên khuôn. Đặt lớp lên khuôn (bật 50
 | `girl_top_02` | Váy tím (mẫu váy tím trên `girl_outfits_gray.jpg` hoặc tấm concept), vẽ lại cho vừa thân |
 | `girl_shoes_01` | Giày hồng có nơ kèm tất trắng như concept |
 
-**Gửi kèm:** một ảnh ghép 3 hình gồm thân + tóc + mắt + miệng mặc đồ lót, mặc váy hồng, mặc váy tím. Đặt cạnh `girl_muc_tieu_phong_cach.png` để so.
+**Gửi kèm:** một ảnh ghép 3 hình gồm thân + tóc + mắt + miệng mặc đồ lót, mặc váy hồng, mặc váy tím. Đặt cạnh `girl_muc_tieu_phong_cach.webp` để so.
 
 **Chỉ gửi ảnh ghép xem trước.** Ảnh ghép được duyệt thì mới gửi các lớp lên repo. Claude chưa duyệt thì chưa gửi lớp.
 

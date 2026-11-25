@@ -120,7 +120,7 @@ void main() {
     test('đường dẫn asset suy ra từ mã manifest', () {
       final outfit = outfitA();
       final top = outfit.layers.firstWhere((l) => l.id == 'girl_top_01');
-      expect(top.assetPath, 'assets/images/character/girl/girl_top_01.png');
+      expect(top.assetPath, 'assets/images/character/girl/girl_top_01.webp');
     });
   });
 

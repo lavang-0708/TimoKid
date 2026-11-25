@@ -19,8 +19,8 @@
 ///
 /// Hình: mặc định vết nứt vẽ bằng CustomPaint đè lên PNG trứng, hai
 /// nửa vỏ là PNG trứng cắt theo đường ziczac; khi Muse giao hình
-/// ([eggCrackArtReady] = true) thì dùng `{loài}_egg_crack_1..3.png`,
-/// `{loài}_shell_top.png`, `{loài}_shell_bottom.png`.
+/// ([eggCrackArtReady] = true) thì dùng `{loài}_egg_crack_1..3.webp`,
+/// `{loài}_shell_top.webp`, `{loài}_shell_bottom.webp`.
 ///
 /// Màn chỉ vào được khi có lần nở đang chờ (`hatch_pending`); nếu
 /// mở trực tiếp mà không có trứng hay không có lần chờ thì hiện thông

@@ -1,7 +1,7 @@
 /// Đường đi + hướng/lật cho bản đồ Thị trấn v3b (PR (C)).
 ///
 /// Logic thuần (không widget) để test được trực tiếp:
-/// - 2 đoạn đường C1/C2 đo từ mặt nhựa thật của `town_v3.png` (khung
+/// - 2 đoạn đường C1/C2 đo từ mặt nhựa thật của `town_v3.webp` (khung
 ///   nền 1600x900, nửa rộng vùng đường [townRoadHalfWidth] = 60 px;
 ///   xem `docs/ASSETS.md` mục "Đường đi C1/C2"). Ghi chú D1–D6 ở dưới
 ///   là lịch sử các vòng sửa trước khi đo lại;
@@ -66,7 +66,7 @@ class TownRoadSegment {
 const List<TownRoadSegment> townRoads = [
   // C1: đường chéo xuống-phải, từ giữa Tiệm bánh/Tháp qua ngã tư lớn
   // (1090, 650) ra mép phải dưới. Tâm đường đo từ mặt nhựa của
-  // town_v3.png (nửa rộng mặt nhựa ~32 px, cộng vỉa hè ~28 px).
+  // town_v3.webp (nửa rộng mặt nhựa ~32 px, cộng vỉa hè ~28 px).
   TownRoadSegment(name: 'C1', points: [Offset(700, 459), Offset(1600, 904)]),
   // C2: đường chéo lên-phải, từ ngã ba dưới (770, 810) qua ngã tư lớn
   // lên mép phải giữa.
@@ -170,7 +170,7 @@ const Map<String, TownTravelDirection> personVariantFacing = {
 class TownSpriteChoice {
   const TownSpriteChoice({required this.asset, required this.flipHorizontal});
 
-  /// Đường dẫn asset PNG (vd `assets/images/town/car_01_dr.png`).
+  /// Đường dẫn asset PNG (vd `assets/images/town/car_01_dr.webp`).
   final String asset;
 
   /// true = lật ngang ảnh (dùng cho 2 hướng còn lại).
@@ -182,19 +182,19 @@ class TownSpriteChoice {
 TownSpriteChoice carSpriteFor(String model, TownTravelDirection direction) {
   return switch (direction) {
     TownTravelDirection.downRight => TownSpriteChoice(
-      asset: 'assets/images/town/${model}_dr.png',
+      asset: 'assets/images/town/${model}_dr.webp',
       flipHorizontal: false,
     ),
     TownTravelDirection.downLeft => TownSpriteChoice(
-      asset: 'assets/images/town/${model}_dr.png',
+      asset: 'assets/images/town/${model}_dr.webp',
       flipHorizontal: true,
     ),
     TownTravelDirection.upLeft => TownSpriteChoice(
-      asset: 'assets/images/town/${model}_ur.png',
+      asset: 'assets/images/town/${model}_ur.webp',
       flipHorizontal: false,
     ),
     TownTravelDirection.upRight => TownSpriteChoice(
-      asset: 'assets/images/town/${model}_ur.png',
+      asset: 'assets/images/town/${model}_ur.webp',
       flipHorizontal: true,
     ),
   };
@@ -210,19 +210,19 @@ TownSpriteChoice personSpriteFor(
   final frame = frameB ? 'b' : 'a';
   return switch (direction) {
     TownTravelDirection.downRight => TownSpriteChoice(
-      asset: 'assets/images/town/${model}_dr_$frame.png',
+      asset: 'assets/images/town/${model}_dr_$frame.webp',
       flipHorizontal: false,
     ),
     TownTravelDirection.downLeft => TownSpriteChoice(
-      asset: 'assets/images/town/${model}_dr_$frame.png',
+      asset: 'assets/images/town/${model}_dr_$frame.webp',
       flipHorizontal: true,
     ),
     TownTravelDirection.upRight => TownSpriteChoice(
-      asset: 'assets/images/town/${model}_ur_$frame.png',
+      asset: 'assets/images/town/${model}_ur_$frame.webp',
       flipHorizontal: false,
     ),
     TownTravelDirection.upLeft => TownSpriteChoice(
-      asset: 'assets/images/town/${model}_ur_$frame.png',
+      asset: 'assets/images/town/${model}_ur_$frame.webp',
       flipHorizontal: true,
     ),
   };
@@ -359,7 +359,7 @@ bool pingPongForward(double progress) {
 
 /// Tuyến xe 1 (xe hồng): làn phía nam của C1, tới-lui giữa (774, 511)
 /// và (1524, 882). Đã đối chiếu từng điểm (mỗi 5 px) với mặt nhựa của
-/// town_v3.png: chỉ lệch ở vạch qua đường của ngã tư.
+/// town_v3.webp: chỉ lệch ở vạch qua đường của ngã tư.
 final TownRoute car1Route = TownRoute(const [
   Offset(774, 511),
   Offset(1524, 882),

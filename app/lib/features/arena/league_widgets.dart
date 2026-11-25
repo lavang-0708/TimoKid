@@ -2,7 +2,7 @@
 /// hộp thoại rương cuối tuần (spec tuần 23/11, mục B).
 ///
 /// Khi [leagueArtReady] false thì dùng icon Material; true thì dùng ảnh
-/// `ui_league_<mã>.png` và `ui_chest_<mã>.png`.
+/// `ui_league_<mã>.webp` và `ui_chest_<mã>.webp`.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -31,7 +31,7 @@ class LeagueBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     if (leagueArtReady) {
       return Image.asset(
-        'assets/images/ui/ui_league_${tier.code}.png',
+        'assets/images/ui/ui_league_${tier.code}.webp',
         width: size,
         height: size,
       );
@@ -64,7 +64,7 @@ class LeagueChestIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     if (leagueArtReady) {
       return Image.asset(
-        'assets/images/ui/ui_chest_${tier.code}.png',
+        'assets/images/ui/ui_chest_${tier.code}.webp',
         width: size,
         height: size,
       );

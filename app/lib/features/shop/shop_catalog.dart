@@ -158,19 +158,19 @@ class ShopItem {
 
 /// Thức ăn cho pet: mã → (tên, đường dẫn ảnh).
 const Map<String, (String, String)> petFoods = <String, (String, String)>{
-  'pet_food_bone': ('Xương', 'assets/images/items/pet_food_bone.png'),
-  'pet_food_fish': ('Cá', 'assets/images/items/pet_food_fish.png'),
-  'pet_food_carrot': ('Cà rốt', 'assets/images/items/pet_food_carrot.png'),
+  'pet_food_bone': ('Xương', 'assets/images/items/pet_food_bone.webp'),
+  'pet_food_fish': ('Cá', 'assets/images/items/pet_food_fish.webp'),
+  'pet_food_carrot': ('Cà rốt', 'assets/images/items/pet_food_carrot.webp'),
 };
 
 /// Đồ chơi cho pet: mã → (tên, đường dẫn ảnh).
 const Map<String, (String, String)> petToys = <String, (String, String)>{
-  'pet_toy_ball': ('Quả bóng', 'assets/images/items/pet_toy_ball.png'),
-  'pet_toy_yarn': ('Cuộn len', 'assets/images/items/pet_toy_yarn.png'),
-  'pet_toy_plush': ('Thú bông', 'assets/images/items/pet_toy_plush.png'),
+  'pet_toy_ball': ('Quả bóng', 'assets/images/items/pet_toy_ball.webp'),
+  'pet_toy_yarn': ('Cuộn len', 'assets/images/items/pet_toy_yarn.webp'),
+  'pet_toy_plush': ('Thú bông', 'assets/images/items/pet_toy_plush.webp'),
 };
 
-/// Nội thất bán: mã → (tên, giá xu). Ảnh `assets/images/furniture/<mã>.png`;
+/// Nội thất bán: mã → (tên, giá xu). Ảnh `assets/images/furniture/<mã>.webp`;
 /// ô đặt trong phòng ở `roomShopFurniture` (`room_assets.dart`).
 const Map<String, (String, int)> shopFurniture = <String, (String, int)>{
   'noi_be_ca': ('Bể cá', 120),
@@ -203,7 +203,7 @@ List<ShopItem> shopPetEggItems() => [
 ];
 
 /// Ảnh nội thất mua được.
-String shopFurnitureAsset(String id) => 'assets/images/furniture/$id.png';
+String shopFurnitureAsset(String id) => 'assets/images/furniture/$id.webp';
 
 /// Toàn bộ món bán cho một dáng (`girl`/`boy`); giá trị lạ coi như `girl`.
 /// [furnitureReady] / [premiumOutfitsReady] mặc định theo cờ const; chỉ

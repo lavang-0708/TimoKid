@@ -186,7 +186,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             decoration: BoxDecoration(
               color: Color(0xFFE4D7FF),
               image: DecorationImage(
-                image: AssetImage('$uiArt/ui_onboarding_bg.png'),
+                image: AssetImage('$uiArt/ui_onboarding_bg.webp'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -923,7 +923,7 @@ class _Pedestal extends StatelessWidget {
     return const DecoratedBox(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('$uiArt/ui_pedestal.png'),
+          image: AssetImage('$uiArt/ui_pedestal.webp'),
           fit: BoxFit.fill,
         ),
       ),

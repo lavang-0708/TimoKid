@@ -223,7 +223,7 @@ def main():
         assert img.size == (W, H), (layer_id, img.size)
         assert img.mode == "RGBA", layer_id
         b64 = base64.b64encode(raw).decode("ascii")
-        asset = f"assets/images/character/girl/{layer_id}.png"
+        asset = f"assets/images/character/girl/{layer_id}.webp"
         entries.append((asset, b64))
     lines = [
         "/// Fixture hình tạm cho T2-02 (file sinh tự động, đừng sửa tay).",

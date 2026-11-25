@@ -13,14 +13,14 @@ caro: cùng tông với nền, không lẫn nền, không cắt cụt.
 
 ## Lưu ý định dạng nền
 
-- Nền thị trấn đẩy dạng **PNG** (`town_v2.png`), KHÔNG phải JPEG như
+- Nền thị trấn đẩy dạng **PNG** (`town_v2.webp`), KHÔNG phải JPEG như
   `docs/ASSETS.md` ghi cho loại `background`. Lý do: `tools/assets/decode_incoming.py`
   trên main chỉ chấp nhận PNG (kiểm tra signature PNG, báo lỗi với file khác).
 - PNG 1600x900 đủ màu là 1.984.654 byte (> 1 MB) nên đã lượng tử hóa 256 màu
   + dithering Floyd-Steinberg: còn **581.584 byte** (< 1 MB), xem bằng mắt
   không thấy nhiễu dithering ở cỡ hiển thị, đủ 6 công trình, không cắt cụt.
 - Giai đoạn 2 sẽ cập nhật `docs/ASSETS.md` + manifest cho đúng
-  (nền `town_v2.png`, khung 1600x900).
+  (nền `town_v2.webp`, khung 1600x900).
 
 ## Danh sách file
 

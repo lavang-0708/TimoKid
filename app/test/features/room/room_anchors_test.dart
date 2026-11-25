@@ -1,6 +1,6 @@
 /// Test hình học thuần cho màn Phòng v3b (D): mọi điểm neo/đa giác/
 /// dấu chân trong `docs/D_IMAGES.md` đã kiểm chứng bằng code trên
-/// ảnh `room_v3.png` thật (xem mục 8 trong `docs/D_IMAGES.md` —
+/// ảnh `room_v3.webp` thật (xem mục 8 trong `docs/D_IMAGES.md` —
 /// bài học từ PR #31: không tin vùng khai báo tay, kiểm bằng code).
 ///
 /// Test này chạy KHÔNG cần widget: chỉ kiểm các hằng số hình học
@@ -33,10 +33,10 @@ void main() {
       'room-furniture-coc-sao',
     ]);
     for (final item in roomFurniture) {
-      expect(item.asset, endsWith('_v3.png'));
+      expect(item.asset, endsWith('_v3.webp'));
       expect(item.asset, startsWith('assets/images/furniture/'));
     }
-    expect(roomBackgroundAsset, 'assets/images/backgrounds/room_v3.png');
+    expect(roomBackgroundAsset, 'assets/images/backgrounds/room_v3.webp');
   });
 
   test('điểm neo gấu/đèn/bình/cốc trên mặt phẳng đúng', () {
@@ -84,7 +84,7 @@ void main() {
   });
 
   test('vùng chạm = hộp món vẽ sẵn trong nền (đo bằng PIL 22/11)', () {
-    // Nền room_v3.png đã VẼ SẴN 5 món nên app không vẽ PNG rời đè
+    // Nền room_v3.webp đã VẼ SẴN 5 món nên app không vẽ PNG rời đè
     // lên (đè → hình đôi) mà đặt vùng chạm vô hình đúng hộp món đo
     // trên ảnh thật. Rect đo bằng PIL (khung 1600x900).
     const measured = <String, Rect>{
@@ -113,7 +113,7 @@ void main() {
     ]);
     expect(
       roomCleanBackgroundAsset,
-      'assets/images/backgrounds/room_v3_clean.png',
+      'assets/images/backgrounds/room_v3_clean.webp',
     );
   });
 

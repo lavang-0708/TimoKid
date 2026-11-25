@@ -5,29 +5,29 @@
     "character": {
       "width": 1024,
       "height": 1536,
-      "format": "png",
+      "format": "webp",
       "note": "Khung nhân vật, nền trong suốt, xem assets/templates/khung_nhan_vat_nu.svg (nữ) và khung_nhan_vat_nam.svg (nam)."
     },
     "pet": {
       "width": 512,
       "height": 512,
-      "format": "png",
+      "format": "webp",
       "note": "Pet và trứng, nền trong suốt, mặt đất y = 440, xem assets/templates/khung_pet_do_vat.svg."
     },
     "item": {
       "width": 512,
       "height": 512,
-      "format": "png",
+      "format": "webp",
       "note": "Đồ vật (thức ăn pet, đồ chơi, nội thất nhỏ), nền trong suốt, xem assets/templates/khung_pet_do_vat.svg."
     },
     "furniture": {
       "width": 512,
       "height": 512,
-      "format": "png",
+      "format": "webp",
       "note": "Nội thất đặt trong phòng, nền trong suốt, xem assets/templates/khung_pet_do_vat.svg."
     },
     "background": {
-      "format": "jpg, png",
+      "format": "jpg, webp",
       "note": "Nền phòng/thị trấn, JPEG hoặc PNG (không có nền trong suốt), tỉ lệ ngang 16:9, khuyến nghị 1600x900 trở lên. Nền PNG được phép từ A1 vì đường đưa ảnh base64 chỉ nhận PNG."
     },
     "icon": {
@@ -37,7 +37,7 @@
     "town_layer": {
       "width": 512,
       "height": 512,
-      "format": "png",
+      "format": "webp",
       "note": "Lớp động trên bản đồ thị trấn (mây, xe, cây, người đi bộ), nền trong suốt, xem docs/ASSETS.md mục \"Thị trấn v3b\"."
     }
   },
@@ -96,7 +96,7 @@
   "entries": [
     {
       "id": "girl_body_01",
-      "file": "app/assets/images/character/girl/girl_body_01.png",
+      "file": "app/assets/images/character/girl/girl_body_01.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "body",
@@ -111,7 +111,7 @@
     },
     {
       "id": "girl_body_01_line",
-      "file": "app/assets/images/character/girl/girl_body_01_line.png",
+      "file": "app/assets/images/character/girl/girl_body_01_line.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "body",
@@ -126,7 +126,7 @@
     },
     {
       "id": "girl_eyes_01",
-      "file": "app/assets/images/character/girl/girl_eyes_01.png",
+      "file": "app/assets/images/character/girl/girl_eyes_01.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "eyes",
@@ -141,7 +141,7 @@
     },
     {
       "id": "girl_eyes_01_line",
-      "file": "app/assets/images/character/girl/girl_eyes_01_line.png",
+      "file": "app/assets/images/character/girl/girl_eyes_01_line.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "eyes",
@@ -156,7 +156,7 @@
     },
     {
       "id": "girl_eyes_02",
-      "file": "app/assets/images/character/girl/girl_eyes_02.png",
+      "file": "app/assets/images/character/girl/girl_eyes_02.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "eyes",
@@ -171,7 +171,7 @@
     },
     {
       "id": "girl_eyes_02_line",
-      "file": "app/assets/images/character/girl/girl_eyes_02_line.png",
+      "file": "app/assets/images/character/girl/girl_eyes_02_line.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "eyes",
@@ -186,7 +186,7 @@
     },
     {
       "id": "girl_eyes_03",
-      "file": "app/assets/images/character/girl/girl_eyes_03.png",
+      "file": "app/assets/images/character/girl/girl_eyes_03.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "eyes",
@@ -201,7 +201,7 @@
     },
     {
       "id": "girl_eyes_03_line",
-      "file": "app/assets/images/character/girl/girl_eyes_03_line.png",
+      "file": "app/assets/images/character/girl/girl_eyes_03_line.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "eyes",
@@ -216,7 +216,7 @@
     },
     {
       "id": "girl_mouth_01",
-      "file": "app/assets/images/character/girl/girl_mouth_01.png",
+      "file": "app/assets/images/character/girl/girl_mouth_01.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "mouth",
@@ -231,7 +231,7 @@
     },
     {
       "id": "girl_mouth_01_line",
-      "file": "app/assets/images/character/girl/girl_mouth_01_line.png",
+      "file": "app/assets/images/character/girl/girl_mouth_01_line.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "mouth",
@@ -246,7 +246,7 @@
     },
     {
       "id": "girl_mouth_02",
-      "file": "app/assets/images/character/girl/girl_mouth_02.png",
+      "file": "app/assets/images/character/girl/girl_mouth_02.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "mouth",
@@ -261,7 +261,7 @@
     },
     {
       "id": "girl_mouth_02_line",
-      "file": "app/assets/images/character/girl/girl_mouth_02_line.png",
+      "file": "app/assets/images/character/girl/girl_mouth_02_line.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "mouth",
@@ -276,7 +276,7 @@
     },
     {
       "id": "girl_mouth_03",
-      "file": "app/assets/images/character/girl/girl_mouth_03.png",
+      "file": "app/assets/images/character/girl/girl_mouth_03.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "mouth",
@@ -291,7 +291,7 @@
     },
     {
       "id": "girl_mouth_03_line",
-      "file": "app/assets/images/character/girl/girl_mouth_03_line.png",
+      "file": "app/assets/images/character/girl/girl_mouth_03_line.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "mouth",
@@ -306,7 +306,7 @@
     },
     {
       "id": "girl_hair_back_01",
-      "file": "app/assets/images/character/girl/girl_hair_back_01.png",
+      "file": "app/assets/images/character/girl/girl_hair_back_01.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "hair_back",
@@ -321,7 +321,7 @@
     },
     {
       "id": "girl_hair_front_01",
-      "file": "app/assets/images/character/girl/girl_hair_front_01.png",
+      "file": "app/assets/images/character/girl/girl_hair_front_01.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "hair_front",
@@ -336,7 +336,7 @@
     },
     {
       "id": "girl_hair_back_02",
-      "file": "app/assets/images/character/girl/girl_hair_back_02.png",
+      "file": "app/assets/images/character/girl/girl_hair_back_02.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "hair_back",
@@ -351,7 +351,7 @@
     },
     {
       "id": "girl_hair_front_02",
-      "file": "app/assets/images/character/girl/girl_hair_front_02.png",
+      "file": "app/assets/images/character/girl/girl_hair_front_02.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "hair_front",
@@ -366,7 +366,7 @@
     },
     {
       "id": "girl_hair_back_03",
-      "file": "app/assets/images/character/girl/girl_hair_back_03.png",
+      "file": "app/assets/images/character/girl/girl_hair_back_03.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "hair_back",
@@ -381,7 +381,7 @@
     },
     {
       "id": "girl_hair_front_03",
-      "file": "app/assets/images/character/girl/girl_hair_front_03.png",
+      "file": "app/assets/images/character/girl/girl_hair_front_03.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "hair_front",
@@ -396,7 +396,7 @@
     },
     {
       "id": "girl_top_01",
-      "file": "app/assets/images/character/girl/girl_top_01.png",
+      "file": "app/assets/images/character/girl/girl_top_01.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "top",
@@ -411,7 +411,7 @@
     },
     {
       "id": "girl_top_02",
-      "file": "app/assets/images/character/girl/girl_top_02.png",
+      "file": "app/assets/images/character/girl/girl_top_02.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "top",
@@ -426,7 +426,7 @@
     },
     {
       "id": "girl_top_03",
-      "file": "app/assets/images/character/girl/girl_top_03.png",
+      "file": "app/assets/images/character/girl/girl_top_03.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "top",
@@ -441,7 +441,7 @@
     },
     {
       "id": "girl_bottom_01",
-      "file": "app/assets/images/character/girl/girl_bottom_01.png",
+      "file": "app/assets/images/character/girl/girl_bottom_01.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "bottom",
@@ -456,7 +456,7 @@
     },
     {
       "id": "girl_bottom_02",
-      "file": "app/assets/images/character/girl/girl_bottom_02.png",
+      "file": "app/assets/images/character/girl/girl_bottom_02.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "bottom",
@@ -471,7 +471,7 @@
     },
     {
       "id": "girl_shoes_01",
-      "file": "app/assets/images/character/girl/girl_shoes_01.png",
+      "file": "app/assets/images/character/girl/girl_shoes_01.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "shoes",
@@ -486,7 +486,7 @@
     },
     {
       "id": "girl_accessory_head_01",
-      "file": "app/assets/images/character/girl/girl_accessory_head_01.png",
+      "file": "app/assets/images/character/girl/girl_accessory_head_01.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "accessory_head",
@@ -501,7 +501,7 @@
     },
     {
       "id": "girl_accessory_head_02",
-      "file": "app/assets/images/character/girl/girl_accessory_head_02.png",
+      "file": "app/assets/images/character/girl/girl_accessory_head_02.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "accessory_head",
@@ -516,7 +516,7 @@
     },
     {
       "id": "girl_accessory_hand_01",
-      "file": "app/assets/images/character/girl/girl_accessory_hand_01.png",
+      "file": "app/assets/images/character/girl/girl_accessory_hand_01.webp",
       "kind": "character_layer",
       "form": "girl",
       "layer": "accessory_hand",
@@ -531,7 +531,7 @@
     },
     {
       "id": "boy_body_01",
-      "file": "app/assets/images/character/boy/boy_body_01.png",
+      "file": "app/assets/images/character/boy/boy_body_01.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "body",
@@ -546,7 +546,7 @@
     },
     {
       "id": "boy_body_01_line",
-      "file": "app/assets/images/character/boy/boy_body_01_line.png",
+      "file": "app/assets/images/character/boy/boy_body_01_line.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "body",
@@ -561,7 +561,7 @@
     },
     {
       "id": "boy_eyes_01",
-      "file": "app/assets/images/character/boy/boy_eyes_01.png",
+      "file": "app/assets/images/character/boy/boy_eyes_01.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "eyes",
@@ -576,7 +576,7 @@
     },
     {
       "id": "boy_eyes_01_line",
-      "file": "app/assets/images/character/boy/boy_eyes_01_line.png",
+      "file": "app/assets/images/character/boy/boy_eyes_01_line.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "eyes",
@@ -591,7 +591,7 @@
     },
     {
       "id": "boy_eyes_02",
-      "file": "app/assets/images/character/boy/boy_eyes_02.png",
+      "file": "app/assets/images/character/boy/boy_eyes_02.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "eyes",
@@ -606,7 +606,7 @@
     },
     {
       "id": "boy_eyes_02_line",
-      "file": "app/assets/images/character/boy/boy_eyes_02_line.png",
+      "file": "app/assets/images/character/boy/boy_eyes_02_line.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "eyes",
@@ -621,7 +621,7 @@
     },
     {
       "id": "boy_eyes_03",
-      "file": "app/assets/images/character/boy/boy_eyes_03.png",
+      "file": "app/assets/images/character/boy/boy_eyes_03.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "eyes",
@@ -636,7 +636,7 @@
     },
     {
       "id": "boy_eyes_03_line",
-      "file": "app/assets/images/character/boy/boy_eyes_03_line.png",
+      "file": "app/assets/images/character/boy/boy_eyes_03_line.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "eyes",
@@ -651,7 +651,7 @@
     },
     {
       "id": "boy_mouth_01",
-      "file": "app/assets/images/character/boy/boy_mouth_01.png",
+      "file": "app/assets/images/character/boy/boy_mouth_01.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "mouth",
@@ -666,7 +666,7 @@
     },
     {
       "id": "boy_mouth_01_line",
-      "file": "app/assets/images/character/boy/boy_mouth_01_line.png",
+      "file": "app/assets/images/character/boy/boy_mouth_01_line.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "mouth",
@@ -681,7 +681,7 @@
     },
     {
       "id": "boy_mouth_02",
-      "file": "app/assets/images/character/boy/boy_mouth_02.png",
+      "file": "app/assets/images/character/boy/boy_mouth_02.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "mouth",
@@ -696,7 +696,7 @@
     },
     {
       "id": "boy_mouth_02_line",
-      "file": "app/assets/images/character/boy/boy_mouth_02_line.png",
+      "file": "app/assets/images/character/boy/boy_mouth_02_line.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "mouth",
@@ -711,7 +711,7 @@
     },
     {
       "id": "boy_mouth_03",
-      "file": "app/assets/images/character/boy/boy_mouth_03.png",
+      "file": "app/assets/images/character/boy/boy_mouth_03.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "mouth",
@@ -726,7 +726,7 @@
     },
     {
       "id": "boy_mouth_03_line",
-      "file": "app/assets/images/character/boy/boy_mouth_03_line.png",
+      "file": "app/assets/images/character/boy/boy_mouth_03_line.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "mouth",
@@ -741,7 +741,7 @@
     },
     {
       "id": "boy_hair_back_01",
-      "file": "app/assets/images/character/boy/boy_hair_back_01.png",
+      "file": "app/assets/images/character/boy/boy_hair_back_01.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "hair_back",
@@ -756,7 +756,7 @@
     },
     {
       "id": "boy_hair_front_01",
-      "file": "app/assets/images/character/boy/boy_hair_front_01.png",
+      "file": "app/assets/images/character/boy/boy_hair_front_01.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "hair_front",
@@ -771,7 +771,7 @@
     },
     {
       "id": "boy_hair_back_02",
-      "file": "app/assets/images/character/boy/boy_hair_back_02.png",
+      "file": "app/assets/images/character/boy/boy_hair_back_02.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "hair_back",
@@ -786,7 +786,7 @@
     },
     {
       "id": "boy_hair_front_02",
-      "file": "app/assets/images/character/boy/boy_hair_front_02.png",
+      "file": "app/assets/images/character/boy/boy_hair_front_02.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "hair_front",
@@ -801,7 +801,7 @@
     },
     {
       "id": "boy_top_01",
-      "file": "app/assets/images/character/boy/boy_top_01.png",
+      "file": "app/assets/images/character/boy/boy_top_01.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "top",
@@ -816,7 +816,7 @@
     },
     {
       "id": "boy_top_02",
-      "file": "app/assets/images/character/boy/boy_top_02.png",
+      "file": "app/assets/images/character/boy/boy_top_02.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "top",
@@ -831,7 +831,7 @@
     },
     {
       "id": "boy_bottom_01",
-      "file": "app/assets/images/character/boy/boy_bottom_01.png",
+      "file": "app/assets/images/character/boy/boy_bottom_01.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "bottom",
@@ -846,7 +846,7 @@
     },
     {
       "id": "boy_shoes_01",
-      "file": "app/assets/images/character/boy/boy_shoes_01.png",
+      "file": "app/assets/images/character/boy/boy_shoes_01.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "shoes",
@@ -861,7 +861,7 @@
     },
     {
       "id": "boy_accessory_head_01",
-      "file": "app/assets/images/character/boy/boy_accessory_head_01.png",
+      "file": "app/assets/images/character/boy/boy_accessory_head_01.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "accessory_head",
@@ -876,7 +876,7 @@
     },
     {
       "id": "boy_accessory_hand_01",
-      "file": "app/assets/images/character/boy/boy_accessory_hand_01.png",
+      "file": "app/assets/images/character/boy/boy_accessory_hand_01.webp",
       "kind": "character_layer",
       "form": "boy",
       "layer": "accessory_hand",
@@ -891,7 +891,7 @@
     },
     {
       "id": "dog_egg",
-      "file": "app/assets/images/pets/dog_egg.png",
+      "file": "app/assets/images/pets/dog_egg.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -906,7 +906,7 @@
     },
     {
       "id": "dog_newborn",
-      "file": "app/assets/images/pets/dog_newborn.png",
+      "file": "app/assets/images/pets/dog_newborn.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -921,7 +921,7 @@
     },
     {
       "id": "dog_teen",
-      "file": "app/assets/images/pets/dog_teen.png",
+      "file": "app/assets/images/pets/dog_teen.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -936,7 +936,7 @@
     },
     {
       "id": "dog_adult",
-      "file": "app/assets/images/pets/dog_adult.png",
+      "file": "app/assets/images/pets/dog_adult.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -951,7 +951,7 @@
     },
     {
       "id": "cat_egg",
-      "file": "app/assets/images/pets/cat_egg.png",
+      "file": "app/assets/images/pets/cat_egg.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -966,7 +966,7 @@
     },
     {
       "id": "cat_newborn",
-      "file": "app/assets/images/pets/cat_newborn.png",
+      "file": "app/assets/images/pets/cat_newborn.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -981,7 +981,7 @@
     },
     {
       "id": "cat_teen",
-      "file": "app/assets/images/pets/cat_teen.png",
+      "file": "app/assets/images/pets/cat_teen.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -996,7 +996,7 @@
     },
     {
       "id": "cat_adult",
-      "file": "app/assets/images/pets/cat_adult.png",
+      "file": "app/assets/images/pets/cat_adult.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -1011,7 +1011,7 @@
     },
     {
       "id": "rabbit_egg",
-      "file": "app/assets/images/pets/rabbit_egg.png",
+      "file": "app/assets/images/pets/rabbit_egg.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -1026,7 +1026,7 @@
     },
     {
       "id": "rabbit_newborn",
-      "file": "app/assets/images/pets/rabbit_newborn.png",
+      "file": "app/assets/images/pets/rabbit_newborn.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -1041,7 +1041,7 @@
     },
     {
       "id": "rabbit_teen",
-      "file": "app/assets/images/pets/rabbit_teen.png",
+      "file": "app/assets/images/pets/rabbit_teen.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -1056,7 +1056,7 @@
     },
     {
       "id": "rabbit_adult",
-      "file": "app/assets/images/pets/rabbit_adult.png",
+      "file": "app/assets/images/pets/rabbit_adult.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -1101,7 +1101,7 @@
     },
     {
       "id": "room_v3",
-      "file": "app/assets/images/backgrounds/room_v3.png",
+      "file": "app/assets/images/backgrounds/room_v3.webp",
       "kind": "background",
       "form": "any",
       "layer": null,
@@ -1116,7 +1116,7 @@
     },
     {
       "id": "gau_bong_v3",
-      "file": "app/assets/images/furniture/gau_bong_v3.png",
+      "file": "app/assets/images/furniture/gau_bong_v3.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -1131,7 +1131,7 @@
     },
     {
       "id": "den_sao_v3",
-      "file": "app/assets/images/furniture/den_sao_v3.png",
+      "file": "app/assets/images/furniture/den_sao_v3.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -1146,7 +1146,7 @@
     },
     {
       "id": "chau_cay_v3",
-      "file": "app/assets/images/furniture/chau_cay_v3.png",
+      "file": "app/assets/images/furniture/chau_cay_v3.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -1161,7 +1161,7 @@
     },
     {
       "id": "binh_hoa_v3",
-      "file": "app/assets/images/furniture/binh_hoa_v3.png",
+      "file": "app/assets/images/furniture/binh_hoa_v3.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -1176,7 +1176,7 @@
     },
     {
       "id": "coc_sao_v3",
-      "file": "app/assets/images/furniture/coc_sao_v3.png",
+      "file": "app/assets/images/furniture/coc_sao_v3.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -1191,7 +1191,7 @@
     },
     {
       "id": "room_v2",
-      "file": "app/assets/images/backgrounds/room_v2.png",
+      "file": "app/assets/images/backgrounds/room_v2.webp",
       "kind": "background",
       "form": "any",
       "layer": null,
@@ -1206,7 +1206,7 @@
     },
     {
       "id": "goi",
-      "file": "app/assets/images/furniture/goi.png",
+      "file": "app/assets/images/furniture/goi.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -1221,7 +1221,7 @@
     },
     {
       "id": "coc_sao",
-      "file": "app/assets/images/furniture/coc_sao.png",
+      "file": "app/assets/images/furniture/coc_sao.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -1236,7 +1236,7 @@
     },
     {
       "id": "binh_hoa",
-      "file": "app/assets/images/furniture/binh_hoa.png",
+      "file": "app/assets/images/furniture/binh_hoa.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -1251,7 +1251,7 @@
     },
     {
       "id": "chau_cay",
-      "file": "app/assets/images/furniture/chau_cay.png",
+      "file": "app/assets/images/furniture/chau_cay.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -1266,7 +1266,7 @@
     },
     {
       "id": "khung_anh",
-      "file": "app/assets/images/furniture/khung_anh.png",
+      "file": "app/assets/images/furniture/khung_anh.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -1281,7 +1281,7 @@
     },
     {
       "id": "gau_bong",
-      "file": "app/assets/images/furniture/gau_bong.png",
+      "file": "app/assets/images/furniture/gau_bong.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -1296,7 +1296,7 @@
     },
     {
       "id": "den_sao",
-      "file": "app/assets/images/furniture/den_sao.png",
+      "file": "app/assets/images/furniture/den_sao.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -1311,7 +1311,7 @@
     },
     {
       "id": "day_co",
-      "file": "app/assets/images/furniture/day_co.png",
+      "file": "app/assets/images/furniture/day_co.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -1401,7 +1401,7 @@
     },
     {
       "id": "town_v2",
-      "file": "app/assets/images/backgrounds/town_v2.png",
+      "file": "app/assets/images/backgrounds/town_v2.webp",
       "kind": "background",
       "form": "any",
       "layer": null,
@@ -1416,7 +1416,7 @@
     },
     {
       "id": "town_v3",
-      "file": "app/assets/images/backgrounds/town_v3.png",
+      "file": "app/assets/images/backgrounds/town_v3.webp",
       "kind": "background",
       "form": "any",
       "layer": null,
@@ -1431,7 +1431,7 @@
     },
     {
       "id": "cloud_01",
-      "file": "app/assets/images/town/cloud_01.png",
+      "file": "app/assets/images/town/cloud_01.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1446,7 +1446,7 @@
     },
     {
       "id": "cloud_02",
-      "file": "app/assets/images/town/cloud_02.png",
+      "file": "app/assets/images/town/cloud_02.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1461,7 +1461,7 @@
     },
     {
       "id": "cloud_03",
-      "file": "app/assets/images/town/cloud_03.png",
+      "file": "app/assets/images/town/cloud_03.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1476,7 +1476,7 @@
     },
     {
       "id": "fountain",
-      "file": "app/assets/images/town/fountain.png",
+      "file": "app/assets/images/town/fountain.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1491,7 +1491,7 @@
     },
     {
       "id": "tree_01",
-      "file": "app/assets/images/town/tree_01.png",
+      "file": "app/assets/images/town/tree_01.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1506,7 +1506,7 @@
     },
     {
       "id": "tree_02",
-      "file": "app/assets/images/town/tree_02.png",
+      "file": "app/assets/images/town/tree_02.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1521,7 +1521,7 @@
     },
     {
       "id": "car_01_dr",
-      "file": "app/assets/images/town/car_01_dr.png",
+      "file": "app/assets/images/town/car_01_dr.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1536,7 +1536,7 @@
     },
     {
       "id": "car_01_ur",
-      "file": "app/assets/images/town/car_01_ur.png",
+      "file": "app/assets/images/town/car_01_ur.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1551,7 +1551,7 @@
     },
     {
       "id": "car_02_dr",
-      "file": "app/assets/images/town/car_02_dr.png",
+      "file": "app/assets/images/town/car_02_dr.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1566,7 +1566,7 @@
     },
     {
       "id": "car_02_ur",
-      "file": "app/assets/images/town/car_02_ur.png",
+      "file": "app/assets/images/town/car_02_ur.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1581,7 +1581,7 @@
     },
     {
       "id": "person_01_dr_a",
-      "file": "app/assets/images/town/person_01_dr_a.png",
+      "file": "app/assets/images/town/person_01_dr_a.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1596,7 +1596,7 @@
     },
     {
       "id": "person_01_dr_b",
-      "file": "app/assets/images/town/person_01_dr_b.png",
+      "file": "app/assets/images/town/person_01_dr_b.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1611,7 +1611,7 @@
     },
     {
       "id": "person_01_ur_a",
-      "file": "app/assets/images/town/person_01_ur_a.png",
+      "file": "app/assets/images/town/person_01_ur_a.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1626,7 +1626,7 @@
     },
     {
       "id": "person_01_ur_b",
-      "file": "app/assets/images/town/person_01_ur_b.png",
+      "file": "app/assets/images/town/person_01_ur_b.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1641,7 +1641,7 @@
     },
     {
       "id": "person_02_dr_a",
-      "file": "app/assets/images/town/person_02_dr_a.png",
+      "file": "app/assets/images/town/person_02_dr_a.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1656,7 +1656,7 @@
     },
     {
       "id": "person_02_dr_b",
-      "file": "app/assets/images/town/person_02_dr_b.png",
+      "file": "app/assets/images/town/person_02_dr_b.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1671,7 +1671,7 @@
     },
     {
       "id": "person_02_ur_a",
-      "file": "app/assets/images/town/person_02_ur_a.png",
+      "file": "app/assets/images/town/person_02_ur_a.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1686,7 +1686,7 @@
     },
     {
       "id": "person_02_ur_b",
-      "file": "app/assets/images/town/person_02_ur_b.png",
+      "file": "app/assets/images/town/person_02_ur_b.webp",
       "kind": "town_layer",
       "form": "any",
       "layer": null,
@@ -1701,7 +1701,7 @@
     },
     {
       "id": "girl_bow_01",
-      "file": "app/assets/images/character/girl/girl_bow_01.png",
+      "file": "app/assets/images/character/girl/girl_bow_01.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -1716,7 +1716,7 @@
     },
     {
       "id": "girl_eyes_closed_patch",
-      "file": "app/assets/images/character/girl/girl_eyes_closed_patch.png",
+      "file": "app/assets/images/character/girl/girl_eyes_closed_patch.webp",
       "kind": "character_patch",
       "form": "girl",
       "layer": null,
@@ -1731,7 +1731,7 @@
     },
     {
       "id": "girl_full_01",
-      "file": "app/assets/images/character/girl/girl_full_01.png",
+      "file": "app/assets/images/character/girl/girl_full_01.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -1746,7 +1746,7 @@
     },
     {
       "id": "girl_full_01_wave",
-      "file": "app/assets/images/character/girl/girl_full_01_wave.png",
+      "file": "app/assets/images/character/girl/girl_full_01_wave.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -1761,7 +1761,7 @@
     },
     {
       "id": "girl_full_02",
-      "file": "app/assets/images/character/girl/girl_full_02.png",
+      "file": "app/assets/images/character/girl/girl_full_02.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -1776,7 +1776,7 @@
     },
     {
       "id": "girl_full_02_wave",
-      "file": "app/assets/images/character/girl/girl_full_02_wave.png",
+      "file": "app/assets/images/character/girl/girl_full_02_wave.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -1791,7 +1791,7 @@
     },
     {
       "id": "girl_full_03",
-      "file": "app/assets/images/character/girl/girl_full_03.png",
+      "file": "app/assets/images/character/girl/girl_full_03.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -1806,7 +1806,7 @@
     },
     {
       "id": "girl_full_03_wave",
-      "file": "app/assets/images/character/girl/girl_full_03_wave.png",
+      "file": "app/assets/images/character/girl/girl_full_03_wave.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -1821,7 +1821,7 @@
     },
     {
       "id": "girl_glasses_01",
-      "file": "app/assets/images/character/girl/girl_glasses_01.png",
+      "file": "app/assets/images/character/girl/girl_glasses_01.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -1836,7 +1836,7 @@
     },
     {
       "id": "girl_hat_01",
-      "file": "app/assets/images/character/girl/girl_hat_01.png",
+      "file": "app/assets/images/character/girl/girl_hat_01.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -1851,7 +1851,7 @@
     },
     {
       "id": "girl_shoes_02",
-      "file": "app/assets/images/character/girl/girl_shoes_02.png",
+      "file": "app/assets/images/character/girl/girl_shoes_02.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -1866,7 +1866,7 @@
     },
     {
       "id": "boy_clip_01",
-      "file": "app/assets/images/character/boy/boy_clip_01.png",
+      "file": "app/assets/images/character/boy/boy_clip_01.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -1881,7 +1881,7 @@
     },
     {
       "id": "boy_eyes_closed_patch",
-      "file": "app/assets/images/character/boy/boy_eyes_closed_patch.png",
+      "file": "app/assets/images/character/boy/boy_eyes_closed_patch.webp",
       "kind": "character_patch",
       "form": "boy",
       "layer": null,
@@ -1896,7 +1896,7 @@
     },
     {
       "id": "boy_eyes_closed_patch_01_wave",
-      "file": "app/assets/images/character/boy/boy_eyes_closed_patch_01_wave.png",
+      "file": "app/assets/images/character/boy/boy_eyes_closed_patch_01_wave.webp",
       "kind": "character_patch",
       "form": "boy",
       "layer": null,
@@ -1911,7 +1911,7 @@
     },
     {
       "id": "boy_eyes_closed_patch_02_wave",
-      "file": "app/assets/images/character/boy/boy_eyes_closed_patch_02_wave.png",
+      "file": "app/assets/images/character/boy/boy_eyes_closed_patch_02_wave.webp",
       "kind": "character_patch",
       "form": "boy",
       "layer": null,
@@ -1926,7 +1926,7 @@
     },
     {
       "id": "boy_eyes_closed_patch_03_wave",
-      "file": "app/assets/images/character/boy/boy_eyes_closed_patch_03_wave.png",
+      "file": "app/assets/images/character/boy/boy_eyes_closed_patch_03_wave.webp",
       "kind": "character_patch",
       "form": "boy",
       "layer": null,
@@ -1941,7 +1941,7 @@
     },
     {
       "id": "boy_full_01",
-      "file": "app/assets/images/character/boy/boy_full_01.png",
+      "file": "app/assets/images/character/boy/boy_full_01.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -1956,7 +1956,7 @@
     },
     {
       "id": "boy_full_01_wave",
-      "file": "app/assets/images/character/boy/boy_full_01_wave.png",
+      "file": "app/assets/images/character/boy/boy_full_01_wave.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -1971,7 +1971,7 @@
     },
     {
       "id": "boy_full_02",
-      "file": "app/assets/images/character/boy/boy_full_02.png",
+      "file": "app/assets/images/character/boy/boy_full_02.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -1986,7 +1986,7 @@
     },
     {
       "id": "boy_full_02_wave",
-      "file": "app/assets/images/character/boy/boy_full_02_wave.png",
+      "file": "app/assets/images/character/boy/boy_full_02_wave.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2001,7 +2001,7 @@
     },
     {
       "id": "boy_full_03",
-      "file": "app/assets/images/character/boy/boy_full_03.png",
+      "file": "app/assets/images/character/boy/boy_full_03.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2016,7 +2016,7 @@
     },
     {
       "id": "boy_full_03_wave",
-      "file": "app/assets/images/character/boy/boy_full_03_wave.png",
+      "file": "app/assets/images/character/boy/boy_full_03_wave.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2031,7 +2031,7 @@
     },
     {
       "id": "boy_glasses_01",
-      "file": "app/assets/images/character/boy/boy_glasses_01.png",
+      "file": "app/assets/images/character/boy/boy_glasses_01.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2046,7 +2046,7 @@
     },
     {
       "id": "boy_hat_01",
-      "file": "app/assets/images/character/boy/boy_hat_01.png",
+      "file": "app/assets/images/character/boy/boy_hat_01.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2061,7 +2061,7 @@
     },
     {
       "id": "boy_shoes_02",
-      "file": "app/assets/images/character/boy/boy_shoes_02.png",
+      "file": "app/assets/images/character/boy/boy_shoes_02.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2076,7 +2076,7 @@
     },
     {
       "id": "boy_full_01_walk_dr_a",
-      "file": "app/assets/images/character/boy/boy_full_01_walk_dr_a.png",
+      "file": "app/assets/images/character/boy/boy_full_01_walk_dr_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2091,7 +2091,7 @@
     },
     {
       "id": "boy_full_01_walk_dr_b",
-      "file": "app/assets/images/character/boy/boy_full_01_walk_dr_b.png",
+      "file": "app/assets/images/character/boy/boy_full_01_walk_dr_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2106,7 +2106,7 @@
     },
     {
       "id": "boy_full_01_walk_dr_c",
-      "file": "app/assets/images/character/boy/boy_full_01_walk_dr_c.png",
+      "file": "app/assets/images/character/boy/boy_full_01_walk_dr_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2121,7 +2121,7 @@
     },
     {
       "id": "boy_full_01_walk_dr_d",
-      "file": "app/assets/images/character/boy/boy_full_01_walk_dr_d.png",
+      "file": "app/assets/images/character/boy/boy_full_01_walk_dr_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2136,7 +2136,7 @@
     },
     {
       "id": "boy_full_01_walk_ur_a",
-      "file": "app/assets/images/character/boy/boy_full_01_walk_ur_a.png",
+      "file": "app/assets/images/character/boy/boy_full_01_walk_ur_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2151,7 +2151,7 @@
     },
     {
       "id": "boy_full_01_walk_ur_b",
-      "file": "app/assets/images/character/boy/boy_full_01_walk_ur_b.png",
+      "file": "app/assets/images/character/boy/boy_full_01_walk_ur_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2166,7 +2166,7 @@
     },
     {
       "id": "boy_full_01_walk_ur_c",
-      "file": "app/assets/images/character/boy/boy_full_01_walk_ur_c.png",
+      "file": "app/assets/images/character/boy/boy_full_01_walk_ur_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2181,7 +2181,7 @@
     },
     {
       "id": "boy_full_01_walk_ur_d",
-      "file": "app/assets/images/character/boy/boy_full_01_walk_ur_d.png",
+      "file": "app/assets/images/character/boy/boy_full_01_walk_ur_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2196,7 +2196,7 @@
     },
     {
       "id": "boy_full_02_walk_dr_a",
-      "file": "app/assets/images/character/boy/boy_full_02_walk_dr_a.png",
+      "file": "app/assets/images/character/boy/boy_full_02_walk_dr_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2211,7 +2211,7 @@
     },
     {
       "id": "boy_full_02_walk_dr_b",
-      "file": "app/assets/images/character/boy/boy_full_02_walk_dr_b.png",
+      "file": "app/assets/images/character/boy/boy_full_02_walk_dr_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2226,7 +2226,7 @@
     },
     {
       "id": "boy_full_02_walk_dr_c",
-      "file": "app/assets/images/character/boy/boy_full_02_walk_dr_c.png",
+      "file": "app/assets/images/character/boy/boy_full_02_walk_dr_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2241,7 +2241,7 @@
     },
     {
       "id": "boy_full_02_walk_dr_d",
-      "file": "app/assets/images/character/boy/boy_full_02_walk_dr_d.png",
+      "file": "app/assets/images/character/boy/boy_full_02_walk_dr_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2256,7 +2256,7 @@
     },
     {
       "id": "boy_full_02_walk_ur_a",
-      "file": "app/assets/images/character/boy/boy_full_02_walk_ur_a.png",
+      "file": "app/assets/images/character/boy/boy_full_02_walk_ur_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2271,7 +2271,7 @@
     },
     {
       "id": "boy_full_02_walk_ur_b",
-      "file": "app/assets/images/character/boy/boy_full_02_walk_ur_b.png",
+      "file": "app/assets/images/character/boy/boy_full_02_walk_ur_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2286,7 +2286,7 @@
     },
     {
       "id": "boy_full_02_walk_ur_c",
-      "file": "app/assets/images/character/boy/boy_full_02_walk_ur_c.png",
+      "file": "app/assets/images/character/boy/boy_full_02_walk_ur_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2301,7 +2301,7 @@
     },
     {
       "id": "boy_full_02_walk_ur_d",
-      "file": "app/assets/images/character/boy/boy_full_02_walk_ur_d.png",
+      "file": "app/assets/images/character/boy/boy_full_02_walk_ur_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2316,7 +2316,7 @@
     },
     {
       "id": "boy_full_03_walk_dr_a",
-      "file": "app/assets/images/character/boy/boy_full_03_walk_dr_a.png",
+      "file": "app/assets/images/character/boy/boy_full_03_walk_dr_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2331,7 +2331,7 @@
     },
     {
       "id": "boy_full_03_walk_dr_b",
-      "file": "app/assets/images/character/boy/boy_full_03_walk_dr_b.png",
+      "file": "app/assets/images/character/boy/boy_full_03_walk_dr_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2346,7 +2346,7 @@
     },
     {
       "id": "boy_full_03_walk_dr_c",
-      "file": "app/assets/images/character/boy/boy_full_03_walk_dr_c.png",
+      "file": "app/assets/images/character/boy/boy_full_03_walk_dr_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2361,7 +2361,7 @@
     },
     {
       "id": "boy_full_03_walk_dr_d",
-      "file": "app/assets/images/character/boy/boy_full_03_walk_dr_d.png",
+      "file": "app/assets/images/character/boy/boy_full_03_walk_dr_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2376,7 +2376,7 @@
     },
     {
       "id": "boy_full_03_walk_ur_a",
-      "file": "app/assets/images/character/boy/boy_full_03_walk_ur_a.png",
+      "file": "app/assets/images/character/boy/boy_full_03_walk_ur_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2391,7 +2391,7 @@
     },
     {
       "id": "boy_full_03_walk_ur_b",
-      "file": "app/assets/images/character/boy/boy_full_03_walk_ur_b.png",
+      "file": "app/assets/images/character/boy/boy_full_03_walk_ur_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2406,7 +2406,7 @@
     },
     {
       "id": "boy_full_03_walk_ur_c",
-      "file": "app/assets/images/character/boy/boy_full_03_walk_ur_c.png",
+      "file": "app/assets/images/character/boy/boy_full_03_walk_ur_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2421,7 +2421,7 @@
     },
     {
       "id": "boy_full_03_walk_ur_d",
-      "file": "app/assets/images/character/boy/boy_full_03_walk_ur_d.png",
+      "file": "app/assets/images/character/boy/boy_full_03_walk_ur_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2436,7 +2436,7 @@
     },
     {
       "id": "girl_full_01_backpack",
-      "file": "app/assets/images/character/girl/girl_full_01_backpack.png",
+      "file": "app/assets/images/character/girl/girl_full_01_backpack.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2451,7 +2451,7 @@
     },
     {
       "id": "girl_full_01_walk_dr_a",
-      "file": "app/assets/images/character/girl/girl_full_01_walk_dr_a.png",
+      "file": "app/assets/images/character/girl/girl_full_01_walk_dr_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2466,7 +2466,7 @@
     },
     {
       "id": "girl_full_01_walk_dr_b",
-      "file": "app/assets/images/character/girl/girl_full_01_walk_dr_b.png",
+      "file": "app/assets/images/character/girl/girl_full_01_walk_dr_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2481,7 +2481,7 @@
     },
     {
       "id": "girl_full_01_walk_dr_c",
-      "file": "app/assets/images/character/girl/girl_full_01_walk_dr_c.png",
+      "file": "app/assets/images/character/girl/girl_full_01_walk_dr_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2496,7 +2496,7 @@
     },
     {
       "id": "girl_full_01_walk_dr_d",
-      "file": "app/assets/images/character/girl/girl_full_01_walk_dr_d.png",
+      "file": "app/assets/images/character/girl/girl_full_01_walk_dr_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2511,7 +2511,7 @@
     },
     {
       "id": "girl_full_01_walk_ur_a",
-      "file": "app/assets/images/character/girl/girl_full_01_walk_ur_a.png",
+      "file": "app/assets/images/character/girl/girl_full_01_walk_ur_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2526,7 +2526,7 @@
     },
     {
       "id": "girl_full_01_walk_ur_b",
-      "file": "app/assets/images/character/girl/girl_full_01_walk_ur_b.png",
+      "file": "app/assets/images/character/girl/girl_full_01_walk_ur_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2541,7 +2541,7 @@
     },
     {
       "id": "girl_full_01_walk_ur_c",
-      "file": "app/assets/images/character/girl/girl_full_01_walk_ur_c.png",
+      "file": "app/assets/images/character/girl/girl_full_01_walk_ur_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2556,7 +2556,7 @@
     },
     {
       "id": "girl_full_01_walk_ur_d",
-      "file": "app/assets/images/character/girl/girl_full_01_walk_ur_d.png",
+      "file": "app/assets/images/character/girl/girl_full_01_walk_ur_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2571,7 +2571,7 @@
     },
     {
       "id": "girl_full_01_wave_backpack",
-      "file": "app/assets/images/character/girl/girl_full_01_wave_backpack.png",
+      "file": "app/assets/images/character/girl/girl_full_01_wave_backpack.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2586,7 +2586,7 @@
     },
     {
       "id": "girl_full_02_backpack",
-      "file": "app/assets/images/character/girl/girl_full_02_backpack.png",
+      "file": "app/assets/images/character/girl/girl_full_02_backpack.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2601,7 +2601,7 @@
     },
     {
       "id": "girl_full_02_walk_dr_a",
-      "file": "app/assets/images/character/girl/girl_full_02_walk_dr_a.png",
+      "file": "app/assets/images/character/girl/girl_full_02_walk_dr_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2616,7 +2616,7 @@
     },
     {
       "id": "girl_full_02_walk_dr_b",
-      "file": "app/assets/images/character/girl/girl_full_02_walk_dr_b.png",
+      "file": "app/assets/images/character/girl/girl_full_02_walk_dr_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2631,7 +2631,7 @@
     },
     {
       "id": "girl_full_02_walk_dr_c",
-      "file": "app/assets/images/character/girl/girl_full_02_walk_dr_c.png",
+      "file": "app/assets/images/character/girl/girl_full_02_walk_dr_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2646,7 +2646,7 @@
     },
     {
       "id": "girl_full_02_walk_dr_d",
-      "file": "app/assets/images/character/girl/girl_full_02_walk_dr_d.png",
+      "file": "app/assets/images/character/girl/girl_full_02_walk_dr_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2661,7 +2661,7 @@
     },
     {
       "id": "girl_full_02_walk_ur_a",
-      "file": "app/assets/images/character/girl/girl_full_02_walk_ur_a.png",
+      "file": "app/assets/images/character/girl/girl_full_02_walk_ur_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2676,7 +2676,7 @@
     },
     {
       "id": "girl_full_02_walk_ur_b",
-      "file": "app/assets/images/character/girl/girl_full_02_walk_ur_b.png",
+      "file": "app/assets/images/character/girl/girl_full_02_walk_ur_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2691,7 +2691,7 @@
     },
     {
       "id": "girl_full_02_walk_ur_c",
-      "file": "app/assets/images/character/girl/girl_full_02_walk_ur_c.png",
+      "file": "app/assets/images/character/girl/girl_full_02_walk_ur_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2706,7 +2706,7 @@
     },
     {
       "id": "girl_full_02_walk_ur_d",
-      "file": "app/assets/images/character/girl/girl_full_02_walk_ur_d.png",
+      "file": "app/assets/images/character/girl/girl_full_02_walk_ur_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2721,7 +2721,7 @@
     },
     {
       "id": "girl_full_02_wave_backpack",
-      "file": "app/assets/images/character/girl/girl_full_02_wave_backpack.png",
+      "file": "app/assets/images/character/girl/girl_full_02_wave_backpack.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2736,7 +2736,7 @@
     },
     {
       "id": "girl_full_03_backpack",
-      "file": "app/assets/images/character/girl/girl_full_03_backpack.png",
+      "file": "app/assets/images/character/girl/girl_full_03_backpack.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2751,7 +2751,7 @@
     },
     {
       "id": "girl_full_03_walk_dr_a",
-      "file": "app/assets/images/character/girl/girl_full_03_walk_dr_a.png",
+      "file": "app/assets/images/character/girl/girl_full_03_walk_dr_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2766,7 +2766,7 @@
     },
     {
       "id": "girl_full_03_walk_dr_b",
-      "file": "app/assets/images/character/girl/girl_full_03_walk_dr_b.png",
+      "file": "app/assets/images/character/girl/girl_full_03_walk_dr_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2781,7 +2781,7 @@
     },
     {
       "id": "girl_full_03_walk_dr_c",
-      "file": "app/assets/images/character/girl/girl_full_03_walk_dr_c.png",
+      "file": "app/assets/images/character/girl/girl_full_03_walk_dr_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2796,7 +2796,7 @@
     },
     {
       "id": "girl_full_03_walk_dr_d",
-      "file": "app/assets/images/character/girl/girl_full_03_walk_dr_d.png",
+      "file": "app/assets/images/character/girl/girl_full_03_walk_dr_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2811,7 +2811,7 @@
     },
     {
       "id": "girl_full_03_walk_ur_a",
-      "file": "app/assets/images/character/girl/girl_full_03_walk_ur_a.png",
+      "file": "app/assets/images/character/girl/girl_full_03_walk_ur_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2826,7 +2826,7 @@
     },
     {
       "id": "girl_full_03_walk_ur_b",
-      "file": "app/assets/images/character/girl/girl_full_03_walk_ur_b.png",
+      "file": "app/assets/images/character/girl/girl_full_03_walk_ur_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2841,7 +2841,7 @@
     },
     {
       "id": "girl_full_03_walk_ur_c",
-      "file": "app/assets/images/character/girl/girl_full_03_walk_ur_c.png",
+      "file": "app/assets/images/character/girl/girl_full_03_walk_ur_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2856,7 +2856,7 @@
     },
     {
       "id": "girl_full_03_walk_ur_d",
-      "file": "app/assets/images/character/girl/girl_full_03_walk_ur_d.png",
+      "file": "app/assets/images/character/girl/girl_full_03_walk_ur_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2871,7 +2871,7 @@
     },
     {
       "id": "girl_full_03_wave_backpack",
-      "file": "app/assets/images/character/girl/girl_full_03_wave_backpack.png",
+      "file": "app/assets/images/character/girl/girl_full_03_wave_backpack.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -2886,7 +2886,7 @@
     },
     {
       "id": "boy_full_01_backpack",
-      "file": "app/assets/images/character/boy/boy_full_01_backpack.png",
+      "file": "app/assets/images/character/boy/boy_full_01_backpack.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2901,7 +2901,7 @@
     },
     {
       "id": "boy_full_01_wave_backpack",
-      "file": "app/assets/images/character/boy/boy_full_01_wave_backpack.png",
+      "file": "app/assets/images/character/boy/boy_full_01_wave_backpack.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2916,7 +2916,7 @@
     },
     {
       "id": "boy_full_02_backpack",
-      "file": "app/assets/images/character/boy/boy_full_02_backpack.png",
+      "file": "app/assets/images/character/boy/boy_full_02_backpack.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2931,7 +2931,7 @@
     },
     {
       "id": "boy_full_02_wave_backpack",
-      "file": "app/assets/images/character/boy/boy_full_02_wave_backpack.png",
+      "file": "app/assets/images/character/boy/boy_full_02_wave_backpack.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2946,7 +2946,7 @@
     },
     {
       "id": "boy_full_03_backpack",
-      "file": "app/assets/images/character/boy/boy_full_03_backpack.png",
+      "file": "app/assets/images/character/boy/boy_full_03_backpack.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2961,7 +2961,7 @@
     },
     {
       "id": "boy_full_03_wave_backpack",
-      "file": "app/assets/images/character/boy/boy_full_03_wave_backpack.png",
+      "file": "app/assets/images/character/boy/boy_full_03_wave_backpack.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -2976,7 +2976,7 @@
     },
     {
       "id": "ui_btn_back",
-      "file": "app/assets/images/ui/ui_btn_back.png",
+      "file": "app/assets/images/ui/ui_btn_back.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -2991,7 +2991,7 @@
     },
     {
       "id": "ui_btn_back_pressed",
-      "file": "app/assets/images/ui/ui_btn_back_pressed.png",
+      "file": "app/assets/images/ui/ui_btn_back_pressed.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3006,7 +3006,7 @@
     },
     {
       "id": "ui_card",
-      "file": "app/assets/images/ui/ui_card.png",
+      "file": "app/assets/images/ui/ui_card.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3021,7 +3021,7 @@
     },
     {
       "id": "ui_card_selected",
-      "file": "app/assets/images/ui/ui_card_selected.png",
+      "file": "app/assets/images/ui/ui_card_selected.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3036,7 +3036,7 @@
     },
     {
       "id": "ui_coin",
-      "file": "app/assets/images/ui/ui_coin.png",
+      "file": "app/assets/images/ui/ui_coin.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3051,7 +3051,7 @@
     },
     {
       "id": "ui_gem",
-      "file": "app/assets/images/ui/ui_gem.png",
+      "file": "app/assets/images/ui/ui_gem.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3066,7 +3066,7 @@
     },
     {
       "id": "ui_hud_bar",
-      "file": "app/assets/images/ui/ui_hud_bar.png",
+      "file": "app/assets/images/ui/ui_hud_bar.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3081,7 +3081,7 @@
     },
     {
       "id": "ui_icon_room",
-      "file": "app/assets/images/ui/ui_icon_room.png",
+      "file": "app/assets/images/ui/ui_icon_room.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3096,7 +3096,7 @@
     },
     {
       "id": "ui_icon_shop",
-      "file": "app/assets/images/ui/ui_icon_shop.png",
+      "file": "app/assets/images/ui/ui_icon_shop.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3111,7 +3111,7 @@
     },
     {
       "id": "ui_icon_town",
-      "file": "app/assets/images/ui/ui_icon_town.png",
+      "file": "app/assets/images/ui/ui_icon_town.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3126,7 +3126,7 @@
     },
     {
       "id": "ui_icon_wardrobe",
-      "file": "app/assets/images/ui/ui_icon_wardrobe.png",
+      "file": "app/assets/images/ui/ui_icon_wardrobe.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3141,7 +3141,7 @@
     },
     {
       "id": "ui_logo",
-      "file": "app/assets/images/ui/ui_logo.png",
+      "file": "app/assets/images/ui/ui_logo.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3156,7 +3156,7 @@
     },
     {
       "id": "ui_onboarding_bg",
-      "file": "app/assets/images/ui/ui_onboarding_bg.png",
+      "file": "app/assets/images/ui/ui_onboarding_bg.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3171,7 +3171,7 @@
     },
     {
       "id": "ui_pedestal",
-      "file": "app/assets/images/ui/ui_pedestal.png",
+      "file": "app/assets/images/ui/ui_pedestal.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3186,7 +3186,7 @@
     },
     {
       "id": "ui_sign_board",
-      "file": "app/assets/images/ui/ui_sign_board.png",
+      "file": "app/assets/images/ui/ui_sign_board.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3201,7 +3201,7 @@
     },
     {
       "id": "ui_splash_bg",
-      "file": "app/assets/images/ui/ui_splash_bg.png",
+      "file": "app/assets/images/ui/ui_splash_bg.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3216,7 +3216,7 @@
     },
     {
       "id": "ui_star",
-      "file": "app/assets/images/ui/ui_star.png",
+      "file": "app/assets/images/ui/ui_star.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3231,7 +3231,7 @@
     },
     {
       "id": "shop_bg",
-      "file": "app/assets/images/backgrounds/shop_bg.png",
+      "file": "app/assets/images/backgrounds/shop_bg.webp",
       "kind": "background",
       "form": "any",
       "layer": null,
@@ -3246,7 +3246,7 @@
     },
     {
       "id": "pet_food_bone",
-      "file": "app/assets/images/items/pet_food_bone.png",
+      "file": "app/assets/images/items/pet_food_bone.webp",
       "kind": "item",
       "form": "any",
       "layer": null,
@@ -3261,7 +3261,7 @@
     },
     {
       "id": "pet_food_fish",
-      "file": "app/assets/images/items/pet_food_fish.png",
+      "file": "app/assets/images/items/pet_food_fish.webp",
       "kind": "item",
       "form": "any",
       "layer": null,
@@ -3276,7 +3276,7 @@
     },
     {
       "id": "pet_food_carrot",
-      "file": "app/assets/images/items/pet_food_carrot.png",
+      "file": "app/assets/images/items/pet_food_carrot.webp",
       "kind": "item",
       "form": "any",
       "layer": null,
@@ -3291,7 +3291,7 @@
     },
     {
       "id": "pet_toy_ball",
-      "file": "app/assets/images/items/pet_toy_ball.png",
+      "file": "app/assets/images/items/pet_toy_ball.webp",
       "kind": "item",
       "form": "any",
       "layer": null,
@@ -3306,7 +3306,7 @@
     },
     {
       "id": "pet_toy_yarn",
-      "file": "app/assets/images/items/pet_toy_yarn.png",
+      "file": "app/assets/images/items/pet_toy_yarn.webp",
       "kind": "item",
       "form": "any",
       "layer": null,
@@ -3321,7 +3321,7 @@
     },
     {
       "id": "pet_toy_plush",
-      "file": "app/assets/images/items/pet_toy_plush.png",
+      "file": "app/assets/images/items/pet_toy_plush.webp",
       "kind": "item",
       "form": "any",
       "layer": null,
@@ -3336,7 +3336,7 @@
     },
     {
       "id": "ui_icon_clothes",
-      "file": "app/assets/images/ui/ui_icon_clothes.png",
+      "file": "app/assets/images/ui/ui_icon_clothes.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3351,7 +3351,7 @@
     },
     {
       "id": "ui_icon_pet_items",
-      "file": "app/assets/images/ui/ui_icon_pet_items.png",
+      "file": "app/assets/images/ui/ui_icon_pet_items.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -3366,7 +3366,7 @@
     },
     {
       "id": "dog_egg_crack_1",
-      "file": "app/assets/images/pets/dog_egg_crack_1.png",
+      "file": "app/assets/images/pets/dog_egg_crack_1.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3381,7 +3381,7 @@
     },
     {
       "id": "dog_egg_crack_2",
-      "file": "app/assets/images/pets/dog_egg_crack_2.png",
+      "file": "app/assets/images/pets/dog_egg_crack_2.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3396,7 +3396,7 @@
     },
     {
       "id": "dog_egg_crack_3",
-      "file": "app/assets/images/pets/dog_egg_crack_3.png",
+      "file": "app/assets/images/pets/dog_egg_crack_3.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3411,7 +3411,7 @@
     },
     {
       "id": "dog_shell_bottom",
-      "file": "app/assets/images/pets/dog_shell_bottom.png",
+      "file": "app/assets/images/pets/dog_shell_bottom.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3426,7 +3426,7 @@
     },
     {
       "id": "dog_shell_top",
-      "file": "app/assets/images/pets/dog_shell_top.png",
+      "file": "app/assets/images/pets/dog_shell_top.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3441,7 +3441,7 @@
     },
     {
       "id": "cat_egg_crack_1",
-      "file": "app/assets/images/pets/cat_egg_crack_1.png",
+      "file": "app/assets/images/pets/cat_egg_crack_1.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3456,7 +3456,7 @@
     },
     {
       "id": "cat_egg_crack_2",
-      "file": "app/assets/images/pets/cat_egg_crack_2.png",
+      "file": "app/assets/images/pets/cat_egg_crack_2.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3471,7 +3471,7 @@
     },
     {
       "id": "cat_egg_crack_3",
-      "file": "app/assets/images/pets/cat_egg_crack_3.png",
+      "file": "app/assets/images/pets/cat_egg_crack_3.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3486,7 +3486,7 @@
     },
     {
       "id": "cat_shell_bottom",
-      "file": "app/assets/images/pets/cat_shell_bottom.png",
+      "file": "app/assets/images/pets/cat_shell_bottom.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3501,7 +3501,7 @@
     },
     {
       "id": "cat_shell_top",
-      "file": "app/assets/images/pets/cat_shell_top.png",
+      "file": "app/assets/images/pets/cat_shell_top.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3516,7 +3516,7 @@
     },
     {
       "id": "rabbit_egg_crack_1",
-      "file": "app/assets/images/pets/rabbit_egg_crack_1.png",
+      "file": "app/assets/images/pets/rabbit_egg_crack_1.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3531,7 +3531,7 @@
     },
     {
       "id": "rabbit_egg_crack_2",
-      "file": "app/assets/images/pets/rabbit_egg_crack_2.png",
+      "file": "app/assets/images/pets/rabbit_egg_crack_2.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3546,7 +3546,7 @@
     },
     {
       "id": "rabbit_egg_crack_3",
-      "file": "app/assets/images/pets/rabbit_egg_crack_3.png",
+      "file": "app/assets/images/pets/rabbit_egg_crack_3.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3561,7 +3561,7 @@
     },
     {
       "id": "rabbit_shell_bottom",
-      "file": "app/assets/images/pets/rabbit_shell_bottom.png",
+      "file": "app/assets/images/pets/rabbit_shell_bottom.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3576,7 +3576,7 @@
     },
     {
       "id": "rabbit_shell_top",
-      "file": "app/assets/images/pets/rabbit_shell_top.png",
+      "file": "app/assets/images/pets/rabbit_shell_top.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3591,7 +3591,7 @@
     },
     {
       "id": "dog_newborn_walk_a",
-      "file": "app/assets/images/pets/dog_newborn_walk_a.png",
+      "file": "app/assets/images/pets/dog_newborn_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3606,7 +3606,7 @@
     },
     {
       "id": "dog_newborn_walk_b",
-      "file": "app/assets/images/pets/dog_newborn_walk_b.png",
+      "file": "app/assets/images/pets/dog_newborn_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3621,7 +3621,7 @@
     },
     {
       "id": "dog_newborn_walk_c",
-      "file": "app/assets/images/pets/dog_newborn_walk_c.png",
+      "file": "app/assets/images/pets/dog_newborn_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3636,7 +3636,7 @@
     },
     {
       "id": "dog_newborn_walk_d",
-      "file": "app/assets/images/pets/dog_newborn_walk_d.png",
+      "file": "app/assets/images/pets/dog_newborn_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3651,7 +3651,7 @@
     },
     {
       "id": "dog_newborn_happy",
-      "file": "app/assets/images/pets/dog_newborn_happy.png",
+      "file": "app/assets/images/pets/dog_newborn_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3666,7 +3666,7 @@
     },
     {
       "id": "dog_newborn_sit",
-      "file": "app/assets/images/pets/dog_newborn_sit.png",
+      "file": "app/assets/images/pets/dog_newborn_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3681,7 +3681,7 @@
     },
     {
       "id": "dog_teen_walk_a",
-      "file": "app/assets/images/pets/dog_teen_walk_a.png",
+      "file": "app/assets/images/pets/dog_teen_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3696,7 +3696,7 @@
     },
     {
       "id": "dog_teen_walk_b",
-      "file": "app/assets/images/pets/dog_teen_walk_b.png",
+      "file": "app/assets/images/pets/dog_teen_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3711,7 +3711,7 @@
     },
     {
       "id": "dog_teen_walk_c",
-      "file": "app/assets/images/pets/dog_teen_walk_c.png",
+      "file": "app/assets/images/pets/dog_teen_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3726,7 +3726,7 @@
     },
     {
       "id": "dog_teen_walk_d",
-      "file": "app/assets/images/pets/dog_teen_walk_d.png",
+      "file": "app/assets/images/pets/dog_teen_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3741,7 +3741,7 @@
     },
     {
       "id": "dog_teen_happy",
-      "file": "app/assets/images/pets/dog_teen_happy.png",
+      "file": "app/assets/images/pets/dog_teen_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3756,7 +3756,7 @@
     },
     {
       "id": "dog_teen_sit",
-      "file": "app/assets/images/pets/dog_teen_sit.png",
+      "file": "app/assets/images/pets/dog_teen_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3771,7 +3771,7 @@
     },
     {
       "id": "dog_adult_walk_a",
-      "file": "app/assets/images/pets/dog_adult_walk_a.png",
+      "file": "app/assets/images/pets/dog_adult_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3786,7 +3786,7 @@
     },
     {
       "id": "dog_adult_walk_b",
-      "file": "app/assets/images/pets/dog_adult_walk_b.png",
+      "file": "app/assets/images/pets/dog_adult_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3801,7 +3801,7 @@
     },
     {
       "id": "dog_adult_walk_c",
-      "file": "app/assets/images/pets/dog_adult_walk_c.png",
+      "file": "app/assets/images/pets/dog_adult_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3816,7 +3816,7 @@
     },
     {
       "id": "dog_adult_walk_d",
-      "file": "app/assets/images/pets/dog_adult_walk_d.png",
+      "file": "app/assets/images/pets/dog_adult_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3831,7 +3831,7 @@
     },
     {
       "id": "dog_adult_happy",
-      "file": "app/assets/images/pets/dog_adult_happy.png",
+      "file": "app/assets/images/pets/dog_adult_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3846,7 +3846,7 @@
     },
     {
       "id": "dog_adult_sit",
-      "file": "app/assets/images/pets/dog_adult_sit.png",
+      "file": "app/assets/images/pets/dog_adult_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3861,7 +3861,7 @@
     },
     {
       "id": "cat_newborn_walk_a",
-      "file": "app/assets/images/pets/cat_newborn_walk_a.png",
+      "file": "app/assets/images/pets/cat_newborn_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3876,7 +3876,7 @@
     },
     {
       "id": "cat_newborn_walk_b",
-      "file": "app/assets/images/pets/cat_newborn_walk_b.png",
+      "file": "app/assets/images/pets/cat_newborn_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3891,7 +3891,7 @@
     },
     {
       "id": "cat_newborn_walk_c",
-      "file": "app/assets/images/pets/cat_newborn_walk_c.png",
+      "file": "app/assets/images/pets/cat_newborn_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3906,7 +3906,7 @@
     },
     {
       "id": "cat_newborn_walk_d",
-      "file": "app/assets/images/pets/cat_newborn_walk_d.png",
+      "file": "app/assets/images/pets/cat_newborn_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3921,7 +3921,7 @@
     },
     {
       "id": "cat_newborn_happy",
-      "file": "app/assets/images/pets/cat_newborn_happy.png",
+      "file": "app/assets/images/pets/cat_newborn_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3936,7 +3936,7 @@
     },
     {
       "id": "cat_newborn_sit",
-      "file": "app/assets/images/pets/cat_newborn_sit.png",
+      "file": "app/assets/images/pets/cat_newborn_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3951,7 +3951,7 @@
     },
     {
       "id": "cat_teen_walk_a",
-      "file": "app/assets/images/pets/cat_teen_walk_a.png",
+      "file": "app/assets/images/pets/cat_teen_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3966,7 +3966,7 @@
     },
     {
       "id": "cat_teen_walk_b",
-      "file": "app/assets/images/pets/cat_teen_walk_b.png",
+      "file": "app/assets/images/pets/cat_teen_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3981,7 +3981,7 @@
     },
     {
       "id": "cat_teen_walk_c",
-      "file": "app/assets/images/pets/cat_teen_walk_c.png",
+      "file": "app/assets/images/pets/cat_teen_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -3996,7 +3996,7 @@
     },
     {
       "id": "cat_teen_walk_d",
-      "file": "app/assets/images/pets/cat_teen_walk_d.png",
+      "file": "app/assets/images/pets/cat_teen_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4011,7 +4011,7 @@
     },
     {
       "id": "cat_teen_happy",
-      "file": "app/assets/images/pets/cat_teen_happy.png",
+      "file": "app/assets/images/pets/cat_teen_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4026,7 +4026,7 @@
     },
     {
       "id": "cat_teen_sit",
-      "file": "app/assets/images/pets/cat_teen_sit.png",
+      "file": "app/assets/images/pets/cat_teen_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4041,7 +4041,7 @@
     },
     {
       "id": "cat_adult_walk_a",
-      "file": "app/assets/images/pets/cat_adult_walk_a.png",
+      "file": "app/assets/images/pets/cat_adult_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4056,7 +4056,7 @@
     },
     {
       "id": "cat_adult_walk_b",
-      "file": "app/assets/images/pets/cat_adult_walk_b.png",
+      "file": "app/assets/images/pets/cat_adult_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4071,7 +4071,7 @@
     },
     {
       "id": "cat_adult_walk_c",
-      "file": "app/assets/images/pets/cat_adult_walk_c.png",
+      "file": "app/assets/images/pets/cat_adult_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4086,7 +4086,7 @@
     },
     {
       "id": "cat_adult_walk_d",
-      "file": "app/assets/images/pets/cat_adult_walk_d.png",
+      "file": "app/assets/images/pets/cat_adult_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4101,7 +4101,7 @@
     },
     {
       "id": "cat_adult_happy",
-      "file": "app/assets/images/pets/cat_adult_happy.png",
+      "file": "app/assets/images/pets/cat_adult_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4116,7 +4116,7 @@
     },
     {
       "id": "cat_adult_sit",
-      "file": "app/assets/images/pets/cat_adult_sit.png",
+      "file": "app/assets/images/pets/cat_adult_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4131,7 +4131,7 @@
     },
     {
       "id": "rabbit_newborn_walk_a",
-      "file": "app/assets/images/pets/rabbit_newborn_walk_a.png",
+      "file": "app/assets/images/pets/rabbit_newborn_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4146,7 +4146,7 @@
     },
     {
       "id": "rabbit_newborn_walk_b",
-      "file": "app/assets/images/pets/rabbit_newborn_walk_b.png",
+      "file": "app/assets/images/pets/rabbit_newborn_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4161,7 +4161,7 @@
     },
     {
       "id": "rabbit_newborn_walk_c",
-      "file": "app/assets/images/pets/rabbit_newborn_walk_c.png",
+      "file": "app/assets/images/pets/rabbit_newborn_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4176,7 +4176,7 @@
     },
     {
       "id": "rabbit_newborn_walk_d",
-      "file": "app/assets/images/pets/rabbit_newborn_walk_d.png",
+      "file": "app/assets/images/pets/rabbit_newborn_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4191,7 +4191,7 @@
     },
     {
       "id": "rabbit_newborn_happy",
-      "file": "app/assets/images/pets/rabbit_newborn_happy.png",
+      "file": "app/assets/images/pets/rabbit_newborn_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4206,7 +4206,7 @@
     },
     {
       "id": "rabbit_newborn_sit",
-      "file": "app/assets/images/pets/rabbit_newborn_sit.png",
+      "file": "app/assets/images/pets/rabbit_newborn_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4221,7 +4221,7 @@
     },
     {
       "id": "rabbit_teen_walk_a",
-      "file": "app/assets/images/pets/rabbit_teen_walk_a.png",
+      "file": "app/assets/images/pets/rabbit_teen_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4236,7 +4236,7 @@
     },
     {
       "id": "rabbit_teen_walk_b",
-      "file": "app/assets/images/pets/rabbit_teen_walk_b.png",
+      "file": "app/assets/images/pets/rabbit_teen_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4251,7 +4251,7 @@
     },
     {
       "id": "rabbit_teen_walk_c",
-      "file": "app/assets/images/pets/rabbit_teen_walk_c.png",
+      "file": "app/assets/images/pets/rabbit_teen_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4266,7 +4266,7 @@
     },
     {
       "id": "rabbit_teen_walk_d",
-      "file": "app/assets/images/pets/rabbit_teen_walk_d.png",
+      "file": "app/assets/images/pets/rabbit_teen_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4281,7 +4281,7 @@
     },
     {
       "id": "rabbit_teen_happy",
-      "file": "app/assets/images/pets/rabbit_teen_happy.png",
+      "file": "app/assets/images/pets/rabbit_teen_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4296,7 +4296,7 @@
     },
     {
       "id": "rabbit_teen_sit",
-      "file": "app/assets/images/pets/rabbit_teen_sit.png",
+      "file": "app/assets/images/pets/rabbit_teen_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4311,7 +4311,7 @@
     },
     {
       "id": "rabbit_adult_walk_a",
-      "file": "app/assets/images/pets/rabbit_adult_walk_a.png",
+      "file": "app/assets/images/pets/rabbit_adult_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4326,7 +4326,7 @@
     },
     {
       "id": "rabbit_adult_walk_b",
-      "file": "app/assets/images/pets/rabbit_adult_walk_b.png",
+      "file": "app/assets/images/pets/rabbit_adult_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4341,7 +4341,7 @@
     },
     {
       "id": "rabbit_adult_walk_c",
-      "file": "app/assets/images/pets/rabbit_adult_walk_c.png",
+      "file": "app/assets/images/pets/rabbit_adult_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4356,7 +4356,7 @@
     },
     {
       "id": "rabbit_adult_walk_d",
-      "file": "app/assets/images/pets/rabbit_adult_walk_d.png",
+      "file": "app/assets/images/pets/rabbit_adult_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4371,7 +4371,7 @@
     },
     {
       "id": "rabbit_adult_happy",
-      "file": "app/assets/images/pets/rabbit_adult_happy.png",
+      "file": "app/assets/images/pets/rabbit_adult_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4386,7 +4386,7 @@
     },
     {
       "id": "rabbit_adult_sit",
-      "file": "app/assets/images/pets/rabbit_adult_sit.png",
+      "file": "app/assets/images/pets/rabbit_adult_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -4401,7 +4401,7 @@
     },
     {
       "id": "room_v3_clean",
-      "file": "app/assets/images/backgrounds/room_v3_clean.png",
+      "file": "app/assets/images/backgrounds/room_v3_clean.webp",
       "kind": "background",
       "form": "any",
       "layer": null,
@@ -4416,7 +4416,7 @@
     },
     {
       "id": "noi_be_ca",
-      "file": "app/assets/images/furniture/noi_be_ca.png",
+      "file": "app/assets/images/furniture/noi_be_ca.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -4431,7 +4431,7 @@
     },
     {
       "id": "noi_den_trang",
-      "file": "app/assets/images/furniture/noi_den_trang.png",
+      "file": "app/assets/images/furniture/noi_den_trang.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -4446,7 +4446,7 @@
     },
     {
       "id": "noi_ke_sach",
-      "file": "app/assets/images/furniture/noi_ke_sach.png",
+      "file": "app/assets/images/furniture/noi_ke_sach.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -4461,7 +4461,7 @@
     },
     {
       "id": "noi_ghe_luoi",
-      "file": "app/assets/images/furniture/noi_ghe_luoi.png",
+      "file": "app/assets/images/furniture/noi_ghe_luoi.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -4476,7 +4476,7 @@
     },
     {
       "id": "noi_nha_pet",
-      "file": "app/assets/images/furniture/noi_nha_pet.png",
+      "file": "app/assets/images/furniture/noi_nha_pet.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -4491,7 +4491,7 @@
     },
     {
       "id": "noi_cay_cao",
-      "file": "app/assets/images/furniture/noi_cay_cao.png",
+      "file": "app/assets/images/furniture/noi_cay_cao.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -4506,7 +4506,7 @@
     },
     {
       "id": "noi_leu",
-      "file": "app/assets/images/furniture/noi_leu.png",
+      "file": "app/assets/images/furniture/noi_leu.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -4521,7 +4521,7 @@
     },
     {
       "id": "noi_tranh",
-      "file": "app/assets/images/furniture/noi_tranh.png",
+      "file": "app/assets/images/furniture/noi_tranh.webp",
       "kind": "furniture",
       "form": "any",
       "layer": null,
@@ -4536,7 +4536,7 @@
     },
     {
       "id": "arena_building",
-      "file": "app/assets/images/town/arena_building.png",
+      "file": "app/assets/images/town/arena_building.webp",
       "kind": "town_building",
       "form": "any",
       "layer": null,
@@ -4551,7 +4551,7 @@
     },
     {
       "id": "arena_bg",
-      "file": "app/assets/images/backgrounds/arena_bg.png",
+      "file": "app/assets/images/backgrounds/arena_bg.webp",
       "kind": "background",
       "form": "any",
       "layer": null,
@@ -4566,7 +4566,7 @@
     },
     {
       "id": "medal_gold",
-      "file": "app/assets/images/ui/medal_gold.png",
+      "file": "app/assets/images/ui/medal_gold.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -4581,7 +4581,7 @@
     },
     {
       "id": "medal_silver",
-      "file": "app/assets/images/ui/medal_silver.png",
+      "file": "app/assets/images/ui/medal_silver.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -4596,7 +4596,7 @@
     },
     {
       "id": "medal_bronze",
-      "file": "app/assets/images/ui/medal_bronze.png",
+      "file": "app/assets/images/ui/medal_bronze.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -4611,7 +4611,7 @@
     },
     {
       "id": "medal_participant",
-      "file": "app/assets/images/ui/medal_participant.png",
+      "file": "app/assets/images/ui/medal_participant.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -4626,7 +4626,7 @@
     },
     {
       "id": "gem_chest",
-      "file": "app/assets/images/items/gem_chest.png",
+      "file": "app/assets/images/items/gem_chest.webp",
       "kind": "item",
       "form": "any",
       "layer": null,
@@ -4641,7 +4641,7 @@
     },
     {
       "id": "girl_full_04",
-      "file": "app/assets/images/character/girl/girl_full_04.png",
+      "file": "app/assets/images/character/girl/girl_full_04.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -4656,7 +4656,7 @@
     },
     {
       "id": "girl_full_04_wave",
-      "file": "app/assets/images/character/girl/girl_full_04_wave.png",
+      "file": "app/assets/images/character/girl/girl_full_04_wave.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -4671,7 +4671,7 @@
     },
     {
       "id": "girl_full_04_walk_dr_a",
-      "file": "app/assets/images/character/girl/girl_full_04_walk_dr_a.png",
+      "file": "app/assets/images/character/girl/girl_full_04_walk_dr_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -4686,7 +4686,7 @@
     },
     {
       "id": "girl_full_04_walk_dr_b",
-      "file": "app/assets/images/character/girl/girl_full_04_walk_dr_b.png",
+      "file": "app/assets/images/character/girl/girl_full_04_walk_dr_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -4701,7 +4701,7 @@
     },
     {
       "id": "girl_full_04_walk_dr_c",
-      "file": "app/assets/images/character/girl/girl_full_04_walk_dr_c.png",
+      "file": "app/assets/images/character/girl/girl_full_04_walk_dr_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -4716,7 +4716,7 @@
     },
     {
       "id": "girl_full_04_walk_dr_d",
-      "file": "app/assets/images/character/girl/girl_full_04_walk_dr_d.png",
+      "file": "app/assets/images/character/girl/girl_full_04_walk_dr_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -4731,7 +4731,7 @@
     },
     {
       "id": "girl_full_04_walk_ur_a",
-      "file": "app/assets/images/character/girl/girl_full_04_walk_ur_a.png",
+      "file": "app/assets/images/character/girl/girl_full_04_walk_ur_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -4746,7 +4746,7 @@
     },
     {
       "id": "girl_full_04_walk_ur_b",
-      "file": "app/assets/images/character/girl/girl_full_04_walk_ur_b.png",
+      "file": "app/assets/images/character/girl/girl_full_04_walk_ur_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -4761,7 +4761,7 @@
     },
     {
       "id": "girl_full_04_walk_ur_c",
-      "file": "app/assets/images/character/girl/girl_full_04_walk_ur_c.png",
+      "file": "app/assets/images/character/girl/girl_full_04_walk_ur_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -4776,7 +4776,7 @@
     },
     {
       "id": "girl_full_04_walk_ur_d",
-      "file": "app/assets/images/character/girl/girl_full_04_walk_ur_d.png",
+      "file": "app/assets/images/character/girl/girl_full_04_walk_ur_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -4791,7 +4791,7 @@
     },
     {
       "id": "boy_full_04",
-      "file": "app/assets/images/character/boy/boy_full_04.png",
+      "file": "app/assets/images/character/boy/boy_full_04.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -4806,7 +4806,7 @@
     },
     {
       "id": "boy_full_04_wave",
-      "file": "app/assets/images/character/boy/boy_full_04_wave.png",
+      "file": "app/assets/images/character/boy/boy_full_04_wave.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -4821,7 +4821,7 @@
     },
     {
       "id": "boy_full_04_walk_dr_a",
-      "file": "app/assets/images/character/boy/boy_full_04_walk_dr_a.png",
+      "file": "app/assets/images/character/boy/boy_full_04_walk_dr_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -4836,7 +4836,7 @@
     },
     {
       "id": "boy_full_04_walk_dr_b",
-      "file": "app/assets/images/character/boy/boy_full_04_walk_dr_b.png",
+      "file": "app/assets/images/character/boy/boy_full_04_walk_dr_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -4851,7 +4851,7 @@
     },
     {
       "id": "boy_full_04_walk_dr_c",
-      "file": "app/assets/images/character/boy/boy_full_04_walk_dr_c.png",
+      "file": "app/assets/images/character/boy/boy_full_04_walk_dr_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -4866,7 +4866,7 @@
     },
     {
       "id": "boy_full_04_walk_dr_d",
-      "file": "app/assets/images/character/boy/boy_full_04_walk_dr_d.png",
+      "file": "app/assets/images/character/boy/boy_full_04_walk_dr_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -4881,7 +4881,7 @@
     },
     {
       "id": "boy_full_04_walk_ur_a",
-      "file": "app/assets/images/character/boy/boy_full_04_walk_ur_a.png",
+      "file": "app/assets/images/character/boy/boy_full_04_walk_ur_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -4896,7 +4896,7 @@
     },
     {
       "id": "boy_full_04_walk_ur_b",
-      "file": "app/assets/images/character/boy/boy_full_04_walk_ur_b.png",
+      "file": "app/assets/images/character/boy/boy_full_04_walk_ur_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -4911,7 +4911,7 @@
     },
     {
       "id": "boy_full_04_walk_ur_c",
-      "file": "app/assets/images/character/boy/boy_full_04_walk_ur_c.png",
+      "file": "app/assets/images/character/boy/boy_full_04_walk_ur_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -4926,7 +4926,7 @@
     },
     {
       "id": "boy_full_04_walk_ur_d",
-      "file": "app/assets/images/character/boy/boy_full_04_walk_ur_d.png",
+      "file": "app/assets/images/character/boy/boy_full_04_walk_ur_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -4941,7 +4941,7 @@
     },
     {
       "id": "girl_full_05",
-      "file": "app/assets/images/character/girl/girl_full_05.png",
+      "file": "app/assets/images/character/girl/girl_full_05.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -4956,7 +4956,7 @@
     },
     {
       "id": "girl_full_05_wave",
-      "file": "app/assets/images/character/girl/girl_full_05_wave.png",
+      "file": "app/assets/images/character/girl/girl_full_05_wave.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -4971,7 +4971,7 @@
     },
     {
       "id": "girl_full_05_walk_dr_a",
-      "file": "app/assets/images/character/girl/girl_full_05_walk_dr_a.png",
+      "file": "app/assets/images/character/girl/girl_full_05_walk_dr_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -4986,7 +4986,7 @@
     },
     {
       "id": "girl_full_05_walk_dr_b",
-      "file": "app/assets/images/character/girl/girl_full_05_walk_dr_b.png",
+      "file": "app/assets/images/character/girl/girl_full_05_walk_dr_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5001,7 +5001,7 @@
     },
     {
       "id": "girl_full_05_walk_dr_c",
-      "file": "app/assets/images/character/girl/girl_full_05_walk_dr_c.png",
+      "file": "app/assets/images/character/girl/girl_full_05_walk_dr_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5016,7 +5016,7 @@
     },
     {
       "id": "girl_full_05_walk_dr_d",
-      "file": "app/assets/images/character/girl/girl_full_05_walk_dr_d.png",
+      "file": "app/assets/images/character/girl/girl_full_05_walk_dr_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5031,7 +5031,7 @@
     },
     {
       "id": "girl_full_05_walk_ur_a",
-      "file": "app/assets/images/character/girl/girl_full_05_walk_ur_a.png",
+      "file": "app/assets/images/character/girl/girl_full_05_walk_ur_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5046,7 +5046,7 @@
     },
     {
       "id": "girl_full_05_walk_ur_b",
-      "file": "app/assets/images/character/girl/girl_full_05_walk_ur_b.png",
+      "file": "app/assets/images/character/girl/girl_full_05_walk_ur_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5061,7 +5061,7 @@
     },
     {
       "id": "girl_full_05_walk_ur_c",
-      "file": "app/assets/images/character/girl/girl_full_05_walk_ur_c.png",
+      "file": "app/assets/images/character/girl/girl_full_05_walk_ur_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5076,7 +5076,7 @@
     },
     {
       "id": "girl_full_05_walk_ur_d",
-      "file": "app/assets/images/character/girl/girl_full_05_walk_ur_d.png",
+      "file": "app/assets/images/character/girl/girl_full_05_walk_ur_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5091,7 +5091,7 @@
     },
     {
       "id": "boy_full_05",
-      "file": "app/assets/images/character/boy/boy_full_05.png",
+      "file": "app/assets/images/character/boy/boy_full_05.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5106,7 +5106,7 @@
     },
     {
       "id": "boy_full_05_wave",
-      "file": "app/assets/images/character/boy/boy_full_05_wave.png",
+      "file": "app/assets/images/character/boy/boy_full_05_wave.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5121,7 +5121,7 @@
     },
     {
       "id": "boy_full_05_walk_dr_a",
-      "file": "app/assets/images/character/boy/boy_full_05_walk_dr_a.png",
+      "file": "app/assets/images/character/boy/boy_full_05_walk_dr_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5136,7 +5136,7 @@
     },
     {
       "id": "boy_full_05_walk_dr_b",
-      "file": "app/assets/images/character/boy/boy_full_05_walk_dr_b.png",
+      "file": "app/assets/images/character/boy/boy_full_05_walk_dr_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5151,7 +5151,7 @@
     },
     {
       "id": "boy_full_05_walk_dr_c",
-      "file": "app/assets/images/character/boy/boy_full_05_walk_dr_c.png",
+      "file": "app/assets/images/character/boy/boy_full_05_walk_dr_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5166,7 +5166,7 @@
     },
     {
       "id": "boy_full_05_walk_dr_d",
-      "file": "app/assets/images/character/boy/boy_full_05_walk_dr_d.png",
+      "file": "app/assets/images/character/boy/boy_full_05_walk_dr_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5181,7 +5181,7 @@
     },
     {
       "id": "boy_full_05_walk_ur_a",
-      "file": "app/assets/images/character/boy/boy_full_05_walk_ur_a.png",
+      "file": "app/assets/images/character/boy/boy_full_05_walk_ur_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5196,7 +5196,7 @@
     },
     {
       "id": "boy_full_05_walk_ur_b",
-      "file": "app/assets/images/character/boy/boy_full_05_walk_ur_b.png",
+      "file": "app/assets/images/character/boy/boy_full_05_walk_ur_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5211,7 +5211,7 @@
     },
     {
       "id": "boy_full_05_walk_ur_c",
-      "file": "app/assets/images/character/boy/boy_full_05_walk_ur_c.png",
+      "file": "app/assets/images/character/boy/boy_full_05_walk_ur_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5226,7 +5226,7 @@
     },
     {
       "id": "boy_full_05_walk_ur_d",
-      "file": "app/assets/images/character/boy/boy_full_05_walk_ur_d.png",
+      "file": "app/assets/images/character/boy/boy_full_05_walk_ur_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5241,7 +5241,7 @@
     },
     {
       "id": "girl_full_06",
-      "file": "app/assets/images/character/girl/girl_full_06.png",
+      "file": "app/assets/images/character/girl/girl_full_06.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5256,7 +5256,7 @@
     },
     {
       "id": "girl_full_06_wave",
-      "file": "app/assets/images/character/girl/girl_full_06_wave.png",
+      "file": "app/assets/images/character/girl/girl_full_06_wave.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5271,7 +5271,7 @@
     },
     {
       "id": "girl_full_06_walk_dr_a",
-      "file": "app/assets/images/character/girl/girl_full_06_walk_dr_a.png",
+      "file": "app/assets/images/character/girl/girl_full_06_walk_dr_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5286,7 +5286,7 @@
     },
     {
       "id": "girl_full_06_walk_dr_b",
-      "file": "app/assets/images/character/girl/girl_full_06_walk_dr_b.png",
+      "file": "app/assets/images/character/girl/girl_full_06_walk_dr_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5301,7 +5301,7 @@
     },
     {
       "id": "girl_full_06_walk_dr_c",
-      "file": "app/assets/images/character/girl/girl_full_06_walk_dr_c.png",
+      "file": "app/assets/images/character/girl/girl_full_06_walk_dr_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5316,7 +5316,7 @@
     },
     {
       "id": "girl_full_06_walk_dr_d",
-      "file": "app/assets/images/character/girl/girl_full_06_walk_dr_d.png",
+      "file": "app/assets/images/character/girl/girl_full_06_walk_dr_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5331,7 +5331,7 @@
     },
     {
       "id": "girl_full_06_walk_ur_a",
-      "file": "app/assets/images/character/girl/girl_full_06_walk_ur_a.png",
+      "file": "app/assets/images/character/girl/girl_full_06_walk_ur_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5346,7 +5346,7 @@
     },
     {
       "id": "girl_full_06_walk_ur_b",
-      "file": "app/assets/images/character/girl/girl_full_06_walk_ur_b.png",
+      "file": "app/assets/images/character/girl/girl_full_06_walk_ur_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5361,7 +5361,7 @@
     },
     {
       "id": "girl_full_06_walk_ur_c",
-      "file": "app/assets/images/character/girl/girl_full_06_walk_ur_c.png",
+      "file": "app/assets/images/character/girl/girl_full_06_walk_ur_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5376,7 +5376,7 @@
     },
     {
       "id": "girl_full_06_walk_ur_d",
-      "file": "app/assets/images/character/girl/girl_full_06_walk_ur_d.png",
+      "file": "app/assets/images/character/girl/girl_full_06_walk_ur_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5391,7 +5391,7 @@
     },
     {
       "id": "boy_full_06",
-      "file": "app/assets/images/character/boy/boy_full_06.png",
+      "file": "app/assets/images/character/boy/boy_full_06.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5406,7 +5406,7 @@
     },
     {
       "id": "boy_full_06_wave",
-      "file": "app/assets/images/character/boy/boy_full_06_wave.png",
+      "file": "app/assets/images/character/boy/boy_full_06_wave.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5421,7 +5421,7 @@
     },
     {
       "id": "boy_full_06_walk_dr_a",
-      "file": "app/assets/images/character/boy/boy_full_06_walk_dr_a.png",
+      "file": "app/assets/images/character/boy/boy_full_06_walk_dr_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5436,7 +5436,7 @@
     },
     {
       "id": "boy_full_06_walk_dr_b",
-      "file": "app/assets/images/character/boy/boy_full_06_walk_dr_b.png",
+      "file": "app/assets/images/character/boy/boy_full_06_walk_dr_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5451,7 +5451,7 @@
     },
     {
       "id": "boy_full_06_walk_dr_c",
-      "file": "app/assets/images/character/boy/boy_full_06_walk_dr_c.png",
+      "file": "app/assets/images/character/boy/boy_full_06_walk_dr_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5466,7 +5466,7 @@
     },
     {
       "id": "boy_full_06_walk_dr_d",
-      "file": "app/assets/images/character/boy/boy_full_06_walk_dr_d.png",
+      "file": "app/assets/images/character/boy/boy_full_06_walk_dr_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5481,7 +5481,7 @@
     },
     {
       "id": "boy_full_06_walk_ur_a",
-      "file": "app/assets/images/character/boy/boy_full_06_walk_ur_a.png",
+      "file": "app/assets/images/character/boy/boy_full_06_walk_ur_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5496,7 +5496,7 @@
     },
     {
       "id": "boy_full_06_walk_ur_b",
-      "file": "app/assets/images/character/boy/boy_full_06_walk_ur_b.png",
+      "file": "app/assets/images/character/boy/boy_full_06_walk_ur_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5511,7 +5511,7 @@
     },
     {
       "id": "boy_full_06_walk_ur_c",
-      "file": "app/assets/images/character/boy/boy_full_06_walk_ur_c.png",
+      "file": "app/assets/images/character/boy/boy_full_06_walk_ur_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5526,7 +5526,7 @@
     },
     {
       "id": "boy_full_06_walk_ur_d",
-      "file": "app/assets/images/character/boy/boy_full_06_walk_ur_d.png",
+      "file": "app/assets/images/character/boy/boy_full_06_walk_ur_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5541,7 +5541,7 @@
     },
     {
       "id": "girl_full_07",
-      "file": "app/assets/images/character/girl/girl_full_07.png",
+      "file": "app/assets/images/character/girl/girl_full_07.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5556,7 +5556,7 @@
     },
     {
       "id": "girl_full_07_wave",
-      "file": "app/assets/images/character/girl/girl_full_07_wave.png",
+      "file": "app/assets/images/character/girl/girl_full_07_wave.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5571,7 +5571,7 @@
     },
     {
       "id": "girl_full_07_walk_dr_a",
-      "file": "app/assets/images/character/girl/girl_full_07_walk_dr_a.png",
+      "file": "app/assets/images/character/girl/girl_full_07_walk_dr_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5586,7 +5586,7 @@
     },
     {
       "id": "girl_full_07_walk_dr_b",
-      "file": "app/assets/images/character/girl/girl_full_07_walk_dr_b.png",
+      "file": "app/assets/images/character/girl/girl_full_07_walk_dr_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5601,7 +5601,7 @@
     },
     {
       "id": "girl_full_07_walk_dr_c",
-      "file": "app/assets/images/character/girl/girl_full_07_walk_dr_c.png",
+      "file": "app/assets/images/character/girl/girl_full_07_walk_dr_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5616,7 +5616,7 @@
     },
     {
       "id": "girl_full_07_walk_dr_d",
-      "file": "app/assets/images/character/girl/girl_full_07_walk_dr_d.png",
+      "file": "app/assets/images/character/girl/girl_full_07_walk_dr_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5631,7 +5631,7 @@
     },
     {
       "id": "girl_full_07_walk_ur_a",
-      "file": "app/assets/images/character/girl/girl_full_07_walk_ur_a.png",
+      "file": "app/assets/images/character/girl/girl_full_07_walk_ur_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5646,7 +5646,7 @@
     },
     {
       "id": "girl_full_07_walk_ur_b",
-      "file": "app/assets/images/character/girl/girl_full_07_walk_ur_b.png",
+      "file": "app/assets/images/character/girl/girl_full_07_walk_ur_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5661,7 +5661,7 @@
     },
     {
       "id": "girl_full_07_walk_ur_c",
-      "file": "app/assets/images/character/girl/girl_full_07_walk_ur_c.png",
+      "file": "app/assets/images/character/girl/girl_full_07_walk_ur_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5676,7 +5676,7 @@
     },
     {
       "id": "girl_full_07_walk_ur_d",
-      "file": "app/assets/images/character/girl/girl_full_07_walk_ur_d.png",
+      "file": "app/assets/images/character/girl/girl_full_07_walk_ur_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5691,7 +5691,7 @@
     },
     {
       "id": "boy_full_07",
-      "file": "app/assets/images/character/boy/boy_full_07.png",
+      "file": "app/assets/images/character/boy/boy_full_07.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5706,7 +5706,7 @@
     },
     {
       "id": "boy_full_07_wave",
-      "file": "app/assets/images/character/boy/boy_full_07_wave.png",
+      "file": "app/assets/images/character/boy/boy_full_07_wave.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5721,7 +5721,7 @@
     },
     {
       "id": "boy_full_07_walk_dr_a",
-      "file": "app/assets/images/character/boy/boy_full_07_walk_dr_a.png",
+      "file": "app/assets/images/character/boy/boy_full_07_walk_dr_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5736,7 +5736,7 @@
     },
     {
       "id": "boy_full_07_walk_dr_b",
-      "file": "app/assets/images/character/boy/boy_full_07_walk_dr_b.png",
+      "file": "app/assets/images/character/boy/boy_full_07_walk_dr_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5751,7 +5751,7 @@
     },
     {
       "id": "boy_full_07_walk_dr_c",
-      "file": "app/assets/images/character/boy/boy_full_07_walk_dr_c.png",
+      "file": "app/assets/images/character/boy/boy_full_07_walk_dr_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5766,7 +5766,7 @@
     },
     {
       "id": "boy_full_07_walk_dr_d",
-      "file": "app/assets/images/character/boy/boy_full_07_walk_dr_d.png",
+      "file": "app/assets/images/character/boy/boy_full_07_walk_dr_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5781,7 +5781,7 @@
     },
     {
       "id": "boy_full_07_walk_ur_a",
-      "file": "app/assets/images/character/boy/boy_full_07_walk_ur_a.png",
+      "file": "app/assets/images/character/boy/boy_full_07_walk_ur_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5796,7 +5796,7 @@
     },
     {
       "id": "boy_full_07_walk_ur_b",
-      "file": "app/assets/images/character/boy/boy_full_07_walk_ur_b.png",
+      "file": "app/assets/images/character/boy/boy_full_07_walk_ur_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5811,7 +5811,7 @@
     },
     {
       "id": "boy_full_07_walk_ur_c",
-      "file": "app/assets/images/character/boy/boy_full_07_walk_ur_c.png",
+      "file": "app/assets/images/character/boy/boy_full_07_walk_ur_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5826,7 +5826,7 @@
     },
     {
       "id": "boy_full_07_walk_ur_d",
-      "file": "app/assets/images/character/boy/boy_full_07_walk_ur_d.png",
+      "file": "app/assets/images/character/boy/boy_full_07_walk_ur_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -5841,7 +5841,7 @@
     },
     {
       "id": "girl_full_08",
-      "file": "app/assets/images/character/girl/girl_full_08.png",
+      "file": "app/assets/images/character/girl/girl_full_08.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5856,7 +5856,7 @@
     },
     {
       "id": "girl_full_08_wave",
-      "file": "app/assets/images/character/girl/girl_full_08_wave.png",
+      "file": "app/assets/images/character/girl/girl_full_08_wave.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5871,7 +5871,7 @@
     },
     {
       "id": "girl_full_08_walk_dr_a",
-      "file": "app/assets/images/character/girl/girl_full_08_walk_dr_a.png",
+      "file": "app/assets/images/character/girl/girl_full_08_walk_dr_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5886,7 +5886,7 @@
     },
     {
       "id": "girl_full_08_walk_dr_b",
-      "file": "app/assets/images/character/girl/girl_full_08_walk_dr_b.png",
+      "file": "app/assets/images/character/girl/girl_full_08_walk_dr_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5901,7 +5901,7 @@
     },
     {
       "id": "girl_full_08_walk_dr_c",
-      "file": "app/assets/images/character/girl/girl_full_08_walk_dr_c.png",
+      "file": "app/assets/images/character/girl/girl_full_08_walk_dr_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5916,7 +5916,7 @@
     },
     {
       "id": "girl_full_08_walk_dr_d",
-      "file": "app/assets/images/character/girl/girl_full_08_walk_dr_d.png",
+      "file": "app/assets/images/character/girl/girl_full_08_walk_dr_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5931,7 +5931,7 @@
     },
     {
       "id": "girl_full_08_walk_ur_a",
-      "file": "app/assets/images/character/girl/girl_full_08_walk_ur_a.png",
+      "file": "app/assets/images/character/girl/girl_full_08_walk_ur_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5946,7 +5946,7 @@
     },
     {
       "id": "girl_full_08_walk_ur_b",
-      "file": "app/assets/images/character/girl/girl_full_08_walk_ur_b.png",
+      "file": "app/assets/images/character/girl/girl_full_08_walk_ur_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5961,7 +5961,7 @@
     },
     {
       "id": "girl_full_08_walk_ur_c",
-      "file": "app/assets/images/character/girl/girl_full_08_walk_ur_c.png",
+      "file": "app/assets/images/character/girl/girl_full_08_walk_ur_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5976,7 +5976,7 @@
     },
     {
       "id": "girl_full_08_walk_ur_d",
-      "file": "app/assets/images/character/girl/girl_full_08_walk_ur_d.png",
+      "file": "app/assets/images/character/girl/girl_full_08_walk_ur_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -5991,7 +5991,7 @@
     },
     {
       "id": "boy_full_08",
-      "file": "app/assets/images/character/boy/boy_full_08.png",
+      "file": "app/assets/images/character/boy/boy_full_08.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6006,7 +6006,7 @@
     },
     {
       "id": "boy_full_08_wave",
-      "file": "app/assets/images/character/boy/boy_full_08_wave.png",
+      "file": "app/assets/images/character/boy/boy_full_08_wave.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6021,7 +6021,7 @@
     },
     {
       "id": "boy_full_08_walk_dr_a",
-      "file": "app/assets/images/character/boy/boy_full_08_walk_dr_a.png",
+      "file": "app/assets/images/character/boy/boy_full_08_walk_dr_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6036,7 +6036,7 @@
     },
     {
       "id": "boy_full_08_walk_dr_b",
-      "file": "app/assets/images/character/boy/boy_full_08_walk_dr_b.png",
+      "file": "app/assets/images/character/boy/boy_full_08_walk_dr_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6051,7 +6051,7 @@
     },
     {
       "id": "boy_full_08_walk_dr_c",
-      "file": "app/assets/images/character/boy/boy_full_08_walk_dr_c.png",
+      "file": "app/assets/images/character/boy/boy_full_08_walk_dr_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6066,7 +6066,7 @@
     },
     {
       "id": "boy_full_08_walk_dr_d",
-      "file": "app/assets/images/character/boy/boy_full_08_walk_dr_d.png",
+      "file": "app/assets/images/character/boy/boy_full_08_walk_dr_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6081,7 +6081,7 @@
     },
     {
       "id": "boy_full_08_walk_ur_a",
-      "file": "app/assets/images/character/boy/boy_full_08_walk_ur_a.png",
+      "file": "app/assets/images/character/boy/boy_full_08_walk_ur_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6096,7 +6096,7 @@
     },
     {
       "id": "boy_full_08_walk_ur_b",
-      "file": "app/assets/images/character/boy/boy_full_08_walk_ur_b.png",
+      "file": "app/assets/images/character/boy/boy_full_08_walk_ur_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6111,7 +6111,7 @@
     },
     {
       "id": "boy_full_08_walk_ur_c",
-      "file": "app/assets/images/character/boy/boy_full_08_walk_ur_c.png",
+      "file": "app/assets/images/character/boy/boy_full_08_walk_ur_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6126,7 +6126,7 @@
     },
     {
       "id": "boy_full_08_walk_ur_d",
-      "file": "app/assets/images/character/boy/boy_full_08_walk_ur_d.png",
+      "file": "app/assets/images/character/boy/boy_full_08_walk_ur_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6141,7 +6141,7 @@
     },
     {
       "id": "girl_full_09",
-      "file": "app/assets/images/character/girl/girl_full_09.png",
+      "file": "app/assets/images/character/girl/girl_full_09.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6156,7 +6156,7 @@
     },
     {
       "id": "girl_full_09_wave",
-      "file": "app/assets/images/character/girl/girl_full_09_wave.png",
+      "file": "app/assets/images/character/girl/girl_full_09_wave.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6171,7 +6171,7 @@
     },
     {
       "id": "girl_full_09_walk_dr_a",
-      "file": "app/assets/images/character/girl/girl_full_09_walk_dr_a.png",
+      "file": "app/assets/images/character/girl/girl_full_09_walk_dr_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6186,7 +6186,7 @@
     },
     {
       "id": "girl_full_09_walk_dr_b",
-      "file": "app/assets/images/character/girl/girl_full_09_walk_dr_b.png",
+      "file": "app/assets/images/character/girl/girl_full_09_walk_dr_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6201,7 +6201,7 @@
     },
     {
       "id": "girl_full_09_walk_dr_c",
-      "file": "app/assets/images/character/girl/girl_full_09_walk_dr_c.png",
+      "file": "app/assets/images/character/girl/girl_full_09_walk_dr_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6216,7 +6216,7 @@
     },
     {
       "id": "girl_full_09_walk_dr_d",
-      "file": "app/assets/images/character/girl/girl_full_09_walk_dr_d.png",
+      "file": "app/assets/images/character/girl/girl_full_09_walk_dr_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6231,7 +6231,7 @@
     },
     {
       "id": "girl_full_09_walk_ur_a",
-      "file": "app/assets/images/character/girl/girl_full_09_walk_ur_a.png",
+      "file": "app/assets/images/character/girl/girl_full_09_walk_ur_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6246,7 +6246,7 @@
     },
     {
       "id": "girl_full_09_walk_ur_b",
-      "file": "app/assets/images/character/girl/girl_full_09_walk_ur_b.png",
+      "file": "app/assets/images/character/girl/girl_full_09_walk_ur_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6261,7 +6261,7 @@
     },
     {
       "id": "girl_full_09_walk_ur_c",
-      "file": "app/assets/images/character/girl/girl_full_09_walk_ur_c.png",
+      "file": "app/assets/images/character/girl/girl_full_09_walk_ur_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6276,7 +6276,7 @@
     },
     {
       "id": "girl_full_09_walk_ur_d",
-      "file": "app/assets/images/character/girl/girl_full_09_walk_ur_d.png",
+      "file": "app/assets/images/character/girl/girl_full_09_walk_ur_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6291,7 +6291,7 @@
     },
     {
       "id": "boy_full_09",
-      "file": "app/assets/images/character/boy/boy_full_09.png",
+      "file": "app/assets/images/character/boy/boy_full_09.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6306,7 +6306,7 @@
     },
     {
       "id": "boy_full_09_wave",
-      "file": "app/assets/images/character/boy/boy_full_09_wave.png",
+      "file": "app/assets/images/character/boy/boy_full_09_wave.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6321,7 +6321,7 @@
     },
     {
       "id": "boy_full_09_walk_dr_a",
-      "file": "app/assets/images/character/boy/boy_full_09_walk_dr_a.png",
+      "file": "app/assets/images/character/boy/boy_full_09_walk_dr_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6336,7 +6336,7 @@
     },
     {
       "id": "boy_full_09_walk_dr_b",
-      "file": "app/assets/images/character/boy/boy_full_09_walk_dr_b.png",
+      "file": "app/assets/images/character/boy/boy_full_09_walk_dr_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6351,7 +6351,7 @@
     },
     {
       "id": "boy_full_09_walk_dr_c",
-      "file": "app/assets/images/character/boy/boy_full_09_walk_dr_c.png",
+      "file": "app/assets/images/character/boy/boy_full_09_walk_dr_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6366,7 +6366,7 @@
     },
     {
       "id": "boy_full_09_walk_dr_d",
-      "file": "app/assets/images/character/boy/boy_full_09_walk_dr_d.png",
+      "file": "app/assets/images/character/boy/boy_full_09_walk_dr_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6381,7 +6381,7 @@
     },
     {
       "id": "boy_full_09_walk_ur_a",
-      "file": "app/assets/images/character/boy/boy_full_09_walk_ur_a.png",
+      "file": "app/assets/images/character/boy/boy_full_09_walk_ur_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6396,7 +6396,7 @@
     },
     {
       "id": "boy_full_09_walk_ur_b",
-      "file": "app/assets/images/character/boy/boy_full_09_walk_ur_b.png",
+      "file": "app/assets/images/character/boy/boy_full_09_walk_ur_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6411,7 +6411,7 @@
     },
     {
       "id": "boy_full_09_walk_ur_c",
-      "file": "app/assets/images/character/boy/boy_full_09_walk_ur_c.png",
+      "file": "app/assets/images/character/boy/boy_full_09_walk_ur_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6426,7 +6426,7 @@
     },
     {
       "id": "boy_full_09_walk_ur_d",
-      "file": "app/assets/images/character/boy/boy_full_09_walk_ur_d.png",
+      "file": "app/assets/images/character/boy/boy_full_09_walk_ur_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6441,7 +6441,7 @@
     },
     {
       "id": "girl_full_10",
-      "file": "app/assets/images/character/girl/girl_full_10.png",
+      "file": "app/assets/images/character/girl/girl_full_10.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6456,7 +6456,7 @@
     },
     {
       "id": "girl_full_10_wave",
-      "file": "app/assets/images/character/girl/girl_full_10_wave.png",
+      "file": "app/assets/images/character/girl/girl_full_10_wave.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6471,7 +6471,7 @@
     },
     {
       "id": "girl_full_10_walk_dr_a",
-      "file": "app/assets/images/character/girl/girl_full_10_walk_dr_a.png",
+      "file": "app/assets/images/character/girl/girl_full_10_walk_dr_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6486,7 +6486,7 @@
     },
     {
       "id": "girl_full_10_walk_dr_b",
-      "file": "app/assets/images/character/girl/girl_full_10_walk_dr_b.png",
+      "file": "app/assets/images/character/girl/girl_full_10_walk_dr_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6501,7 +6501,7 @@
     },
     {
       "id": "girl_full_10_walk_dr_c",
-      "file": "app/assets/images/character/girl/girl_full_10_walk_dr_c.png",
+      "file": "app/assets/images/character/girl/girl_full_10_walk_dr_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6516,7 +6516,7 @@
     },
     {
       "id": "girl_full_10_walk_dr_d",
-      "file": "app/assets/images/character/girl/girl_full_10_walk_dr_d.png",
+      "file": "app/assets/images/character/girl/girl_full_10_walk_dr_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6531,7 +6531,7 @@
     },
     {
       "id": "girl_full_10_walk_ur_a",
-      "file": "app/assets/images/character/girl/girl_full_10_walk_ur_a.png",
+      "file": "app/assets/images/character/girl/girl_full_10_walk_ur_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6546,7 +6546,7 @@
     },
     {
       "id": "girl_full_10_walk_ur_b",
-      "file": "app/assets/images/character/girl/girl_full_10_walk_ur_b.png",
+      "file": "app/assets/images/character/girl/girl_full_10_walk_ur_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6561,7 +6561,7 @@
     },
     {
       "id": "girl_full_10_walk_ur_c",
-      "file": "app/assets/images/character/girl/girl_full_10_walk_ur_c.png",
+      "file": "app/assets/images/character/girl/girl_full_10_walk_ur_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6576,7 +6576,7 @@
     },
     {
       "id": "girl_full_10_walk_ur_d",
-      "file": "app/assets/images/character/girl/girl_full_10_walk_ur_d.png",
+      "file": "app/assets/images/character/girl/girl_full_10_walk_ur_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6591,7 +6591,7 @@
     },
     {
       "id": "boy_full_10",
-      "file": "app/assets/images/character/boy/boy_full_10.png",
+      "file": "app/assets/images/character/boy/boy_full_10.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6606,7 +6606,7 @@
     },
     {
       "id": "boy_full_10_wave",
-      "file": "app/assets/images/character/boy/boy_full_10_wave.png",
+      "file": "app/assets/images/character/boy/boy_full_10_wave.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6621,7 +6621,7 @@
     },
     {
       "id": "boy_full_10_walk_dr_a",
-      "file": "app/assets/images/character/boy/boy_full_10_walk_dr_a.png",
+      "file": "app/assets/images/character/boy/boy_full_10_walk_dr_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6636,7 +6636,7 @@
     },
     {
       "id": "boy_full_10_walk_dr_b",
-      "file": "app/assets/images/character/boy/boy_full_10_walk_dr_b.png",
+      "file": "app/assets/images/character/boy/boy_full_10_walk_dr_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6651,7 +6651,7 @@
     },
     {
       "id": "boy_full_10_walk_dr_c",
-      "file": "app/assets/images/character/boy/boy_full_10_walk_dr_c.png",
+      "file": "app/assets/images/character/boy/boy_full_10_walk_dr_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6666,7 +6666,7 @@
     },
     {
       "id": "boy_full_10_walk_dr_d",
-      "file": "app/assets/images/character/boy/boy_full_10_walk_dr_d.png",
+      "file": "app/assets/images/character/boy/boy_full_10_walk_dr_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6681,7 +6681,7 @@
     },
     {
       "id": "boy_full_10_walk_ur_a",
-      "file": "app/assets/images/character/boy/boy_full_10_walk_ur_a.png",
+      "file": "app/assets/images/character/boy/boy_full_10_walk_ur_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6696,7 +6696,7 @@
     },
     {
       "id": "boy_full_10_walk_ur_b",
-      "file": "app/assets/images/character/boy/boy_full_10_walk_ur_b.png",
+      "file": "app/assets/images/character/boy/boy_full_10_walk_ur_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6711,7 +6711,7 @@
     },
     {
       "id": "boy_full_10_walk_ur_c",
-      "file": "app/assets/images/character/boy/boy_full_10_walk_ur_c.png",
+      "file": "app/assets/images/character/boy/boy_full_10_walk_ur_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6726,7 +6726,7 @@
     },
     {
       "id": "boy_full_10_walk_ur_d",
-      "file": "app/assets/images/character/boy/boy_full_10_walk_ur_d.png",
+      "file": "app/assets/images/character/boy/boy_full_10_walk_ur_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6741,7 +6741,7 @@
     },
     {
       "id": "girl_full_11",
-      "file": "app/assets/images/character/girl/girl_full_11.png",
+      "file": "app/assets/images/character/girl/girl_full_11.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6756,7 +6756,7 @@
     },
     {
       "id": "girl_full_11_wave",
-      "file": "app/assets/images/character/girl/girl_full_11_wave.png",
+      "file": "app/assets/images/character/girl/girl_full_11_wave.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6771,7 +6771,7 @@
     },
     {
       "id": "girl_full_11_walk_dr_a",
-      "file": "app/assets/images/character/girl/girl_full_11_walk_dr_a.png",
+      "file": "app/assets/images/character/girl/girl_full_11_walk_dr_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6786,7 +6786,7 @@
     },
     {
       "id": "girl_full_11_walk_dr_b",
-      "file": "app/assets/images/character/girl/girl_full_11_walk_dr_b.png",
+      "file": "app/assets/images/character/girl/girl_full_11_walk_dr_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6801,7 +6801,7 @@
     },
     {
       "id": "girl_full_11_walk_dr_c",
-      "file": "app/assets/images/character/girl/girl_full_11_walk_dr_c.png",
+      "file": "app/assets/images/character/girl/girl_full_11_walk_dr_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6816,7 +6816,7 @@
     },
     {
       "id": "girl_full_11_walk_dr_d",
-      "file": "app/assets/images/character/girl/girl_full_11_walk_dr_d.png",
+      "file": "app/assets/images/character/girl/girl_full_11_walk_dr_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6831,7 +6831,7 @@
     },
     {
       "id": "girl_full_11_walk_ur_a",
-      "file": "app/assets/images/character/girl/girl_full_11_walk_ur_a.png",
+      "file": "app/assets/images/character/girl/girl_full_11_walk_ur_a.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6846,7 +6846,7 @@
     },
     {
       "id": "girl_full_11_walk_ur_b",
-      "file": "app/assets/images/character/girl/girl_full_11_walk_ur_b.png",
+      "file": "app/assets/images/character/girl/girl_full_11_walk_ur_b.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6861,7 +6861,7 @@
     },
     {
       "id": "girl_full_11_walk_ur_c",
-      "file": "app/assets/images/character/girl/girl_full_11_walk_ur_c.png",
+      "file": "app/assets/images/character/girl/girl_full_11_walk_ur_c.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6876,7 +6876,7 @@
     },
     {
       "id": "girl_full_11_walk_ur_d",
-      "file": "app/assets/images/character/girl/girl_full_11_walk_ur_d.png",
+      "file": "app/assets/images/character/girl/girl_full_11_walk_ur_d.webp",
       "kind": "character_full",
       "form": "girl",
       "layer": null,
@@ -6891,7 +6891,7 @@
     },
     {
       "id": "boy_full_11",
-      "file": "app/assets/images/character/boy/boy_full_11.png",
+      "file": "app/assets/images/character/boy/boy_full_11.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6906,7 +6906,7 @@
     },
     {
       "id": "boy_full_11_wave",
-      "file": "app/assets/images/character/boy/boy_full_11_wave.png",
+      "file": "app/assets/images/character/boy/boy_full_11_wave.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6921,7 +6921,7 @@
     },
     {
       "id": "boy_full_11_walk_dr_a",
-      "file": "app/assets/images/character/boy/boy_full_11_walk_dr_a.png",
+      "file": "app/assets/images/character/boy/boy_full_11_walk_dr_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6936,7 +6936,7 @@
     },
     {
       "id": "boy_full_11_walk_dr_b",
-      "file": "app/assets/images/character/boy/boy_full_11_walk_dr_b.png",
+      "file": "app/assets/images/character/boy/boy_full_11_walk_dr_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6951,7 +6951,7 @@
     },
     {
       "id": "boy_full_11_walk_dr_c",
-      "file": "app/assets/images/character/boy/boy_full_11_walk_dr_c.png",
+      "file": "app/assets/images/character/boy/boy_full_11_walk_dr_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6966,7 +6966,7 @@
     },
     {
       "id": "boy_full_11_walk_dr_d",
-      "file": "app/assets/images/character/boy/boy_full_11_walk_dr_d.png",
+      "file": "app/assets/images/character/boy/boy_full_11_walk_dr_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6981,7 +6981,7 @@
     },
     {
       "id": "boy_full_11_walk_ur_a",
-      "file": "app/assets/images/character/boy/boy_full_11_walk_ur_a.png",
+      "file": "app/assets/images/character/boy/boy_full_11_walk_ur_a.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -6996,7 +6996,7 @@
     },
     {
       "id": "boy_full_11_walk_ur_b",
-      "file": "app/assets/images/character/boy/boy_full_11_walk_ur_b.png",
+      "file": "app/assets/images/character/boy/boy_full_11_walk_ur_b.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -7011,7 +7011,7 @@
     },
     {
       "id": "boy_full_11_walk_ur_c",
-      "file": "app/assets/images/character/boy/boy_full_11_walk_ur_c.png",
+      "file": "app/assets/images/character/boy/boy_full_11_walk_ur_c.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -7026,7 +7026,7 @@
     },
     {
       "id": "boy_full_11_walk_ur_d",
-      "file": "app/assets/images/character/boy/boy_full_11_walk_ur_d.png",
+      "file": "app/assets/images/character/boy/boy_full_11_walk_ur_d.webp",
       "kind": "character_full",
       "form": "boy",
       "layer": null,
@@ -7041,7 +7041,7 @@
     },
     {
       "id": "squirrel_egg",
-      "file": "app/assets/images/pets/squirrel_egg.png",
+      "file": "app/assets/images/pets/squirrel_egg.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7056,7 +7056,7 @@
     },
     {
       "id": "squirrel_newborn",
-      "file": "app/assets/images/pets/squirrel_newborn.png",
+      "file": "app/assets/images/pets/squirrel_newborn.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7071,7 +7071,7 @@
     },
     {
       "id": "squirrel_teen",
-      "file": "app/assets/images/pets/squirrel_teen.png",
+      "file": "app/assets/images/pets/squirrel_teen.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7086,7 +7086,7 @@
     },
     {
       "id": "squirrel_adult",
-      "file": "app/assets/images/pets/squirrel_adult.png",
+      "file": "app/assets/images/pets/squirrel_adult.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7101,7 +7101,7 @@
     },
     {
       "id": "squirrel_egg_crack_1",
-      "file": "app/assets/images/pets/squirrel_egg_crack_1.png",
+      "file": "app/assets/images/pets/squirrel_egg_crack_1.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7116,7 +7116,7 @@
     },
     {
       "id": "squirrel_egg_crack_2",
-      "file": "app/assets/images/pets/squirrel_egg_crack_2.png",
+      "file": "app/assets/images/pets/squirrel_egg_crack_2.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7131,7 +7131,7 @@
     },
     {
       "id": "squirrel_egg_crack_3",
-      "file": "app/assets/images/pets/squirrel_egg_crack_3.png",
+      "file": "app/assets/images/pets/squirrel_egg_crack_3.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7146,7 +7146,7 @@
     },
     {
       "id": "squirrel_shell_bottom",
-      "file": "app/assets/images/pets/squirrel_shell_bottom.png",
+      "file": "app/assets/images/pets/squirrel_shell_bottom.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7161,7 +7161,7 @@
     },
     {
       "id": "squirrel_shell_top",
-      "file": "app/assets/images/pets/squirrel_shell_top.png",
+      "file": "app/assets/images/pets/squirrel_shell_top.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7176,7 +7176,7 @@
     },
     {
       "id": "squirrel_newborn_walk_a",
-      "file": "app/assets/images/pets/squirrel_newborn_walk_a.png",
+      "file": "app/assets/images/pets/squirrel_newborn_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7191,7 +7191,7 @@
     },
     {
       "id": "squirrel_newborn_walk_b",
-      "file": "app/assets/images/pets/squirrel_newborn_walk_b.png",
+      "file": "app/assets/images/pets/squirrel_newborn_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7206,7 +7206,7 @@
     },
     {
       "id": "squirrel_newborn_walk_c",
-      "file": "app/assets/images/pets/squirrel_newborn_walk_c.png",
+      "file": "app/assets/images/pets/squirrel_newborn_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7221,7 +7221,7 @@
     },
     {
       "id": "squirrel_newborn_walk_d",
-      "file": "app/assets/images/pets/squirrel_newborn_walk_d.png",
+      "file": "app/assets/images/pets/squirrel_newborn_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7236,7 +7236,7 @@
     },
     {
       "id": "squirrel_newborn_happy",
-      "file": "app/assets/images/pets/squirrel_newborn_happy.png",
+      "file": "app/assets/images/pets/squirrel_newborn_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7251,7 +7251,7 @@
     },
     {
       "id": "squirrel_newborn_sit",
-      "file": "app/assets/images/pets/squirrel_newborn_sit.png",
+      "file": "app/assets/images/pets/squirrel_newborn_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7266,7 +7266,7 @@
     },
     {
       "id": "squirrel_teen_walk_a",
-      "file": "app/assets/images/pets/squirrel_teen_walk_a.png",
+      "file": "app/assets/images/pets/squirrel_teen_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7281,7 +7281,7 @@
     },
     {
       "id": "squirrel_teen_walk_b",
-      "file": "app/assets/images/pets/squirrel_teen_walk_b.png",
+      "file": "app/assets/images/pets/squirrel_teen_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7296,7 +7296,7 @@
     },
     {
       "id": "squirrel_teen_walk_c",
-      "file": "app/assets/images/pets/squirrel_teen_walk_c.png",
+      "file": "app/assets/images/pets/squirrel_teen_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7311,7 +7311,7 @@
     },
     {
       "id": "squirrel_teen_walk_d",
-      "file": "app/assets/images/pets/squirrel_teen_walk_d.png",
+      "file": "app/assets/images/pets/squirrel_teen_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7326,7 +7326,7 @@
     },
     {
       "id": "squirrel_teen_happy",
-      "file": "app/assets/images/pets/squirrel_teen_happy.png",
+      "file": "app/assets/images/pets/squirrel_teen_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7341,7 +7341,7 @@
     },
     {
       "id": "squirrel_teen_sit",
-      "file": "app/assets/images/pets/squirrel_teen_sit.png",
+      "file": "app/assets/images/pets/squirrel_teen_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7356,7 +7356,7 @@
     },
     {
       "id": "squirrel_adult_walk_a",
-      "file": "app/assets/images/pets/squirrel_adult_walk_a.png",
+      "file": "app/assets/images/pets/squirrel_adult_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7371,7 +7371,7 @@
     },
     {
       "id": "squirrel_adult_walk_b",
-      "file": "app/assets/images/pets/squirrel_adult_walk_b.png",
+      "file": "app/assets/images/pets/squirrel_adult_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7386,7 +7386,7 @@
     },
     {
       "id": "squirrel_adult_walk_c",
-      "file": "app/assets/images/pets/squirrel_adult_walk_c.png",
+      "file": "app/assets/images/pets/squirrel_adult_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7401,7 +7401,7 @@
     },
     {
       "id": "squirrel_adult_walk_d",
-      "file": "app/assets/images/pets/squirrel_adult_walk_d.png",
+      "file": "app/assets/images/pets/squirrel_adult_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7416,7 +7416,7 @@
     },
     {
       "id": "squirrel_adult_happy",
-      "file": "app/assets/images/pets/squirrel_adult_happy.png",
+      "file": "app/assets/images/pets/squirrel_adult_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7431,7 +7431,7 @@
     },
     {
       "id": "squirrel_adult_sit",
-      "file": "app/assets/images/pets/squirrel_adult_sit.png",
+      "file": "app/assets/images/pets/squirrel_adult_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7446,7 +7446,7 @@
     },
     {
       "id": "capybara_egg",
-      "file": "app/assets/images/pets/capybara_egg.png",
+      "file": "app/assets/images/pets/capybara_egg.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7461,7 +7461,7 @@
     },
     {
       "id": "capybara_newborn",
-      "file": "app/assets/images/pets/capybara_newborn.png",
+      "file": "app/assets/images/pets/capybara_newborn.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7476,7 +7476,7 @@
     },
     {
       "id": "capybara_teen",
-      "file": "app/assets/images/pets/capybara_teen.png",
+      "file": "app/assets/images/pets/capybara_teen.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7491,7 +7491,7 @@
     },
     {
       "id": "capybara_adult",
-      "file": "app/assets/images/pets/capybara_adult.png",
+      "file": "app/assets/images/pets/capybara_adult.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7506,7 +7506,7 @@
     },
     {
       "id": "capybara_egg_crack_1",
-      "file": "app/assets/images/pets/capybara_egg_crack_1.png",
+      "file": "app/assets/images/pets/capybara_egg_crack_1.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7521,7 +7521,7 @@
     },
     {
       "id": "capybara_egg_crack_2",
-      "file": "app/assets/images/pets/capybara_egg_crack_2.png",
+      "file": "app/assets/images/pets/capybara_egg_crack_2.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7536,7 +7536,7 @@
     },
     {
       "id": "capybara_egg_crack_3",
-      "file": "app/assets/images/pets/capybara_egg_crack_3.png",
+      "file": "app/assets/images/pets/capybara_egg_crack_3.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7551,7 +7551,7 @@
     },
     {
       "id": "capybara_shell_bottom",
-      "file": "app/assets/images/pets/capybara_shell_bottom.png",
+      "file": "app/assets/images/pets/capybara_shell_bottom.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7566,7 +7566,7 @@
     },
     {
       "id": "capybara_shell_top",
-      "file": "app/assets/images/pets/capybara_shell_top.png",
+      "file": "app/assets/images/pets/capybara_shell_top.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7581,7 +7581,7 @@
     },
     {
       "id": "capybara_newborn_walk_a",
-      "file": "app/assets/images/pets/capybara_newborn_walk_a.png",
+      "file": "app/assets/images/pets/capybara_newborn_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7596,7 +7596,7 @@
     },
     {
       "id": "capybara_newborn_walk_b",
-      "file": "app/assets/images/pets/capybara_newborn_walk_b.png",
+      "file": "app/assets/images/pets/capybara_newborn_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7611,7 +7611,7 @@
     },
     {
       "id": "capybara_newborn_walk_c",
-      "file": "app/assets/images/pets/capybara_newborn_walk_c.png",
+      "file": "app/assets/images/pets/capybara_newborn_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7626,7 +7626,7 @@
     },
     {
       "id": "capybara_newborn_walk_d",
-      "file": "app/assets/images/pets/capybara_newborn_walk_d.png",
+      "file": "app/assets/images/pets/capybara_newborn_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7641,7 +7641,7 @@
     },
     {
       "id": "capybara_newborn_happy",
-      "file": "app/assets/images/pets/capybara_newborn_happy.png",
+      "file": "app/assets/images/pets/capybara_newborn_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7656,7 +7656,7 @@
     },
     {
       "id": "capybara_newborn_sit",
-      "file": "app/assets/images/pets/capybara_newborn_sit.png",
+      "file": "app/assets/images/pets/capybara_newborn_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7671,7 +7671,7 @@
     },
     {
       "id": "capybara_teen_walk_a",
-      "file": "app/assets/images/pets/capybara_teen_walk_a.png",
+      "file": "app/assets/images/pets/capybara_teen_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7686,7 +7686,7 @@
     },
     {
       "id": "capybara_teen_walk_b",
-      "file": "app/assets/images/pets/capybara_teen_walk_b.png",
+      "file": "app/assets/images/pets/capybara_teen_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7701,7 +7701,7 @@
     },
     {
       "id": "capybara_teen_walk_c",
-      "file": "app/assets/images/pets/capybara_teen_walk_c.png",
+      "file": "app/assets/images/pets/capybara_teen_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7716,7 +7716,7 @@
     },
     {
       "id": "capybara_teen_walk_d",
-      "file": "app/assets/images/pets/capybara_teen_walk_d.png",
+      "file": "app/assets/images/pets/capybara_teen_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7731,7 +7731,7 @@
     },
     {
       "id": "capybara_teen_happy",
-      "file": "app/assets/images/pets/capybara_teen_happy.png",
+      "file": "app/assets/images/pets/capybara_teen_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7746,7 +7746,7 @@
     },
     {
       "id": "capybara_teen_sit",
-      "file": "app/assets/images/pets/capybara_teen_sit.png",
+      "file": "app/assets/images/pets/capybara_teen_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7761,7 +7761,7 @@
     },
     {
       "id": "capybara_adult_walk_a",
-      "file": "app/assets/images/pets/capybara_adult_walk_a.png",
+      "file": "app/assets/images/pets/capybara_adult_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7776,7 +7776,7 @@
     },
     {
       "id": "capybara_adult_walk_b",
-      "file": "app/assets/images/pets/capybara_adult_walk_b.png",
+      "file": "app/assets/images/pets/capybara_adult_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7791,7 +7791,7 @@
     },
     {
       "id": "capybara_adult_walk_c",
-      "file": "app/assets/images/pets/capybara_adult_walk_c.png",
+      "file": "app/assets/images/pets/capybara_adult_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7806,7 +7806,7 @@
     },
     {
       "id": "capybara_adult_walk_d",
-      "file": "app/assets/images/pets/capybara_adult_walk_d.png",
+      "file": "app/assets/images/pets/capybara_adult_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7821,7 +7821,7 @@
     },
     {
       "id": "capybara_adult_happy",
-      "file": "app/assets/images/pets/capybara_adult_happy.png",
+      "file": "app/assets/images/pets/capybara_adult_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7836,7 +7836,7 @@
     },
     {
       "id": "capybara_adult_sit",
-      "file": "app/assets/images/pets/capybara_adult_sit.png",
+      "file": "app/assets/images/pets/capybara_adult_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7851,7 +7851,7 @@
     },
     {
       "id": "dragon_egg",
-      "file": "app/assets/images/pets/dragon_egg.png",
+      "file": "app/assets/images/pets/dragon_egg.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7866,7 +7866,7 @@
     },
     {
       "id": "dragon_newborn",
-      "file": "app/assets/images/pets/dragon_newborn.png",
+      "file": "app/assets/images/pets/dragon_newborn.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7881,7 +7881,7 @@
     },
     {
       "id": "dragon_teen",
-      "file": "app/assets/images/pets/dragon_teen.png",
+      "file": "app/assets/images/pets/dragon_teen.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7896,7 +7896,7 @@
     },
     {
       "id": "dragon_adult",
-      "file": "app/assets/images/pets/dragon_adult.png",
+      "file": "app/assets/images/pets/dragon_adult.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7911,7 +7911,7 @@
     },
     {
       "id": "dragon_egg_crack_1",
-      "file": "app/assets/images/pets/dragon_egg_crack_1.png",
+      "file": "app/assets/images/pets/dragon_egg_crack_1.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7926,7 +7926,7 @@
     },
     {
       "id": "dragon_egg_crack_2",
-      "file": "app/assets/images/pets/dragon_egg_crack_2.png",
+      "file": "app/assets/images/pets/dragon_egg_crack_2.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7941,7 +7941,7 @@
     },
     {
       "id": "dragon_egg_crack_3",
-      "file": "app/assets/images/pets/dragon_egg_crack_3.png",
+      "file": "app/assets/images/pets/dragon_egg_crack_3.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7956,7 +7956,7 @@
     },
     {
       "id": "dragon_shell_bottom",
-      "file": "app/assets/images/pets/dragon_shell_bottom.png",
+      "file": "app/assets/images/pets/dragon_shell_bottom.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7971,7 +7971,7 @@
     },
     {
       "id": "dragon_shell_top",
-      "file": "app/assets/images/pets/dragon_shell_top.png",
+      "file": "app/assets/images/pets/dragon_shell_top.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -7986,7 +7986,7 @@
     },
     {
       "id": "dragon_newborn_walk_a",
-      "file": "app/assets/images/pets/dragon_newborn_walk_a.png",
+      "file": "app/assets/images/pets/dragon_newborn_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8001,7 +8001,7 @@
     },
     {
       "id": "dragon_newborn_walk_b",
-      "file": "app/assets/images/pets/dragon_newborn_walk_b.png",
+      "file": "app/assets/images/pets/dragon_newborn_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8016,7 +8016,7 @@
     },
     {
       "id": "dragon_newborn_walk_c",
-      "file": "app/assets/images/pets/dragon_newborn_walk_c.png",
+      "file": "app/assets/images/pets/dragon_newborn_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8031,7 +8031,7 @@
     },
     {
       "id": "dragon_newborn_walk_d",
-      "file": "app/assets/images/pets/dragon_newborn_walk_d.png",
+      "file": "app/assets/images/pets/dragon_newborn_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8046,7 +8046,7 @@
     },
     {
       "id": "dragon_newborn_happy",
-      "file": "app/assets/images/pets/dragon_newborn_happy.png",
+      "file": "app/assets/images/pets/dragon_newborn_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8061,7 +8061,7 @@
     },
     {
       "id": "dragon_newborn_sit",
-      "file": "app/assets/images/pets/dragon_newborn_sit.png",
+      "file": "app/assets/images/pets/dragon_newborn_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8076,7 +8076,7 @@
     },
     {
       "id": "dragon_teen_walk_a",
-      "file": "app/assets/images/pets/dragon_teen_walk_a.png",
+      "file": "app/assets/images/pets/dragon_teen_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8091,7 +8091,7 @@
     },
     {
       "id": "dragon_teen_walk_b",
-      "file": "app/assets/images/pets/dragon_teen_walk_b.png",
+      "file": "app/assets/images/pets/dragon_teen_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8106,7 +8106,7 @@
     },
     {
       "id": "dragon_teen_walk_c",
-      "file": "app/assets/images/pets/dragon_teen_walk_c.png",
+      "file": "app/assets/images/pets/dragon_teen_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8121,7 +8121,7 @@
     },
     {
       "id": "dragon_teen_walk_d",
-      "file": "app/assets/images/pets/dragon_teen_walk_d.png",
+      "file": "app/assets/images/pets/dragon_teen_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8136,7 +8136,7 @@
     },
     {
       "id": "dragon_teen_happy",
-      "file": "app/assets/images/pets/dragon_teen_happy.png",
+      "file": "app/assets/images/pets/dragon_teen_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8151,7 +8151,7 @@
     },
     {
       "id": "dragon_teen_sit",
-      "file": "app/assets/images/pets/dragon_teen_sit.png",
+      "file": "app/assets/images/pets/dragon_teen_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8166,7 +8166,7 @@
     },
     {
       "id": "dragon_adult_walk_a",
-      "file": "app/assets/images/pets/dragon_adult_walk_a.png",
+      "file": "app/assets/images/pets/dragon_adult_walk_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8181,7 +8181,7 @@
     },
     {
       "id": "dragon_adult_walk_b",
-      "file": "app/assets/images/pets/dragon_adult_walk_b.png",
+      "file": "app/assets/images/pets/dragon_adult_walk_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8196,7 +8196,7 @@
     },
     {
       "id": "dragon_adult_walk_c",
-      "file": "app/assets/images/pets/dragon_adult_walk_c.png",
+      "file": "app/assets/images/pets/dragon_adult_walk_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8211,7 +8211,7 @@
     },
     {
       "id": "dragon_adult_walk_d",
-      "file": "app/assets/images/pets/dragon_adult_walk_d.png",
+      "file": "app/assets/images/pets/dragon_adult_walk_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8226,7 +8226,7 @@
     },
     {
       "id": "dragon_adult_happy",
-      "file": "app/assets/images/pets/dragon_adult_happy.png",
+      "file": "app/assets/images/pets/dragon_adult_happy.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8241,7 +8241,7 @@
     },
     {
       "id": "dragon_adult_sit",
-      "file": "app/assets/images/pets/dragon_adult_sit.png",
+      "file": "app/assets/images/pets/dragon_adult_sit.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8256,7 +8256,7 @@
     },
     {
       "id": "dragon_fire_1",
-      "file": "app/assets/images/pets/dragon_fire_1.png",
+      "file": "app/assets/images/pets/dragon_fire_1.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8271,7 +8271,7 @@
     },
     {
       "id": "dragon_fire_2",
-      "file": "app/assets/images/pets/dragon_fire_2.png",
+      "file": "app/assets/images/pets/dragon_fire_2.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8286,7 +8286,7 @@
     },
     {
       "id": "dragon_fire_3",
-      "file": "app/assets/images/pets/dragon_fire_3.png",
+      "file": "app/assets/images/pets/dragon_fire_3.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8301,7 +8301,7 @@
     },
     {
       "id": "dragon_fire_4",
-      "file": "app/assets/images/pets/dragon_fire_4.png",
+      "file": "app/assets/images/pets/dragon_fire_4.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8316,7 +8316,7 @@
     },
     {
       "id": "dragon_water_1",
-      "file": "app/assets/images/pets/dragon_water_1.png",
+      "file": "app/assets/images/pets/dragon_water_1.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8331,7 +8331,7 @@
     },
     {
       "id": "dragon_water_2",
-      "file": "app/assets/images/pets/dragon_water_2.png",
+      "file": "app/assets/images/pets/dragon_water_2.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8346,7 +8346,7 @@
     },
     {
       "id": "dragon_water_3",
-      "file": "app/assets/images/pets/dragon_water_3.png",
+      "file": "app/assets/images/pets/dragon_water_3.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8361,7 +8361,7 @@
     },
     {
       "id": "dragon_water_4",
-      "file": "app/assets/images/pets/dragon_water_4.png",
+      "file": "app/assets/images/pets/dragon_water_4.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8376,7 +8376,7 @@
     },
     {
       "id": "dragon_fly_a",
-      "file": "app/assets/images/pets/dragon_fly_a.png",
+      "file": "app/assets/images/pets/dragon_fly_a.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8391,7 +8391,7 @@
     },
     {
       "id": "dragon_fly_b",
-      "file": "app/assets/images/pets/dragon_fly_b.png",
+      "file": "app/assets/images/pets/dragon_fly_b.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8406,7 +8406,7 @@
     },
     {
       "id": "dragon_fly_c",
-      "file": "app/assets/images/pets/dragon_fly_c.png",
+      "file": "app/assets/images/pets/dragon_fly_c.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8421,7 +8421,7 @@
     },
     {
       "id": "dragon_fly_d",
-      "file": "app/assets/images/pets/dragon_fly_d.png",
+      "file": "app/assets/images/pets/dragon_fly_d.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8436,7 +8436,7 @@
     },
     {
       "id": "dragon_aura",
-      "file": "app/assets/images/pets/dragon_aura.png",
+      "file": "app/assets/images/pets/dragon_aura.webp",
       "kind": "pet",
       "form": "any",
       "layer": null,
@@ -8451,7 +8451,7 @@
     },
     {
       "id": "ui_emote_hungry",
-      "file": "app/assets/images/ui/ui_emote_hungry.png",
+      "file": "app/assets/images/ui/ui_emote_hungry.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8466,7 +8466,7 @@
     },
     {
       "id": "ui_emote_sad",
-      "file": "app/assets/images/ui/ui_emote_sad.png",
+      "file": "app/assets/images/ui/ui_emote_sad.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8481,7 +8481,7 @@
     },
     {
       "id": "ui_emote_happy",
-      "file": "app/assets/images/ui/ui_emote_happy.png",
+      "file": "app/assets/images/ui/ui_emote_happy.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8496,7 +8496,7 @@
     },
     {
       "id": "ui_pet_meal",
-      "file": "app/assets/images/ui/ui_pet_meal.png",
+      "file": "app/assets/images/ui/ui_pet_meal.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8511,7 +8511,7 @@
     },
     {
       "id": "ui_league_bronze",
-      "file": "app/assets/images/ui/ui_league_bronze.png",
+      "file": "app/assets/images/ui/ui_league_bronze.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8526,7 +8526,7 @@
     },
     {
       "id": "ui_league_silver",
-      "file": "app/assets/images/ui/ui_league_silver.png",
+      "file": "app/assets/images/ui/ui_league_silver.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8541,7 +8541,7 @@
     },
     {
       "id": "ui_league_gold",
-      "file": "app/assets/images/ui/ui_league_gold.png",
+      "file": "app/assets/images/ui/ui_league_gold.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8556,7 +8556,7 @@
     },
     {
       "id": "ui_league_diamond",
-      "file": "app/assets/images/ui/ui_league_diamond.png",
+      "file": "app/assets/images/ui/ui_league_diamond.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8571,7 +8571,7 @@
     },
     {
       "id": "ui_chest_bronze",
-      "file": "app/assets/images/ui/ui_chest_bronze.png",
+      "file": "app/assets/images/ui/ui_chest_bronze.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8586,7 +8586,7 @@
     },
     {
       "id": "ui_chest_silver",
-      "file": "app/assets/images/ui/ui_chest_silver.png",
+      "file": "app/assets/images/ui/ui_chest_silver.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8601,7 +8601,7 @@
     },
     {
       "id": "ui_chest_gold",
-      "file": "app/assets/images/ui/ui_chest_gold.png",
+      "file": "app/assets/images/ui/ui_chest_gold.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8616,7 +8616,7 @@
     },
     {
       "id": "ui_chest_diamond",
-      "file": "app/assets/images/ui/ui_chest_diamond.png",
+      "file": "app/assets/images/ui/ui_chest_diamond.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8631,7 +8631,7 @@
     },
     {
       "id": "ui_quest_board",
-      "file": "app/assets/images/ui/ui_quest_board.png",
+      "file": "app/assets/images/ui/ui_quest_board.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8646,7 +8646,7 @@
     },
     {
       "id": "ui_quest_check",
-      "file": "app/assets/images/ui/ui_quest_check.png",
+      "file": "app/assets/images/ui/ui_quest_check.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8661,7 +8661,7 @@
     },
     {
       "id": "ui_streak_flame",
-      "file": "app/assets/images/ui/ui_streak_flame.png",
+      "file": "app/assets/images/ui/ui_streak_flame.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8676,7 +8676,7 @@
     },
     {
       "id": "ui_streak_chest",
-      "file": "app/assets/images/ui/ui_streak_chest.png",
+      "file": "app/assets/images/ui/ui_streak_chest.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8691,7 +8691,7 @@
     },
     {
       "id": "ui_tower_lock",
-      "file": "app/assets/images/ui/ui_tower_lock.png",
+      "file": "app/assets/images/ui/ui_tower_lock.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8706,7 +8706,7 @@
     },
     {
       "id": "ui_tower_boss",
-      "file": "app/assets/images/ui/ui_tower_boss.png",
+      "file": "app/assets/images/ui/ui_tower_boss.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,
@@ -8721,7 +8721,7 @@
     },
     {
       "id": "ui_celebrate_burst",
-      "file": "app/assets/images/ui/ui_celebrate_burst.png",
+      "file": "app/assets/images/ui/ui_celebrate_burst.webp",
       "kind": "ui",
       "form": "any",
       "layer": null,

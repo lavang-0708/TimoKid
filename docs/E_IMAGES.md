@@ -70,13 +70,13 @@ thấy.
 
 | File | Vai trò | Cỡ (byte) | Bán trong suốt |
 | --- | --- | --- | --- |
-| `girl_full_01.png` | Toàn thân, váy hồng nơ to (bộ 1) | 403.232 | 0,0000 |
-| `girl_full_02.png` | Toàn thân, váy tím nơ (bộ 2) | 408.668 | 0,0000 |
-| `girl_full_03.png` | Toàn thân, váy hồng + tạp dề trắng bèo (bộ 3) | 470.843 | 0,0000 |
-| `girl_full_01_wave.png` | Bộ 1, tay phải giơ lên vẫy | 412.375 | 0,0000 |
-| `girl_full_02_wave.png` | Bộ 2, tay phải vẫy | 411.799 | 0,0000 |
-| `girl_full_03_wave.png` | Bộ 3, tay phải vẫy | 474.170 | 0,0000 |
-| `girl_eyes_closed_patch.png` | Miếng vá mắt nhắm (xem dưới) | 25.367 | 24,01% * |
+| `girl_full_01.webp` | Toàn thân, váy hồng nơ to (bộ 1) | 403.232 | 0,0000 |
+| `girl_full_02.webp` | Toàn thân, váy tím nơ (bộ 2) | 408.668 | 0,0000 |
+| `girl_full_03.webp` | Toàn thân, váy hồng + tạp dề trắng bèo (bộ 3) | 470.843 | 0,0000 |
+| `girl_full_01_wave.webp` | Bộ 1, tay phải giơ lên vẫy | 412.375 | 0,0000 |
+| `girl_full_02_wave.webp` | Bộ 2, tay phải vẫy | 411.799 | 0,0000 |
+| `girl_full_03_wave.webp` | Bộ 3, tay phải vẫy | 474.170 | 0,0000 |
+| `girl_eyes_closed_patch.webp` | Miếng vá mắt nhắm (xem dưới) | 25.367 | 24,01% * |
 
 \* Patch có viền feather 14 px (alpha dốc dần về 0 ở mép rect) nên
 24% pixel bán trong suốt là **do thiết kế**; phần trong hoàn toàn
@@ -197,13 +197,13 @@ cộng thêm pet của bé.
 
 | File | Vai trò | Cỡ (byte) | Bán trong suốt |
 | --- | --- | --- | --- |
-| `boy_full_01.png` | Toàn thân, áo thun xanh + short xanh, sneaker xanh nhạt (bộ 1) | 295.092 | 0,0000 |
-| `boy_full_02.png` | Toàn thân, hoodie xanh lá + quần xanh lá, sneaker xanh lá (bộ 2) | 329.300 | 0,0000 |
-| `boy_full_03.png` | Toàn thân, áo thun đỏ + quần jean xanh xắn gấu, sneaker đỏ (bộ 3) | 307.809 | 0,0000 |
-| `boy_full_01_wave.png` | Bộ 1, tay phải giơ lên vẫy | 311.293 | 0,0000 |
-| `boy_full_02_wave.png` | Bộ 2, tay phải vẫy | 353.258 | 0,0000 |
-| `boy_full_03_wave.png` | Bộ 3, tay phải vẫy | 309.586 | 0,0000 |
-| `boy_eyes_closed_patch.png` | Miếng vá mắt nhắm (xem dưới) | 45.075 | 17,82% * |
+| `boy_full_01.webp` | Toàn thân, áo thun xanh + short xanh, sneaker xanh nhạt (bộ 1) | 295.092 | 0,0000 |
+| `boy_full_02.webp` | Toàn thân, hoodie xanh lá + quần xanh lá, sneaker xanh lá (bộ 2) | 329.300 | 0,0000 |
+| `boy_full_03.webp` | Toàn thân, áo thun đỏ + quần jean xanh xắn gấu, sneaker đỏ (bộ 3) | 307.809 | 0,0000 |
+| `boy_full_01_wave.webp` | Bộ 1, tay phải giơ lên vẫy | 311.293 | 0,0000 |
+| `boy_full_02_wave.webp` | Bộ 2, tay phải vẫy | 353.258 | 0,0000 |
+| `boy_full_03_wave.webp` | Bộ 3, tay phải vẫy | 309.586 | 0,0000 |
+| `boy_eyes_closed_patch.webp` | Miếng vá mắt nhắm (xem dưới) | 45.075 | 17,82% * |
 
 \* Patch có viền feather 14 px (alpha dốc dần về 0 ở mép rect) nên
 17,82% pixel bán trong suốt là **do thiết kế**; phần trong hoàn toàn
@@ -375,10 +375,10 @@ bộ viền ngoài; đếm bằng code số pixel alpha = 0 trong vùng thân.
 
 | File patch | Dùng cho ảnh | Rect (x, y, rộng × cao) | Cỡ (byte) |
 | --- | --- | --- | --- |
-| `boy_eyes_closed_patch.png` | `boy_full_01/02/03` (nghỉ) | (291, 506), 432×205 | 45.075 |
-| `boy_eyes_closed_patch_01_wave.png` | `boy_full_01_wave` | (297, 493), 427×245 | 63.900 |
-| `boy_eyes_closed_patch_02_wave.png` | `boy_full_02_wave` | (280, 502), 441×243 | 60.631 |
-| `boy_eyes_closed_patch_03_wave.png` | `boy_full_03_wave` | (295, 495), 432×250 | 68.852 |
+| `boy_eyes_closed_patch.webp` | `boy_full_01/02/03` (nghỉ) | (291, 506), 432×205 | 45.075 |
+| `boy_eyes_closed_patch_01_wave.webp` | `boy_full_01_wave` | (297, 493), 427×245 | 63.900 |
+| `boy_eyes_closed_patch_02_wave.webp` | `boy_full_02_wave` | (280, 502), 441×243 | 60.631 |
+| `boy_eyes_closed_patch_03_wave.webp` | `boy_full_03_wave` | (295, 495), 432×250 | 68.852 |
 
 - **Kiểm:** đặt từng patch lên đúng ảnh của nó, phóng to vùng mắt 3× — mí
   đóng kín, đường mi rõ, **0 tròng nâu/trắng/đồng tử lộ (đọc bằng mắt)**,
@@ -469,18 +469,18 @@ giày = 0,0000 (mép cứng sau dilate, như ảnh toàn thân lô 1/2).
 
 | File | Vai trò | Cỡ (byte) | Bán trong suốt |
 | --- | --- | --- | --- |
-| `girl_hat_01.png` | Beret hồng có nơ, đội đỉnh tóc | 144.138 | 0,0422 |
-| `girl_bow_01.png` | Nơ kẹp tóc hồng, cài thái dương trái | 29.549 | 0,1596 |
-| `girl_glasses_01.png` | Kính tròn gọng hồng, vòng rỗng | 73.012 | 0,2268 |
-| `girl_backpack_01.png` | Balo hồng: túi sau vai + quai đeo trước ngực/vai | 113.978 | 0,1208 |
-| `girl_shoes_02.png` | Mary Jane trắng thay giày hồng/tím gốc | 45.708 | 0,0000 |
-| `boy_hat_01.png` | Mũ lưỡi trai xanh, lưỡi sang trái | 130.170 | 0,0492 |
-| `boy_clip_01.png` | Kẹp tóc xanh hình sao 5 cánh | 22.117 | 0,1730 |
-| `boy_glasses_01.png` | Kính tròn gọng xanh, vòng rỗng | 74.043 | 0,3045 |
-| `boy_backpack_01.png` | Balo xanh: túi sau vai + quai đeo | 119.389 | 0,1240 |
-| `boy_shoes_02.png` | Sneaker trắng thay sneaker màu gốc | 62.117 | 0,0000 |
+| `girl_hat_01.webp` | Beret hồng có nơ, đội đỉnh tóc | 144.138 | 0,0422 |
+| `girl_bow_01.webp` | Nơ kẹp tóc hồng, cài thái dương trái | 29.549 | 0,1596 |
+| `girl_glasses_01.webp` | Kính tròn gọng hồng, vòng rỗng | 73.012 | 0,2268 |
+| `girl_backpack_01.webp` | Balo hồng: túi sau vai + quai đeo trước ngực/vai | 113.978 | 0,1208 |
+| `girl_shoes_02.webp` | Mary Jane trắng thay giày hồng/tím gốc | 45.708 | 0,0000 |
+| `boy_hat_01.webp` | Mũ lưỡi trai xanh, lưỡi sang trái | 130.170 | 0,0492 |
+| `boy_clip_01.webp` | Kẹp tóc xanh hình sao 5 cánh | 22.117 | 0,1730 |
+| `boy_glasses_01.webp` | Kính tròn gọng xanh, vòng rỗng | 74.043 | 0,3045 |
+| `boy_backpack_01.webp` | Balo xanh: túi sau vai + quai đeo | 119.389 | 0,1240 |
+| `boy_shoes_02.webp` | Sneaker trắng thay sneaker màu gốc | 62.117 | 0,0000 |
 
-> Lưu ý: kích thước và tỉ lệ bán trong suốt của 2 kính trong bảng là bản gốc lô 3; sau sửa ở mục "Sửa kính lô 3" cuối file: `girl_glasses_01.png` 74.920 byte / 0,51%, `boy_glasses_01.png` 73.494 byte / 0,53%.
+> Lưu ý: kích thước và tỉ lệ bán trong suốt của 2 kính trong bảng là bản gốc lô 3; sau sửa ở mục "Sửa kính lô 3" cuối file: `girl_glasses_01.webp` 74.920 byte / 0,51%, `boy_glasses_01.webp` 73.494 byte / 0,53%.
 
 ## Vị trí / điểm neo (khung 1024×1536, bbox đo bằng code từ PNG cuối)
 
@@ -779,7 +779,7 @@ Miệng bé trai (508,720) nên kiểm lại cùng cách trước giai đoạn c
 
 ## File (24 PNG, khung 1024×1536, PNG trong suốt, đã lượng tử 256 màu,
 ## bán trong suốt 0,0000, chân y=1428–1429)
-girl_full_01_walk_dr_a/b/c/d.png, girl_full_01_walk_ur_a/b/c/d.png
+girl_full_01_walk_dr_a/b/c/d.webp, girl_full_01_walk_ur_a/b/c/d.webp
 (tương tự 02 váy tím, 03 váy hồng + tạp dề trắng)
 [Bảng 24 khung: cỡ byte + tâm mắt + miệng + chân y + lỗ alpha — xem bảng
 trong báo cáo lô 4; mắt-y 556,9–566,2; mắt-x 576–724.]
@@ -836,7 +836,7 @@ b1a6b1dd, eaeaf8de, 0b135535, 79efdef6.
 
 Vẽ lại 3 loài × 4 giai đoạn theo phong cách 3D mềm mới (chủ dự án xác nhận 21/11 ~01:16;
 giữ bản mới như ảnh, KHÔNG gộp dấu hiệu pet cũ — chủ dự án chốt 21/11 ~21:06).
-Thay 1:1 file cũ PR #21, giữ đúng tên `app/assets/images/pets/<loài>_<giai đoạn>.png`.
+Thay 1:1 file cũ PR #21, giữ đúng tên `app/assets/images/pets/<loài>_<giai đoạn>.webp`.
 
 ## Nhận diện 3 loài theo v2 (khác hẳn bản cũ PR #21)
 
@@ -869,15 +869,15 @@ Nốt nhỏ: vệt xanh nhạt ~1 px dưới đáy trứng/mới nở thỏ + vi
 
 ## 3 điểm sửa theo review (chủ dự án chốt 21/11 ~21:06)
 
-1. **Thỏ nhỡ tai cụp:** vẽ lại `rabbit_teen.png` — tai dựng thành tai cụp rủ 2 bên như
+1. **Thỏ nhỡ tai cụp:** vẽ lại `rabbit_teen.webp` — tai dựng thành tai cụp rủ 2 bên như
    trưởng thành (ngắn hơn một chút), giữ khăn xanh lá; 3 giai đoạn đã nở cùng tai cụp.
    Chó v2 vẽ lại bị loại (mặt đổi quá nhiều), vẽ lại v3 giữ mặt chibi như nhỡ mới đạt.
-2. **Chó/mèo trưởng thành lớn hơn nhỡ rõ:** vẽ lại `dog_adult.png` (thân dài hơn, chân cao
-   hơn, mặt bớt tròn) và `cat_adult.png` (thân dài hơn, chân cao hơn, mặt bớt tròn) —
+2. **Chó/mèo trưởng thành lớn hơn nhỡ rõ:** vẽ lại `dog_adult.webp` (thân dài hơn, chân cao
+   hơn, mặt bớt tròn) và `cat_adult.webp` (thân dài hơn, chân cao hơn, mặt bớt tròn) —
    ghép nhỡ + trưởng thành cạnh bé trong phòng thấy pet lớn lên rõ.
-3. **Mảnh vỏ trong vùng thân:** `cat_newborn.png` xoá 3.864 px mảnh văng xa (mảnh trái
+3. **Mảnh vỏ trong vùng thân:** `cat_newborn.webp` xoá 3.864 px mảnh văng xa (mảnh trái
    2.318 px, mảnh dưới-trái 806 px, mảnh dưới-phải 673 px + 20 đốm ≤10 px); giữ mảnh sát
-   vỏ 363 px + mảnh giữa dưới đáy vỏ 147 px. `rabbit_newborn.png` xoá mảnh vỏ nửa bát trái
+   vỏ 363 px + mảnh giữa dưới đáy vỏ 147 px. `rabbit_newborn.webp` xoá mảnh vỏ nửa bát trái
    6.145 px (6.030 px + 115 px vụn mép); mảnh phải + vệt xanh 62 px giữ lại vì dính liền
    vỏ chính, đọc như mảnh vỏ trứng trong vùng thân. Hệ quả: thỏ mới nở cao 398 (đáy y=437)
    thay vì 400 — lệch 2 px, ở cỡ app chưa tới 1 px.
@@ -896,30 +896,30 @@ PNG vẽ thân cao 400 px mọi giai đoạn là đúng.
 # Giao diện kiểu game — (F) lô 6: UI v3b (17 file, app/assets/images/ui/)
 
 Phong cách 3D mềm pastel như nhân vật (E) + phòng v3b + thị trấn v3b.
-KHÔNG có chữ trên ảnh (app tự vẽ chữ tiếng Việt) — trừ `ui_logo.png` chỉ có chữ Latin "TimoKid".
+KHÔNG có chữ trên ảnh (app tự vẽ chữ tiếng Việt) — trừ `ui_logo.webp` chỉ có chữ Latin "TimoKid".
 PNG trong suốt, alpha sạch (semi 0,0000), không bóng đổ nền (app tự vẽ bóng).
 
 ## Bảng 17 file
 
 | file | kích thước | bytes | ghi chú |
 |---|---|---|---|
-| ui_btn_back.png | 256×256 | 35.809 | Nút kẹo hồng, mũi tên trái trắng to |
-| ui_btn_back_pressed.png | 256×256 | 37.145 | Cùng nút, lún xuống + tối hơn |
-| ui_icon_wardrobe.png | 256×256 | 37.927 | Nút xanh dương, tủ + móc áo |
-| ui_icon_shop.png | 256×256 | 36.712 | Nút xanh lá, túi mua sắm |
-| ui_icon_town.png | 256×256 | 41.527 | Nút tím, nhà nhỏ |
-| ui_icon_room.png | 256×256 | 31.709 | Nút cam, giường nhỏ |
-| ui_coin.png | 128×128 | 14.754 | Xu vàng, sao nổi trên mặt, không nền tròn |
-| ui_gem.png | 128×128 | 12.129 | Kim cương tím |
-| ui_star.png | 128×128 | 10.654 | Sao vàng 5 cánh |
-| ui_hud_bar.png | 1024×128 | 1.636 | Thanh trong mờ (alpha 168); dải giữa x100–924 đơn sắc tuyệt đối theo hàng x (đo bằng code), kéo giãn ngang được |
-| ui_sign_board.png | 768×320 | 50.423 | Biển gỗ + 2 dây, giữa trống; nội dung 768×267 letterbox, không méo |
-| ui_logo.png | 1024×512 | 222.368 | "TimoKid" gradient hồng→tím, viền trắng; bé gái + bé trai + 3 pet quanh chữ |
-| ui_splash_bg.png | 1600×900 | 572.623 | Trời pastel mây + thị trấn mờ xa (đục) |
-| ui_onboarding_bg.png | 1600×900 | 437.561 | Phòng thay đồ, giữa trống (đục) |
-| ui_pedestal.png | 512×256 | 32.703 | Bệ 2 tầng tím + kem |
-| ui_card.png | 384×480 | 2.960 | Khung thẻ, viền sáng trắng |
-| ui_card_selected.png | 384×480 | 6.068 | Viền vàng + quầng phát sáng |
+| ui_btn_back.webp | 256×256 | 35.809 | Nút kẹo hồng, mũi tên trái trắng to |
+| ui_btn_back_pressed.webp | 256×256 | 37.145 | Cùng nút, lún xuống + tối hơn |
+| ui_icon_wardrobe.webp | 256×256 | 37.927 | Nút xanh dương, tủ + móc áo |
+| ui_icon_shop.webp | 256×256 | 36.712 | Nút xanh lá, túi mua sắm |
+| ui_icon_town.webp | 256×256 | 41.527 | Nút tím, nhà nhỏ |
+| ui_icon_room.webp | 256×256 | 31.709 | Nút cam, giường nhỏ |
+| ui_coin.webp | 128×128 | 14.754 | Xu vàng, sao nổi trên mặt, không nền tròn |
+| ui_gem.webp | 128×128 | 12.129 | Kim cương tím |
+| ui_star.webp | 128×128 | 10.654 | Sao vàng 5 cánh |
+| ui_hud_bar.webp | 1024×128 | 1.636 | Thanh trong mờ (alpha 168); dải giữa x100–924 đơn sắc tuyệt đối theo hàng x (đo bằng code), kéo giãn ngang được |
+| ui_sign_board.webp | 768×320 | 50.423 | Biển gỗ + 2 dây, giữa trống; nội dung 768×267 letterbox, không méo |
+| ui_logo.webp | 1024×512 | 222.368 | "TimoKid" gradient hồng→tím, viền trắng; bé gái + bé trai + 3 pet quanh chữ |
+| ui_splash_bg.webp | 1600×900 | 572.623 | Trời pastel mây + thị trấn mờ xa (đục) |
+| ui_onboarding_bg.webp | 1600×900 | 437.561 | Phòng thay đồ, giữa trống (đục) |
+| ui_pedestal.webp | 512×256 | 32.703 | Bệ 2 tầng tím + kem |
+| ui_card.webp | 384×480 | 2.960 | Khung thẻ, viền sáng trắng |
+| ui_card_selected.webp | 384×480 | 6.068 | Viền vàng + quầng phát sáng |
 
 Tổng PNG 1.584.708 B. Thanh HUD và 2 thẻ có semi > 0 theo thiết kế
 (nền trong mờ / quầng sáng), không phải bẩn. 0 px magenta còn sót (đo bằng code).
@@ -940,21 +940,21 @@ nhân vật/UI vẫn MAXCOVERAGE như các lô trước. Biển gỗ vẽ lại 
 
 Phong cách 3D mềm pastel như nhân vật (E) + phòng v3b + thị trấn v3b + UI lô 6.
 KHÔNG có chữ trên ảnh (app tự vẽ chữ tiếng Việt). PNG trong suốt, alpha sạch
-(semi 0,0000), không bóng đổ nền (app tự vẽ bóng) — trừ `shop_bg.png` là nền đục.
+(semi 0,0000), không bóng đổ nền (app tự vẽ bóng) — trừ `shop_bg.webp` là nền đục.
 
 ## Bảng 9 file
 
 | file | kích thước | bytes | đích | ghi chú |
 |---|---|---|---|---|
-| shop_bg.png | 1600×900 | 552.506 | app/assets/images/backgrounds/ | Nền đục, kệ gỗ 2 rìa, giữa/dưới trống sáng (độ sáng giữa 210,5, đáy-giữa 225,3); MEDIANCUT |
-| pet_food_bone.png | 512×512 | 104.625 | app/assets/images/items/ | Bánh xương nâu vàng |
-| pet_food_fish.png | 512×512 | 192.615 | app/assets/images/items/ | Cá nướng nhỏ vàng nâu, đứng dọc |
-| pet_food_carrot.png | 512×512 | 87.680 | app/assets/images/items/ | Cà rốt cam, lá xanh |
-| pet_toy_ball.png | 512×512 | 109.940 | app/assets/images/items/ | Bóng sọc pastel |
-| pet_toy_yarn.png | 512×512 | 174.788 | app/assets/images/items/ | Cuộn len hồng, sợi thò ra còn nguyên |
-| pet_toy_plush.png | 512×512 | 175.296 | app/assets/images/items/ | Gấu bông mini kem + nơ hồng |
-| ui_icon_clothes.png | 256×256 | 37.911 | app/assets/images/ui/ | Nút kẹo hồng, áo trắng; cùng bộ nút lô 6 |
-| ui_icon_pet_items.png | 256×256 | 36.868 | app/assets/images/ui/ | Nút kẹo vàng cam, bát thức ăn pet trắng |
+| shop_bg.webp | 1600×900 | 552.506 | app/assets/images/backgrounds/ | Nền đục, kệ gỗ 2 rìa, giữa/dưới trống sáng (độ sáng giữa 210,5, đáy-giữa 225,3); MEDIANCUT |
+| pet_food_bone.webp | 512×512 | 104.625 | app/assets/images/items/ | Bánh xương nâu vàng |
+| pet_food_fish.webp | 512×512 | 192.615 | app/assets/images/items/ | Cá nướng nhỏ vàng nâu, đứng dọc |
+| pet_food_carrot.webp | 512×512 | 87.680 | app/assets/images/items/ | Cà rốt cam, lá xanh |
+| pet_toy_ball.webp | 512×512 | 109.940 | app/assets/images/items/ | Bóng sọc pastel |
+| pet_toy_yarn.webp | 512×512 | 174.788 | app/assets/images/items/ | Cuộn len hồng, sợi thò ra còn nguyên |
+| pet_toy_plush.webp | 512×512 | 175.296 | app/assets/images/items/ | Gấu bông mini kem + nơ hồng |
+| ui_icon_clothes.webp | 256×256 | 37.911 | app/assets/images/ui/ | Nút kẹo hồng, áo trắng; cùng bộ nút lô 6 |
+| ui_icon_pet_items.webp | 256×256 | 36.868 | app/assets/images/ui/ | Nút kẹo vàng cam, bát thức ăn pet trắng |
 
 Tổng PNG 1.472.229 B. Tách nền bằng khoảng cách RGB tới màu nền magenta từng file
 (ngưỡng 50) + despill viền (thay pixel viền lẫn nền bằng màu pixel trong kề);
@@ -971,7 +971,7 @@ blob SHA local `d4976e65f25f`, SHA-256 local `aa1f6210f75d`.
 ### Lô 8 nhóm (B) — Pet chuyển động (54 file, 22/11/2026)
 
 Mỗi loài dog/cat/rabbit × 3 giai đoạn newborn/teen/adult × 6 file
-(`{loài}_{giai đoạn}_walk_a..d.png`, `_happy.png`, `_sit.png`) → 54 file vào
+(`{loài}_{giai đoạn}_walk_a..d.webp`, `_happy.webp`, `_sit.webp`) → 54 file vào
 `app/assets/images/pets/`, 512×512, PNG trong suốt, alpha sạch (semi 0,0000,
 0 px magenta), quantize 256 màu MAXCOVERAGE + Floyd–Steinberg. Vẽ từ 9 ảnh
 giai đoạn lô 5 đã duyệt (giữ đúng nhận dạng pet v2); walk nhìn nghiêng 3/4
@@ -999,9 +999,9 @@ walk), `aefdbc1b` (thỏ newborn happy/sit + teen 6), `9b1686d5` (thỏ adult 6)
 ### Lô 8 nhóm (A) — Vỡ trứng từ từ (15 file, 22/11/2026)
 
 Mỗi loài dog/cat/rabbit × 5 file, 512×512, vào `app/assets/images/pets/`:
-`{loài}_egg_crack_1.png` (1 vết nứt nhỏ), `{loài}_egg_crack_2.png` (nứt lan
-+ 1 mảnh vỏ bong), `{loài}_egg_crack_3.png` (nứt khắp, nắp hé thấy lông/tai),
-`{loài}_shell_bottom.png` (nửa vỏ dưới rỗng), `{loài}_shell_top.png` (nắp trên rời).
+`{loài}_egg_crack_1.webp` (1 vết nứt nhỏ), `{loài}_egg_crack_2.webp` (nứt lan
++ 1 mảnh vỏ bong), `{loài}_egg_crack_3.webp` (nứt khắp, nắp hé thấy lông/tai),
+`{loài}_shell_bottom.webp` (nửa vỏ dưới rỗng), `{loài}_shell_top.webp` (nắp trên rời).
 Làm bằng cách sửa trực tiếp từ ảnh trứng gốc lô 5 (không vẽ lại): đường cắt
 răng cưa ±14 px — chó y≈165, mèo y≈285, thỏ y≈290; nắp crack_3 nâng 16 px +
 xoay 4°, khe tối + dải lông cắt từ đỉnh đầu newborn (chó lông vàng + tai cụp,
@@ -1022,11 +1022,11 @@ nắp thỏ giữ như hiện tại, 2 nốt nhỏ còn lại bỏ qua; ĐÃ DEC
 tiên bị service restart gián đoạn, lần đẩy lại thẻ duyệt hết hạn ~03:44 —
 nên gộp chung với mục doc nhóm (C) trong 1 lần đẩy.)
 
-### Lô 8 nhóm (C) — room_v3_clean.png (1 file, 22/11/2026)
+### Lô 8 nhóm (C) — room_v3_clean.webp (1 file, 22/11/2026)
 
 Nền phòng sạch 1600×900, PNG đục, 256 màu, 772.906 byte, SHA-256
 `937716bc4ae884f4f16e0a9d028c7ab3a6f6363887ace84d6d2bb73307f188ee` →
-`app/assets/images/backgrounds/room_v3_clean.png`. Y hệt `room_v3.png`
+`app/assets/images/backgrounds/room_v3_clean.webp`. Y hệt `room_v3.webp`
 (694.028 byte, SHA-256 `a838c756…e41f40`), chỉ xoá 4 đồ rời bằng inpainting
 theo mặt phẳng (Laplace có barrier, 1 px, Neumann) + lấp gradient dọc cho đầu
 giường/tường kem + bóng sách trên bàn: gấu bông x[329,475) y[435,563)
@@ -1044,7 +1044,7 @@ chấp nhận được (Claude duyệt 22/11 ~13:24). Đẩy 1 lần: `7d313e94`
 kệ x≈1150–1360; bàn kết thúc x≈1360 (không phải 1470); bình hoa đặt trên
 bàn học, không phải trên kệ phải.
 
-> **Sửa lỗi chó mới nở (22/11, sau PR #49):** ảnh đứng `dog_newborn.png` đã duyệt là chó
+> **Sửa lỗi chó mới nở (22/11, sau PR #49):** ảnh đứng `dog_newborn.webp` đã duyệt là chó
 > ĐÃ RA KHỎI VỎ, nhưng 6 khung `dog_newborn_walk_a..d/happy/sit` của lô 8B lại vẽ chó ngồi
 > TRONG VỎ. Đã vẽ lại cả 6 khung không vỏ, khớp đúng ảnh đứng (chó vàng, tai cụp, mũi đen,
 > lưỡi thè, mắt nâu to), cùng cỡ: walk bbox y 41–440 (d: 42–440), happy y 10–400,
@@ -1060,12 +1060,12 @@ Số liệu 6 file mới (thay thế 6 file cũ trên nhánh, cùng tên):
 
 | file | byte | bbox (x0,x1,y0,y1) | chân y | đầu y | SHA-256 (12 ký tự đầu) |
 |---|---|---|---|---|---|
-| dog_newborn_walk_a.png | 114405 | 52, 460, 41, 440 | 440 | 41 | d97994993bc0 |
-| dog_newborn_walk_b.png | 114348 | 50, 463, 41, 440 | 440 | 41 | 661f16900256 |
-| dog_newborn_walk_c.png | 114009 | 53, 460, 41, 440 | 440 | 41 | ff2a27e91ecf |
-| dog_newborn_walk_d.png | 115893 | 43, 469, 42, 440 | 440 | 42 | 4800f9c08b56 |
-| dog_newborn_happy.png | 102433 | 91, 422, 10, 400 | 400 | 10 | 243430091f4a |
-| dog_newborn_sit.png | 126182 | 59, 453, 30, 440 | 440 | 30 | 964f7cfa9cb5 |
+| dog_newborn_walk_a.webp | 114405 | 52, 460, 41, 440 | 440 | 41 | d97994993bc0 |
+| dog_newborn_walk_b.webp | 114348 | 50, 463, 41, 440 | 440 | 41 | 661f16900256 |
+| dog_newborn_walk_c.webp | 114009 | 53, 460, 41, 440 | 440 | 41 | ff2a27e91ecf |
+| dog_newborn_walk_d.webp | 115893 | 43, 469, 42, 440 | 440 | 42 | 4800f9c08b56 |
+| dog_newborn_happy.webp | 102433 | 91, 422, 10, 400 | 400 | 10 | 243430091f4a |
+| dog_newborn_sit.webp | 126182 | 59, 453, 30, 440 | 440 | 30 | 964f7cfa9cb5 |
 
 Đẩy 1 lần đè lên 6 file cũ: commit 13554bfa, .b64 916.364 B, đầu nhánh 13554bfa; 6/6 blob SHA đối chiếu khớp trên nhánh và khác blob cũ (chứng minh đã đè đúng file mới). ĐƯỢC DUYỆT 22/11 ~14:08 (Claude), các nốt nhỏ chấp nhận hết.
 
@@ -1077,16 +1077,16 @@ sạch (semi 0, magenta 0 px), quantize 256 màu MAXCOVERAGE + Floyd–Steinberg
 
 | File | Byte | bbox (x0, x1, y0, y1) | Đáy y | SHA-256 |
 |---|---|---|---|---|
-| noi_be_ca.png | 67.158 | 110, 403, 121, 440 | 440 | 6cbecc45c2b1 |
-| noi_den_trang.png | 26.985 | 138, 374, 141, 440 | 440 | 89b9e3c712a5 |
-| noi_ke_sach.png | 78.048 | 85, 427, 81, 440 | 440 | 9b58c057e33b |
-| noi_ghe_luoi.png | 42.295 | 121, 392, 212, 440 | 440 | f4f9d128c79c |
-| noi_nha_pet.png | 54.374 | 98, 415, 141, 440 | 440 | 997f74ced65f |
-| noi_cay_cao.png | 49.344 | 124, 389, 61, 440 | 440 | 968aff79e6e8 |
-| noi_leu.png | 53.352 | 82, 431, 102, 440 | 440 | d870d9285c41 |
-| noi_tranh.png | 41.975 | 116, 396, 141, 440 | 440 | fcbbdf2a3533 |
+| noi_be_ca.webp | 67.158 | 110, 403, 121, 440 | 440 | 6cbecc45c2b1 |
+| noi_den_trang.webp | 26.985 | 138, 374, 141, 440 | 440 | 89b9e3c712a5 |
+| noi_ke_sach.webp | 78.048 | 85, 427, 81, 440 | 440 | 9b58c057e33b |
+| noi_ghe_luoi.webp | 42.295 | 121, 392, 212, 440 | 440 | f4f9d128c79c |
+| noi_nha_pet.webp | 54.374 | 98, 415, 141, 440 | 440 | 997f74ced65f |
+| noi_cay_cao.webp | 49.344 | 124, 389, 61, 440 | 440 | 968aff79e6e8 |
+| noi_leu.webp | 53.352 | 82, 431, 102, 440 | 440 | d870d9285c41 |
+| noi_tranh.webp | 41.975 | 116, 396, 141, 440 | 440 | fcbbdf2a3533 |
 
-Vị trí đặt thử trên `room_v3_clean.png` 1600×900 (app chỉnh lại khi đưa
+Vị trí đặt thử trên `room_v3_clean.webp` 1600×900 (app chỉnh lại khi đưa
 vào): bể cá đầu phải bàn học, chân (1330, 500), scale 0,42, hiển thị 124×135;
 đèn trăng mặt tủ đầu giường, chân (130, 590), scale 0,35, 83×106; kệ sách sàn
 trước-trái, chân (320, 830), scale 0,55, 189×199; ghế lười sàn góc
@@ -1119,13 +1119,13 @@ Phong cách v3b, sáng trên-trái, không chữ, không bóng nền. Tổng PNG
 
 | File | Byte | Khung / bbox | Đích trong app |
 |---|---|---|---|
-| arena_building.png | 257.355 | 1024×640, bbox 122, 902, 42, 600, chân y=600, SHA-256 `a5d394c8fbda` | `app/assets/images/town/arena_building.png` |
-| arena_bg.png | 641.627 | 1600×900 RGB đục, 256 màu, SHA-256 `e798fa537d1d` | `app/assets/images/backgrounds/arena_bg.png` |
-| medal_gold.png | 22.857 | 256×256, bbox 38, 218, 23, 232, chân y=232, SHA-256 `7f55b8dbbb0e` | `app/assets/images/ui/medal_gold.png` |
-| medal_silver.png | 25.431 | 256×256, bbox 38, 218, 24, 232, chân y=232, SHA-256 `c50ac39c233b` | `app/assets/images/ui/medal_silver.png` |
-| medal_bronze.png | 23.543 | 256×256, bbox 38, 218, 23, 232, chân y=232, SHA-256 `45e7dddfcc86` | `app/assets/images/ui/medal_bronze.png` |
-| medal_participant.png | 19.671 | 256×256, bbox 44, 213, 23, 232, chân y=232, SHA-256 `64a39a85fb18` | `app/assets/images/ui/medal_participant.png` |
-| gem_chest.png | 103.694 | 512×512, bbox 67, 445, 41, 440, chân y=440, SHA-256 `9c961ac94e07` | `app/assets/images/items/gem_chest.png` |
+| arena_building.webp | 257.355 | 1024×640, bbox 122, 902, 42, 600, chân y=600, SHA-256 `a5d394c8fbda` | `app/assets/images/town/arena_building.webp` |
+| arena_bg.webp | 641.627 | 1600×900 RGB đục, 256 màu, SHA-256 `e798fa537d1d` | `app/assets/images/backgrounds/arena_bg.webp` |
+| medal_gold.webp | 22.857 | 256×256, bbox 38, 218, 23, 232, chân y=232, SHA-256 `7f55b8dbbb0e` | `app/assets/images/ui/medal_gold.webp` |
+| medal_silver.webp | 25.431 | 256×256, bbox 38, 218, 24, 232, chân y=232, SHA-256 `c50ac39c233b` | `app/assets/images/ui/medal_silver.webp` |
+| medal_bronze.webp | 23.543 | 256×256, bbox 38, 218, 23, 232, chân y=232, SHA-256 `45e7dddfcc86` | `app/assets/images/ui/medal_bronze.webp` |
+| medal_participant.webp | 19.671 | 256×256, bbox 44, 213, 23, 232, chân y=232, SHA-256 `64a39a85fb18` | `app/assets/images/ui/medal_participant.webp` |
+| gem_chest.webp | 103.694 | 512×512, bbox 67, 445, 41, 440, chân y=440, SHA-256 `9c961ac94e07` | `app/assets/images/items/gem_chest.webp` |
 
 Đấu trường: oval 2 tầng vòm, mái vòm giữa, cờ tam giác + dây cờ, pastel
 đào/kem. Đặt trên bản đồ thị trấn tại tâm chân (1060, 872), scale 0,2305,
@@ -1150,7 +1150,7 @@ thật (m2 toàn cục ăn mặt dưới viên đá rời — tím sẫm (166,3,
 m2); `finish()` xoá nốt magenta chói còn lại (r>170, g<90, b>140). Đẩy 1
 lần: commit `9feba87e`; 6/7 blob SHA đối chiếu khớp trên nhánh —
 `arena_bg.png.b64` (855.504 B) không tải lại được để đối chiếu (bảo vệ mã
-xác minh, giống `room_v3.png` trên main), đã kiểm bằng vòng khứ hồi local:
+xác minh, giống `room_v3.webp` trên main), đã kiểm bằng vòng khứ hồi local:
 .b64 giải mã đúng từng byte PNG gốc (SHA-256 `e798fa53…`), 1 dòng base64;
 Claude kiểm lại bằng git. ĐƯỢC DUYỆT 22/11 ~15:20 (Claude): cả 7 file;
 quyết 2 điểm — (1) đấu trường hiển thị 180×129 chấp nhận (nhỏ nhất trong 6
@@ -1174,26 +1174,26 @@ cách v3b.
 
 | File | Byte | Chân y | Tâm mắt |
 |---|---|---|---|
-| girl_full_04.png | 460.643 | 1428 | (491,6; 560,0) |
-| girl_full_04_wave.png | 445.760 | 1428 | (500,3; 547,1) |
-| girl_full_04_walk_dr_a.png | 451.334 | 1428 | gần (720,8; 573,4) |
-| girl_full_04_walk_dr_b.png | 437.806 | 1428 | gần (718,1; 577,5) |
-| girl_full_04_walk_dr_c.png | 432.351 | 1428 | gần (715,3; 569,1) |
-| girl_full_04_walk_dr_d.png | 440.884 | 1428 | gần (716,3; 564,6) |
-| girl_full_04_walk_ur_a.png | 440.136 | 1428 | gần (725,8; 529,7) |
-| girl_full_04_walk_ur_b.png | 419.228 | 1428 | gần (715,6; 531,3) |
-| girl_full_04_walk_ur_c.png | 442.381 | 1428 | gần (711,0; 519,0) |
-| girl_full_04_walk_ur_d.png | 414.206 | 1428 | gần (726,1; 567,5) |
-| boy_full_04.png | 406.116 | 1428 | (504,6; 628,5) |
-| boy_full_04_wave.png | 430.835 | 1428 | (503,2; 625,4) |
-| boy_full_04_walk_dr_a.png | 398.817 | 1428 | (505,6; 626,6) |
-| boy_full_04_walk_dr_b.png | 444.234 | 1428 | (524,8; 638,6) |
-| boy_full_04_walk_dr_c.png | 409.964 | 1428 | (520,2; 634,7) |
-| boy_full_04_walk_dr_d.png | 428.459 | 1428 | (530,2; 629,7) |
-| boy_full_04_walk_ur_a.png | 395.595 | 1428 | (681,1; 642,2) |
-| boy_full_04_walk_ur_b.png | 414.987 | 1428 | (689,3; 642,3) |
-| boy_full_04_walk_ur_c.png | 399.188 | 1428 | (692,8; 640,2) |
-| boy_full_04_walk_ur_d.png | 399.690 | 1428 | (685,1; 620,6) |
+| girl_full_04.webp | 460.643 | 1428 | (491,6; 560,0) |
+| girl_full_04_wave.webp | 445.760 | 1428 | (500,3; 547,1) |
+| girl_full_04_walk_dr_a.webp | 451.334 | 1428 | gần (720,8; 573,4) |
+| girl_full_04_walk_dr_b.webp | 437.806 | 1428 | gần (718,1; 577,5) |
+| girl_full_04_walk_dr_c.webp | 432.351 | 1428 | gần (715,3; 569,1) |
+| girl_full_04_walk_dr_d.webp | 440.884 | 1428 | gần (716,3; 564,6) |
+| girl_full_04_walk_ur_a.webp | 440.136 | 1428 | gần (725,8; 529,7) |
+| girl_full_04_walk_ur_b.webp | 419.228 | 1428 | gần (715,6; 531,3) |
+| girl_full_04_walk_ur_c.webp | 442.381 | 1428 | gần (711,0; 519,0) |
+| girl_full_04_walk_ur_d.webp | 414.206 | 1428 | gần (726,1; 567,5) |
+| boy_full_04.webp | 406.116 | 1428 | (504,6; 628,5) |
+| boy_full_04_wave.webp | 430.835 | 1428 | (503,2; 625,4) |
+| boy_full_04_walk_dr_a.webp | 398.817 | 1428 | (505,6; 626,6) |
+| boy_full_04_walk_dr_b.webp | 444.234 | 1428 | (524,8; 638,6) |
+| boy_full_04_walk_dr_c.webp | 409.964 | 1428 | (520,2; 634,7) |
+| boy_full_04_walk_dr_d.webp | 428.459 | 1428 | (530,2; 629,7) |
+| boy_full_04_walk_ur_a.webp | 395.595 | 1428 | (681,1; 642,2) |
+| boy_full_04_walk_ur_b.webp | 414.987 | 1428 | (689,3; 642,3) |
+| boy_full_04_walk_ur_c.webp | 399.188 | 1428 | (692,8; 640,2) |
+| boy_full_04_walk_ur_d.webp | 399.690 | 1428 | (685,1; 620,6) |
 
 Gái 04: váy lavender nhạt, cổ trắng, nơ eo, tay phồng, tất trắng, giày búp bê
 lavender — xòe vừa, KHÔNG lộng lẫy quá (đúng vị trí rẻ nhất trong 4 bộ).
@@ -1259,26 +1259,26 @@ tay vẫy, khung đi = khung thật 2 hướng × 4 khung. Phong cách v3b.
 
 | File | Byte | Chân y | Tâm mắt |
 |---|---|---|---|
-| girl_full_05.png | 581.037 | 1428 | (492,1; 562,2) |
-| girl_full_05_wave.png | 654.387 | 1428 | (490,7; 560,5) |
-| girl_full_05_walk_dr_a.png | 588.292 | 1428 | gần (712,0; 559,6) |
-| girl_full_05_walk_dr_b.png | 598.031 | 1428 | (568,0; 561,2) |
-| girl_full_05_walk_dr_c.png | 617.008 | 1428 | gần (713,1; 573,7) |
-| girl_full_05_walk_dr_d.png | 587.070 | 1428 | gần (696,4; 576,8) |
-| girl_full_05_walk_ur_a.png | 558.672 | 1428 | gần (700,8; 556,3) |
-| girl_full_05_walk_ur_b.png | 581.208 | 1428 | — (detector không bắt được mắt) |
-| girl_full_05_walk_ur_c.png | 598.570 | 1428 | gần (703,7; 563,1) |
-| girl_full_05_walk_ur_d.png | 564.698 | 1428 | gần (718,8; 560,1) |
-| boy_full_05.png | 325.924 | 1428 | (505,1; 629,0) |
-| boy_full_05_wave.png | 360.067 | 1428 | (503,8; 630,8) |
-| boy_full_05_walk_dr_a.png | 368.567 | 1428 | (504,6; 629,4) |
-| boy_full_05_walk_dr_b.png | 356.224 | 1428 | (510,6; 623,1) |
-| boy_full_05_walk_dr_c.png | 348.384 | 1428 | (527,5; 625,6) |
-| boy_full_05_walk_dr_d.png | 370.411 | 1428 | (523,3; 624,5) |
-| boy_full_05_walk_ur_a.png | 326.785 | 1428 | (704,5; 622,3) |
-| boy_full_05_walk_ur_b.png | 351.742 | 1428 | (690,7; 629,0) |
-| boy_full_05_walk_ur_c.png | 374.462 | 1428 | (692,8; 628,6) |
-| boy_full_05_walk_ur_d.png | 344.771 | 1428 | (675,7; 629,5) |
+| girl_full_05.webp | 581.037 | 1428 | (492,1; 562,2) |
+| girl_full_05_wave.webp | 654.387 | 1428 | (490,7; 560,5) |
+| girl_full_05_walk_dr_a.webp | 588.292 | 1428 | gần (712,0; 559,6) |
+| girl_full_05_walk_dr_b.webp | 598.031 | 1428 | (568,0; 561,2) |
+| girl_full_05_walk_dr_c.webp | 617.008 | 1428 | gần (713,1; 573,7) |
+| girl_full_05_walk_dr_d.webp | 587.070 | 1428 | gần (696,4; 576,8) |
+| girl_full_05_walk_ur_a.webp | 558.672 | 1428 | gần (700,8; 556,3) |
+| girl_full_05_walk_ur_b.webp | 581.208 | 1428 | — (detector không bắt được mắt) |
+| girl_full_05_walk_ur_c.webp | 598.570 | 1428 | gần (703,7; 563,1) |
+| girl_full_05_walk_ur_d.webp | 564.698 | 1428 | gần (718,8; 560,1) |
+| boy_full_05.webp | 325.924 | 1428 | (505,1; 629,0) |
+| boy_full_05_wave.webp | 360.067 | 1428 | (503,8; 630,8) |
+| boy_full_05_walk_dr_a.webp | 368.567 | 1428 | (504,6; 629,4) |
+| boy_full_05_walk_dr_b.webp | 356.224 | 1428 | (510,6; 623,1) |
+| boy_full_05_walk_dr_c.webp | 348.384 | 1428 | (527,5; 625,6) |
+| boy_full_05_walk_dr_d.webp | 370.411 | 1428 | (523,3; 624,5) |
+| boy_full_05_walk_ur_a.webp | 326.785 | 1428 | (704,5; 622,3) |
+| boy_full_05_walk_ur_b.webp | 351.742 | 1428 | (690,7; 629,0) |
+| boy_full_05_walk_ur_c.webp | 374.462 | 1428 | (692,8; 628,6) |
+| boy_full_05_walk_ur_d.webp | 344.771 | 1428 | (675,7; 629,5) |
 
 Gái 05: váy dạ hội dài màu đỏ hồng đậm (burgundy/rose), xòe vừa–rộng, nơ eo
 lớn, ren viền chân váy, đính đá/ánh sao nhẹ, tay phồng, giày búp bê đỏ quai
@@ -1394,26 +1394,26 @@ quantize bằng code (numpy + scipy + PIL), đúng quy trình bộ 04–05 (`key
 
 | File | Vai trò | Cỡ (byte) | Chân y | Tâm mắt |
 | --- | --- | --- | --- | --- |
-| `girl_full_06.png` | Váy công chúa, đứng | 569.578 | 1428 | (493,1; 561,5) |
-| `girl_full_06_wave.png` | Váy công chúa, tay phải vẫy | 574.860 | 1428 | gần (584,6; 563,4) * |
-| `girl_full_06_walk_dr_a.png` | Đi xuống-phải, khung a | 570.905 | 1428 | gần (723,0; 556,6) |
-| `girl_full_06_walk_dr_b.png` | Đi xuống-phải, khung b | 566.584 | 1428 | gần (725,3; 542,6) |
-| `girl_full_06_walk_dr_c.png` | Đi xuống-phải, khung c | 567.510 | 1428 | gần (729,6; 530,2) † |
-| `girl_full_06_walk_dr_d.png` | Đi xuống-phải, khung d | 537.150 | 1428 | gần (691,8; 577,7) |
-| `girl_full_06_walk_ur_a.png` | Đi lên-phải, khung a | 539.568 | 1428 | gần (704,3; 559,4) |
-| `girl_full_06_walk_ur_b.png` | Đi lên-phải, khung b | 529.469 | 1428 | gần (712,8; 543,6) |
-| `girl_full_06_walk_ur_c.png` | Đi lên-phải, khung c | 523.782 | 1428 | gần (702,6; 558,5) |
-| `girl_full_06_walk_ur_d.png` | Đi lên-phải, khung d | 554.871 | 1428 | gần (702,9; 544,0) |
-| `boy_full_06.png` | Hoàng tử + áo choàng, đứng | 428.241 | 1428 | (505,0; 629,8) |
-| `boy_full_06_wave.png` | Hoàng tử, vẫy | 454.574 | 1428 | (504,1; 628,8) |
-| `boy_full_06_walk_dr_a.png` | Đi xuống-phải, khung a | 437.772 | 1428 | (504,5; 629,4) |
-| `boy_full_06_walk_dr_b.png` | Đi xuống-phải, khung b | 436.413 | 1428 | (505,3; 627,0) |
-| `boy_full_06_walk_dr_c.png` | Đi xuống-phải, khung c | 411.891 | 1428 | (504,5; 631,2) |
-| `boy_full_06_walk_dr_d.png` | Đi xuống-phải, khung d | 375.988 | 1428 | (502,9; 623,1) |
-| `boy_full_06_walk_ur_a.png` | Đi lên-phải, khung a | 422.729 | 1428 | (560,5; 629,6) |
-| `boy_full_06_walk_ur_b.png` | Đi lên-phải, khung b | 416.872 | 1428 | (570,0; 636,4) |
-| `boy_full_06_walk_ur_c.png` | Đi lên-phải, khung c | 423.685 | 1428 | (610,0; 633,5) |
-| `boy_full_06_walk_ur_d.png` | Đi lên-phải, khung d | 417.654 | 1428 | (580,6; 637,8) |
+| `girl_full_06.webp` | Váy công chúa, đứng | 569.578 | 1428 | (493,1; 561,5) |
+| `girl_full_06_wave.webp` | Váy công chúa, tay phải vẫy | 574.860 | 1428 | gần (584,6; 563,4) * |
+| `girl_full_06_walk_dr_a.webp` | Đi xuống-phải, khung a | 570.905 | 1428 | gần (723,0; 556,6) |
+| `girl_full_06_walk_dr_b.webp` | Đi xuống-phải, khung b | 566.584 | 1428 | gần (725,3; 542,6) |
+| `girl_full_06_walk_dr_c.webp` | Đi xuống-phải, khung c | 567.510 | 1428 | gần (729,6; 530,2) † |
+| `girl_full_06_walk_dr_d.webp` | Đi xuống-phải, khung d | 537.150 | 1428 | gần (691,8; 577,7) |
+| `girl_full_06_walk_ur_a.webp` | Đi lên-phải, khung a | 539.568 | 1428 | gần (704,3; 559,4) |
+| `girl_full_06_walk_ur_b.webp` | Đi lên-phải, khung b | 529.469 | 1428 | gần (712,8; 543,6) |
+| `girl_full_06_walk_ur_c.webp` | Đi lên-phải, khung c | 523.782 | 1428 | gần (702,6; 558,5) |
+| `girl_full_06_walk_ur_d.webp` | Đi lên-phải, khung d | 554.871 | 1428 | gần (702,9; 544,0) |
+| `boy_full_06.webp` | Hoàng tử + áo choàng, đứng | 428.241 | 1428 | (505,0; 629,8) |
+| `boy_full_06_wave.webp` | Hoàng tử, vẫy | 454.574 | 1428 | (504,1; 628,8) |
+| `boy_full_06_walk_dr_a.webp` | Đi xuống-phải, khung a | 437.772 | 1428 | (504,5; 629,4) |
+| `boy_full_06_walk_dr_b.webp` | Đi xuống-phải, khung b | 436.413 | 1428 | (505,3; 627,0) |
+| `boy_full_06_walk_dr_c.webp` | Đi xuống-phải, khung c | 411.891 | 1428 | (504,5; 631,2) |
+| `boy_full_06_walk_dr_d.webp` | Đi xuống-phải, khung d | 375.988 | 1428 | (502,9; 623,1) |
+| `boy_full_06_walk_ur_a.webp` | Đi lên-phải, khung a | 422.729 | 1428 | (560,5; 629,6) |
+| `boy_full_06_walk_ur_b.webp` | Đi lên-phải, khung b | 416.872 | 1428 | (570,0; 636,4) |
+| `boy_full_06_walk_ur_c.webp` | Đi lên-phải, khung c | 423.685 | 1428 | (610,0; 633,5) |
+| `boy_full_06_walk_ur_d.webp` | Đi lên-phải, khung d | 417.654 | 1428 | (580,6; 637,8) |
 
 \* wave gái: detector chuẩn chỉ bắt được mắt phải (mắt trái vỡ thành mảnh < 25 px);
 hợp nhất 2 mảnh mắt trái (401,0; 556,3) + mắt phải cho tâm mắt (492,8; 559,9),
@@ -1583,26 +1583,26 @@ Tổng 20 file = 13.870.515 byte; .b64 ≈ 18,5 MB.
 
 | File | Vai trò | Cỡ (byte) | Chân y | Tâm mắt |
 | --- | --- | --- | --- | --- |
-| `girl_full_07.png` | Nữ hoàng tiên, đứng | 868.671 | 1428 | (491,0; 560,6) † |
-| `girl_full_07_wave.png` | Nữ hoàng tiên, tay phải vẫy | 865.116 | 1428 | (491,2; 560,3) † |
-| `girl_full_07_walk_dr_a.png` | Đi xuống-phải, khung a | 753.062 | 1428 | gần (711,7; 580,3) |
-| `girl_full_07_walk_dr_b.png` | Đi xuống-phải, khung b | 790.881 | 1428 | gần (728,5; 554,8) |
-| `girl_full_07_walk_dr_c.png` | Đi xuống-phải, khung c | 757.762 | 1428 | gần (701,3; 570,7) |
-| `girl_full_07_walk_dr_d.png` | Đi xuống-phải, khung d | 690.948 | 1428 | gần (735,3; 567,4) |
-| `girl_full_07_walk_ur_a.png` | Đi lên-phải, khung a | 820.169 | 1428 | gần (713,5; 558,2) |
-| `girl_full_07_walk_ur_b.png` | Đi lên-phải, khung b | 767.601 | 1428 | gần (727,7; 568,4) |
-| `girl_full_07_walk_ur_c.png` | Đi lên-phải, khung c | 854.832 | 1428 | gần (699,9; 547,0) |
-| `girl_full_07_walk_ur_d.png` | Đi lên-phải, khung d | 788.562 | 1428 | gần (737,6; 562,9) |
-| `boy_full_07.png` | Hiệp sĩ hoàng gia, đứng | 614.239 | 1428 | (503,7; 630,0) |
-| `boy_full_07_wave.png` | Hiệp sĩ, vẫy (v2) | 612.653 | 1428 | (505,2; 629,4) |
-| `boy_full_07_walk_dr_a.png` | Đi xuống-phải, khung a (v2) | 581.263 | 1428 | hcx 423,3 / hcy 372,4 |
-| `boy_full_07_walk_dr_b.png` | Đi xuống-phải, khung b (v2) | 575.002 | 1428 | hcx 423,7 / hcy 371,8 |
-| `boy_full_07_walk_dr_c.png` | Đi xuống-phải, khung c (v2) | 571.089 | 1428 | hcx 423,5 / hcy 370,7 |
-| `boy_full_07_walk_dr_d.png` | Đi xuống-phải, khung d | 578.058 | 1428 | hcx 423,5 / hcy 373,5 |
-| `boy_full_07_walk_ur_a.png` | Đi lên-phải, khung a | 577.833 | 1428 | hcx 484,8 / hcy 393,2 |
-| `boy_full_07_walk_ur_b.png` | Đi lên-phải, khung b | 604.385 | 1428 | hcx 484,3 / hcy 392,2 |
-| `boy_full_07_walk_ur_c.png` | Đi lên-phải, khung c | 583.565 | 1428 | hcx 484,7 / hcy 393,1 |
-| `boy_full_07_walk_ur_d.png` | Đi lên-phải, khung d | 614.824 | 1428 | hcx 484,9 / hcy 392,9 |
+| `girl_full_07.webp` | Nữ hoàng tiên, đứng | 868.671 | 1428 | (491,0; 560,6) † |
+| `girl_full_07_wave.webp` | Nữ hoàng tiên, tay phải vẫy | 865.116 | 1428 | (491,2; 560,3) † |
+| `girl_full_07_walk_dr_a.webp` | Đi xuống-phải, khung a | 753.062 | 1428 | gần (711,7; 580,3) |
+| `girl_full_07_walk_dr_b.webp` | Đi xuống-phải, khung b | 790.881 | 1428 | gần (728,5; 554,8) |
+| `girl_full_07_walk_dr_c.webp` | Đi xuống-phải, khung c | 757.762 | 1428 | gần (701,3; 570,7) |
+| `girl_full_07_walk_dr_d.webp` | Đi xuống-phải, khung d | 690.948 | 1428 | gần (735,3; 567,4) |
+| `girl_full_07_walk_ur_a.webp` | Đi lên-phải, khung a | 820.169 | 1428 | gần (713,5; 558,2) |
+| `girl_full_07_walk_ur_b.webp` | Đi lên-phải, khung b | 767.601 | 1428 | gần (727,7; 568,4) |
+| `girl_full_07_walk_ur_c.webp` | Đi lên-phải, khung c | 854.832 | 1428 | gần (699,9; 547,0) |
+| `girl_full_07_walk_ur_d.webp` | Đi lên-phải, khung d | 788.562 | 1428 | gần (737,6; 562,9) |
+| `boy_full_07.webp` | Hiệp sĩ hoàng gia, đứng | 614.239 | 1428 | (503,7; 630,0) |
+| `boy_full_07_wave.webp` | Hiệp sĩ, vẫy (v2) | 612.653 | 1428 | (505,2; 629,4) |
+| `boy_full_07_walk_dr_a.webp` | Đi xuống-phải, khung a (v2) | 581.263 | 1428 | hcx 423,3 / hcy 372,4 |
+| `boy_full_07_walk_dr_b.webp` | Đi xuống-phải, khung b (v2) | 575.002 | 1428 | hcx 423,7 / hcy 371,8 |
+| `boy_full_07_walk_dr_c.webp` | Đi xuống-phải, khung c (v2) | 571.089 | 1428 | hcx 423,5 / hcy 370,7 |
+| `boy_full_07_walk_dr_d.webp` | Đi xuống-phải, khung d | 578.058 | 1428 | hcx 423,5 / hcy 373,5 |
+| `boy_full_07_walk_ur_a.webp` | Đi lên-phải, khung a | 577.833 | 1428 | hcx 484,8 / hcy 393,2 |
+| `boy_full_07_walk_ur_b.webp` | Đi lên-phải, khung b | 604.385 | 1428 | hcx 484,3 / hcy 392,2 |
+| `boy_full_07_walk_ur_c.webp` | Đi lên-phải, khung c | 583.565 | 1428 | hcx 484,7 / hcy 393,1 |
+| `boy_full_07_walk_ur_d.webp` | Đi lên-phải, khung d | 614.824 | 1428 | hcx 484,9 / hcy 392,9 |
 
 † gái full/wave: blob detector trả None (tròng mắt vỡ mảnh < 25 px sau quantize
 + dither). Tâm mắt báo theo blue-union detector trên ảnh thô đã key (hợp nhất
@@ -1678,7 +1678,7 @@ dưới). Overlay 07 chồng 01 (đỏ 45%) cho thấy mắt trùng nhau.
   mắt ur_b 152,6 → 168,2, ur_c 154,4 → 172,1, ur_d 154,7 → 173,1 (01 ur
   168,0–180,4). Miệng 8/8 khung đi nay cười khép thống nhất (trước ur a/b/d
   cười hở, c khép). Glitter làm dịu lại: dr_a 789 → 0, ur_b 811 → 461 (còn
-  dưới mốc cũ đã duyệt 973), ur_d 705 → 0. Ảnh ghép `a_walk_vs_standing.png`
+  dưới mốc cũ đã duyệt 973), ur_d 705 → 0. Ảnh ghép `a_walk_vs_standing.webp`
   (đứng + 8 khung đi cạnh nhau): không thấy mặt to↔nhỏ giật. Bản mặt hẹp cũ
   giữ trong `gen/walk_redo_v1/old_walk_finals/`.
 - **Kiểm chứng chức năng miếng mắt nhắm — ĐÃ ĐẠT:** gái full **8 px**, wave
@@ -1710,10 +1710,10 @@ dưới). Overlay 07 chồng 01 (đỏ 45%) cho thấy mắt trùng nhau.
 
 Ảnh ghép `work/composites/`: (a) gái 07 full + wave cạnh gái 01 full;
 (b) trai 07 full + wave cạnh trai 01 full; (c) dải đi dr + ur mỗi dáng;
-(a2) `a_walk_vs_standing.png` — ảnh đứng mới + 8 khung đi mới cạnh nhau
+(a2) `a_walk_vs_standing.webp` — ảnh đứng mới + 8 khung đi mới cạnh nhau
 (chứng minh đứng↔đi không giật mặt); (d) gái 07 + trai 07 full ở cỡ app
 trong phòng v3b; (d) overlay lid-zone mới
-`d_lid_07_new.png` (xanh = trong vùng 01, đỏ = ngoài — gần như toàn xanh).
+`d_lid_07_new.webp` (xanh = trong vùng 01, đỏ = ngoài — gần như toàn xanh).
 
 - Mặt/mắt gái 07 và trai 07 trùng 01 (đã soi cạnh nhau + overlay 50/50 +
   overlay lid-zone: mắt gái 07 MỚI chính là mắt 01, không còn vệt hở).
@@ -1809,33 +1809,33 @@ lô 8B-fix). Tổng PNG 3.883.520 B (~5,18 MB .b64).
 
 | file | byte | bbox (x0, y0, x1, y1) | đất y | SHA-256 (12 ký tự đầu) | lần vẽ |
 |---|---|---|---|---|---|
-| squirrel_adult.png | 119009 | 86, 40, 425, 439 | 439 | 1614bba75c2d | 1 |
-| squirrel_adult_happy.png | 150880 | 64, 8, 446, 399 | 399 | 871a7ee562a1 | 1 |
-| squirrel_adult_sit.png | 155904 | 72, 40, 438, 439 | 439 | 1a35ae88b105 | 1 |
-| squirrel_adult_walk_a.png | 179314 | 26, 40, 485, 439 | 439 | 35eb94e85aa4 | 2 |
-| squirrel_adult_walk_b.png | 188758 | 8, 40, 503, 439 | 439 | 1a37fc96a5db | 2 |
-| squirrel_adult_walk_c.png | 182436 | 30, 40, 480, 439 | 439 | dd029c0c843c | 1 |
-| squirrel_adult_walk_d.png | 175864 | 0, 40, 510, 439 | 439 | aa47049757bc | 2 |
-| squirrel_egg.png | 113014 | 62, 40, 448, 439 | 439 | 5b77d2b80058 | 1 |
-| squirrel_egg_crack_1.png | 117446 | 97, 40, 414, 439 | 439 | c642e456d29f | 1 |
-| squirrel_egg_crack_2.png | 113153 | 104, 40, 407, 439 | 439 | 12024db9a4c4 | 1 |
-| squirrel_egg_crack_3.png | 135738 | 78, 40, 433, 439 | 439 | 2a4ed509947d | 1 |
-| squirrel_newborn.png | 102843 | 64, 40, 446, 439 | 439 | ebb719ba29d1 | 1 |
-| squirrel_newborn_happy.png | 128688 | 75, 8, 436, 399 | 399 | cc9df4ba211e | 1 |
-| squirrel_newborn_sit.png | 134371 | 79, 40, 432, 439 | 439 | 52e547ee72de | 1 |
-| squirrel_newborn_walk_a.png | 159694 | 29, 41, 482, 439 | 439 | c6676d9901e7 | 1 |
-| squirrel_newborn_walk_b.png | 157227 | 30, 40, 481, 439 | 439 | f02558efbc15 | 1 |
-| squirrel_newborn_walk_c.png | 138977 | 32, 40, 477, 439 | 439 | 1e1e1fbc88fa | 1 |
-| squirrel_newborn_walk_d.png | 157123 | 24, 40, 487, 439 | 439 | 4e7f15b0108d | 1 |
-| squirrel_shell_bottom.png | 88762 | 102, 155, 407, 439 | 439 | 2b1b1d8f9859 | 1 |
-| squirrel_shell_top.png | 67000 | 102, 60, 407, 262 | 262 | e2cff270861a | 1 |
-| squirrel_teen.png | 127188 | 75, 40, 435, 439 | 439 | 66077fce0ed7 | 1 |
-| squirrel_teen_happy.png | 141427 | 68, 9, 442, 399 | 399 | 9d86dd36e82a | 1 |
-| squirrel_teen_sit.png | 163209 | 56, 40, 454, 439 | 439 | 4b8aa7075f3e | 1 |
-| squirrel_teen_walk_a.png | 175383 | 31, 40, 479, 439 | 439 | 643b62fcd840 | 1 |
-| squirrel_teen_walk_b.png | 180279 | 13, 40, 497, 439 | 439 | 78c7ab45d97a | 1 |
-| squirrel_teen_walk_c.png | 168570 | 43, 40, 467, 439 | 439 | 61d317a8d18c | 1 |
-| squirrel_teen_walk_d.png | 161263 | 54, 40, 457, 439 | 439 | 7e17ddac69b1 | 1 |
+| squirrel_adult.webp | 119009 | 86, 40, 425, 439 | 439 | 1614bba75c2d | 1 |
+| squirrel_adult_happy.webp | 150880 | 64, 8, 446, 399 | 399 | 871a7ee562a1 | 1 |
+| squirrel_adult_sit.webp | 155904 | 72, 40, 438, 439 | 439 | 1a35ae88b105 | 1 |
+| squirrel_adult_walk_a.webp | 179314 | 26, 40, 485, 439 | 439 | 35eb94e85aa4 | 2 |
+| squirrel_adult_walk_b.webp | 188758 | 8, 40, 503, 439 | 439 | 1a37fc96a5db | 2 |
+| squirrel_adult_walk_c.webp | 182436 | 30, 40, 480, 439 | 439 | dd029c0c843c | 1 |
+| squirrel_adult_walk_d.webp | 175864 | 0, 40, 510, 439 | 439 | aa47049757bc | 2 |
+| squirrel_egg.webp | 113014 | 62, 40, 448, 439 | 439 | 5b77d2b80058 | 1 |
+| squirrel_egg_crack_1.webp | 117446 | 97, 40, 414, 439 | 439 | c642e456d29f | 1 |
+| squirrel_egg_crack_2.webp | 113153 | 104, 40, 407, 439 | 439 | 12024db9a4c4 | 1 |
+| squirrel_egg_crack_3.webp | 135738 | 78, 40, 433, 439 | 439 | 2a4ed509947d | 1 |
+| squirrel_newborn.webp | 102843 | 64, 40, 446, 439 | 439 | ebb719ba29d1 | 1 |
+| squirrel_newborn_happy.webp | 128688 | 75, 8, 436, 399 | 399 | cc9df4ba211e | 1 |
+| squirrel_newborn_sit.webp | 134371 | 79, 40, 432, 439 | 439 | 52e547ee72de | 1 |
+| squirrel_newborn_walk_a.webp | 159694 | 29, 41, 482, 439 | 439 | c6676d9901e7 | 1 |
+| squirrel_newborn_walk_b.webp | 157227 | 30, 40, 481, 439 | 439 | f02558efbc15 | 1 |
+| squirrel_newborn_walk_c.webp | 138977 | 32, 40, 477, 439 | 439 | 1e1e1fbc88fa | 1 |
+| squirrel_newborn_walk_d.webp | 157123 | 24, 40, 487, 439 | 439 | 4e7f15b0108d | 1 |
+| squirrel_shell_bottom.webp | 88762 | 102, 155, 407, 439 | 439 | 2b1b1d8f9859 | 1 |
+| squirrel_shell_top.webp | 67000 | 102, 60, 407, 262 | 262 | e2cff270861a | 1 |
+| squirrel_teen.webp | 127188 | 75, 40, 435, 439 | 439 | 66077fce0ed7 | 1 |
+| squirrel_teen_happy.webp | 141427 | 68, 9, 442, 399 | 399 | 9d86dd36e82a | 1 |
+| squirrel_teen_sit.webp | 163209 | 56, 40, 454, 439 | 439 | 4b8aa7075f3e | 1 |
+| squirrel_teen_walk_a.webp | 175383 | 31, 40, 479, 439 | 439 | 643b62fcd840 | 1 |
+| squirrel_teen_walk_b.webp | 180279 | 13, 40, 497, 439 | 439 | 78c7ab45d97a | 1 |
+| squirrel_teen_walk_c.webp | 168570 | 43, 40, 467, 439 | 439 | 61d317a8d18c | 1 |
+| squirrel_teen_walk_d.webp | 161263 | 54, 40, 457, 439 | 439 | 7e17ddac69b1 | 1 |
 
 #### Mốc đo (đo bằng code từ ảnh thật)
 
@@ -1938,33 +1938,33 @@ lô 8B-fix). Tổng PNG 2.886.931 B (~3,85 MB .b64).
 
 | file | byte | bbox (x0, y0, x1, y1) | đất y | SHA-256 (12 ký tự đầu) | lần vẽ |
 |---|---|---|---|---|---|
-| capybara_adult.png | 99099 | 125, 40, 386, 439 | 439 | 6fa7ce144065 | 1 |
-| capybara_adult_happy.png | 103187 | 112, 8, 399, 399 | 399 | 30baf2810a88 | 1 |
-| capybara_adult_sit.png | 101688 | 124, 40, 387, 439 | 439 | 1f78ea95c8c3 | 1 |
-| capybara_adult_walk_a.png | 111748 | 80, 40, 431, 439 | 439 | bb94f540093f | 1 |
-| capybara_adult_walk_b.png | 121794 | 73, 40, 438, 439 | 439 | 29b3ebbf6f9c | 1 |
-| capybara_adult_walk_c.png | 119107 | 67, 40, 443, 439 | 439 | f559e19580b2 | 1 |
-| capybara_adult_walk_d.png | 119283 | 62, 40, 449, 439 | 439 | 911d60086f64 | 1 |
-| capybara_egg.png | 114706 | 103, 40, 408, 439 | 439 | 7b7fa0461b05 | 1 |
-| capybara_egg_crack_1.png | 108685 | 95, 40, 415, 439 | 439 | 1ddc3233c99c | 1 |
-| capybara_egg_crack_2.png | 114000 | 103, 40, 407, 439 | 439 | 588f1ff9dbc6 | 1 |
-| capybara_egg_crack_3.png | 106889 | 116, 40, 395, 439 | 439 | 38a662ae3e24 | 2 |
-| capybara_newborn.png | 117901 | 94, 40, 417, 439 | 439 | 3e739f892438 | 1 |
-| capybara_newborn_happy.png | 114554 | 100, 8, 411, 399 | 399 | e79d6b5cf4ef | 1 |
-| capybara_newborn_sit.png | 109622 | 133, 40, 377, 439 | 439 | 3d6f89ef4c5a | 1 |
-| capybara_newborn_walk_a.png | 105796 | 62, 40, 449, 439 | 439 | feac8c496889 | 1 |
-| capybara_newborn_walk_b.png | 113316 | 62, 40, 448, 439 | 439 | fac79290c7d2 | 3 |
-| capybara_newborn_walk_c.png | 100072 | 59, 40, 452, 439 | 439 | 22471723b51a | 1 |
-| capybara_newborn_walk_d.png | 110252 | 59, 40, 452, 439 | 439 | 057a6939ecee | 3 |
-| capybara_shell_bottom.png | 78859 | 101, 166, 409, 439 | 439 | 680f28667d44 | 1 |
-| capybara_shell_top.png | 73834 | 101, 60, 409, 278 | 278 | 242df8d0fad3 | 2 |
-| capybara_teen.png | 99028 | 110, 40, 401, 439 | 439 | bc1e778b30b6 | 1 |
-| capybara_teen_happy.png | 94268 | 120, 8, 390, 399 | 399 | 2e1006191c62 | 1 |
-| capybara_teen_sit.png | 107845 | 93, 40, 417, 439 | 439 | 63614b66874e | 2 |
-| capybara_teen_walk_a.png | 114587 | 56, 40, 454, 439 | 439 | 141854ad6eab | 1 |
-| capybara_teen_walk_b.png | 112015 | 87, 40, 424, 439 | 439 | ccc554fd4b1b | 1 |
-| capybara_teen_walk_c.png | 106427 | 82, 40, 428, 439 | 439 | fbac8fec7f36 | 2 |
-| capybara_teen_walk_d.png | 108369 | 83, 40, 428, 439 | 439 | 6b09ddeaf5dd | 1 |
+| capybara_adult.webp | 99099 | 125, 40, 386, 439 | 439 | 6fa7ce144065 | 1 |
+| capybara_adult_happy.webp | 103187 | 112, 8, 399, 399 | 399 | 30baf2810a88 | 1 |
+| capybara_adult_sit.webp | 101688 | 124, 40, 387, 439 | 439 | 1f78ea95c8c3 | 1 |
+| capybara_adult_walk_a.webp | 111748 | 80, 40, 431, 439 | 439 | bb94f540093f | 1 |
+| capybara_adult_walk_b.webp | 121794 | 73, 40, 438, 439 | 439 | 29b3ebbf6f9c | 1 |
+| capybara_adult_walk_c.webp | 119107 | 67, 40, 443, 439 | 439 | f559e19580b2 | 1 |
+| capybara_adult_walk_d.webp | 119283 | 62, 40, 449, 439 | 439 | 911d60086f64 | 1 |
+| capybara_egg.webp | 114706 | 103, 40, 408, 439 | 439 | 7b7fa0461b05 | 1 |
+| capybara_egg_crack_1.webp | 108685 | 95, 40, 415, 439 | 439 | 1ddc3233c99c | 1 |
+| capybara_egg_crack_2.webp | 114000 | 103, 40, 407, 439 | 439 | 588f1ff9dbc6 | 1 |
+| capybara_egg_crack_3.webp | 106889 | 116, 40, 395, 439 | 439 | 38a662ae3e24 | 2 |
+| capybara_newborn.webp | 117901 | 94, 40, 417, 439 | 439 | 3e739f892438 | 1 |
+| capybara_newborn_happy.webp | 114554 | 100, 8, 411, 399 | 399 | e79d6b5cf4ef | 1 |
+| capybara_newborn_sit.webp | 109622 | 133, 40, 377, 439 | 439 | 3d6f89ef4c5a | 1 |
+| capybara_newborn_walk_a.webp | 105796 | 62, 40, 449, 439 | 439 | feac8c496889 | 1 |
+| capybara_newborn_walk_b.webp | 113316 | 62, 40, 448, 439 | 439 | fac79290c7d2 | 3 |
+| capybara_newborn_walk_c.webp | 100072 | 59, 40, 452, 439 | 439 | 22471723b51a | 1 |
+| capybara_newborn_walk_d.webp | 110252 | 59, 40, 452, 439 | 439 | 057a6939ecee | 3 |
+| capybara_shell_bottom.webp | 78859 | 101, 166, 409, 439 | 439 | 680f28667d44 | 1 |
+| capybara_shell_top.webp | 73834 | 101, 60, 409, 278 | 278 | 242df8d0fad3 | 2 |
+| capybara_teen.webp | 99028 | 110, 40, 401, 439 | 439 | bc1e778b30b6 | 1 |
+| capybara_teen_happy.webp | 94268 | 120, 8, 390, 399 | 399 | 2e1006191c62 | 1 |
+| capybara_teen_sit.webp | 107845 | 93, 40, 417, 439 | 439 | 63614b66874e | 2 |
+| capybara_teen_walk_a.webp | 114587 | 56, 40, 454, 439 | 439 | 141854ad6eab | 1 |
+| capybara_teen_walk_b.webp | 112015 | 87, 40, 424, 439 | 439 | ccc554fd4b1b | 1 |
+| capybara_teen_walk_c.webp | 106427 | 82, 40, 428, 439 | 439 | fbac8fec7f36 | 2 |
+| capybara_teen_walk_d.webp | 108369 | 83, 40, 428, 439 | 439 | 6b09ddeaf5dd | 1 |
 
 #### Mốc đo (đo bằng code từ ảnh thật)
 
@@ -2037,7 +2037,7 @@ lô 8B-fix). Tổng PNG 2.886.931 B (~3,85 MB .b64).
    sóc; teen đứng bbox rộng 292 px > adult 262 px do tư thế.
 7. Đối chân a/c chỉ gần đúng (AI vẽ), như lô 8B/sóc; newborn b/d đọc như khung sải
    hơn là chân lướt qua nhau.
-8. capybara_egg.png (xem trước v2 đã duyệt) có sẵn 4 px dark-magenta ở (265–268,
+8. capybara_egg.webp (xem trước v2 đã duyệt) có sẵn 4 px dark-magenta ở (265–268,
    55), RGB (175–188, 33–52, 196–215) — ghi trong redo_v2, KHÔNG sửa (file duyệt
    dùng lại nguyên bản).
 9. Lông khung đi đã chỉnh ấm bằng code (không vẽ lại): R−B 62–84 so với ảnh đứng
@@ -2079,33 +2079,33 @@ Tổng PNG 3.955.938 B (~5,27 MB .b64).
 
 | file | byte | bbox (x0, y0, x1, y1) | đất y | SHA-256 (12 ký tự đầu) | lần vẽ |
 |---|---|---|---|---|---|
-| dragon_adult.png | 146872 | 54, 40, 457, 439 | 439 | 7eaaa6e9028c | 1 |
-| dragon_adult_happy.png | 142561 | 43, 8, 468, 399 | 399 | 44e4e70bde1b | 2 |
-| dragon_adult_sit.png | 156689 | 76, 40, 434, 439 | 439 | 41a64dbd4257 | 1 |
-| dragon_adult_walk_a.png | 150448 | 50, 40, 460, 439 | 439 | b39bf247c61d | 1 |
-| dragon_adult_walk_b.png | 130495 | 89, 40, 421, 439 | 439 | 48f2c4cfedc0 | 1 |
-| dragon_adult_walk_c.png | 123279 | 88, 40, 423, 439 | 439 | 210a1f80068b | 1 |
-| dragon_adult_walk_d.png | 134037 | 54, 40, 456, 439 | 439 | 55cc4d8f2db4 | 1 |
-| dragon_egg.png | 158795 | 88, 40, 422, 439 | 439 | e5e9b498f3d0 | 1 |
-| dragon_egg_crack_1.png | 139879 | 97, 40, 414, 439 | 439 | d020bed85e79 | 1 |
-| dragon_egg_crack_2.png | 147397 | 109, 40, 402, 439 | 439 | 160d6aac3b34 | 2 |
-| dragon_egg_crack_3.png | 181947 | 43, 40, 468, 439 | 439 | ca021a90bc25 | 1 |
-| dragon_newborn.png | 142755 | 102, 40, 409, 439 | 439 | 7b769fbd889a | 1 |
-| dragon_newborn_happy.png | 143995 | 45, 8, 465, 399 | 399 | 454cb1b2422a | 2 |
-| dragon_newborn_sit.png | 154701 | 75, 40, 436, 439 | 439 | 3c2631d857cd | 1 |
-| dragon_newborn_walk_a.png | 144509 | 70, 40, 440, 439 | 439 | face9044cc61 | 1 |
-| dragon_newborn_walk_b.png | 162500 | 77, 40, 434, 439 | 439 | 2556f9ed6ccd | 1 |
-| dragon_newborn_walk_c.png | 160411 | 58, 40, 453, 439 | 439 | 28bbfbce8283 | 1 |
-| dragon_newborn_walk_d.png | 150906 | 77, 40, 433, 439 | 439 | 8095bd4db8b5 | 1 |
-| dragon_shell_bottom.png | 111861 | 102, 106, 407, 439 | 439 | f5c9272e61ae | 1 |
-| dragon_shell_top.png | 123027 | 102, 60, 407, 360 | 360 | 0bbf8755ad30 | 2 |
-| dragon_teen.png | 149180 | 78, 40, 433, 439 | 439 | 8defa0decd34 | 1 |
-| dragon_teen_happy.png | 151152 | 34, 8, 476, 399 | 399 | 632f45421e36 | 1 |
-| dragon_teen_sit.png | 162326 | 68, 40, 443, 439 | 439 | c04600c35d35 | 1 |
-| dragon_teen_walk_a.png | 144614 | 73, 40, 438, 439 | 439 | d1eaa0dfbafc | 1 |
-| dragon_teen_walk_b.png | 143934 | 83, 40, 428, 439 | 439 | ca44b1bbccb6 | 1 |
-| dragon_teen_walk_c.png | 151671 | 81, 40, 430, 439 | 439 | 54d8e7b6cec3 | 1 |
-| dragon_teen_walk_d.png | 145997 | 85, 40, 425, 439 | 439 | 81294fcceaaf | 1 |
+| dragon_adult.webp | 146872 | 54, 40, 457, 439 | 439 | 7eaaa6e9028c | 1 |
+| dragon_adult_happy.webp | 142561 | 43, 8, 468, 399 | 399 | 44e4e70bde1b | 2 |
+| dragon_adult_sit.webp | 156689 | 76, 40, 434, 439 | 439 | 41a64dbd4257 | 1 |
+| dragon_adult_walk_a.webp | 150448 | 50, 40, 460, 439 | 439 | b39bf247c61d | 1 |
+| dragon_adult_walk_b.webp | 130495 | 89, 40, 421, 439 | 439 | 48f2c4cfedc0 | 1 |
+| dragon_adult_walk_c.webp | 123279 | 88, 40, 423, 439 | 439 | 210a1f80068b | 1 |
+| dragon_adult_walk_d.webp | 134037 | 54, 40, 456, 439 | 439 | 55cc4d8f2db4 | 1 |
+| dragon_egg.webp | 158795 | 88, 40, 422, 439 | 439 | e5e9b498f3d0 | 1 |
+| dragon_egg_crack_1.webp | 139879 | 97, 40, 414, 439 | 439 | d020bed85e79 | 1 |
+| dragon_egg_crack_2.webp | 147397 | 109, 40, 402, 439 | 439 | 160d6aac3b34 | 2 |
+| dragon_egg_crack_3.webp | 181947 | 43, 40, 468, 439 | 439 | ca021a90bc25 | 1 |
+| dragon_newborn.webp | 142755 | 102, 40, 409, 439 | 439 | 7b769fbd889a | 1 |
+| dragon_newborn_happy.webp | 143995 | 45, 8, 465, 399 | 399 | 454cb1b2422a | 2 |
+| dragon_newborn_sit.webp | 154701 | 75, 40, 436, 439 | 439 | 3c2631d857cd | 1 |
+| dragon_newborn_walk_a.webp | 144509 | 70, 40, 440, 439 | 439 | face9044cc61 | 1 |
+| dragon_newborn_walk_b.webp | 162500 | 77, 40, 434, 439 | 439 | 2556f9ed6ccd | 1 |
+| dragon_newborn_walk_c.webp | 160411 | 58, 40, 453, 439 | 439 | 28bbfbce8283 | 1 |
+| dragon_newborn_walk_d.webp | 150906 | 77, 40, 433, 439 | 439 | 8095bd4db8b5 | 1 |
+| dragon_shell_bottom.webp | 111861 | 102, 106, 407, 439 | 439 | f5c9272e61ae | 1 |
+| dragon_shell_top.webp | 123027 | 102, 60, 407, 360 | 360 | 0bbf8755ad30 | 2 |
+| dragon_teen.webp | 149180 | 78, 40, 433, 439 | 439 | 8defa0decd34 | 1 |
+| dragon_teen_happy.webp | 151152 | 34, 8, 476, 399 | 399 | 632f45421e36 | 1 |
+| dragon_teen_sit.webp | 162326 | 68, 40, 443, 439 | 439 | c04600c35d35 | 1 |
+| dragon_teen_walk_a.webp | 144614 | 73, 40, 438, 439 | 439 | d1eaa0dfbafc | 1 |
+| dragon_teen_walk_b.webp | 143934 | 83, 40, 428, 439 | 439 | ca44b1bbccb6 | 1 |
+| dragon_teen_walk_c.webp | 151671 | 81, 40, 430, 439 | 439 | 54d8e7b6cec3 | 1 |
+| dragon_teen_walk_d.webp | 145997 | 85, 40, 425, 439 | 439 | 81294fcceaaf | 1 |
 
 #### Mốc đo (đo bằng code từ ảnh thật)
 
@@ -2162,7 +2162,7 @@ Tổng PNG 3.955.938 B (~5,27 MB .b64).
 #### Điểm chưa chắc — nói thẳng
 
 1. Dark-magenta thước nới còn 13 px, đều là nét viền tím sẫm của artwork (đã
-   kiểm bằng zoom 3×–6×): dragon_newborn.png (file xem trước đã duyệt, KHÔNG
+   kiểm bằng zoom 3×–6×): dragon_newborn.webp (file xem trước đã duyệt, KHÔNG
    sửa) 7 px; newborn_happy 4 px đường mi mắt nhắm (sâu trong mặt, edge_d
    12,8–16,3); teen_happy 2 px viền cánh (304–305, 189–190). Thước chuẩn = 0.
    Tiền lệ: trứng capybara có 4 px dark-magenta giữ nguyên.
@@ -2226,19 +2226,19 @@ trưởng thành đi quãng dài sẽ tự bay; (c) hào quang luôn tỏa sau r
 
 | file | byte | bbox (x0, y0, x1, y1) | đất y / đáy y | SHA-256 (12 ký tự đầu) | lần vẽ |
 |---|---|---|---|---|---|
-| dragon_fire_1.png | 116571 | 10, 40, 391, 439 | 439 | ab5c1c68635e | 2 |
-| dragon_fire_2.png | 156945 | 27, 40, 505, 439 | 439 | bf2193f9b2c7 | 2 |
-| dragon_fire_3.png | 135843 | 22, 40, 502, 439 | 439 | e1579ee23c51 | 2 |
-| dragon_fire_4.png | 125480 | 26, 40, 454, 439 | 439 | fb3601bac65b | 1 |
-| dragon_water_1.png | 145892 | 32, 40, 451, 439 | 439 | 6f1f115d098d | 2 |
-| dragon_water_2.png | 153703 | 36, 40, 485, 439 | 439 | 7337715baa15 | 3 |
-| dragon_water_3.png | 156878 | 27, 40, 505, 439 | 439 | 869ade13cd22 | 3 |
-| dragon_water_4.png | 144946 | 31, 40, 488, 439 | 439 | de7ab04f8667 | 1 |
-| dragon_fly_a.png | 143007 | 72, 19, 438, 388 | 388 | 1222327243b8 | 1 |
-| dragon_fly_b.png | 110326 | 7, 94, 458, 341 | 341 | ea3051cf1e95 | 3 |
-| dragon_fly_c.png | 130619 | 72, 88, 438, 459 | 459 | 778c05db522b | 2 |
-| dragon_fly_d.png | 145726 | 74, 19, 436, 388 | 388 | 01b9892e271e | 3 |
-| dragon_aura.png | 77020 | 25, 11, 484, 467 | — | 77697b891f67 | 2 |
+| dragon_fire_1.webp | 116571 | 10, 40, 391, 439 | 439 | ab5c1c68635e | 2 |
+| dragon_fire_2.webp | 156945 | 27, 40, 505, 439 | 439 | bf2193f9b2c7 | 2 |
+| dragon_fire_3.webp | 135843 | 22, 40, 502, 439 | 439 | e1579ee23c51 | 2 |
+| dragon_fire_4.webp | 125480 | 26, 40, 454, 439 | 439 | fb3601bac65b | 1 |
+| dragon_water_1.webp | 145892 | 32, 40, 451, 439 | 439 | 6f1f115d098d | 2 |
+| dragon_water_2.webp | 153703 | 36, 40, 485, 439 | 439 | 7337715baa15 | 3 |
+| dragon_water_3.webp | 156878 | 27, 40, 505, 439 | 439 | 869ade13cd22 | 3 |
+| dragon_water_4.webp | 144946 | 31, 40, 488, 439 | 439 | de7ab04f8667 | 1 |
+| dragon_fly_a.webp | 143007 | 72, 19, 438, 388 | 388 | 1222327243b8 | 1 |
+| dragon_fly_b.webp | 110326 | 7, 94, 458, 341 | 341 | ea3051cf1e95 | 3 |
+| dragon_fly_c.webp | 130619 | 72, 88, 438, 459 | 459 | 778c05db522b | 2 |
+| dragon_fly_d.webp | 145726 | 74, 19, 436, 388 | 388 | 01b9892e271e | 3 |
+| dragon_aura.webp | 77020 | 25, 11, 484, 467 | — | 77697b891f67 | 2 |
 
 #### Mốc đo (đo bằng code từ ảnh thật)
 
@@ -2310,8 +2310,8 @@ trưởng thành đi quãng dài sẽ tự bay; (c) hào quang luôn tỏa sau r
   thẳng, không tàn dư magenta; lửa đọc là lửa, nước đọc là nước ở cả cỡ app;
   cánh bay không bị keying ăn mất (màng cánh hồng còn nguyên).
 - Ảnh ghép: dải lửa 1..4, dải nước 1..4, chu kỳ bay a..d, 13 file ở cỡ app
-  trong phòng v3b (`dragon_fx/composites/strip_fire.png`, `strip_water.png`,
-  `strip_fly.png`, `d_room_13.png`).
+  trong phòng v3b (`dragon_fx/composites/strip_fire.webp`, `strip_water.webp`,
+  `strip_fly.webp`, `d_room_13.webp`).
 - 4 file xem trước đối chiếu SHA-256 khớp nguyên bản (fire_2 `bf2193f9b2c7…`,
   water_2 `7337715baa15…`, fly_a `1222327243b8…`, aura `77697b891f67…`).
 
@@ -2376,12 +2376,12 @@ Floyd–Steinberg. Tổng PNG 2.391.194 B (~3,19 MB .b64).
   duyệt 24/11 ~14:01).
 - Huy hiệu hạng tuần (league bronze→diamond) + rương cuối tuần (chest
   bronze→diamond): càng cao càng sáng/lộng lẫy dần (xem "Mốc đo" dưới).
-- `ui_celebrate_burst.png` là khung phủ kín màn (tia chạm mép khung, tâm
+- `ui_celebrate_burst.webp` là khung phủ kín màn (tia chạm mép khung, tâm
   trống hoàn toàn: 0 px alpha trong r<205, tức 40% khung) — dùng làm overlay
   toàn màn, KHÔNG dùng làm icon nhỏ.
-- `ui_tower_boss.png` là trùm tháp (đánh boss mở tháp), `ui_tower_lock.png`
-  là tháp đang khóa; `ui_streak_chest.png` là rương thưởng streak 7 ngày,
-  cố ý hoành tráng hơn `ui_chest_gold.png` (to hơn, dải vàng, bùng sáng +
+- `ui_tower_boss.webp` là trùm tháp (đánh boss mở tháp), `ui_tower_lock.webp`
+  là tháp đang khóa; `ui_streak_chest.webp` là rương thưởng streak 7 ngày,
+  cố ý hoành tráng hơn `ui_chest_gold.webp` (to hơn, dải vàng, bùng sáng +
   2 lửa bên, không tràn xu/ngọc) để không lẫn với rương gold thường.
 
 #### Quyết định đã chốt (Claude duyệt xem trước 24/11 ~14:01)
@@ -2391,7 +2391,7 @@ Floyd–Steinberg. Tổng PNG 2.391.194 B (~3,19 MB .b64).
 3. Emote **ĐỔI — bỏ mặt mèo**: vẽ lại 3 emote thành bong bóng trắng CHỈ CÓ
    biểu tượng (đói = bát trống + giọt mồ hôi, buồn = mây xám + giọt mưa,
    vui = tim hồng + lấp lánh). Bản xem trước có mặt mèo đã LOẠI, không vào app.
-4. `ui_tower_boss.png`: **rim-recolor 101 px** viền hồng-magenta (236,98,238)
+4. `ui_tower_boss.webp`: **rim-recolor 101 px** viền hồng-magenta (236,98,238)
    ở mép → màu palette gần nhất, không thêm màu mới; sau recolor 0 px theo
    đúng thước đếm 101 px đó.
 5. Vệt hồng 1–2 px trên mép sticker trắng: **BỎ QUA** (không sửa; ở cỡ app
@@ -2401,25 +2401,25 @@ Floyd–Steinberg. Tổng PNG 2.391.194 B (~3,19 MB .b64).
 
 | file | byte | bbox (x0, y0, x1, y1) | SHA-256 (12 ký tự đầu) | lần vẽ |
 |---|---|---|---|---|
-| ui_emote_hungry.png | 94166 | 26, 49, 485, 462 | 4c0b75761700 | 1 |
-| ui_emote_sad.png | 78621 | 26, 40, 485, 470 | 114233940c46 | 1 |
-| ui_emote_happy.png | 65957 | 26, 43, 485, 467 | e7ec80491fe2 | 1 |
-| ui_pet_meal.png | 69900 | 26, 84, 485, 426 | d01bde761caf | 1 |
-| ui_league_bronze.png | 101994 | 83, 26, 428, 485 | 73c2d3ecc9ec | 1 |
-| ui_league_silver.png | 117354 | 83, 26, 428, 485 | 3367215ff042 | 1 |
-| ui_league_gold.png | 114997 | 50, 26, 460, 485 | d3afc1e044b3 | 1 |
-| ui_league_diamond.png | 178534 | 48, 26, 463, 485 | 36f70afb256d | 1 |
-| ui_chest_bronze.png | 117080 | 26, 42, 485, 468 | ad72cb5a315e | 1 |
-| ui_chest_silver.png | 127028 | 36, 26, 475, 485 | c4eb0eee458c | 1 |
-| ui_chest_gold.png | 133819 | 26, 50, 485, 461 | f369deeebfc3 | 1 |
-| ui_chest_diamond.png | 190941 | 26, 52, 485, 458 | f23d094aa8fb | 1 |
-| ui_quest_board.png | 109938 | 35, 26, 475, 485 | 2eeafb65852f | 1 |
-| ui_quest_check.png | 123561 | 27, 26, 484, 485 | 906d963845d8 | 1 |
-| ui_streak_flame.png | 74070 | 57, 26, 454, 485 | bd9f97a10a06 | 1 |
-| ui_streak_chest.png | 147586 | 26, 39, 485, 471 | f6d43b6408d8 | 1 |
-| ui_tower_lock.png | 79251 | 69, 26, 441, 485 | 5e81266e49b0 | 1 |
-| ui_tower_boss.png | 91080 | 62, 26, 449, 485 | 98fbd15f77d2 | 1 |
-| ui_celebrate_burst.png | 375317 | 0, 0, 1023, 1023 | 5df9c7a406dc | 1 |
+| ui_emote_hungry.webp | 94166 | 26, 49, 485, 462 | 4c0b75761700 | 1 |
+| ui_emote_sad.webp | 78621 | 26, 40, 485, 470 | 114233940c46 | 1 |
+| ui_emote_happy.webp | 65957 | 26, 43, 485, 467 | e7ec80491fe2 | 1 |
+| ui_pet_meal.webp | 69900 | 26, 84, 485, 426 | d01bde761caf | 1 |
+| ui_league_bronze.webp | 101994 | 83, 26, 428, 485 | 73c2d3ecc9ec | 1 |
+| ui_league_silver.webp | 117354 | 83, 26, 428, 485 | 3367215ff042 | 1 |
+| ui_league_gold.webp | 114997 | 50, 26, 460, 485 | d3afc1e044b3 | 1 |
+| ui_league_diamond.webp | 178534 | 48, 26, 463, 485 | 36f70afb256d | 1 |
+| ui_chest_bronze.webp | 117080 | 26, 42, 485, 468 | ad72cb5a315e | 1 |
+| ui_chest_silver.webp | 127028 | 36, 26, 475, 485 | c4eb0eee458c | 1 |
+| ui_chest_gold.webp | 133819 | 26, 50, 485, 461 | f369deeebfc3 | 1 |
+| ui_chest_diamond.webp | 190941 | 26, 52, 485, 458 | f23d094aa8fb | 1 |
+| ui_quest_board.webp | 109938 | 35, 26, 475, 485 | 2eeafb65852f | 1 |
+| ui_quest_check.webp | 123561 | 27, 26, 484, 485 | 906d963845d8 | 1 |
+| ui_streak_flame.webp | 74070 | 57, 26, 454, 485 | bd9f97a10a06 | 1 |
+| ui_streak_chest.webp | 147586 | 26, 39, 485, 471 | f6d43b6408d8 | 1 |
+| ui_tower_lock.webp | 79251 | 69, 26, 441, 485 | 5e81266e49b0 | 1 |
+| ui_tower_boss.webp | 91080 | 62, 26, 449, 485 | 98fbd15f77d2 | 1 |
+| ui_celebrate_burst.webp | 375317 | 0, 0, 1023, 1023 | 5df9c7a406dc | 1 |
 
 #### Mốc đo (đo bằng code từ ảnh thật)
 
@@ -2483,13 +2483,13 @@ Floyd–Steinberg. Tổng PNG 2.391.194 B (~3,19 MB .b64).
   phóng 3× mép tower_boss: không lỗ alpha, không mép thẳng, không tàn dư
   magenta sáng; 3 emote mới đọc rõ đói/buồn/vui ở 100 px; tier bronze →
   diamond tăng dần rõ.
-- Ảnh ghép (`lot13/work/composites/`): `b_final_19_dark.png` (19 icon
-  trên nền tối), `b_emotes_100px.png` (3 emote mới ở 100 px cạnh nhau),
-  `b_emotes_in_room.png` (3 emote mới ở cỡ app trong phòng v3b),
-  `c_tower_boss_cluster_3x.png` + `c_tower_boss_bottom_3x.png`
+- Ảnh ghép (`lot13/work/composites/`): `b_final_19_dark.webp` (19 icon
+  trên nền tối), `b_emotes_100px.webp` (3 emote mới ở 100 px cạnh nhau),
+  `b_emotes_in_room.webp` (3 emote mới ở cỡ app trong phòng v3b),
+  `c_tower_boss_cluster_3x.webp` + `c_tower_boss_bottom_3x.webp`
   (tower_boss trước/sau recolor phóng 3× ở mép, có khoanh đỏ vị trí 101 px).
 - 15 file không đổi đối chiếu SHA-256 khớp nguyên bản xem trước; bản gốc
-  tower_boss giữ trong `lot13/work/backup/ui_tower_boss_orig.png` (SHA
+  tower_boss giữ trong `lot13/work/backup/ui_tower_boss_orig.webp` (SHA
   `795c65814233…`); tower_boss cuối SHA `98fbd15f77d2…`, đúng 101 px đổi,
   alpha không đổi.
 
@@ -2597,26 +2597,26 @@ Tổng 20 file = 8,819,139 byte; .b64 ≈ 11,21 MB.
 
 | File | Vai trò | Cỡ (byte) | Chân y | Tâm mắt |
 | --- | --- | --- | --- | --- |
-| `girl_full_08.png` | Yếm jean dã ngoại, đứng | 490,698 | 1429 | (491,0; 560,2) † | `2d0978492dd3` |
-| `girl_full_08_wave.png` | Yếm jean, tay phải vẫy | 502,446 | 1428 | (493,1; 563,2) † | `e6ed0963a1ae` |
-| `girl_full_08_walk_dr_a.png` | Đi xuống-phải, khung a | 469,995 | 1428 | gần (731,1; 565,6) | `5cdbbe757790` |
-| `girl_full_08_walk_dr_b.png` | Đi xuống-phải, khung b | 497,877 | 1428 | gần (704,4; 564,6) | `48ebf8bcd916` |
-| `girl_full_08_walk_dr_c.png` | Đi xuống-phải, khung c | 465,959 | 1428 | gần (738,7; 567,1) | `11d618dffe39` |
-| `girl_full_08_walk_dr_d.png` | Đi xuống-phải, khung d | 491,393 | 1428 | gần (715,9; 563,7) | `90689c8c9889` |
-| `girl_full_08_walk_ur_a.png` | Đi lên-phải, khung a | 485,404 | 1428 | gần (698,2; 559,2) | `82a4f2028796` |
-| `girl_full_08_walk_ur_b.png` | Đi lên-phải, khung b | 470,181 | 1428 | gần (730,1; 565,4) | `dfd327fdab9c` |
-| `girl_full_08_walk_ur_c.png` | Đi lên-phải, khung c | 486,670 | 1428 | gần (728,7; 556,0) | `f38701931583` |
-| `girl_full_08_walk_ur_d.png` | Đi lên-phải, khung d | 463,342 | 1428 | gần (740,4; 575,5) | `9cb630523e61` |
-| `boy_full_08.png` | Polo dã ngoại, đứng | 322,710 | 1428 | (503,8; 630,6) ‡ | `954f015c6ba5` |
-| `boy_full_08_wave.png` | Polo, tay phải vẫy | 410,072 | 1428 | (503,7; 630,2) ‡ | `f887bfc3ebaf` |
-| `boy_full_08_walk_dr_a.png` | Đi xuống-phải, khung a | 410,117 | 1428 | hcx 423,5 / hcy 364,5 | `9cf38087a1bf` |
-| `boy_full_08_walk_dr_b.png` | Đi xuống-phải, khung b | 424,359 | 1428 | hcx 423,5 / hcy 370,0 | `eb5991545d1c` |
-| `boy_full_08_walk_dr_c.png` | Đi xuống-phải, khung c | 407,559 | 1428 | hcx 424,2 / hcy 367,6 | `a8730da06c1a` |
-| `boy_full_08_walk_dr_d.png` | Đi xuống-phải, khung d | 412,988 | 1428 | hcx 423,4 / hcy 371,8 | `113a76a24f1c` |
-| `boy_full_08_walk_ur_a.png` | Đi lên-phải, khung a | 405,079 | 1428 | hcx 484,2 / hcy 390,0 | `b19761ecb878` |
-| `boy_full_08_walk_ur_b.png` | Đi lên-phải, khung b | 417,440 | 1428 | hcx 485,0 / hcy 389,7 | `5df3b0f00496` |
-| `boy_full_08_walk_ur_c.png` | Đi lên-phải, khung c | 385,743 | 1428 | hcx 484,8 / hcy 390,9 | `74eb9e014116` |
-| `boy_full_08_walk_ur_d.png` | Đi lên-phải, khung d | 399,107 | 1428 | hcx 484,9 / hcy 387,5 | `49f773c9c7b7` |
+| `girl_full_08.webp` | Yếm jean dã ngoại, đứng | 490,698 | 1429 | (491,0; 560,2) † | `2d0978492dd3` |
+| `girl_full_08_wave.webp` | Yếm jean, tay phải vẫy | 502,446 | 1428 | (493,1; 563,2) † | `e6ed0963a1ae` |
+| `girl_full_08_walk_dr_a.webp` | Đi xuống-phải, khung a | 469,995 | 1428 | gần (731,1; 565,6) | `5cdbbe757790` |
+| `girl_full_08_walk_dr_b.webp` | Đi xuống-phải, khung b | 497,877 | 1428 | gần (704,4; 564,6) | `48ebf8bcd916` |
+| `girl_full_08_walk_dr_c.webp` | Đi xuống-phải, khung c | 465,959 | 1428 | gần (738,7; 567,1) | `11d618dffe39` |
+| `girl_full_08_walk_dr_d.webp` | Đi xuống-phải, khung d | 491,393 | 1428 | gần (715,9; 563,7) | `90689c8c9889` |
+| `girl_full_08_walk_ur_a.webp` | Đi lên-phải, khung a | 485,404 | 1428 | gần (698,2; 559,2) | `82a4f2028796` |
+| `girl_full_08_walk_ur_b.webp` | Đi lên-phải, khung b | 470,181 | 1428 | gần (730,1; 565,4) | `dfd327fdab9c` |
+| `girl_full_08_walk_ur_c.webp` | Đi lên-phải, khung c | 486,670 | 1428 | gần (728,7; 556,0) | `f38701931583` |
+| `girl_full_08_walk_ur_d.webp` | Đi lên-phải, khung d | 463,342 | 1428 | gần (740,4; 575,5) | `9cb630523e61` |
+| `boy_full_08.webp` | Polo dã ngoại, đứng | 322,710 | 1428 | (503,8; 630,6) ‡ | `954f015c6ba5` |
+| `boy_full_08_wave.webp` | Polo, tay phải vẫy | 410,072 | 1428 | (503,7; 630,2) ‡ | `f887bfc3ebaf` |
+| `boy_full_08_walk_dr_a.webp` | Đi xuống-phải, khung a | 410,117 | 1428 | hcx 423,5 / hcy 364,5 | `9cf38087a1bf` |
+| `boy_full_08_walk_dr_b.webp` | Đi xuống-phải, khung b | 424,359 | 1428 | hcx 423,5 / hcy 370,0 | `eb5991545d1c` |
+| `boy_full_08_walk_dr_c.webp` | Đi xuống-phải, khung c | 407,559 | 1428 | hcx 424,2 / hcy 367,6 | `a8730da06c1a` |
+| `boy_full_08_walk_dr_d.webp` | Đi xuống-phải, khung d | 412,988 | 1428 | hcx 423,4 / hcy 371,8 | `113a76a24f1c` |
+| `boy_full_08_walk_ur_a.webp` | Đi lên-phải, khung a | 405,079 | 1428 | hcx 484,2 / hcy 390,0 | `b19761ecb878` |
+| `boy_full_08_walk_ur_b.webp` | Đi lên-phải, khung b | 417,440 | 1428 | hcx 485,0 / hcy 389,7 | `5df3b0f00496` |
+| `boy_full_08_walk_ur_c.webp` | Đi lên-phải, khung c | 385,743 | 1428 | hcx 484,8 / hcy 390,9 | `74eb9e014116` |
+| `boy_full_08_walk_ur_d.webp` | Đi lên-phải, khung d | 399,107 | 1428 | hcx 484,9 / hcy 387,5 | `49f773c9c7b7` |
 
 † gái full/wave: tâm mắt = trung bình 2 mắt blob (iris) trên file final đã quantize:
 full L (386,7; 559,2), R (595,3; 561,2); wave L (388,1; 562,6), R (598,1; 563,7).
@@ -2673,7 +2673,7 @@ full L (398,2; 631,2), R (609,4; 630,0); wave L (400,1; 630,9), R (607,2; 629,4)
   thật (07 wave dy = 6,8 px; 07 wave vs 01 cũng vượt cổng x: L +14,5, R −10,3).
   Sau warp du vs 01 L (+4,2; +4,6), R (−3,2; +3,2) — gần 07 wave hơn trước
   nhiều; **lid-box 0 px** (trước 16) — miếng 01 che kín. Soi 3× cạnh 07 wave
-  (`fix_wave_faces_3x.png`): mặt không biến dạng, tóc/trán nguyên.
+  (`fix_wave_faces_3x.webp`): mặt không biến dạng, tóc/trán nguyên.
   Miệng wave (528,3; 710,1) cười khép, trùng full. Bbox wave (79, 198, 859, 1429);
   cao 1231; 254 màu (wave duy nhất dưới 256 — do warp + requantize, không phải
   lỗi). File wave mới: 410.072 byte, SHA-256 `f887bfc3ebaf…`.
@@ -2688,7 +2688,7 @@ full L (398,2; 631,2), R (609,4; 630,0); wave L (400,1; 630,9), R (607,2; 629,4)
   **Chấm đen dưới tai ur_a/ur_c ĐÃ XÓA BẰNG CODE 24/11** (quyết Claude ~17:37):
   0 px đen tại (428,672) và (419,674) — đo bằng code cửa sổ 30×30 và core 13×13
   (trước: 29 px ur_a / 37 px ur_c); đường cổ áo ur_a (12 px) còn nguyên; soi 3×
-  (`fix_ears_3x_v2.png`) da liền mạch, không vết. File mới: ur_a 405.079 byte
+  (`fix_ears_3x_v2.webp`) da liền mạch, không vết. File mới: ur_a 405.079 byte
   SHA `b19761ecb878…`, ur_c 385.743 byte SHA `74eb9e014116…`. ur_b/ur_d không đổi.
   Cao bbox khung đi 1227–1255 (đã chấp nhận, xem dưới).
 - Magenta exact #FF00FF ở full: **361 px — 361/361 nằm ở vùng alpha = 0**
@@ -2697,13 +2697,13 @@ full L (398,2; 631,2), R (609,4; 630,0); wave L (400,1; 630,9), R (607,2; 629,4)
 
 ## Kiểm chứng (soi bằng mắt trên nền tối (60,60,80) + nền phòng v3b)
 
-Ảnh ghép `lot14/work/set08/composites/`: (a) `girl_10_dark.png` (10 file gái);
-(b) `boy_10_dark.png` (10 file trai); (c) `set08_room20.png` (20 file ở cỡ app
-trong phòng v3b — verifier làm mới); mặt 3× `verify_faces_3x_girl.png` /
-`verify_faces_3x_boy.png` (01/07/08 × full/wave); mặt khung đi 2×
-`verify_walk_faces_2x.png`; dải đi `verify_walk_strips.png`; sửa bằng code
-`fix_wave_faces_3x.png` (wave trai trước/sau warp 3× cạnh 07 wave) và
-`fix_ears_3x_v2.png` (vùng tai ur_a/ur_c trước/sau xóa 3×).
+Ảnh ghép `lot14/work/set08/composites/`: (a) `girl_10_dark.webp` (10 file gái);
+(b) `boy_10_dark.webp` (10 file trai); (c) `set08_room20.webp` (20 file ở cỡ app
+trong phòng v3b — verifier làm mới); mặt 3× `verify_faces_3x_girl.webp` /
+`verify_faces_3x_boy.webp` (01/07/08 × full/wave); mặt khung đi 2×
+`verify_walk_faces_2x.webp`; dải đi `verify_walk_strips.webp`; sửa bằng code
+`fix_wave_faces_3x.webp` (wave trai trước/sau warp 3× cạnh 07 wave) và
+`fix_ears_3x_v2.webp` (vùng tai ur_a/ur_c trước/sau xóa 3×).
 
 - Mặt/mắt gái 08 = mắt 01 (đã ghép dải mắt, không thấy đường ghép); mặt/mắt
   trai 08 full thẳng, khớp 07/01; wave trai đã warp thẳng (xem trên).
@@ -2862,26 +2862,26 @@ Tổng 20 file = 10,674,685 byte; .b64 ≈ 14,23 MB (lớn hơn bộ 08: 8,82 MB
 
 | File | Vai trò | Cỡ (byte) | Chân y | Tâm mắt |
 | --- | --- | --- | --- | --- |
-| `girl_full_09.png` | Áo dài đỏ hoa mai, đứng | 496,269 | 1429 | (489,8; 558,4) † | `8bc124138724` |
-| `girl_full_09_wave.png` | Áo dài đỏ, tay phải vẫy | 518,807 | 1428 | (491,8; 561,6) † | `3d9a0e4a056d` |
-| `girl_full_09_walk_dr_a.png` | Đi xuống-phải, khung a | 554,893 | 1428 | gần (707,3; 582,0) | `7190270105e9` |
-| `girl_full_09_walk_dr_b.png` | Đi xuống-phải, khung b | 552,840 | 1428 | gần (725,8; 555,5) | `86f08b1555cb` |
-| `girl_full_09_walk_dr_c.png` | Đi xuống-phải, khung c | 525,573 | 1428 | gần (719,7; 568,5) | `3a0c4abea5ff` |
-| `girl_full_09_walk_dr_d.png` | Đi xuống-phải, khung d | 535,778 | 1428 | gần (705,2; 569,0) | `bdbcb10e5fc6` |
-| `girl_full_09_walk_ur_a.png` | Đi lên-phải, khung a | 478,869 | 1428 | gần (746,0; 564,1) | `542b410912ce` |
-| `girl_full_09_walk_ur_b.png` | Đi lên-phải, khung b | 526,914 | 1428 | gần (723,2; 537,4) | `ff03894c2be1` |
-| `girl_full_09_walk_ur_c.png` | Đi lên-phải, khung c | 497,741 | 1428 | gần (—) § | `dc2783fc008c` |
-| `girl_full_09_walk_ur_d.png` | Đi lên-phải, khung d | 476,875 | 1428 | gần (689,6; 551,1) | `aee85e72f27e` |
-| `boy_full_09.png` | Áo dài gấm xanh, đứng | 510,964 | 1428 | (505,0; 635,2) ‡ | `f0db72895a12` |
-| `boy_full_09_wave.png` | Áo dài xanh, tay phải vẫy | 542,691 | 1428 | (504,9; 630,5) ‡ | `a3a0efb23ad0` |
-| `boy_full_09_walk_dr_a.png` | Đi xuống-phải, khung a | 577,166 | 1428 | hcx 423,5 / hcy 373,8 | `5954b2caea84` |
-| `boy_full_09_walk_dr_b.png` | Đi xuống-phải, khung b | 599,757 | 1428 | hcx 424,5 / hcy 371,0 | `1712ab931216` |
-| `boy_full_09_walk_dr_c.png` | Đi xuống-phải, khung c | 571,042 | 1428 | hcx 423,6 / hcy 370,5 | `4110e4816a83` |
-| `boy_full_09_walk_dr_d.png` | Đi xuống-phải, khung d | 598,740 | 1428 | hcx 424,0 / hcy 373,6 | `87e83d5b5723` |
-| `boy_full_09_walk_ur_a.png` | Đi lên-phải, khung a | 525,940 | 1428 | hcx 484,0 / hcy 396,5 | `bc71eb8b69e0` |
-| `boy_full_09_walk_ur_b.png` | Đi lên-phải, khung b | 509,667 | 1428 | hcx 484,3 / hcy 391,3 | `69e194119805` |
-| `boy_full_09_walk_ur_c.png` | Đi lên-phải, khung c | 536,625 | 1428 | hcx 484,4 / hcy 394,7 | `82771c972b9f` |
-| `boy_full_09_walk_ur_d.png` | Đi lên-phải, khung d | 539,011 | 1428 | hcx 484,2 / hcy 392,6 | `a6e9f38142f0` |
+| `girl_full_09.webp` | Áo dài đỏ hoa mai, đứng | 496,269 | 1429 | (489,8; 558,4) † | `8bc124138724` |
+| `girl_full_09_wave.webp` | Áo dài đỏ, tay phải vẫy | 518,807 | 1428 | (491,8; 561,6) † | `3d9a0e4a056d` |
+| `girl_full_09_walk_dr_a.webp` | Đi xuống-phải, khung a | 554,893 | 1428 | gần (707,3; 582,0) | `7190270105e9` |
+| `girl_full_09_walk_dr_b.webp` | Đi xuống-phải, khung b | 552,840 | 1428 | gần (725,8; 555,5) | `86f08b1555cb` |
+| `girl_full_09_walk_dr_c.webp` | Đi xuống-phải, khung c | 525,573 | 1428 | gần (719,7; 568,5) | `3a0c4abea5ff` |
+| `girl_full_09_walk_dr_d.webp` | Đi xuống-phải, khung d | 535,778 | 1428 | gần (705,2; 569,0) | `bdbcb10e5fc6` |
+| `girl_full_09_walk_ur_a.webp` | Đi lên-phải, khung a | 478,869 | 1428 | gần (746,0; 564,1) | `542b410912ce` |
+| `girl_full_09_walk_ur_b.webp` | Đi lên-phải, khung b | 526,914 | 1428 | gần (723,2; 537,4) | `ff03894c2be1` |
+| `girl_full_09_walk_ur_c.webp` | Đi lên-phải, khung c | 497,741 | 1428 | gần (—) § | `dc2783fc008c` |
+| `girl_full_09_walk_ur_d.webp` | Đi lên-phải, khung d | 476,875 | 1428 | gần (689,6; 551,1) | `aee85e72f27e` |
+| `boy_full_09.webp` | Áo dài gấm xanh, đứng | 510,964 | 1428 | (505,0; 635,2) ‡ | `f0db72895a12` |
+| `boy_full_09_wave.webp` | Áo dài xanh, tay phải vẫy | 542,691 | 1428 | (504,9; 630,5) ‡ | `a3a0efb23ad0` |
+| `boy_full_09_walk_dr_a.webp` | Đi xuống-phải, khung a | 577,166 | 1428 | hcx 423,5 / hcy 373,8 | `5954b2caea84` |
+| `boy_full_09_walk_dr_b.webp` | Đi xuống-phải, khung b | 599,757 | 1428 | hcx 424,5 / hcy 371,0 | `1712ab931216` |
+| `boy_full_09_walk_dr_c.webp` | Đi xuống-phải, khung c | 571,042 | 1428 | hcx 423,6 / hcy 370,5 | `4110e4816a83` |
+| `boy_full_09_walk_dr_d.webp` | Đi xuống-phải, khung d | 598,740 | 1428 | hcx 424,0 / hcy 373,6 | `87e83d5b5723` |
+| `boy_full_09_walk_ur_a.webp` | Đi lên-phải, khung a | 525,940 | 1428 | hcx 484,0 / hcy 396,5 | `bc71eb8b69e0` |
+| `boy_full_09_walk_ur_b.webp` | Đi lên-phải, khung b | 509,667 | 1428 | hcx 484,3 / hcy 391,3 | `69e194119805` |
+| `boy_full_09_walk_ur_c.webp` | Đi lên-phải, khung c | 536,625 | 1428 | hcx 484,4 / hcy 394,7 | `82771c972b9f` |
+| `boy_full_09_walk_ur_d.webp` | Đi lên-phải, khung d | 539,011 | 1428 | hcx 484,2 / hcy 392,6 | `a6e9f38142f0` |
 
 † gái full/wave: tâm mắt = trung bình 2 mắt blob (iris) trên file final đã quantize:
 full L (386,8; 558,7), R (592,8; 558,1); wave L (388,1; 561,2), R (595,4; 562,0).
@@ -2904,7 +2904,7 @@ SHA-256 trên là bản SAU fix strip của verifier (10 file gái đổi SHA so
   R (−2,9; −3,5) — worst 3,5 px, trong nhiễu detector ±5 px. Khoảng đồng tử blob
   206,0 px (01: 207,0). Trên layers (trước quantize) blob KHỚP TUYỆT ĐỐI 01
   (0,0; 0,0) — lệch final là nhiễu quantize/dither (như wave 08). Soi mặt 3×
-  (`verify_faces_3x_girl.png`): KHÔNG thấy vết ghép dải mắt.
+  (`verify_faces_3x_girl.webp`): KHÔNG thấy vết ghép dải mắt.
   Lid-band y500–620: full **8 px** ngoài vùng (01 tự đo 0, 07 full 8); hộp 70×80
   quanh mắt 01: full **0 px**, wave **0 px** — miếng 01 che kín.
   Bbox full (193, 198, 839, 1430); cao bbox 1231.
@@ -2945,7 +2945,7 @@ SHA-256 trên là bản SAU fix strip của verifier (10 file gái đổi SHA so
   Trước warp dy = 14,5 px ở layers (đầu nghiêng thật). Sau warp du vs 07 wave
   L (−1,2; +3,8), R (+0,5; −1,1) — khớp 07 wave hơn 01 (vs 01: L +13,3, R −9,8);
   span 191,4 vs 07 wave 189,7; **lid-box 1 px** (07 wave = 5) — miếng 01 che kín.
-  Soi 3× cạnh 01/07 wave (`verify_faces_3x_boy.png`): mặt thẳng, không biến dạng,
+  Soi 3× cạnh 01/07 wave (`verify_faces_3x_boy.webp`): mặt thẳng, không biến dạng,
   tóc/trán nguyên. Bbox wave (123, 201, 839, 1429); cao 1227.
 - Khung đi dr: hcx 423,5–424,5 (07: 423,3–423,7), hcy 370,5–373,8
   (07: 370,7–373,5) — khớp 07 gần như tuyệt đối; mắt gần dark-centroid R trung bình
@@ -2958,7 +2958,7 @@ SHA-256 trên là bản SAU fix strip của verifier (10 file gái đổi SHA so
   wave (707,689)–(713,696) 39 px, ur_b (474,681)–(485,692) 93 px,
   ur_c (492,665)–(499,673) 50 px — đo lại **0 px tối tại cả 3 vị trí**
   (verifier đo độc lập, kể cả cửa sổ 30×30 quanh mỗi vị trí: wave 1 px, ur_b 0,
-  ur_c 0); soi 3× (`verify_ears_3x.png`) da liền mạch, chỉ còn vết tô phẳng mờ
+  ur_c 0); soi 3× (`verify_ears_3x.webp`) da liền mạch, chỉ còn vết tô phẳng mờ
   ở wave (thấy ở 3×, không thấy ở cỡ app). 07 KHÔNG có chấm ở đúng 2 ô ur_b/ur_c
   (0 px) — đó là vết riêng của 09, xóa là đúng. **Ngoại lệ — chấm tai PHẢI
   (wave): xem "Điểm chưa chắc".**
@@ -2968,12 +2968,12 @@ SHA-256 trên là bản SAU fix strip của verifier (10 file gái đổi SHA so
 ## Kiểm chứng (soi bằng mắt trên nền tối (60,60,80) + nền phòng v3b)
 
 Ảnh ghép của verifier `lot14/work/set09/composites/` (làm mới, độc lập với ảnh ghép
-của 2 agent vẽ): (a) `verify_girl10_dark.png` (10 file gái); (b) `verify_boy10_dark.png`
-(10 file trai); (c) `verify_set09_room20.png` (20 file ở cỡ app trong phòng v3b);
-(d) `verify_faces_3x_girl.png` / `verify_faces_3x_boy.png` (01/07/09 × full/wave, 3×);
-mặt khung đi 2× `verify_walk_faces_2x.png`; tai 3× `verify_ears_3x.png` và
-`verify_boy_ears_01_07_09_3x.png`; giày gái trước/sau fix
-`verify_girl_shoes_4x.png` / `verify_girl_shoes_after.png`.
+của 2 agent vẽ): (a) `verify_girl10_dark.webp` (10 file gái); (b) `verify_boy10_dark.webp`
+(10 file trai); (c) `verify_set09_room20.webp` (20 file ở cỡ app trong phòng v3b);
+(d) `verify_faces_3x_girl.webp` / `verify_faces_3x_boy.webp` (01/07/09 × full/wave, 3×);
+mặt khung đi 2× `verify_walk_faces_2x.webp`; tai 3× `verify_ears_3x.webp` và
+`verify_boy_ears_01_07_09_3x.webp`; giày gái trước/sau fix
+`verify_girl_shoes_4x.webp` / `verify_girl_shoes_after.webp`.
 
 - Mặt/mắt gái 09 = mắt 01 (đã ghép dải mắt, không thấy đường ghép); mặt/mắt trai 09
   full thẳng, khớp 07/01; wave trai đã warp thẳng (dy 1,9 px).
@@ -3076,7 +3076,7 @@ trai boy_full_09_walk_ur_d `a6e9f38142f0`
   — đối chiếu blob SHA trên nhánh bị chặn (bảo vệ mã xác minh, giống bộ 04–08),
   Claude kiểm lại bằng git khi decode.
   Nốt đẩy lần 3: GitHub secret scanning chặn lần đẩy đầu (chuỗi base64 của
-  boy_full_09_wave.png tình cờ chứa mẫu "Tencent Cloud Secret ID" — dương tính
+  boy_full_09_wave.webp tình cờ chứa mẫu "Tencent Cloud Secret ID" — dương tính
   giả, không có khóa thật). Đã mã lại PNG đó lossless (compress_level 6, pixel
   y hệt, 541.214 → 542.691 byte, SHA `a3a0efb23ad0`) rồi đẩy lại; bản gốc giữ ở
   `set09/backup_secret_scan/`. Bài học: quét .b64 staged tìm mẫu secret
@@ -3155,8 +3155,8 @@ mặt/dáng đầu và ảnh 07 làm mẫu tư thế; tách nền + chuẩn hoá
   0/9 file, tai xa dark/silver/bright/grey = 0, chấm tai gần còn nguyên
   (full 45, wave 36, dr_b 71, dr_c 84, dr_d 82), mắt full/wave + lid-box
   KHÔNG ĐỔI. Backup ở `backup_fix_ears2/` (trước F2) và `backup_fix_rim/`
-  (sau F2, trước F1). Ảnh ghép sau sửa: `fix_rim_boy10_dark.png`,
-  `fix_rim_room.png`, `fix_ears_ur_4x.png` (đã soi — xem "Kiểm chứng").
+  (sau F2, trước F1). Ảnh ghép sau sửa: `fix_rim_boy10_dark.webp`,
+  `fix_rim_room.webp`, `fix_ears_ur_4x.webp` (đã soi — xem "Kiểm chứng").
 - **Quy tắc miếng mắt nhắm (Claude chốt 22/11): app dùng CHUNG miếng mắt nhắm
   của bộ 01 cho cả full/wave 10** — mắt đứng VÀ vẫy phải trùng bộ 01 trong ±3 px.
   Từ bộ 05 trở đi KHÔNG làm miếng riêng, dùng miếng 01.
@@ -3164,12 +3164,12 @@ mặt/dáng đầu và ảnh 07 làm mẫu tư thế; tách nền + chuẩn hoá
   `report.json` trong `lot14/work/set10/`):** đo lại 20/20 bằng cùng định nghĩa
   detector như bộ 09 + thước đỏ sẫm 2 pass + ô chấm tai + quét huy hiệu; SHA-256
   và byte khớp `girl_report.json` / `boy_report.json` cả 20 file. Ảnh ghép của
-  verifier ở `lot14/work/set10/composites/` (`verify_girl10_dark.png`,
-  `verify_boy10_dark.png`, `verify_set10_room20.png`, `verify_faces_3x_girl.png`,
-  `verify_faces_3x_boy.png`, `verify_walk_faces_2x.png`,
-  `verify_boy_walk_faces_2x.png`, `verify_badge_4x.png` + 3 zoom 6x,
-  `verify_ears_3x.png` + 4 crop tai 4x trước/sau fix, `verify_girl_shoes_4x.png`,
-  `verify_seam_3x_girl.png`). **Sau khi sửa F1/F2 bằng code 24/11, verifier
+  verifier ở `lot14/work/set10/composites/` (`verify_girl10_dark.webp`,
+  `verify_boy10_dark.webp`, `verify_set10_room20.webp`, `verify_faces_3x_girl.webp`,
+  `verify_faces_3x_boy.webp`, `verify_walk_faces_2x.webp`,
+  `verify_boy_walk_faces_2x.webp`, `verify_badge_4x.webp` + 3 zoom 6x,
+  `verify_ears_3x.webp` + 4 crop tai 4x trước/sau fix, `verify_girl_shoes_4x.webp`,
+  `verify_seam_3x_girl.webp`). **Sau khi sửa F1/F2 bằng code 24/11, verifier
   (`verify10.py`) chạy lại lần 3 (14:11) đo lại 20/20 trên file final mới:
   SHA/byte khớp `report.json` / `boy_report.json` đã cập nhật cả 20 file;
   gái 10/10 SHA không đổi 1 byte.**
@@ -3184,26 +3184,26 @@ trước sửa 10.407.237 byte / 13,88 MB).
 
 | File | Vai trò | Cỡ (byte) | Chân y | Tâm mắt |
 | --- | --- | --- | --- | --- |
-| `girl_full_10.png` | Váy sao xanh tím, đứng | 657,958 | 1429 | (491,6; 560,6) † | `4f122cf7a9a8` |
-| `girl_full_10_wave.png` | Váy sao, tay phải vẫy | 714,003 | 1428 | (489,6; 559,5) † | `2d02ad011a4c` |
-| `girl_full_10_walk_dr_a.png` | Đi xuống-phải, khung a | 715,684 | 1428 | gần (726,8; 541,8) | `0daf017c25ee` |
-| `girl_full_10_walk_dr_b.png` | Đi xuống-phải, khung b | 651,059 | 1428 | gần (717,7; 570,4) | `b6b4d4d98ead` |
-| `girl_full_10_walk_dr_c.png` | Đi xuống-phải, khung c | 635,332 | 1428 | gần (722,5; 577,5) | `20fc47c3e865` |
-| `girl_full_10_walk_dr_d.png` | Đi xuống-phải, khung d | 620,569 | 1428 | gần (724,0; 570,1) | `37d9acdf2664` |
-| `girl_full_10_walk_ur_a.png` | Đi lên-phải, khung a | 612,220 | 1428 | gần (728,6; 586,0) | `947707efd546` |
-| `girl_full_10_walk_ur_b.png` | Đi lên-phải, khung b | 641,449 | 1428 | gần (720,2; 529,4) | `5f120e1a72a8` |
-| `girl_full_10_walk_ur_c.png` | Đi lên-phải, khung c | 665,328 | 1428 | gần (723,5; 555,2) | `a0a0d4c0c8fa` |
-| `girl_full_10_walk_ur_d.png` | Đi lên-phải, khung d | 589,836 | 1428 | gần (716,6; 571,6) | `77e678a45ecb` |
-| `boy_full_10.png` | Phi hành gia trắng, đứng | 356,510 | 1429 | (504,1; 629,8) ‡ | `8fc642f6b4a6` |
-| `boy_full_10_wave.png` | Phi hành gia, tay phải vẫy | 482,056 | 1428 | (504,9; 631,2) ‡ | `2d0f49dbc787` |
-| `boy_full_10_walk_dr_a.png` | Đi xuống-phải, khung a | 481,911 | 1428 | hcx 424,2 / hcy 370,9 | `8a1033710883` |
-| `boy_full_10_walk_dr_b.png` | Đi xuống-phải, khung b | 451,033 | 1428 | hcx 423,8 / hcy 371,9 | `834c3406a03b` |
-| `boy_full_10_walk_dr_c.png` | Đi xuống-phải, khung c | 468,400 | 1428 | hcx 423,8 / hcy 371,5 | `2aeb8cbcf345` |
-| `boy_full_10_walk_dr_d.png` | Đi xuống-phải, khung d | 490,090 | 1428 | hcx 424,2 / hcy 371,1 | `58adc68e16b1` |
-| `boy_full_10_walk_ur_a.png` | Đi lên-phải, khung a | 472,284 | 1428 | hcx 485,2 / hcy 408,0 | `a17a103d997d` |
-| `boy_full_10_walk_ur_b.png` | Đi lên-phải, khung b | 471,128 | 1428 | hcx 484,7 / hcy 401,1 | `731e10d4ed88` |
-| `boy_full_10_walk_ur_c.png` | Đi lên-phải, khung c | 478,491 | 1428 | hcx 484,9 / hcy 393,0 | `14bafbab4938` |
-| `boy_full_10_walk_ur_d.png` | Đi lên-phải, khung d | 436,360 | 1428 | hcx 484,4 / hcy 399,0 | `e0542bcb892f` |
+| `girl_full_10.webp` | Váy sao xanh tím, đứng | 657,958 | 1429 | (491,6; 560,6) † | `4f122cf7a9a8` |
+| `girl_full_10_wave.webp` | Váy sao, tay phải vẫy | 714,003 | 1428 | (489,6; 559,5) † | `2d02ad011a4c` |
+| `girl_full_10_walk_dr_a.webp` | Đi xuống-phải, khung a | 715,684 | 1428 | gần (726,8; 541,8) | `0daf017c25ee` |
+| `girl_full_10_walk_dr_b.webp` | Đi xuống-phải, khung b | 651,059 | 1428 | gần (717,7; 570,4) | `b6b4d4d98ead` |
+| `girl_full_10_walk_dr_c.webp` | Đi xuống-phải, khung c | 635,332 | 1428 | gần (722,5; 577,5) | `20fc47c3e865` |
+| `girl_full_10_walk_dr_d.webp` | Đi xuống-phải, khung d | 620,569 | 1428 | gần (724,0; 570,1) | `37d9acdf2664` |
+| `girl_full_10_walk_ur_a.webp` | Đi lên-phải, khung a | 612,220 | 1428 | gần (728,6; 586,0) | `947707efd546` |
+| `girl_full_10_walk_ur_b.webp` | Đi lên-phải, khung b | 641,449 | 1428 | gần (720,2; 529,4) | `5f120e1a72a8` |
+| `girl_full_10_walk_ur_c.webp` | Đi lên-phải, khung c | 665,328 | 1428 | gần (723,5; 555,2) | `a0a0d4c0c8fa` |
+| `girl_full_10_walk_ur_d.webp` | Đi lên-phải, khung d | 589,836 | 1428 | gần (716,6; 571,6) | `77e678a45ecb` |
+| `boy_full_10.webp` | Phi hành gia trắng, đứng | 356,510 | 1429 | (504,1; 629,8) ‡ | `8fc642f6b4a6` |
+| `boy_full_10_wave.webp` | Phi hành gia, tay phải vẫy | 482,056 | 1428 | (504,9; 631,2) ‡ | `2d0f49dbc787` |
+| `boy_full_10_walk_dr_a.webp` | Đi xuống-phải, khung a | 481,911 | 1428 | hcx 424,2 / hcy 370,9 | `8a1033710883` |
+| `boy_full_10_walk_dr_b.webp` | Đi xuống-phải, khung b | 451,033 | 1428 | hcx 423,8 / hcy 371,9 | `834c3406a03b` |
+| `boy_full_10_walk_dr_c.webp` | Đi xuống-phải, khung c | 468,400 | 1428 | hcx 423,8 / hcy 371,5 | `2aeb8cbcf345` |
+| `boy_full_10_walk_dr_d.webp` | Đi xuống-phải, khung d | 490,090 | 1428 | hcx 424,2 / hcy 371,1 | `58adc68e16b1` |
+| `boy_full_10_walk_ur_a.webp` | Đi lên-phải, khung a | 472,284 | 1428 | hcx 485,2 / hcy 408,0 | `a17a103d997d` |
+| `boy_full_10_walk_ur_b.webp` | Đi lên-phải, khung b | 471,128 | 1428 | hcx 484,7 / hcy 401,1 | `731e10d4ed88` |
+| `boy_full_10_walk_ur_c.webp` | Đi lên-phải, khung c | 478,491 | 1428 | hcx 484,9 / hcy 393,0 | `14bafbab4938` |
+| `boy_full_10_walk_ur_d.webp` | Đi lên-phải, khung d | 436,360 | 1428 | hcx 484,4 / hcy 399,0 | `e0542bcb892f` |
 
 † gái full/wave: tâm mắt = trung bình 2 mắt blob (iris) trên file final đã quantize:
 full L (387,8; 560,4), R (595,5; 560,8); wave L (386,6; 559,0), R (592,5; 560,0).
@@ -3223,7 +3223,7 @@ SHA-256 trên là bản final hiện tại; verifier đo lại khớp `girl_repo
 - Tâm mắt full 10 **blob L (+0,3; +0,2), R (+1,0; +0,1)** — worst 1,0 px, **ĐẠT
   cổng ±3 VÀ mục tiêu ±1,5**; union worst 0,9 px (L −0,9/+0,9, R +0,8/+0,4);
   span blob 207,7 px (01: 207,0). Trên layers (trước quantize) blob KHỚP TUYỆT
-  ĐỐI 01 (0,0; 0,0). Soi mặt 3× (`verify_faces_3x_girl.png`): KHÔNG thấy vết
+  ĐỐI 01 (0,0; 0,0). Soi mặt 3× (`verify_faces_3x_girl.webp`): KHÔNG thấy vết
   ghép dải mắt; đo gradient biên dưới dải (y595) = 2,5, thấp hơn median mặt 5,8
   (01 tự nhiên 15,2 ở đó) — không có đường nối đo được.
   Lid-band y500–620: full **3 px** ngoài vùng (01 tự đo 0, 07 full 8); hộp 70×80
@@ -3251,10 +3251,10 @@ SHA-256 trên là bản final hiện tại; verifier đo lại khớp `girl_repo
   còn 3 px ở dr_a + ur_d** — đúng hàng y=1350 (ranh giới thước), màu tím-hồng
   giống váy/giày thật; thước này cũng bắt 159 px ở girl 07 full (váy/giày thật)
   nên không đặc hiệu hoàn toàn; soi giày 4× không thấy vệt. Không cần sửa.
-- 2 tấm xem kiểu dùng lại, không đổi nội dung: girl full = `preview/girl_10.png`
+- 2 tấm xem kiểu dùng lại, không đổi nội dung: girl full = `preview/girl_10.webp`
   + ghép dải mắt + defringe + requantize (alpha khác 699 px — silhouette y hệt;
   RGB khác >40 có 15.567 px, trong đó 8.952 px ở y400–600 = vùng dải mắt ghép);
-  boy full = `preview/boy_10.png` + xóa chữ huy hiệu (alpha khác 3 px, RGB khác
+  boy full = `preview/boy_10.webp` + xóa chữ huy hiệu (alpha khác 3 px, RGB khác
   >40 chỉ trong bbox huy hiệu x540–614, y899–934).
 
 ### Bé trai (so với bộ 01: union L (395,9; 626,3), R (610,4; 626,2), span 214,5)
@@ -3268,7 +3268,7 @@ SHA-256 trên là bản final hiện tại; verifier đo lại khớp `girl_repo
   ĐÃ SỬA BẰNG CODE 24/11 (warp dải mắt 1 pass, trước warp dy = −18,8 px ở layers).
   Du vs 01 tối đa +6,3 px (L y; 07 full cũng +4,1/+6,3 vs 01 ở mắt trái);
   span 209,6 vs 07 wave 189,7; **lid-box 0 px** (07 wave = 5) — miếng 01 che kín.
-  Soi 3× cạnh 01/07 wave (`verify_faces_3x_boy.png`): mặt thẳng, không biến dạng.
+  Soi 3× cạnh 01/07 wave (`verify_faces_3x_boy.webp`): mặt thẳng, không biến dạng.
   Bbox wave (130, 169, 937, 1429); cao 1259.
 - Khung đi dr: hcx 423,8–424,2 (07: 423,3–423,7), hcy 370,9–371,9
   (07: 370,7–373,5) — khớp 07 gần như tuyệt đối. Khung đi ur: hcx 484,4–485,2
@@ -3283,22 +3283,22 @@ SHA-256 trên là bản final hiện tại; verifier đo lại khớp `girl_repo
   ở dr_a — không phải sót chữ.
 - **Chấm đen tai GẦN trai GIỮ ĐÚNG (quyết Claude 24/11 ~20:24):** verifier đo
   lại dark px trong ô đã khai (sau sửa F1/F2): full 45 px (agent 48 — khác ngưỡng đo),
-  wave 36 px, dr_b 71, dr_c 84 (trước sửa 85 — nhiễu dither 1 px), dr_d 82 px; soi 3× (`verify_ears_3x.png`) chấm
+  wave 36 px, dr_b 71, dr_c 84 (trước sửa 85 — nhiễu dither 1 px), dr_d 82 px; soi 3× (`verify_ears_3x.webp`) chấm
   tròn đen trên dái tai, y hệt 01 (38 px) / 07 (52 px) ở cùng ô. dr_a không có
   chấm (soi 3× tai sạch). Bóng tối dưới hàm (full/wave) là bóng cổ/hàm, không
   phải chấm — giữ nguyên.
 - **Chấm đen tai XA trai — ĐÃ TÔ LẠI BẰNG DA PHẲNG 24/11 (F2 ĐÃ SỬA):** dark px
   trong ô: ur_a/b/c/d = 0/0/0/0; silver 0/0/0/0, bright>200 0/0/0/0, grey trong
   ô mở rộng ±4 px 0/0/0/0 (trước sửa silver 14/4/7/1, bright 7/7/5/1). Soi
-  `fix_ears_ur_4x.png`: khuyên bạc hết, tai trần. Ở 4× mảng da tô phẳng hơi
+  `fix_ears_ur_4x.webp`: khuyên bạc hết, tai trần. Ở 4× mảng da tô phẳng hơi
   nhạt hơn da xung quanh (ur_a, ur_d rõ nhất) — ở cỡ app ~5 px, khó thấy.
 - **Viền trắng bao toàn thân ở wave + 8 khung đi trai — ĐÃ SỬA XONG 24/11 (F1):**
   white px trong vành 5 px mép silhouette sau sửa = 0 cả 9 file
   (wave 0/28.462, dr_a 0/29.228, dr_b 0/29.541, dr_c 0/29.084, dr_d 0/30.606,
   ur_a 0/27.937, ur_b 0/29.249, ur_c 0/29.472, ur_d 0/28.720); trước sửa
   ~100% (wave 98,9%), full 10 chỉ 0,4% và boy 07/09 = 0%. Đã có sẵn trong ảnh
-  gen gốc, key10 khuếch đại. Soi `fix_rim_boy10_dark.png` +
-  `fix_rim_room.png`: viền trắng hết hẳn ở cỡ app, không mất chi tiết trắng
+  gen gốc, key10 khuếch đại. Soi `fix_rim_boy10_dark.webp` +
+  `fix_rim_room.webp`: viền trắng hết hẳn ở cỡ app, không mất chi tiết trắng
   thật (giày/găng/vòng sao còn nguyên). Ở zoom 3× mép trên tóc còn vệt sọc
   mảnh dọc (đọc như vân sợi tóc); highlight trắng TRONG tóc (dist 13–39)
   giữ nguyên — là sợi sáng của tóc, không phải vỏ trắng.
@@ -3306,16 +3306,16 @@ SHA-256 trên là bản final hiện tại; verifier đo lại khớp `girl_repo
 ## Kiểm chứng (soi bằng mắt trên nền tối (60,60,80) + nền phòng v3b)
 
 Ảnh ghép của verifier `lot14/work/set10/composites/` (làm mới, độc lập với ảnh ghép
-của 2 agent vẽ): (a) `verify_girl10_dark.png` (10 file gái); (b) `verify_boy10_dark.png`
-(10 file trai); (c) `verify_set10_room20.png` (20 file ở cỡ app trong phòng v3b);
-(d) `verify_faces_3x_girl.png` / `verify_faces_3x_boy.png` (01/07/10 × full/wave, 3×);
-mặt khung đi 2× `verify_walk_faces_2x.png` + `verify_boy_walk_faces_2x.png`;
-tai 3× `verify_ears_3x.png` (+ 4 crop tai ur 4× trước/sau fix); huy hiệu 4×
-`verify_badge_4x.png` (+ 3 zoom 6x full/dr_a/ur_b); giày gái
-`verify_girl_shoes_4x.png`; mối ghép mắt gái `verify_seam_3x_girl.png`.
-**Ảnh ghép sau sửa F1/F2 (24/11, đã soi):** `fix_rim_boy10_dark.png` (9 file trai
-sau sửa + full ref trên nền tối), `fix_rim_room.png` (10 file trai sau sửa ở cỡ
-app trong phòng v3b), `fix_ears_ur_4x.png` (tai xa 4 khung ur trước/sau, 4×).
+của 2 agent vẽ): (a) `verify_girl10_dark.webp` (10 file gái); (b) `verify_boy10_dark.webp`
+(10 file trai); (c) `verify_set10_room20.webp` (20 file ở cỡ app trong phòng v3b);
+(d) `verify_faces_3x_girl.webp` / `verify_faces_3x_boy.webp` (01/07/10 × full/wave, 3×);
+mặt khung đi 2× `verify_walk_faces_2x.webp` + `verify_boy_walk_faces_2x.webp`;
+tai 3× `verify_ears_3x.webp` (+ 4 crop tai ur 4× trước/sau fix); huy hiệu 4×
+`verify_badge_4x.webp` (+ 3 zoom 6x full/dr_a/ur_b); giày gái
+`verify_girl_shoes_4x.webp`; mối ghép mắt gái `verify_seam_3x_girl.webp`.
+**Ảnh ghép sau sửa F1/F2 (24/11, đã soi):** `fix_rim_boy10_dark.webp` (9 file trai
+sau sửa + full ref trên nền tối), `fix_rim_room.webp` (10 file trai sau sửa ở cỡ
+app trong phòng v3b), `fix_ears_ur_4x.webp` (tai xa 4 khung ur trước/sau, 4×).
 
 - Mặt/mắt gái 10 = mắt 01 (đã ghép dải mắt, không thấy đường ghép, không đường nối
   đo được ở biên dải y595); mặt/mắt trai 10 full thẳng, khớp 07/01; wave trai đã
@@ -3331,7 +3331,7 @@ app trong phòng v3b), `fix_ears_ur_4x.png` (tai xa 4 khung ur trước/sau, 4×
   ur_a/b gái bob ±18 px — soi mặt bình thường).
 - Trong phòng v3b ở cỡ app: tỉ lệ tự nhiên, chân chạm sàn; gái sạch, không thấy
   viền lạ; **trai sau sửa F1 (24/11): viền trắng đã hết hẳn, 10 file nhất quán
-  (`fix_rim_room.png` đã soi)** — trước sửa thấy viền trắng mỏng quanh người ở
+  (`fix_rim_room.webp` đã soi)** — trước sửa thấy viền trắng mỏng quanh người ở
   wave + 8 khung đi, hình full đầu tiên không có.
 - Sau sửa F1/F2: white-rim 0/9 file trai; tai xa ur_a..d dark/silver/bright/grey
   = 0; chấm tai gần còn nguyên; mắt full/wave + lid-box không đổi; 256 màu ở
@@ -3356,14 +3356,14 @@ app trong phòng v3b), `fix_ears_ur_4x.png` (tai xa 4 khung ur trước/sau, 4×
   tiếp trên final đã quantize làm wave lên 339 màu → đã requantize lại từ
   layers (khớp byte/SHA 481.658/`5fe54090…`) rồi postq lại bằng donor 1px,
   giữ 256 màu. **Sau sửa white-rim = 0 cả 9 file** (đo lại bằng thước
-  verifier, verify10 lần 3). Soi `fix_rim_boy10_dark.png` + `fix_rim_room.png`:
+  verifier, verify10 lần 3). Soi `fix_rim_boy10_dark.webp` + `fix_rim_room.webp`:
   viền trắng hết hẳn ở cỡ app, không mất chi tiết trắng thật (giày/găng/vòng
   sao còn nguyên). Tồn dư: ở zoom 3× mép trên tóc còn vệt sọc mảnh dọc (đọc
   như vân sợi tóc); highlight trắng TRONG tóc (dist 13–39) giữ nguyên — là sợi
   sáng của tóc, không phải vỏ trắng. Mắt full/wave + lid-box không đổi.
 - **F2 — CHẤM TAI XA TRAI THÀNH KHUYÊN BẠC — ĐÃ SỬA XONG BẰNG CODE 24/11:**
   trước sửa dark px trong ô: ur_a 2 px, ur_b/c/d 0 px (pre-fix 99/78/65/81 —
-  đen đúng là đã hết) NHƯNG soi 3×/4× (`ear_ur_a/b_*_4x.png`): cùng vị trí
+  đen đúng là đã hết) NHƯNG soi 3×/4× (`ear_ur_a/b_*_4x.webp`): cùng vị trí
   chấm đen cũ giờ là khuyên tròn BẠC lấp lánh (~10–12 px). Cơ chế:
   `fix10_ears.py` fill nearest-good — chấm đen bóng có highlight trắng BÊN
   TRONG nên fill chép highlight lan khắp chấm, thành hạt bạc (bộ 09 dùng flat
@@ -3373,7 +3373,7 @@ app trong phòng v3b), `fix_ears_ur_4x.png` (tai xa 4 khung ur trước/sau, 4×
   dilate 4 px (v1 dilate 2 sót mép dưới thành lưỡi liềm tối — đã làm lại v2);
   da ur_a (205,144,130), ur_b (252,196,183), ur_c (247,195,177),
   ur_d (235,180,159). **Sau sửa: dark 0/0/0/0, silver 0/0/0/0, bright>200
-  0/0/0/0, grey ô mở rộng ±4 px 0/0/0/0.** Soi `fix_ears_ur_4x.png`: khuyên
+  0/0/0/0, grey ô mở rộng ±4 px 0/0/0/0.** Soi `fix_ears_ur_4x.webp`: khuyên
   bạc hết, tai trần. Tồn dư: ở 4× mảng da phẳng hơi nhạt hơn da xung quanh
   (ur_a, ur_d rõ nhất) — ở cỡ app ~5 px, khó thấy; còn 2–3 px chấm tối nhỏ ở
   mép mảng tô ur_c/ur_d (dưới ngưỡng grey). Chấm tai GẦN còn nguyên
@@ -3456,7 +3456,7 @@ trai boy_full_10_walk_ur_d `e0542bcb892f`
   — đối chiếu blob SHA trên nhánh bị chặn (bảo vệ mã xác minh, giống bộ 04–09),
   Claude kiểm lại bằng git khi decode.
   Nốt đẩy: quét mẫu secret trước đẩy bắt được chuỗi base64 của
-  boy_full_10_wave.png tình cờ chứa mẫu "Tencent Cloud Secret ID" (dương tính
+  boy_full_10_wave.webp tình cờ chứa mẫu "Tencent Cloud Secret ID" (dương tính
   giả, giống bộ 09) — đã mã lại PNG đó lossless compress_level 6 (pixel y hệt,
   481.924 → 485.171 byte, SHA `13e7f4766bd6`, bản gốc ở
   `set10/backup_secret_scan/`) rồi mới đẩy.
@@ -3528,11 +3528,11 @@ mặt/dáng đầu và ảnh 07 làm mẫu tư thế; tách nền + chuẩn hoá
   như bộ 09 + thước đỏ sẫm 2 pass + thước halo mép tóc + ô chấm tai đúng vị trí);
   SHA-256 và byte khớp `girl_report.json` / `boy_report.json` / `verify11.json` cả
   20 file. Ảnh ghép của verifier ở `lot14/work/set11/composites/` (tiền tố
-  `verify11_mine_*`): `verify11_mine_girl_dark.png`, `verify11_mine_boy_dark.png`,
-  `verify11_mine_room20.png`, `verify11_mine_faces_3x_girl.png`,
-  `verify11_mine_faces_3x_boy.png`, `verify11_mine_walk_faces_2x.png`,
-  `verify11_mine_girl_shoes_4x.png`, `verify11_mine_seam_3x_girl.png`,
-  `verify11_mine_ears_3x_boy.png`, `verify11_mine_shield_2x_boy.png`.
+  `verify11_mine_*`): `verify11_mine_girl_dark.webp`, `verify11_mine_boy_dark.webp`,
+  `verify11_mine_room20.webp`, `verify11_mine_faces_3x_girl.webp`,
+  `verify11_mine_faces_3x_boy.webp`, `verify11_mine_walk_faces_2x.webp`,
+  `verify11_mine_girl_shoes_4x.webp`, `verify11_mine_seam_3x_girl.webp`,
+  `verify11_mine_ears_3x_boy.webp`, `verify11_mine_shield_2x_boy.webp`.
 
 ## File (20/20 PNG đã xong, khung 1024×1536, PNG trong suốt, đã lượng tử)
 
@@ -3543,26 +3543,26 @@ Tổng 20 file = 13,543,999 byte; .b64 ≈ 18,058,665 byte.
 
 | File | Vai trò | Cỡ (byte) | Chân y | Tâm mắt |
 | --- | --- | --- | --- | --- |
-| `girl_full_11.png` | Váy vảy rồng mint-hồng, đứng | 826,562 | 1429 | (491.2; 560.1) † | `bba8f04f4013` |
-| `girl_full_11_wave.png` | Váy rồng, tay phải vẫy | 874,377 | 1428 | (492.5; 561.6) † | `1d350671a59e` |
-| `girl_full_11_walk_dr_a.png` | Đi xuống-phải, khung a | 653,589 | 1428 | gần (732.2; 561.3) | `b490f1cee783` |
-| `girl_full_11_walk_dr_b.png` | Đi xuống-phải, khung b | 664,058 | 1428 | gần (745.5; 571.6) | `e400673d023f` |
-| `girl_full_11_walk_dr_c.png` | Đi xuống-phải, khung c | 695,260 | 1428 | gần (719.8; 557.7) | `5c6249b0aae5` |
-| `girl_full_11_walk_dr_d.png` | Đi xuống-phải, khung d | 727,889 | 1428 | gần (725.3; 560.6) | `faaa09b35bfe` |
-| `girl_full_11_walk_ur_a.png` | Đi lên-phải, khung a | 689,409 | 1428 | gần (700.3; 555.2) | `a38ffd59e767` |
-| `girl_full_11_walk_ur_b.png` | Đi lên-phải, khung b | 617,479 | 1428 | gần (748.5; 571.1) | `8a7c66cecb24` |
-| `girl_full_11_walk_ur_c.png` | Đi lên-phải, khung c | 649,542 | 1428 | gần (703.0; 560.5) | `49b051367158` |
-| `girl_full_11_walk_ur_d.png` | Đi lên-phải, khung d | 626,435 | 1428 | gần (709.3; 560.2) | `4d249b51c905` |
-| `boy_full_11.png` | Giáp rồng mint-vàng + áo choàng, đứng | 744,146 | 1429 | (504.0; 626.4) ‡ | `aa01348e9b10` |
-| `boy_full_11_wave.png` | Giáp rồng, tay phải vẫy | 747,966 | 1428 | (506.0; 636.1) ‡ | `ce779bfe0f83` |
-| `boy_full_11_walk_dr_a.png` | Đi xuống-phải, khung a | 655,066 | 1428 | hcx 424.2 / hcy 374.8 | `b4dc9a1efb4e` |
-| `boy_full_11_walk_dr_b.png` | Đi xuống-phải, khung b | 634,558 | 1428 | hcx 423.8 / hcy 374.0 | `435788c371c4` |
-| `boy_full_11_walk_dr_c.png` | Đi xuống-phải, khung c | 641,379 | 1428 | hcx 423.7 / hcy 365.6 | `dc30b2843dea` |
-| `boy_full_11_walk_dr_d.png` | Đi xuống-phải, khung d | 630,337 | 1428 | hcx 423.9 / hcy 369.7 | `4aeb4e8083ac` |
-| `boy_full_11_walk_ur_a.png` | Đi lên-phải, khung a | 660,176 | 1428 | hcx 525.0 / hcy 385.5 | `bd1c9f1d6d90` |
-| `boy_full_11_walk_ur_b.png` | Đi lên-phải, khung b | 653,034 | 1428 | hcx 525.1 / hcy 383.2 | `9ba2b757461b` |
-| `boy_full_11_walk_ur_c.png` | Đi lên-phải, khung c | 584,778 | 1428 | hcx 525.2 / hcy 383.4 | `a0f1632c0604` |
-| `boy_full_11_walk_ur_d.png` | Đi lên-phải, khung d | 567,959 | 1428 | hcx 525.2 / hcy 384.0 | `9424ba952a10` |
+| `girl_full_11.webp` | Váy vảy rồng mint-hồng, đứng | 826,562 | 1429 | (491.2; 560.1) † | `bba8f04f4013` |
+| `girl_full_11_wave.webp` | Váy rồng, tay phải vẫy | 874,377 | 1428 | (492.5; 561.6) † | `1d350671a59e` |
+| `girl_full_11_walk_dr_a.webp` | Đi xuống-phải, khung a | 653,589 | 1428 | gần (732.2; 561.3) | `b490f1cee783` |
+| `girl_full_11_walk_dr_b.webp` | Đi xuống-phải, khung b | 664,058 | 1428 | gần (745.5; 571.6) | `e400673d023f` |
+| `girl_full_11_walk_dr_c.webp` | Đi xuống-phải, khung c | 695,260 | 1428 | gần (719.8; 557.7) | `5c6249b0aae5` |
+| `girl_full_11_walk_dr_d.webp` | Đi xuống-phải, khung d | 727,889 | 1428 | gần (725.3; 560.6) | `faaa09b35bfe` |
+| `girl_full_11_walk_ur_a.webp` | Đi lên-phải, khung a | 689,409 | 1428 | gần (700.3; 555.2) | `a38ffd59e767` |
+| `girl_full_11_walk_ur_b.webp` | Đi lên-phải, khung b | 617,479 | 1428 | gần (748.5; 571.1) | `8a7c66cecb24` |
+| `girl_full_11_walk_ur_c.webp` | Đi lên-phải, khung c | 649,542 | 1428 | gần (703.0; 560.5) | `49b051367158` |
+| `girl_full_11_walk_ur_d.webp` | Đi lên-phải, khung d | 626,435 | 1428 | gần (709.3; 560.2) | `4d249b51c905` |
+| `boy_full_11.webp` | Giáp rồng mint-vàng + áo choàng, đứng | 744,146 | 1429 | (504.0; 626.4) ‡ | `aa01348e9b10` |
+| `boy_full_11_wave.webp` | Giáp rồng, tay phải vẫy | 747,966 | 1428 | (506.0; 636.1) ‡ | `ce779bfe0f83` |
+| `boy_full_11_walk_dr_a.webp` | Đi xuống-phải, khung a | 655,066 | 1428 | hcx 424.2 / hcy 374.8 | `b4dc9a1efb4e` |
+| `boy_full_11_walk_dr_b.webp` | Đi xuống-phải, khung b | 634,558 | 1428 | hcx 423.8 / hcy 374.0 | `435788c371c4` |
+| `boy_full_11_walk_dr_c.webp` | Đi xuống-phải, khung c | 641,379 | 1428 | hcx 423.7 / hcy 365.6 | `dc30b2843dea` |
+| `boy_full_11_walk_dr_d.webp` | Đi xuống-phải, khung d | 630,337 | 1428 | hcx 423.9 / hcy 369.7 | `4aeb4e8083ac` |
+| `boy_full_11_walk_ur_a.webp` | Đi lên-phải, khung a | 660,176 | 1428 | hcx 525.0 / hcy 385.5 | `bd1c9f1d6d90` |
+| `boy_full_11_walk_ur_b.webp` | Đi lên-phải, khung b | 653,034 | 1428 | hcx 525.1 / hcy 383.2 | `9ba2b757461b` |
+| `boy_full_11_walk_ur_c.webp` | Đi lên-phải, khung c | 584,778 | 1428 | hcx 525.2 / hcy 383.4 | `a0f1632c0604` |
+| `boy_full_11_walk_ur_d.webp` | Đi lên-phải, khung d | 567,959 | 1428 | hcx 525.2 / hcy 384.0 | `9424ba952a10` |
 
 † gái full/wave: tâm mắt = trung bình 2 mắt blob (iris) trên file final đã quantize:
 full L (387,5; 560,1), R (595,0; 560,1); wave L (387,8; 560,6), R (597,1; 562,6).
@@ -3588,7 +3588,7 @@ trai đã đổi byte/SHA do sửa F1 (xem "Điểm chưa chắc") và đo lại
   cổng ±3 nhưng KHÔNG đạt mục tiêu ±1,5** (thiếu 1,1 px ở R x); union worst 1,8 px.
   Span blob 209,3 px (01: 207,0). Lid-band 53 px — KHÔNG PHẢI mắt mở ngoài vùng
   (xem (c) dưới); lid-box 3 px (07 wave 2, 01 wave 1). Bbox wave (50, 236, 972, 1429);
-  cao 1192. Soi mặt 3×: KHÔNG thấy vết ghép dải mắt (xem `verify11_mine_seam_3x_girl.png`).
+  cao 1192. Soi mặt 3×: KHÔNG thấy vết ghép dải mắt (xem `verify11_mine_seam_3x_girl.webp`).
 - Khung đi: mắt gần trung bình dr **(730,7; 562,8)** vs 07 **(719,2; 568,3)**; ur
   **(715,3; 561,7)** vs 07 **(719,7; 559,1)** — cycle mean khớp trong ~11 px; riêng
   ur_b x +26,3 / ur_a x −21,9 / ur_c x −19,2 (xem (b) — đầu lắc trong chu trình,
@@ -3598,10 +3598,10 @@ trai đã đổi byte/SHA do sửa F1 (xem "Điểm chưa chắc") và đo lại
   px/file trên cả 10 file gái; trung vị màu (148,73,125) khác bóng bộ 09 ~(155,5,158);
   cụm lớn nhất full 716 px nằm TRONG silhouette giữa 2 giày dưới gấu váy; preview đã
   duyệt có nhiều hơn (1376 px); 07 đã duyệt cũng có 159/327 px cùng họ màu. KHÔNG tô lại.
-- 2 tấm xem kiểu dùng lại, không đổi nội dung: girl full = `preview/girl_11.png` +
+- 2 tấm xem kiểu dùng lại, không đổi nội dung: girl full = `preview/girl_11.webp` +
   ghép dải mắt + defringe + requantize (alpha khác 0 px — silhouette y hệt; RGB khác
   >40 trên px opaque 13.163 px, trong đó 8.490 px trong vùng dải mắt ghép);
-  boy full = `preview/boy_11.png` + defringe + touchup 47 px (alpha khác 0 px,
+  boy full = `preview/boy_11.webp` + defringe + touchup 47 px (alpha khác 0 px,
   RGB khác >40 trên px opaque 704 px). (Số RGB>40 thô 260k/913k px lần đầu đo là
   RGB của px TRONG SUỐT, không nhìn thấy — đã đo lại chỉ trên px opaque.)
 
@@ -3636,13 +3636,13 @@ trai đã đổi byte/SHA do sửa F1 (xem "Điểm chưa chắc") và đo lại
 ## Kiểm chứng (soi bằng mắt trên nền tối (60,60,80) + nền phòng v3b)
 
 Ảnh ghép của verifier `lot14/work/set11/composites/` (làm mới, độc lập với ảnh ghép
-của 2 agent vẽ): (a) `verify11_mine_girl_dark.png` (10 file gái);
-(b) `verify11_mine_boy_dark.png` (10 file trai); (c) `verify11_mine_room20.png`
-(20 file ở cỡ app trong phòng v3b); (d) `verify11_mine_faces_3x_girl.png` /
-`verify11_mine_faces_3x_boy.png` (01/07/11 × full/wave, 3×); mặt khung đi 2×
-`verify11_mine_walk_faces_2x.png`; tai 3× `verify11_mine_ears_3x_boy.png` (+ 4 crop
-tai xa ur 4× cạnh 07 — soi F1); khiên 2× `verify11_mine_shield_2x_boy.png`; giày gái
-`verify11_mine_girl_shoes_4x.png`; mối ghép mắt gái `verify11_mine_seam_3x_girl.png`.
+của 2 agent vẽ): (a) `verify11_mine_girl_dark.webp` (10 file gái);
+(b) `verify11_mine_boy_dark.webp` (10 file trai); (c) `verify11_mine_room20.webp`
+(20 file ở cỡ app trong phòng v3b); (d) `verify11_mine_faces_3x_girl.webp` /
+`verify11_mine_faces_3x_boy.webp` (01/07/11 × full/wave, 3×); mặt khung đi 2×
+`verify11_mine_walk_faces_2x.webp`; tai 3× `verify11_mine_ears_3x_boy.webp` (+ 4 crop
+tai xa ur 4× cạnh 07 — soi F1); khiên 2× `verify11_mine_shield_2x_boy.webp`; giày gái
+`verify11_mine_girl_shoes_4x.webp`; mối ghép mắt gái `verify11_mine_seam_3x_girl.webp`.
 
 - Mặt/mắt gái 11 = mắt 01 (đã ghép dải mắt, không thấy đường ghép, không đường nối
   đo được); mặt/mắt trai 11 full thẳng, khớp 07/01; wave trai dy 5,2 px như 07 wave.
@@ -3672,7 +3672,7 @@ tai xa ur 4× cạnh 07 — soi F1); khiên 2× `verify11_mine_shield_2x_boy.png
   chấm dilate 4 px, tô bằng màu da gần nhất trên file final (nearest-skin donor —
   chỉ màu đã có trong palette, không requantize, alpha không đổi). Đo lại: dark = 0
   trong ô ĐÚNG (ur_b (455,653,464,665), ur_c (521,663,537,679), ur_d
-  (664,649,679,670)); soi 4× (`composites/fix_ears_ur_4x.png`): da liền mạch,
+  (664,649,679,670)); soi 4× (`composites/fix_ears_ur_4x.webp`): da liền mạch,
   không vết xám, không mép vá. Byte/SHA mới: ur_b 653.034 (`9ba2b757461b`), ur_c
   584.778 (`a0f1632c0604`), ur_d 567.959 (`9424ba952a10`); 17 file còn lại SHA không
   đổi 17/17; 3 file vẫn 1024×1536, semi 0, magenta 0 (3 thước), 256 màu, chân y

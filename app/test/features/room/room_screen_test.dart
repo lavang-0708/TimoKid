@@ -282,7 +282,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('kid-full-girl-3-backpack')), findsOneWidget);
     expect(
-      find.byKey(const Key('kid-overlay-girl_glasses_01.png')),
+      find.byKey(const Key('kid-overlay-girl_glasses_01.webp')),
       findsOneWidget,
     );
     expect(
@@ -641,7 +641,7 @@ void main() {
     expect(provider, isA<AssetImage>());
     expect(
       (provider as AssetImage).assetName,
-      'assets/images/pets/dog_egg.png',
+      'assets/images/pets/dog_egg.webp',
     );
     // Ô trứng không còn SVG (từ A1, nền + nội thất Phòng cũng là
     // PNG thật, không còn SVG tạm nào trong màn Phòng).
@@ -666,7 +666,7 @@ void main() {
         .whereType<AssetImage>()
         .map((p) => p.assetName)
         .toList();
-    expect(assetNames, contains('assets/images/backgrounds/room_v3.png'));
+    expect(assetNames, contains('assets/images/backgrounds/room_v3.webp'));
     expect(assetNames, isNot(contains(roomCleanBackgroundAsset)));
     // Góp ý 22/11: PNG rời đè lên món vẽ sẵn trong nền gây hình đôi.
     expect(assetNames.where((n) => n.contains('furniture/')), isEmpty);
@@ -706,7 +706,7 @@ void main() {
     expect(assetNames, contains(roomCleanBackgroundAsset));
     expect(
       assetNames,
-      isNot(contains('assets/images/backgrounds/room_v3.png')),
+      isNot(contains('assets/images/backgrounds/room_v3.webp')),
     );
     for (final name in [
       'gau_bong_v3',
@@ -714,12 +714,12 @@ void main() {
       'binh_hoa_v3',
       'coc_sao_v3',
     ]) {
-      expect(assetNames, contains('assets/images/furniture/$name.png'));
+      expect(assetNames, contains('assets/images/furniture/$name.webp'));
     }
     // Chậu cây vẫn vẽ trong nền sạch: không vẽ PNG rời (tránh hình đôi).
     expect(
       assetNames,
-      isNot(contains('assets/images/furniture/chau_cay_v3.png')),
+      isNot(contains('assets/images/furniture/chau_cay_v3.webp')),
     );
   });
 
@@ -760,7 +760,7 @@ void main() {
     expect(provider, isA<AssetImage>());
     expect(
       (provider as AssetImage).assetName,
-      'assets/images/pets/dog_newborn.png',
+      'assets/images/pets/dog_newborn.webp',
     );
   });
 
