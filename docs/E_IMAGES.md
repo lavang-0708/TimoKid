@@ -4242,3 +4242,229 @@ cửa sổ GIỮ NGUYÊN.
 Chưa decode (chờ Claude decode).
 
 > Nốt: file `.b64` của nền `room_rong` trúng mẫu secret scanning của GitHub (chuỗi base64 tình cờ chứa `AKID` + 32 ký tự, dương tính giả) nên đã mã lại PNG lossless `compress_level` 3 — pixel y hệt, byte 459.869 → 506.815, SHA-256 mới `4cc38facc620…` (bản gốc ở `backup_secret_scan/room_rong.png`).
+
+### Lô 15 — Phòng Ngân hà (ngan_ha): nền trống + 7 sprite lớn + 8 món mua thêm + 5 món nhỏ (25/11/2026)
+
+Đích: nền `app/assets/images/backgrounds/room_ngan_ha.png`; 7 sprite lớn
+`app/assets/images/furniture/ngan_ha_<giuong|tu_dau_giuong|tu_ao|ban_hoc|ghe|ke_lon|tham>.png`;
+8 món mua thêm `app/assets/images/furniture/ngan_ha_<nha_pet|ke_sach|be_ca|cay_cao|ghe_luoi|leu|den_trang|tranh>.png`;
+3 món nhỏ bản theo chủ đề `app/assets/images/furniture/ngan_ha_<gau_bong|chau_cay|binh_hoa>.png`;
+2 món nhỏ _v3 DÙNG LẠI (`den_sao_v3`, `coc_sao_v3` — đã có trên nhánh, không đẩy lại).
+Phòng Ngân hà làm theo BRIEF MỚI (25/11) như phòng gốc v4: nền TRỐNG hoàn toàn
+(không đồ đứng trên sàn, không bóng đổ của đồ — app tự vẽ bóng mềm dưới chân
+từng món), đồ là SPRITE RỜI để bé kéo-thả tự sắp xếp. Bản xem kiểu đã duyệt
+(25/11 ~00:16, Claude duyệt 25/11 ~20:47) làm hướng màu sắc/đồ đạc: tường xanh
+đêm có sao + chòm sao, cửa sổ nhìn thấy sao Thổ + hành tinh, giường tên lửa,
+kệ tên lửa, thảm xanh sao. Các sửa theo duyệt kiểu đã làm: **sáng hơn bản xem
+kiểu 15–20%** (sàn mục tiêu ~(200,160,140)); **be_ca + den_trang vẽ lại ĐÚNG
+TỈ LỆ, không kéo giãn** (bản xem kiểu giãn ngang 11% / kéo dọc 6%); giữ cửa
+lều tối như bản duyệt.
+
+- Nền trống: giữ phối cảnh, góc nhìn và vùng sàn như room_v3/v4 (cửa sổ giữa,
+  tường sau xanh đêm, tường 2 bên xanh đêm, sàn gỗ sáng); chỉ có tường, sàn,
+  cửa sổ + rèm kem, trần, đèn trần mây, kệ mây + 2 khung nhỏ trên tường trái,
+  chòm sao vẽ trên tường. **KHÔNG két sưởi** — tường dưới cửa sổ để trống
+  (quyết định phòng gốc 1, áp cho mọi phòng chủ đề).
+- 7 sprite lớn vẽ mới theo chủ đề Ngân hà, cùng phối cảnh 3/4 và cùng hướng
+  sáng trên-trái với nền để ghép vào trông liền khối. Bàn học TRƠN (chỉ giữ
+  sách, không bình/không cốc bút vẽ sẵn — quyết định phòng gốc 8).
+- 8 món mua thêm vẽ theo chủ đề Ngân hà (nhà pet trạm vũ trụ, kệ sách tên
+  lửa, bể sứa phát sáng, cây lá xanh lam, ghế bean sao, lều trạm vũ trụ, đèn
+  mặt trăng, tranh vũ trụ) — khớp đúng khung/cỡ/điểm chân món gốc cùng chỗ.
+- 5 món nhỏ: 3 vẽ mới theo chủ đề (gấu phi hành gia, chậu cây lá xanh lam,
+  bình hoa sao) + 2 dùng lại _v3 (đèn sao, cốc sao — đã hợp chủ đề sẵn).
+
+## Cách làm
+
+- Nền (`room_ngan_ha.png`, 1600×900, opaque, MEDIANCUT 256 màu): khác v4 ở
+  1 điểm — thay vì lấy bản xem kiểu có đồ rồi bỏ đồ bằng code, generate gen1
+  bằng media.generate_image EDIT từ `room_v4.png` (nền đã trống sẵn, đã bỏ
+  két) thành phòng Ngân hà trống, nên **gen1 vốn không có két sưởi, không có
+  giường/tủ/bàn/ghế/kệ/thảm/chậu/bóng đồ**, không cần bước bỏ két bằng code.
+  Sau đó grid-warp toàn bộ về lưới mốc room_v3 như v4 (take 2, sửa edge
+  row-map 1017→990), grade sàn bằng code cho sáng hơn bản xem kiểu, quantize
+  256 màu. Sàn median đo được (197,157,138) so với mục tiêu (200,160,140) —
+  lệch ≤3; điểm mẫu (300,850)=(212,162,131), (1200,850)=(208,157,129).
+- Sprite lớn + món mua thêm + món nhỏ mới: vẽ từng món bằng AI trên nền
+  magenta đặc, tách nền + quantize bằng code (pipeline lô 10/15: key median
+  góc + flood-fill nền từ biên, KHÔNG `binary_fill_holes`; defringe recolor
+  3 px; alpha threshold semi=0; quantize 256 màu MAXCOVERAGE +
+  Floyd–Steinberg). **LƯU Ý — lỗi ở key15.py (phát hiện độc lập bởi 2 agent
+  khi làm lô này):** tập border của flood-fill chứa label 0 (= chính vật
+  thể) nên raw nào có pixel fg0 chạm biên (vignette magenta sẫm ở mép) sẽ bị
+  loại cả vật → mask rỗng. Sửa: loại label 0 khỏi tập border. Các script key
+  của lô này đã sửa; script cũ chưa sửa thì đừng dùng lại.
+- Món mua thêm đổi phương pháp tách nền sang key_v4 (khoảng cách vuông góc
+  với tia magenta): raw .webp có dải vignette magenta sẫm ở mép phải (bể/
+  đèn) mà dist Euclid không tách được. V1 của 4 món (nhà pet/kệ/bể/cây) lệch
+  tỉ lệ −38%..−48% (vẽ hẹp-dài quá) nên đã **vẽ lại V2**, không ép xi; V2 đạt
+  −9,33%..+6,72%, xử lý bằng aniso nhẹ (kệ x1,103; nhà pet y1,072; tranh
+  y1,031 — trong tiền lệ tủ áo v4 1,386).
+- Gấu bông phi hành gia: media.generate_image trả HTTP 503 khi agent món
+  nhỏ vẽ (quá tải, agent không thử lại) — parent vẽ lại sau khi media hồi,
+  tách nền bằng `key_gau.py` (adapt key_small_ngan_ha.py): kính mũ trong
+  suốt nhìn xuyên thấy nền magenta nên các lo kín trong mũ được tô lại kính
+  mờ (228,232,242) SAU mọi bước strip; bóng đậm dưới chân (magenta tối,
+  thoát 3 thước vì R<200) xóa toàn bộ; bbox rộng hơn _v3 (298 thay vì 264)
+  vì gấu dang tay rộng — giữ đúng tỉ lệ raw, aniso 0,988.
+- Đo vị trí bằng code trên ảnh thật; ảnh ghép soi bằng mắt (nền tối/trắng/
+  xám 128/phòng thật, mép ngoài phóng 3×). Lỗi nhỏ sửa bằng code, không hỏi.
+  Bố cục mặc định sửa 3 chỗ sau khi soi ảnh ghép v1 (xem mục "Ảnh ghép").
+
+## Nền trống room_ngan_ha.png
+
+| Món | Đích | PNG | SHA-12 | Mốc bố cục so với room_v3 |
+|---|---|---|---|---|
+| Nền trống | `app/assets/images/backgrounds/room_ngan_ha.png` | 525.717 byte | `df27a4c8d42e` | đỉnh thanh rèm y65 (v3 y75, v4 y65); mép sàn giữa y625–630 (v3 y625, khớp); góc tường x~335/1150 (khớp); Sao Thổ trong cửa sổ bbox x640–893/y200–349; kệ mây + 2 khung tường trái, đèn mây trần giữ vị trí; rèm kem dài tới ~y610 (như v4); **không két sưởi** — tường dưới cửa sổ là tường xanh đêm có chòm sao, liền mạch |
+
+- Sàn sáng hơn bản xem kiểu rõ rệt (xem kiểu (165,126,111) → median
+  (197,157,138)); sàn soi mắt trống hoàn toàn, không dấu đồ đạc/bóng đồ.
+- Cửa sổ dọc hơi ngắn hơn v3: hàng kính dưới y410 so với v3 y446 (~−36 px),
+  gờ dưới y434 (~−12 px) — nhìn mắt vẫn cân đối, Sao Thổ nằm gọn trong ô
+  kính. Đầu thanh rèm phải hơi dài/béo hơn bên trái sau warp (nhìn như đầu
+  thanh + vòng rèm). Kệ mây to hơn kệ v3 một chút (đồ trang trí dính tường,
+  giữ nguyên).
+
+## 7 sprite lớn mới
+
+| Món | Đích | PNG | SHA-12 | Cỡ hiển thị (khung 1600×900) | Điểm chân |
+|---|---|---|---|---|---|
+| Giường tên lửa | `app/assets/images/furniture/ngan_ha_giuong.png` | 82.898 byte | `7857156d8497` | 500×340, x160–660, y375–715 | (410, 715) |
+| Tủ đầu giường | `app/assets/images/furniture/ngan_ha_tu_dau_giuong.png` | 30.553 byte | `96b5a639cafb` | 194×190, x70–264, y590–780 | (167, 780) |
+| Tủ áo | `app/assets/images/furniture/ngan_ha_tu_ao.png` | 99.709 byte | `4afa1be45107` | 320×820, x1280–1600, y65–885 (đúng tỉ lệ, như v4) | (1440, 885) |
+| Bàn học | `app/assets/images/furniture/ngan_ha_ban_hoc.png` | 74.241 byte | `df1db8f7236c` | **320×269, x1050–1370, y506–775** (sprite TRƠN, chỉ giữ sách) | (1210, 775) |
+| Ghế | `app/assets/images/furniture/ngan_ha_ghe.png` | 98.797 byte | `8de9456fbb1c` | 160×240, x990–1150, y505–745 | (1070, 745) |
+| Kệ tên lửa | `app/assets/images/furniture/ngan_ha_ke_lon.png` | 125.994 byte | `084f705972d5` | 270×360, x990–1260, y30–390 (treo tường) | (1125, 390) — treo tường |
+| Thảm tròn | `app/assets/images/furniture/ngan_ha_tham.png` | 139.219 byte | `b1360bae3d8e` | 590×160, x410–1000, y695–855 | (705, 855) |
+
+- Cổng: strict (255,0,255) = 0 và lot10 = 0 ở cả 7 file; semi = 0; ≤256 màu.
+  Thước loose còn 2.468 (ghế) / 2.304 (kệ) — TOÀN BỘ là màu tím thiết kế ở
+  NỘI THẤT (shading tím-lavender ghế median (154,89,188); gáy sách tím trên
+  kệ median (181,104,180)), đã chứng minh có trong ảnh gen gốc; theo skill,
+  màu tím thật thì dùng thước bright-rim (= 0). Pink-family (giường 5.333 …
+  ghế 29.232) cũng toàn màu thiết kế nội thất (lavender, shading bạc-hồng,
+  sách hồng/tím) — bright-rim = 0. Không tô lại.
+- Giường: thân tên lửa trắng-bạc, chăn xanh đậm có sao vàng, gối trắng, cửa
+  sổ tròn; KHÔNG có gấu bông (gấu là món rời). Tủ đầu giường: khối vuông
+  kem/trắng 2 ngăn, núm sao, mặt trên TRỐNG.
+- Tủ áo: xanh chàm, decal sao vàng + trăng lưỡi liềm, núm tròn, hiển thị
+  320 rộng ĐÚNG TỈ LỆ như v4.
+- Bàn học: **sprite TRƠN** — chỉ bàn + 1 chồng sách, KHÔNG bình hoa, KHÔNG
+  cốc bút vẽ sẵn (quyết định phòng gốc 8). Hiển thị 320×269 (brief ghi
+  320×360 là số cũ của bàn v4 còn bình/cốc; bàn trơn giữ đúng tỉ lệ
+  320×269 như v4 đã sửa — kéo dọc 320×360 sẽ giãn bàn 34%).
+- Ghế: ghế vòng tím-lavender; lỗ xuyên thấu 65.361 px là thiết kế (vòm tựa
+  lưng + khe dưới mặt ghế), không phải lỗi key.
+- Kệ tên lửa: kệ TREO TƯỜNG — neo = mép dưới kệ (lửa tên lửa, y=390 khung
+  phòng), KHÔNG phải chân sàn; sách + quả cầu nhỏ; khe trong suốt giữa
+  sách/khung 395 px là khe thật.
+- Thảm tròn: xanh đậm, sao vàng + trăng lưỡi liềm, ellipse nằm phẳng trên sàn.
+
+## 8 món mua thêm mới (512×512, chân y=440)
+
+| Món | Đích | PNG | SHA-12 | Bbox (khung 512) | Điểm chân | Cỡ hiển thị (tỉ lệ 0,45) | Vị trí mặc định (khung 1600×900) |
+|---|---|---|---|---|---|---|---|
+| Nhà pet trạm vũ trụ | `furniture/ngan_ha_nha_pet.png` | 76.817 byte | `26a036ba3e42` | (98,139,416,440) 318×301 | (256, 439) | 143×135 | sàn phải, trước bàn (950, 880) |
+| Kệ sách tên lửa | `furniture/ngan_ha_ke_sach.png` | 80.917 byte | `8d339692593a` | (85,81,427,441) 342×360 | (255, 440) | 154×162 | sàn trái, trước giường (400, 875) |
+| Bể sứa phát sáng | `furniture/ngan_ha_be_ca.png` | 70.357 byte | `f180449d65f5` | (110,122,403,441) 293×319 | (281, 440) | 132×144 | sàn phải, trước bàn (1150, 880) |
+| Cây cao lá xanh lam | `furniture/ngan_ha_cay_cao.png` | 123.419 byte | `04d98475a7bf` | (125,61,389,441) 264×380 | (258, 440) | 119×171 | góc phải, trước tủ áo/chân bàn (1300, 860) |
+| Ghế bean sao | `furniture/ngan_ha_ghe_luoi.png` | 59.242 byte | `646a75f1f682` | (122,214,393,441) 271×227 | (259, 440) | 122×102 | sàn trái, trước tủ đầu giường (260, 880) |
+| Lều trạm vũ trụ | `furniture/ngan_ha_leu.png` | 68.907 byte | `71f0899356bc` | (83,103,431,440) 348×337 | (266, 439) | 157×152 | góc trái phòng (100, 880) — DÙNG LẠI bản xem kiểu, SHA khớp preview |
+| Đèn mặt trăng | `furniture/ngan_ha_den_trang.png` | 48.606 byte | `7e3616270327` | (139,142,373,441) 234×299 | (255, 440) | 105×135 | **trên bậu cửa sổ (880, 465)**, cạnh cốc sao |
+| Tranh vũ trụ | `furniture/ngan_ha_tranh.png` | 60.698 byte | `7475611ac51f` | (116,140,397,441) 281×301 | (256, 440) | 126×135 | tường trái (410, 300) |
+
+- Cổng: strict = 0 và lot10 = 0 ở cả 8 file; semi = 0; ≤256 màu; bbox khớp
+  mục tiêu trong ±2 px; chân y=440 (nhà pet/lều 439, mất 1 px đáy do strip
+  viền, trong dung sai 440/441). **Be_ca + den_trang VẼ ĐÚNG TỈ LỆ** (bể
+  +0,28%, đèn −1,42%, trong ±3% — không giãn như bản xem kiểu).
+- Bể sứa: loose 211 + pink-family 2.724 là sứa tím/hồng PHÁT SÁNG THẬT +
+  viền kính trên bể ánh hồng như bản xem kiểu (preview: pink 1.380, family
+  543) — KHÔNG tô lại, sẽ làm hỏng sứa. **Claude quyết.**
+- Đèn mặt trăng: pink-family 6.897 là shading hồng-xám thật của khối mặt
+  trăng (màu chủ đạo (216,167,159)); loose 37 là viền mauve ở đáy đế. Mặt
+  trăng hơi hồng kem — **Claude quyết** (chấp nhận hay vẽ lại trắng hơn).
+- Kệ sách: pink-family 5.165 nhưng bão hòa chỉ 20 — chủ yếu là màu XÁM thật
+  (182,169,169) của thân tên lửa bạc, thước pink bắt nhầm; loose = 4.
+- Tranh: pink-family 719, bão hòa 0 — shading xám/tím nhạt; loose = 0.
+- Cây cao: loose 51 là shading tím của lá ở mép; lỗ kín 659 px là khe trong
+  suốt giữa lá (tiền lệ `noi_cay_cao` 299 px) — khe lá đúng thiết kế, không
+  lấp. Lều: loose 1.204 là màu tím-mơ thật của panel phải dưới (preview đã
+  ghi, strict = 0); cửa lều tối gần đen GIỮ NGUYÊN như đã duyệt.
+- Halo/white-rim 144–867 là highlight thật của vật trắng/bạc (mặt trăng,
+  thân tên lửa, vòm nhà) — soi 3× xác nhận không phải viền do key.
+
+## 5 món nhỏ (3 mới theo chủ đề + 2 dùng lại _v3)
+
+| Món | Đích | PNG | SHA-12 | Bbox (khung 512) | Điểm chân | Cỡ hiển thị | Neo trong phòng |
+|---|---|---|---|---|---|---|---|
+| Gấu phi hành gia (mới) | `furniture/ngan_ha_gau_bong.png` | 83.850 byte | `5d796ef98fd3` | (108,95,406,445) 298×350 | (261, 443) | 139×163 (tỉ lệ 0,466) | trên giường (415, 548) |
+| Chậu cây lá xanh lam (mới) | `furniture/ngan_ha_chau_cay.png` | 94.063 byte | `45ec5072289a` | (99,119,374,441) 275×322 | (237, 440) | 193×225 (tỉ lệ 0,70) | sàn dưới cửa sổ (842, 686) |
+| Bình hoa sao (mới) | `furniture/ngan_ha_binh_hoa.png` | 56.933 byte | `0c1feac75c43` | (156,106,361,429) 205×323 | (257, 428) | 81×128 (tỉ lệ 0,396) | trên bàn học (1105, 575) |
+| Đèn sao (dùng lại _v3) | `furniture/den_sao_v3.png` (đã có) | 242.411 byte | `fc50089f22e4` | (96,91,419,450) 323×359 | (256, 449) | 124×138 (tỉ lệ 0,383) | trên tủ đầu giường (150, 578) |
+| Cốc sao (dùng lại _v3) | `furniture/coc_sao_v3.png` (đã có) | 238.805 byte | `814bff936abe` | (100,83,355,434) 255×351 | (261, 433) | 80×111 (tỉ lệ 0,315) | trên bậu cửa sổ (700, 465) |
+
+- 3 món mới: magenta 0 (3 thước), semi = 0, ≤256 màu. Gấu phi hành gia:
+  gấu bông mặc đồ phi hành gia trắng, mũ bong kính trong, huy hiệu sao vàng;
+  bbox rộng hơn _v3 (298 thay vì 264) vì gấu dang tay rộng — giữ đúng tỉ lệ
+  raw, aniso 0,988. Bình hoa: nén dọc ~10% (aniso 0,898) để khớp bbox _v3 —
+  trong tiền lệ be_ca 11% đã chấp nhận; hiển thị cao 128 px như quyết định
+  phòng gốc 7.
+- 2 món dùng lại: byte + SHA khớp file _v3 trên nhánh (xem v4/doc, mục "5 món
+  nhỏ _v3"); magenta 0/0/0, semi 0; **không đẩy lại**. Chỉ dùng file _v3
+  trong `v4/small_v3_branch/` làm tham chiếu, không dùng file plain v2
+  (bài học phòng v4: plain và _v3 là 2 ảnh khác nhau hoàn toàn).
+- Tên đích 3 món mới dùng tiền tố `ngan_ha_` (bản theo chủ đề của phòng) —
+  code cần chọn đúng bản theo phòng; **Claude chốt tên file** khi decode.
+
+## Ảnh ghép xem trước (lot15/work/ngan_ha/composites/)
+
+- `ngan_ha_default_layout.png` (1.782.403 byte, SHA-12 `4022f1bc6525`):
+  nền trống Ngân hà + 7 sprite lớn + 8 món mua thêm + 5 món nhỏ + bé gái 10
+  (Ngân hà, cao 360 px, chân (630,810)). Bố cục mặc định: giường tên lửa
+  trái, tủ đầu giường cạnh giường, tủ áo phải 320 rộng, bàn học trơn + ghế
+  ở bàn, kệ tên lửa trên tường phải, thảm tròn giữa sàn; món nhỏ: gấu phi
+  hành gia trên giường, đèn sao trên tủ đầu giường, chậu cây sàn dưới cửa
+  sổ, bình hoa 128 px trên bàn, cốc sao + đèn mặt trăng trên bậu cửa sổ,
+  tranh vũ trụ tường trái; 8 món mua thêm: lều góc trái, ghế bean + kệ sách
+  tên lửa sàn trái, nhà pet + bể sứa sàn phải, cây cao góc phải.
+- **Sửa 3 chỗ sau khi soi ảnh ghép v1:** (1) đèn mặt trăng đặt trên kệ tên
+  lửa thì che ngọn lửa kệ + to quá so với ngăn kệ → dời lên bậu cửa sổ
+  (880, 465), cạnh cốc sao; (2) cây cao đứng (720,745) bị bé gái che gần
+  hết → dời ra góc phải (1300, 860), trước tủ áo/chân bàn; (3) tranh
+  (380,300) chạm khung tranh vẽ sẵn → dịch phải 30 px thành (410, 300).
+- Kiểm bằng code (bbox hiển thị): các chồng còn lại đều là cặp cố ý hoặc
+  depth-ok — ghế↔bàn (ghế kê ở bàn), đèn↔kệ đã hết sau khi dời đèn; món
+  trước che món sau đúng thứ tự chân (tủ áo trước bàn, bàn trước bể cá/lều,
+  giường trước kệ sách/lều/bé, cây cao trước chậu cây); đồ đứng trên thảm
+  phẳng. Lối đi: dải x450–850, y750–860 không có chân đồ nào (trừ thảm phẳng
+  + bé gái) — bé đứng giữa thảm ở (630, 810).
+- Soi bằng mắt: ghép liền khối (cùng phối cảnh 3/4 + sáng trên-trái), tỉ lệ
+  các món với nhau + với cửa sổ đúng (bé 360 px đứng ngang giường, tủ áo
+  cao gần bằng trần); bé gái 10 nổi rõ trên nền xanh đêm; không món nào
+  trông như "dán đè" lên đồ vẽ sẵn — vì nền đã trống, mọi món đều là sprite
+  rời có thứ tự sâu đúng.
+
+## Điểm chưa chắc — cờ cho Claude quyết
+
+1. **Đèn mặt trăng hơi hồng kem** (pink-family 6.897, màu chủ đạo
+   (216,167,159)) — chấp nhận hay vẽ lại trắng hơn?
+2. **Bể sứa: viền kính ánh hồng + sứa tím/hồng phát sáng** (loose 211, pink
+   2.724) — chấp nhận như bản xem kiểu hay giảm hồng?
+3. **Ghế + kệ tên lửa: loose 2.468/2.304 là màu tím thiết kế** (strict 0,
+   bright-rim 0) — như tiền lệ v4 (kệ loose 3.206 đã chấp nhận), không tô lại.
+4. **Cửa sổ ngắn hơn room_v3 ~36 px ở dưới** — nhìn mắt vẫn cân đối, chấp
+   nhận không?
+5. **Bố cục mặc định:** đèn mặt trăng lên bậu cửa sổ (không đặt trên kệ),
+   cây cao ra góc phải, tranh dịch phải 30 px — chốt theo bố cục này?
+6. **Tên file 3 món nhỏ theo chủ đề** (`furniture/ngan_ha_gau_bong.png`
+   …) — chốt tên để code chọn đúng bản theo phòng?
+
+## Đẩy lên nhánh (parent đẩy, chưa đẩy)
+
+- 19 file mới, tổng PNG 2.000.937 byte (~2,67 MB b64): nền `room_ngan_ha`
+  + 7 sprite lớn + 8 món mua thêm + 3 món nhỏ mới. Gợi ý chia 3 lần (8/8/3
+  file, trộn theo byte như các lô trước). 2 món nhỏ _v3 dùng lại, không đẩy.
+- SHA-256 đầy đủ từng file trong `lot15/work/ngan_ha/report.json`
+  (mục `files_to_push`).
+
+Chưa decode (chờ Claude decode).
