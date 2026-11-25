@@ -12,6 +12,8 @@
 /// Không có hộp quà may rủi, không mua bằng tiền thật (PLAN T2-06).
 library;
 
+import 'dart:ui' show Rect;
+
 import '../room/room_assets.dart';
 import '../room/room_themes.dart';
 import '../room/room_variants.dart';
@@ -123,7 +125,16 @@ class ShopItem {
     this.rarity,
     this.roomThemeId,
     this.placeableId,
+    this.assetCrop,
+    this.assetAspect,
   });
+
+  /// Phần ảnh [asset] được hiện (tỉ lệ 0..1) khi ảnh có viền trong suốt rộng
+  /// (món nội thất lớn lô 15); null = cả ảnh.
+  final Rect? assetCrop;
+
+  /// Tỉ lệ rộng/cao của phần ảnh hiện ra (đi với [assetCrop]).
+  final double? assetAspect;
 
   /// Chủ đề của bộ/món lẻ phòng ([ShopItemKind.roomTheme] và
   /// [ShopItemKind.roomThemeItem]).
@@ -320,18 +331,21 @@ List<ShopItem> shopItemsFor(
     for (final t in roomThemes)
       if (isRoomThemeReady(t.id, ready: roomThemesReady))
         for (final p in roomPlaceables)
-          ShopItem(
-            id: roomThemeVariantItemId(t.id, p.id),
-            category: ShopCategory.furniture,
-            kind: ShopItemKind.roomThemeItem,
-            name: '${p.item.label} ${t.shortName}',
-            priceXu: t.usesGems ? 0 : t.itemPrice(p.tier),
-            priceGems: t.usesGems ? t.itemPrice(p.tier) : 0,
-            asset: p.assetFor(t.id),
-            rarity: t.rarity,
-            roomThemeId: t.id,
-            placeableId: p.id,
-          ),
+          if (p.hasVariant(t.id))
+            ShopItem(
+              id: roomThemeVariantItemId(t.id, p.id),
+              category: ShopCategory.furniture,
+              kind: ShopItemKind.roomThemeItem,
+              name: '${p.item.label} ${t.shortName}',
+              priceXu: t.usesGems ? 0 : t.itemPrice(p.tier),
+              priceGems: t.usesGems ? t.itemPrice(p.tier) : 0,
+              asset: p.assetFor(t.id),
+              assetCrop: p.artFor(t.id).cropped ? p.artFor(t.id).crop : null,
+              assetAspect: p.artFor(t.id).width / p.artFor(t.id).height,
+              rarity: t.rarity,
+              roomThemeId: t.id,
+              placeableId: p.id,
+            ),
   ];
 }
 

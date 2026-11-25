@@ -193,6 +193,9 @@ class Checker:
             return
         width, height = rgba.size
         frame = FRAMES.get(entry["kind"])
+        # Nội thất lớn (lô 15) có khung riêng: trường "frame": [rộng, cao].
+        if entry.get("frame"):
+            frame = tuple(entry["frame"])
         if frame is not None and (width, height) != frame:
             # Ghi lỗi nhưng vẫn kiểm tiếp độ trong suốt/xám để người
             # cắt thấy hết lỗi trong một lần chạy.

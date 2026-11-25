@@ -37,6 +37,7 @@ import '../onboarding/onboarding_service.dart';
 import '../pet/dragon_fx.dart';
 import '../pet/pet_config.dart';
 import '../pet/pet_service.dart';
+import '../room/cropped_asset_image.dart';
 import '../room/room_screen.dart';
 import '../room/room_themes.dart';
 import '../room/room_variants.dart';
@@ -594,14 +595,27 @@ class ShopItemArt extends StatelessWidget {
     }
     final itemAsset = item.asset;
     if (itemAsset != null) {
-      // Đồ pet / nội thất: ảnh món 512x512 trong suốt, không cắt.
+      // Đồ pet / nội thất: ảnh món 512x512 trong suốt, không cắt (món lớn
+      // lô 15 chỉ hiện phần hộp bao nhìn thấy).
+      final crop = item.assetCrop;
       return Padding(
         padding: const EdgeInsets.all(2),
-        child: Image.asset(
-          itemAsset,
-          fit: BoxFit.contain,
-          errorBuilder: (_, _, _) => const SizedBox.shrink(),
-        ),
+        child: crop != null
+            ? Center(
+                child: AspectRatio(
+                  aspectRatio: item.assetAspect ?? 1,
+                  child: CroppedAssetImage(
+                    asset: itemAsset,
+                    crop: crop,
+                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                  ),
+                ),
+              )
+            : Image.asset(
+                itemAsset,
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) => const SizedBox.shrink(),
+              ),
       );
     }
     final n = item.outfit ?? outfit;

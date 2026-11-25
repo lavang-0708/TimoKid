@@ -177,8 +177,8 @@ void main() {
       // không trắng trơn (cùng lý do như trứng/pet).
       for (final path in [
         roomBackgroundAsset,
-        roomCleanBackgroundAsset,
-        ...roomFurniture.map((f) => f.asset),
+        roomClassicBackgroundAsset,
+        ...roomPlaceables.map((p) => p.item.asset),
       ]) {
         await precacheImage(AssetImage(path), context);
       }

@@ -14,6 +14,12 @@ import 'package:timokid/features/room/room_variants.dart';
 import 'package:timokid/features/shop/shop_catalog.dart';
 import 'package:timokid/features/shop/shop_service.dart';
 
+/// Món có biến thể ở chủ đề [theme] (7 món lớn/vừa; Rồng thêm 8 món cửa hàng).
+List<RoomPlaceable> _variants(String theme) => [
+  for (final p in roomPlaceables)
+    if (p.hasVariant(theme)) p,
+];
+
 void main() {
   late AppDatabase db;
   late String childId;
@@ -42,7 +48,7 @@ void main() {
   );
 
   test('chưa có hình thì không bán bộ lẫn món lẻ nào', () {
-    final themes = shopItemsFor('girl').where(
+    final themes = shopItemsFor('girl', roomThemesReady: const {}).where(
       (i) =>
           i.kind == ShopItemKind.roomTheme ||
           i.kind == ShopItemKind.roomThemeItem,
@@ -50,9 +56,30 @@ void main() {
     expect(themes, isEmpty);
   });
 
+  test('Phòng Rồng đã có hình (cờ const): bộ + 15 món lẻ lên Cửa hàng', () {
+    expect(roomThemeArtReady['rong'], isTrue);
+    expect(roomThemeArtReady['tet'], isFalse);
+    expect(roomThemeArtReady['ngan_ha'], isFalse);
+    final all = shopItemsFor('girl'); // dùng cờ const của app
+    final sets = all.where((i) => i.kind == ShopItemKind.roomTheme).toList();
+    expect(sets.map((i) => i.id), ['room_theme_rong']);
+    expect(sets.single.priceGems, 120);
+    final items = all
+        .where((i) => i.kind == ShopItemKind.roomThemeItem)
+        .toList();
+    // 7 món lớn/vừa + 8 món cửa hàng, toàn bộ của Rồng.
+    expect(items, hasLength(15));
+    expect(items.every((i) => i.roomThemeId == 'rong'), isTrue);
+    expect(items.every((i) => i.usesGems), isTrue);
+    // Món lớn có ô cắt (ảnh 1024x1024 viền trong suốt) để hiện đúng cỡ.
+    final bed = items.firstWhere((i) => i.placeableId == 'noi_giuong');
+    expect(bed.assetCrop, isNotNull);
+    expect(bed.asset, 'assets/images/furniture/rong_giuong.webp');
+  });
+
   test('chỉ chủ đề đã có hình mới có món lẻ', () {
     const only = {'tet': true};
-    expect(roomItems('tet', ready: only), hasLength(roomPlaceables.length));
+    expect(roomItems('tet', ready: only), hasLength(_variants('tet').length));
     expect(roomItems('ngan_ha', ready: only), isEmpty);
     expect(roomItems('rong', ready: only), isEmpty);
   });
@@ -101,43 +128,42 @@ void main() {
       for (final t in roomThemes) {
         final items = roomItems(t.id).toList();
         expect(items.map((i) => i.placeableId), [
-          for (final p in roomPlaceables) p.id,
+          for (final p in _variants(t.id)) p.id,
         ]);
         expect(items.every((i) => i.id.startsWith('room_item_${t.id}_')), true);
         expect(items.every((i) => i.rarity == t.rarity), isTrue);
         expect(items.every((i) => i.category == ShopCategory.furniture), true);
         expect(
           items.map((i) => i.id).toSet(),
-          hasLength(roomPlaceables.length),
+          hasLength(_variants(t.id).length),
         );
       }
     });
 
     test(
-      'bảng giá theo cỡ: Tết 150/220/300, Ngân hà 200/280/350, Rồng 8/12/15',
+      'bảng giá theo cỡ: Tết vừa/lớn 220/300, Ngân hà 280/350, Rồng 8/12/15',
       () {
         int priceOf(String theme, String placeableId) =>
             roomItems(theme)
                 .firstWhere((i) => i.placeableId == placeableId)
                 .price;
-        // small: gấu bông; medium: nhà cho pet; large: lều.
+        // 7 món lớn/vừa có ở cả 3 chủ đề: vừa = ghế, lớn = giường.
         expect(
           [
-            for (final id in ['gau-bong', 'noi_nha_pet', 'noi_leu'])
-              priceOf('tet', id),
+            for (final id in ['noi_ghe', 'noi_giuong']) priceOf('tet', id),
           ],
-          [150, 220, 300],
+          [220, 300],
         );
         expect(
           [
-            for (final id in ['den-sao', 'noi_be_ca', 'noi_ke_sach'])
-              priceOf('ngan_ha', id),
+            for (final id in ['noi_ghe', 'noi_giuong']) priceOf('ngan_ha', id),
           ],
-          [200, 280, 350],
+          [280, 350],
         );
+        // Rồng có thêm 8 món cửa hàng (nhỏ/vừa/lớn).
         expect(
           [
-            for (final id in ['noi_tranh', 'noi_cay_cao', 'noi_leu'])
+            for (final id in ['noi_tranh', 'noi_cay_cao', 'noi_giuong'])
               priceOf('rong', id),
           ],
           [8, 12, 15],
@@ -169,14 +195,22 @@ void main() {
       }
     });
 
-    test('giá bộ rẻ hơn tổng giá mọi món lẻ (cùng loại tiền)', () {
+    test('giá bộ so với tổng món lẻ bán ra (số liệu thực, báo Muse/PM)', () {
+      // Chỉ 7 món lớn/vừa có biến thể ở Tết/Ngân hà nên bộ đắt hơn tổng
+      // món lẻ (+7,5% / +11,6%); Rồng 15 món: bộ rẻ hơn 36,8%. Giá bộ chưa
+      // đổi — cần quyết định sản phẩm; test này ghim số hiện tại.
+      final expected = {
+        'tet': (2000, 1860),
+        'ngan_ha': (2500, 2240),
+        'rong': (120, 190),
+      };
       for (final t in roomThemes) {
         final set = shopItemsFor(
           'girl',
           roomThemesReady: allReady,
         ).firstWhere((i) => i.id == roomThemeItemId(t.id));
         final sum = roomItems(t.id).fold<int>(0, (a, i) => a + i.price);
-        expect(set.price, lessThan(sum), reason: t.id);
+        expect((set.price, sum), expected[t.id], reason: t.id);
         expect(set.currency, roomItems(t.id).first.currency);
       }
     });
@@ -184,7 +218,7 @@ void main() {
     test('mua món lẻ: trừ tiền, mua lại báo đã có', () async {
       final shop = ShopService(db: db, roomThemesReady: allReady);
       await give(1000);
-      final id = roomThemeVariantItemId('tet', 'noi_leu');
+      final id = roomThemeVariantItemId('tet', 'noi_giuong');
       expect(
         await shop.buy(childId: childId, gender: 'girl', itemId: id),
         BuyResult.bought,
@@ -198,14 +232,14 @@ void main() {
         BuyResult.alreadyOwned,
       );
       final own = await shop.roomOwnership(childId);
-      expect(own.hasItemVariant('tet', 'noi_leu'), isTrue);
+      expect(own.hasItemVariant('tet', 'noi_giuong'), isTrue);
       expect(own.hasBackground('tet'), isFalse);
     });
 
     test('đủ mọi món lẻ của chủ đề thì tặng nền, bộ thành đã có', () async {
       final shop = ShopService(db: db, roomThemesReady: allReady);
       await give(100000);
-      final ids = [for (final p in roomPlaceables) p.id];
+      final ids = [for (final p in _variants('tet')) p.id];
       for (var n = 0; n < ids.length; n++) {
         expect(
           (await shop.roomOwnership(childId)).hasBackground('tet'),
@@ -257,14 +291,14 @@ void main() {
         8000,
       );
       final own = await shop.roomOwnership(childId);
-      for (final p in roomPlaceables) {
+      for (final p in _variants('tet')) {
         expect(own.hasItemVariant('tet', p.id), isTrue);
       }
       expect(
         await shop.buy(
           childId: childId,
           gender: 'girl',
-          itemId: roomThemeVariantItemId('tet', 'noi_leu'),
+          itemId: roomThemeVariantItemId('tet', 'noi_giuong'),
         ),
         BuyResult.alreadyOwned,
       );
@@ -273,7 +307,7 @@ void main() {
         await shop.buy(
           childId: childId,
           gender: 'girl',
-          itemId: roomThemeVariantItemId('ngan_ha', 'noi_leu'),
+          itemId: roomThemeVariantItemId('ngan_ha', 'noi_giuong'),
         ),
         BuyResult.bought,
       );
@@ -285,7 +319,7 @@ void main() {
       await shop.buy(
         childId: childId,
         gender: 'girl',
-        itemId: roomThemeVariantItemId('tet', 'noi_leu'),
+        itemId: roomThemeVariantItemId('tet', 'noi_giuong'),
       );
       expect(
         await shop.buy(
@@ -308,7 +342,7 @@ void main() {
         await shop.buy(
           childId: childId,
           gender: 'girl',
-          itemId: roomThemeVariantItemId('tet', 'noi_leu'),
+          itemId: roomThemeVariantItemId('tet', 'noi_giuong'),
         ),
         BuyResult.insufficient,
       );
@@ -316,7 +350,7 @@ void main() {
         await shop.buy(
           childId: childId,
           gender: 'girl',
-          itemId: roomThemeVariantItemId('rong', 'noi_leu'),
+          itemId: roomThemeVariantItemId('rong', 'noi_giuong'),
         ),
         BuyResult.unknownItem,
       );

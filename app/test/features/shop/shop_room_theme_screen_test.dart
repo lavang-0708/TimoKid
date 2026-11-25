@@ -75,13 +75,13 @@ void main() {
   testWidgets('chưa có hình: không có bộ lẫn món lẻ', (tester) async {
     await pumpShop(tester, const {});
     expect(card(roomThemeItemId('tet')), findsNothing);
-    expect(card(roomThemeVariantItemId('tet', 'noi_leu')), findsNothing);
+    expect(card(roomThemeVariantItemId('tet', 'noi_giuong')), findsNothing);
   });
 
   testWidgets('đủ hình: có bộ và món lẻ, chưa ai "Đã có"', (tester) async {
     await pumpShop(tester, const {'tet': true});
     expect(card(roomThemeItemId('tet')), findsOneWidget);
-    expect(card(roomThemeVariantItemId('tet', 'noi_leu')), findsOneWidget);
+    expect(card(roomThemeVariantItemId('tet', 'noi_giuong')), findsOneWidget);
     expect(card(roomThemeItemId('ngan_ha')), findsNothing);
     expect(owned(roomThemeItemId('tet')), findsNothing);
   });
@@ -92,13 +92,13 @@ void main() {
     await grant(roomThemeItemId('tet'));
     await pumpShop(tester, const {'tet': true});
     expect(owned(roomThemeItemId('tet')), findsOneWidget);
-    for (final p in roomPlaceables) {
+    for (final p in roomPlaceables.where((p) => p.hasVariant('tet'))) {
       expect(owned(roomThemeVariantItemId('tet', p.id)), findsOneWidget);
     }
   });
 
   testWidgets('mua lẻ đủ mọi món: bộ hiện "Đã có"', (tester) async {
-    for (final p in roomPlaceables) {
+    for (final p in roomPlaceables.where((p) => p.hasVariant('tet'))) {
       await grant(roomThemeVariantItemId('tet', p.id));
     }
     await pumpShop(tester, const {'tet': true});
@@ -106,10 +106,10 @@ void main() {
   });
 
   testWidgets('mua lẻ một món: chỉ món đó "Đã có", bộ chưa', (tester) async {
-    await grant(roomThemeVariantItemId('tet', 'noi_leu'));
+    await grant(roomThemeVariantItemId('tet', 'noi_giuong'));
     await pumpShop(tester, const {'tet': true});
-    expect(owned(roomThemeVariantItemId('tet', 'noi_leu')), findsOneWidget);
-    expect(owned(roomThemeVariantItemId('tet', 'noi_tranh')), findsNothing);
+    expect(owned(roomThemeVariantItemId('tet', 'noi_giuong')), findsOneWidget);
+    expect(owned(roomThemeVariantItemId('tet', 'noi_ghe')), findsNothing);
     expect(owned(roomThemeItemId('tet')), findsNothing);
   });
 }

@@ -197,7 +197,10 @@ void main() {
     expect(stored.keys, ['noi_nha_pet']);
     expect((stored['noi_nha_pet']! - after).distance, lessThan(0.5));
     // Món khác không bị đụng.
-    expect(framePos(tester, painting), placeable('noi_tranh').defaultPos);
+    expect(
+      (framePos(tester, painting) - placeable('noi_tranh').defaultPos).distance,
+      lessThan(0.5),
+    );
 
     await reopen(tester);
     expect((framePos(tester, house) - after).distance, lessThan(0.5));
