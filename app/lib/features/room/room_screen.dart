@@ -151,6 +151,13 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   /// đề bé đã mua (đã có hình).
   String _roomTheme = roomThemeClassic;
   List<RoomTheme> _ownedThemes = const [];
+
+  /// Chế độ Sắp xếp: bé kéo thả đồ; [_layout] = vị trí đã đổi của phòng
+  /// chủ đề hiện tại (mã món -> góc trên-trái, khung 1600x900).
+  bool _arranging = false;
+  Map<String, Offset> _layout = const {};
+  String? _dragId;
+  Offset _dragRaw = Offset.zero;
   String? _petMenu; // 'food' | 'toy': bảng chọn đang mở
   bool _petBusy = false;
   _PetProp? _prop;
@@ -235,6 +242,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       final roomTheme = ownedThemes.any((t) => t.id == savedTheme)
           ? savedTheme!
           : roomThemeClassic;
+      final layout = await _loadLayout(childId, roomTheme);
       final petStage = activePet?.stage ?? PetStage.egg;
       // Pet lớn lên từ lần bé thấy trước → màn ăn mừng (bấm "Tuyệt vời"
       // mới ghi giai đoạn đã thấy). Giá trị lạ/trứng: ghi lặng lẽ.
@@ -284,6 +292,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
         };
         _ownedThemes = ownedThemes;
         _roomTheme = roomTheme;
+        _layout = layout;
         _petXp = activePet?.xp ?? 0;
         _petStage = petStage;
         _mood = mood;
@@ -367,6 +376,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   }
 
   void _onPetTap() {
+    if (_arranging) return;
     final species = _eggSpecies;
     if (species == null) return;
     if (!_hatched) {
@@ -791,7 +801,115 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       key: roomThemeSettingsKey,
       value: choice,
     );
-    if (mounted) setState(() => _roomTheme = choice);
+    final layout = await _loadLayout(childId, choice);
+    if (mounted) {
+      setState(() {
+        _roomTheme = choice;
+        _layout = layout;
+      });
+      _fixWalkers();
+    }
+  }
+
+  Future<Map<String, Offset>> _loadLayout(String childId, String theme) async {
+    final json = await ref
+        .read(databaseProvider)
+        .settingsDao
+        .getValue(childId: childId, key: roomLayoutSettingsKey(theme));
+    return decodeRoomLayout(json);
+  }
+
+  /// Món kéo thả đang vẽ trong phòng: món nhỏ của phòng gốc (nền sạch,
+  /// phòng gốc) + nội thất mua (khi cờ hình bật).
+  List<RoomPlaceable> get _activePlaceables => [
+    for (final p in roomPlaceables)
+      if (p.shopId == null
+          ? widget.cleanBackground && _roomTheme == roomThemeClassic
+          : widget.furnitureArtReady && _ownedFurniture.contains(p.shopId))
+        p,
+  ];
+
+  /// Góc trên-trái hiện tại của [p] (đã kẹp vào vùng hợp lệ).
+  Offset _posOf(RoomPlaceable p) {
+    final saved = _layout[p.id];
+    return saved == null ? p.defaultPos : roomClampPlaceable(p, saved);
+  }
+
+  void _toggleArranging() {
+    _hideDragonMenu();
+    setState(() {
+      _arranging = !_arranging;
+      _petMenu = null;
+      _dragId = null;
+    });
+  }
+
+  void _onDragStart(RoomPlaceable p) {
+    _dragRaw = _posOf(p);
+    setState(() => _dragId = p.id);
+  }
+
+  /// [frameDelta]: độ dời ngón tay đã đổi sang khung 1600x900.
+  void _onDragUpdate(RoomPlaceable p, Offset frameDelta) {
+    _dragRaw += frameDelta;
+    final clamped = roomClampPlaceable(p, _dragRaw);
+    setState(() => _layout = {..._layout, p.id: clamped});
+  }
+
+  Future<void> _onDragEnd() async {
+    setState(() => _dragId = null);
+    _fixWalkers();
+    await _saveLayout();
+  }
+
+  Future<void> _saveLayout() async {
+    final childId = _childId;
+    if (childId == null) return;
+    await ref
+        .read(databaseProvider)
+        .settingsDao
+        .setValue(
+          childId: childId,
+          key: roomLayoutSettingsKey(_roomTheme),
+          value: encodeRoomLayout(_layout),
+        );
+  }
+
+  /// "Xếp lại như cũ": xóa vị trí đã lưu của phòng chủ đề hiện tại.
+  Future<void> _resetLayout() async {
+    setState(() {
+      _layout = const {};
+      _dragId = null;
+    });
+    _fixWalkers();
+    final childId = _childId;
+    if (childId == null) return;
+    await ref
+        .read(databaseProvider)
+        .settingsDao
+        .deleteSetting(
+          childId: childId,
+          key: roomLayoutSettingsKey(_roomTheme),
+        );
+  }
+
+  /// Món vừa đặt chặn chỗ nhân vật/pet đang đứng: dời họ ra chỗ đứng được.
+  void _fixWalkers() {
+    if (!mounted) return;
+    final extra = _extraObstacles;
+    var kid = _kidFeet;
+    var pet = _petFeet;
+    if (!roomWalkable(kid, extra: extra)) {
+      kid = roomWalkTarget(kid, extra: extra);
+    }
+    if (!roomWalkable(pet, extra: extra)) {
+      pet = roomWalkTarget(pet, extra: extra);
+    }
+    if (kid == _kidFeet && pet == _petFeet) return;
+    setState(() {
+      _kidFeet = kid;
+      _petFeet = pet;
+    });
   }
 
   /// Bấm món chưa mua trong Tủ đồ: đóng bảng, mở Cửa hàng ("Mua ở
@@ -812,6 +930,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
 
   /// Bấm vào nhân vật: vẫy tay chào 1,4 giây.
   void _onKidTap() {
+    if (_arranging) return;
     _waveTimer?.cancel();
     setState(() => _kidWaving = true);
     final name = _profile?.name ?? '';
@@ -821,18 +940,10 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
     });
   }
 
-  /// Nội thất mua đang vẽ trong phòng (rỗng khi cờ hình còn tắt).
-  List<RoomFurniture> get _shopFurniture => widget.furnitureArtReady
-      ? [
-          for (final f in roomShopFurniture)
-            if (_ownedFurniture.contains(roomShopFurnitureId(f))) f,
-        ]
-      : const <RoomFurniture>[];
-
-  /// Dấu chân nội thất mua trên sàn (chặn đường đi như đồ có sẵn).
+  /// Dấu chân nội thất mua trên sàn (chặn đường đi như đồ có sẵn),
+  /// dời theo chỗ bé đã kéo món tới.
   List<Rect> get _extraObstacles => [
-    for (final f in _shopFurniture)
-      if (f.footprint != null) f.footprint!,
+    for (final p in _activePlaceables) ?p.footprintAt(_posOf(p)),
   ];
 
   bool get _petInteractive => _eggSpecies != null && !_loading;
@@ -1019,6 +1130,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
 
   /// (G) Bé chạm vào sàn: nhân vật đi tới đó, pet đi theo sau lưng.
   void _onFloorTap(Offset frame) {
+    if (_arranging) return;
     if (_petMenu != null) setState(() => _petMenu = null);
     _hideDragonMenu();
     _dragonFx.cancel();
@@ -1256,45 +1368,83 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                       ),
                     ),
                     const SizedBox(width: 8),
-                    if (_ownedThemes.isNotEmpty) ...[
+                    if (_arranging) ...[
                       GameRoundButton(
-                        key: const Key('room-theme-button'),
-                        icon: Icons.wallpaper_rounded,
+                        key: const Key('room-arrange-reset'),
+                        icon: Icons.restart_alt_rounded,
                         color: const Color(0xFFE58FB0),
-                        label: 'Phong cách',
-                        onPressed: _openThemePicker,
+                        label: 'Xếp lại như cũ',
+                        onPressed: _resetLayout,
                       ),
                       const SizedBox(width: 8),
+                      GameRoundButton(
+                        key: const Key('room-arrange-done'),
+                        icon: Icons.check_rounded,
+                        color: const Color(0xFF5DC3A8),
+                        label: 'Xong',
+                        onPressed: _toggleArranging,
+                      ),
+                    ] else ...[
+                      if (_ownedThemes.isNotEmpty) ...[
+                        GameRoundButton(
+                          key: const Key('room-theme-button'),
+                          icon: Icons.wallpaper_rounded,
+                          color: const Color(0xFFE58FB0),
+                          label: 'Phong cách',
+                          onPressed: _openThemePicker,
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      GameRoundButton(
+                        key: const Key('room-wardrobe-button'),
+                        icon: Icons.checkroom_rounded,
+                        image: '$uiArt/ui_icon_wardrobe.webp',
+                        color: const Color(0xFFB48CF2),
+                        label: 'Tủ đồ',
+                        locked: !_unlocked,
+                        onPressed: () => _unlocked
+                            ? _openWardrobe()
+                            : _showLockedReminder('Tủ đồ'),
+                      ),
+                      const SizedBox(width: 8),
+                      GameRoundButton(
+                        key: const Key('room-shop-button'),
+                        icon: Icons.storefront_rounded,
+                        image: '$uiArt/ui_icon_shop.webp',
+                        color: const Color(0xFF5DC3A8),
+                        label: 'Cửa hàng',
+                        locked: !_unlocked,
+                        onPressed: () => _unlocked
+                            ? _openShop()
+                            : _showLockedReminder('Cửa hàng'),
+                      ),
                     ],
-                    GameRoundButton(
-                      key: const Key('room-wardrobe-button'),
-                      icon: Icons.checkroom_rounded,
-                      image: '$uiArt/ui_icon_wardrobe.webp',
-                      color: const Color(0xFFB48CF2),
-                      label: 'Tủ đồ',
-                      locked: !_unlocked,
-                      onPressed: () => _unlocked
-                          ? _openWardrobe()
-                          : _showLockedReminder('Tủ đồ'),
-                    ),
-                    const SizedBox(width: 8),
-                    GameRoundButton(
-                      key: const Key('room-shop-button'),
-                      icon: Icons.storefront_rounded,
-                      image: '$uiArt/ui_icon_shop.webp',
-                      color: const Color(0xFF5DC3A8),
-                      label: 'Cửa hàng',
-                      locked: !_unlocked,
-                      onPressed: () => _unlocked
-                          ? _openShop()
-                          : _showLockedReminder('Cửa hàng'),
-                    ),
                   ],
                 ),
               ),
             ),
           ),
-          if (_petInteractive) _petControls(),
+          // Nút Sắp xếp nằm dưới hàng nút góc phải (hàng trên đã đầy ở màn
+          // nhỏ); khi đang sắp xếp, hàng đó đổi thành Xếp lại / Xong.
+          if (!_arranging)
+            Positioned(
+              right: 8,
+              top: 0,
+              child: SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 84),
+                  child: GameRoundButton(
+                    key: const Key('room-arrange-button'),
+                    icon: Icons.open_with_rounded,
+                    color: const Color(0xFFF2A65A),
+                    label: 'Sắp xếp',
+                    onPressed: _toggleArranging,
+                  ),
+                ),
+              ),
+            ),
+          if (_petInteractive && !_arranging) _petControls(),
           if (_celebration case final c?)
             Positioned.fill(
               child: PetGrowCelebration(
@@ -1702,10 +1852,12 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
             Offset anchor,
             double width, {
             ValueNotifier<double>? lift,
+            Key? key,
           }) {
             final sw = width * 0.85;
             final sh = width * 0.10;
             return Positioned(
+              key: key,
               left: fx(anchor.dx - sw / 2),
               top: fy(anchor.dy - sh * 0.3),
               width: fx(sw),
@@ -1730,8 +1882,9 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
             );
           }
 
-          // 5 món xếp theo chân y (xa trước, gần sau) để món gần
-          // che đúng món xa khi chồng lấn.
+          // 5 món có sẵn của phòng (theo chân y). Món vẽ rời (nền sạch)
+          // nằm trong [placeables] và kéo thả được; món còn vẽ sẵn trong
+          // nền (chậu cây; cả 5 món khi dùng nền cũ) chỉ có vùng chạm.
           final itemsByFeet = <RoomFurniture>[
             roomFurniture[3], // bình hoa (neo y = 510)
             roomFurniture[4], // cốc bút (neo y = 515)
@@ -1746,30 +1899,46 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
           final kidBoxW = kidBoxH * kidFrameWidth / kidFrameHeight;
           final petScale = roomDepthScale(_petFeet.dy);
           final petBox = petBoxSize(_petStage, species: _eggSpecies) * petScale;
-          final shopFurniture = _shopFurniture;
+          final placeables = _activePlaceables;
+          Widget placeableSlot(RoomPlaceable p) {
+            final pos = _posOf(p);
+            return Positioned(
+              key: ValueKey('place-${p.id}'),
+              left: fx(pos.dx),
+              top: fy(pos.dy),
+              width: fx(p.size),
+              height: fy(p.size),
+              child: _RoomItemSlot(
+                item: p.item,
+                showImage: true,
+                asset: p.assetFor(_roomTheme),
+                arranging: _arranging,
+                dragging: _dragId == p.id,
+                onTap: () => _showBubble(p.item.reaction),
+                onDragStart: () => _onDragStart(p),
+                onDragUpdate: (d) => _onDragUpdate(
+                  p,
+                  Offset(d.dx / w * roomFrameWidth, d.dy / h * roomFrameHeight),
+                ),
+                onDragEnd: _onDragEnd,
+              ),
+            );
+          }
+
           final actors = <(double, List<Widget>)>[
-            // Nội thất mua đặt trên sàn: xếp theo chân y như nhân vật/pet.
-            for (final f in shopFurniture)
-              if (!f.wall)
+            // Đồ trên sàn/mặt phẳng: xếp theo chân y như nhân vật/pet
+            // (món gắn tường vẽ riêng, luôn ở sau).
+            for (final p in placeables)
+              if (!p.wall)
                 (
-                  f.anchor.dy,
+                  _posOf(p).dy + p.anchorOffset.dy,
                   [
-                    frameShadow(f.anchor, f.placeSize),
-                    Positioned(
-                      left: fx(f.placeX),
-                      top: fy(f.placeY),
-                      width: fx(f.placeSize),
-                      height: fy(f.placeSize),
-                      child: _RoomItemSlot(
-                        item: f,
-                        showImage: true,
-                        asset: roomThemeFurnitureAsset(
-                          _roomTheme,
-                          roomShopFurnitureId(f),
-                        ),
-                        onTap: () => _showBubble(f.reaction),
-                      ),
+                    frameShadow(
+                      _posOf(p) + p.anchorOffset,
+                      p.size,
+                      key: ValueKey('shadow-${p.id}'),
                     ),
+                    placeableSlot(p),
                   ],
                 ),
             if (_prop case final prop?)
@@ -1921,31 +2090,12 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                   ),
                 ),
               ),
-              // Nền sạch: bóng đổ do app vẽ (theo chân y). Nền cũ đã có
-              // bóng + món vẽ sẵn nên không vẽ thêm.
-              if (clean && !themed)
-                for (final item in itemsByFeet)
-                  if (!item.inCleanBackground)
-                    frameShadow(item.anchor, item.placeSize),
-              // 5 món nội thất (theo chân y): nền sạch thì vẽ PNG rời;
-              // nền cũ thì chỉ đặt vùng chạm vô hình đúng chỗ món vẽ
-              // sẵn trong nền (không vẽ PNG rời → không hình đôi).
-              // Phòng chủ đề: nền đã vẽ sẵn món nhỏ theo chủ đề, bỏ 5
-              // món của phòng gốc (cả ảnh lẫn vùng chạm).
+              // Món còn vẽ sẵn trong nền (chậu cây; cả 5 món khi dùng nền
+              // cũ): chỉ đặt vùng chạm vô hình đúng chỗ món trong nền, không
+              // vẽ PNG rời → không hình đôi. Phòng chủ đề: nền đã vẽ sẵn món
+              // nhỏ theo chủ đề, bỏ 5 món của phòng gốc.
               for (final item in themed ? const <RoomFurniture>[] : itemsByFeet)
-                if (clean && !item.inCleanBackground)
-                  Positioned(
-                    left: fx(item.placeX),
-                    top: fy(item.placeY),
-                    width: fx(item.placeSize),
-                    height: fy(item.placeSize),
-                    child: _RoomItemSlot(
-                      item: item,
-                      showImage: true,
-                      onTap: () => _showBubble(item.reaction),
-                    ),
-                  )
-                else
+                if (!clean || item.inCleanBackground)
                   Positioned(
                     left: fx(item.bakedRect.left),
                     top: fy(item.bakedRect.top),
@@ -1957,24 +2107,9 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                       onTap: () => _showBubble(item.reaction),
                     ),
                   ),
-              // Món gắn tường (dưới nhân vật/pet).
-              for (final f in shopFurniture)
-                if (f.wall)
-                  Positioned(
-                    left: fx(f.placeX),
-                    top: fy(f.placeY),
-                    width: fx(f.placeSize),
-                    height: fy(f.placeSize),
-                    child: _RoomItemSlot(
-                      item: f,
-                      showImage: true,
-                      asset: roomThemeFurnitureAsset(
-                        _roomTheme,
-                        roomShopFurnitureId(f),
-                      ),
-                      onTap: () => _showBubble(f.reaction),
-                    ),
-                  ),
+              // Món gắn tường (dưới nhân vật/pet và đồ trên sàn).
+              for (final p in placeables)
+                if (p.wall) placeableSlot(p),
               for (final actor in actors) ...actor.$2,
               if (_bubbleText != null)
                 Positioned(
@@ -2025,6 +2160,11 @@ class _RoomItemSlot extends StatefulWidget {
     required this.onTap,
     required this.showImage,
     this.asset,
+    this.arranging = false,
+    this.dragging = false,
+    this.onDragStart,
+    this.onDragUpdate,
+    this.onDragEnd,
   });
 
   final RoomFurniture item;
@@ -2033,6 +2173,15 @@ class _RoomItemSlot extends StatefulWidget {
   final String? asset;
   final VoidCallback onTap;
   final bool showImage;
+
+  /// Chế độ Sắp xếp: món có viền nổi và kéo được ([onDragStart]/
+  /// [onDragUpdate] theo px màn hình/[onDragEnd]); chạm không phản ứng.
+  /// Ngoài chế độ này kéo không làm gì.
+  final bool arranging;
+  final bool dragging;
+  final VoidCallback? onDragStart;
+  final ValueChanged<Offset>? onDragUpdate;
+  final VoidCallback? onDragEnd;
 
   @override
   State<_RoomItemSlot> createState() => _RoomItemSlotState();
@@ -2052,6 +2201,7 @@ class _RoomItemSlotState extends State<_RoomItemSlot>
   }
 
   void _onTap() {
+    if (widget.arranging) return;
     // Hiệu ứng một lần, tắt khi chạy test (cổng AnimationGate) để ảnh
     // chụp xác định.
     if (AnimationGate.enabled) _pop.forward(from: 0);
@@ -2064,6 +2214,12 @@ class _RoomItemSlotState extends State<_RoomItemSlot>
       key: Key(widget.item.key),
       behavior: HitTestBehavior.opaque,
       onTap: _onTap,
+      onPanStart: widget.arranging ? (_) => widget.onDragStart?.call() : null,
+      onPanUpdate: widget.arranging
+          ? (d) => widget.onDragUpdate?.call(d.delta)
+          : null,
+      onPanEnd: widget.arranging ? (_) => widget.onDragEnd?.call() : null,
+      onPanCancel: widget.arranging ? () => widget.onDragEnd?.call() : null,
       child: Stack(
         clipBehavior: Clip.none,
         fit: StackFit.expand,
@@ -2074,6 +2230,32 @@ class _RoomItemSlotState extends State<_RoomItemSlot>
               fit: BoxFit.fill,
               // Hình nội thất mua có thể chưa về: bỏ trống thay vì lỗi.
               errorBuilder: (_, _, _) => const SizedBox.shrink(),
+            ),
+          if (widget.arranging && widget.showImage)
+            // Viền mờ quanh phần nhìn thấy của ảnh (~68% x 70% ô ảnh).
+            Positioned.fill(
+              child: IgnorePointer(
+                child: FractionallySizedBox(
+                  key: Key('${widget.item.key}-outline'),
+                  widthFactor: 0.68,
+                  heightFactor: 0.70,
+                  alignment: const Alignment(0, 0.03),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: widget.dragging
+                          ? const Color(0x33FFE08A)
+                          : const Color(0x14FFFFFF),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: widget.dragging
+                            ? const Color(0xFFFFC93C)
+                            : const Color(0xB3FFFFFF),
+                        width: widget.dragging ? 3 : 2,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
           AnimatedBuilder(
             animation: _pop,
