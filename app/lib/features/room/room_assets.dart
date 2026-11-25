@@ -467,8 +467,8 @@ class RoomPlaceable {
   final String? drawAfter;
 
   /// Các chủ đề CÓ biến thể của món này (null = mọi chủ đề). Món Muse dùng
-  /// lại nguyên bản ở phòng chủ đề (5 món nhỏ) không có biến thể nên không
-  /// bán lẻ.
+  /// lại nguyên bản ở phòng chủ đề (đèn sao, cốc bút ở Ngân hà; 5 món nhỏ
+  /// ở Rồng) không có biến thể nên không bán lẻ.
   final Set<String>? variantThemes;
 
   bool get wall => kind == RoomPlaceKind.wall;
@@ -656,14 +656,26 @@ const Map<String, RoomItemTier> roomBigFurnitureTier = {
   'noi_tham': RoomItemTier.medium,
 };
 
-/// Hình riêng của 7 món lớn ở phòng Rồng (cỡ theo doc lô 15). Kệ lớn Rồng
-/// ĐỨNG SÀN (khác kệ treo tường của phòng gốc): neo = chân sàn.
+/// Hình riêng từng biến thể (phòng Rồng, Tết, Ngân hà; cỡ theo doc lô 15) của
+/// 7 món lớn, 8 món Cửa hàng và các món nhỏ có bản theo chủ đề (khóa = mã
+/// món). Kệ lớn Rồng ĐỨNG SÀN (khác kệ treo tường của phòng gốc): neo =
+/// chân sàn.
 final Map<String, Map<String, RoomArt>> roomVariantArt = {
   'noi_tham': {
     'rong': RoomArt.trimmed(
       width: 590,
       height: 160,
       crop: Rect.fromLTRB(218 / 1024, 352 / 512, 807 / 1024, 1),
+    ),
+    'ngan_ha': RoomArt.trimmed(
+      width: 590,
+      height: 160,
+      crop: Rect.fromLTRB(38 / 1024, 255 / 512, 987 / 1024, 511 / 512),
+    ),
+    'tet': RoomArt.trimmed(
+      width: 590,
+      height: 160,
+      crop: Rect.fromLTRB(37 / 1024, 255 / 512, 987 / 1024, 512 / 512),
     ),
   },
   'noi_ke_lon': {
@@ -675,6 +687,17 @@ final Map<String, Map<String, RoomArt>> roomVariantArt = {
       footprint: Rect.fromLTRB(-96, -30, 96, 0),
       defaultAnchor: Offset(1190, 762),
     ),
+    'ngan_ha': RoomArt.trimmed(
+      width: 270,
+      height: 360,
+      crop: Rect.fromLTRB(137 / 1024, 24 / 1024, 887 / 1024, 1024 / 1024),
+    ),
+    'tet': RoomArt.trimmed(
+      width: 270,
+      height: 386,
+      crop: Rect.fromLTRB(162 / 1024, 24 / 1024, 862 / 1024, 1024 / 1024),
+      defaultAnchor: Offset(1270, 640),
+    ),
   },
   'noi_giuong': {
     'rong': RoomArt.trimmed(
@@ -682,6 +705,18 @@ final Map<String, Map<String, RoomArt>> roomVariantArt = {
       height: 380,
       crop: Rect.fromLTRB(262 / 1024, 684 / 1024, 762 / 1024, 1),
       footprint: Rect.fromLTRB(-224, -40, 224, 0),
+    ),
+    'ngan_ha': RoomArt.trimmed(
+      width: 500,
+      height: 340,
+      crop: Rect.fromLTRB(262 / 1024, 683 / 1024, 762 / 1024, 1024 / 1024),
+      footprint: Rect.fromLTRB(-200, -40, 200, 0),
+    ),
+    'tet': RoomArt.trimmed(
+      width: 500,
+      height: 339,
+      crop: Rect.fromLTRB(262 / 1024, 685 / 1024, 762 / 1024, 1024 / 1024),
+      footprint: Rect.fromLTRB(-200, -40, 200, 0),
     ),
   },
   'noi_tu_dau_giuong': {
@@ -691,12 +726,36 @@ final Map<String, Map<String, RoomArt>> roomVariantArt = {
       crop: Rect.fromLTRB(415 / 1024, 825 / 1024, 610 / 1024, 1),
       footprint: Rect.fromLTRB(-78, -24, 78, 0),
     ),
+    'ngan_ha': RoomArt.trimmed(
+      width: 194,
+      height: 190,
+      crop: Rect.fromLTRB(414 / 1024, 835 / 1024, 608 / 1024, 1024 / 1024),
+      footprint: Rect.fromLTRB(-80, -24, 80, 0),
+    ),
+    'tet': RoomArt.trimmed(
+      width: 194,
+      height: 189,
+      crop: Rect.fromLTRB(415 / 1024, 835 / 1024, 609 / 1024, 1024 / 1024),
+      footprint: Rect.fromLTRB(-80, -24, 80, 0),
+    ),
   },
   'noi_ban_hoc': {
     'rong': RoomArt.trimmed(
       width: 320,
       height: 262,
       crop: Rect.fromLTRB(352 / 1024, 762 / 1024, 672 / 1024, 1),
+      footprint: Rect.fromLTRB(-128, -30, 128, 0),
+    ),
+    'ngan_ha': RoomArt.trimmed(
+      width: 320,
+      height: 269,
+      crop: Rect.fromLTRB(62 / 1024, 269 / 1024, 962 / 1024, 1024 / 1024),
+      footprint: Rect.fromLTRB(-128, -30, 128, 0),
+    ),
+    'tet': RoomArt.trimmed(
+      width: 320,
+      height: 256,
+      crop: Rect.fromLTRB(63 / 1024, 305 / 1024, 962 / 1024, 1024 / 1024),
       footprint: Rect.fromLTRB(-128, -30, 128, 0),
     ),
   },
@@ -707,12 +766,36 @@ final Map<String, Map<String, RoomArt>> roomVariantArt = {
       crop: Rect.fromLTRB(432 / 1024, 784 / 1024, 592 / 1024, 1),
       footprint: Rect.fromLTRB(-60, -24, 60, 0),
     ),
+    'ngan_ha': RoomArt.trimmed(
+      width: 160,
+      height: 240,
+      crop: Rect.fromLTRB(182 / 1024, 34 / 1024, 842 / 1024, 1024 / 1024),
+      footprint: Rect.fromLTRB(-60, -24, 60, 0),
+    ),
+    'tet': RoomArt.trimmed(
+      width: 160,
+      height: 241,
+      crop: Rect.fromLTRB(182 / 1024, 33 / 1024, 841 / 1024, 1024 / 1024),
+      footprint: Rect.fromLTRB(-60, -24, 60, 0),
+    ),
   },
   'noi_tu_ao': {
     'rong': RoomArt.trimmed(
       width: 320,
       height: 820,
       crop: Rect.fromLTRB(352 / 1024, 204 / 1024, 672 / 1024, 1),
+      footprint: Rect.fromLTRB(-144, -40, 144, 0),
+    ),
+    'ngan_ha': RoomArt.trimmed(
+      width: 320,
+      height: 820,
+      crop: Rect.fromLTRB(352 / 1024, 205 / 1024, 672 / 1024, 1024 / 1024),
+      footprint: Rect.fromLTRB(-144, -40, 144, 0),
+    ),
+    'tet': RoomArt.trimmed(
+      width: 320,
+      height: 817,
+      crop: Rect.fromLTRB(352 / 1024, 204 / 1024, 673 / 1024, 1024 / 1024),
       footprint: Rect.fromLTRB(-144, -40, 144, 0),
     ),
   },
@@ -724,12 +807,36 @@ final Map<String, Map<String, RoomArt>> roomVariantArt = {
       anchor: Offset(141.35, 242.55),
       footprint: Rect.fromLTRB(-63, -24, 63, 0),
     ),
+    'ngan_ha': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.65, 198),
+      footprint: Rect.fromLTRB(-57, -24, 57, 0),
+    ),
+    'tet': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.88, 198),
+      footprint: Rect.fromLTRB(-57, -24, 57, 0),
+    ),
   },
   'noi_ke_sach': {
     'rong': RoomArt(
       width: 230.4,
       height: 230.4,
       anchor: Offset(115.42, 198.45),
+      footprint: Rect.fromLTRB(-62, -24, 62, 0),
+    ),
+    'ngan_ha': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.2, 198.45),
+      footprint: Rect.fromLTRB(-62, -24, 62, 0),
+    ),
+    'tet': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.2, 198.45),
       footprint: Rect.fromLTRB(-62, -24, 62, 0),
     ),
   },
@@ -740,6 +847,18 @@ final Map<String, Map<String, RoomArt>> roomVariantArt = {
       anchor: Offset(115.42, 198.45),
       footprint: Rect.fromLTRB(-49, -24, 49, 0),
     ),
+    'ngan_ha': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.42, 198.45),
+      footprint: Rect.fromLTRB(-53, -24, 53, 0),
+    ),
+    'tet': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.65, 198.45),
+      footprint: Rect.fromLTRB(-53, -24, 53, 0),
+    ),
   },
   'noi_cay_cao': {
     'rong': RoomArt(
@@ -747,6 +866,18 @@ final Map<String, Map<String, RoomArt>> roomVariantArt = {
       height: 230.4,
       anchor: Offset(115.42, 198.45),
       footprint: Rect.fromLTRB(-43, -24, 43, 0),
+    ),
+    'ngan_ha': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.65, 198.45),
+      footprint: Rect.fromLTRB(-48, -24, 48, 0),
+    ),
+    'tet': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.65, 198.45),
+      footprint: Rect.fromLTRB(-48, -24, 48, 0),
     ),
   },
   'noi_ghe_luoi': {
@@ -756,6 +887,18 @@ final Map<String, Map<String, RoomArt>> roomVariantArt = {
       anchor: Offset(115.65, 198.45),
       footprint: Rect.fromLTRB(-38, -24, 38, 0),
     ),
+    'ngan_ha': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.88, 198.45),
+      footprint: Rect.fromLTRB(-49, -24, 49, 0),
+    ),
+    'tet': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.88, 198.45),
+      footprint: Rect.fromLTRB(-49, -24, 49, 0),
+    ),
   },
   'noi_leu': {
     'rong': RoomArt(
@@ -764,6 +907,18 @@ final Map<String, Map<String, RoomArt>> roomVariantArt = {
       anchor: Offset(115.42, 198.45),
       footprint: Rect.fromLTRB(-59, -24, 59, 0),
     ),
+    'ngan_ha': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.65, 198),
+      footprint: Rect.fromLTRB(-63, -24, 63, 0),
+    ),
+    'tet': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.65, 198.45),
+      footprint: Rect.fromLTRB(-63, -24, 63, 0),
+    ),
   },
   'noi_den_trang': {
     'rong': RoomArt(
@@ -771,9 +926,82 @@ final Map<String, Map<String, RoomArt>> roomVariantArt = {
       height: 230.4,
       anchor: Offset(114.98, 198.45),
     ),
+    'ngan_ha': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.2, 198.45),
+      defaultAnchor: Offset(880, 465),
+    ),
+    'tet': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.2, 198.45),
+      defaultAnchor: Offset(840, 465),
+    ),
   },
   'noi_tranh': {
     'rong': RoomArt(width: 230.4, height: 230.4, anchor: Offset(115.2, 198.45)),
+    'ngan_ha': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.42, 198.45),
+      defaultAnchor: Offset(410, 300),
+    ),
+    'tet': RoomArt(
+      width: 230.4,
+      height: 230.4,
+      anchor: Offset(115.2, 198.45),
+      defaultAnchor: Offset(160, 192),
+    ),
+  },
+  'gau-bong': {
+    'ngan_ha': RoomArt(
+      width: 238.59,
+      height: 238.59,
+      anchor: Offset(119.76, 206.9),
+    ),
+    'tet': RoomArt(
+      width: 238.59,
+      height: 238.59,
+      anchor: Offset(119.76, 207.37),
+    ),
+  },
+  'den-sao': {
+    'tet': RoomArt(width: 196.1, height: 196.1, anchor: Offset(98.82, 172.35)),
+  },
+  'chau-cay': {
+    'ngan_ha': RoomArt(
+      width: 358.4,
+      height: 358.4,
+      anchor: Offset(165.55, 308.7),
+      footprint: Rect.fromLTRB(-77, -24, 77, 0),
+    ),
+    'tet': RoomArt(
+      width: 358.4,
+      height: 358.4,
+      anchor: Offset(165.55, 308.7),
+      footprint: Rect.fromLTRB(-77, -24, 77, 0),
+    ),
+  },
+  'binh-hoa': {
+    'ngan_ha': RoomArt(
+      width: 202.24,
+      height: 202.24,
+      anchor: Offset(102.11, 169.46),
+    ),
+    'tet': RoomArt(
+      width: 202.24,
+      height: 202.24,
+      anchor: Offset(101.91, 169.85),
+    ),
+  },
+  'coc-sao': {
+    'tet': RoomArt(
+      width: 161.28,
+      height: 161.28,
+      anchor: Offset(71.66, 136.71),
+      defaultAnchor: Offset(700, 465),
+    ),
   },
 };
 
@@ -938,12 +1166,19 @@ const List<RoomFurniture> roomShopFurnitureV4 = [
   ),
 ];
 
-/// Chủ đề có biến thể của 5 món nhỏ: chưa có (Muse dùng lại nguyên bản
-/// `*_v3` ở phòng chủ đề Rồng; Tết/Ngân hà sẽ thêm sau nếu vẽ riêng).
-const Set<String> _noThemeVariants = <String>{};
+/// Chủ đề có biến thể của từng món nhỏ (mã món -> chủ đề). Phòng Rồng dùng
+/// lại nguyên bản `*_v3` nên không có biến thể; Ngân hà vẽ riêng gấu, chậu
+/// cây, bình hoa (đèn sao, cốc bút dùng lại `_v3`); Tết vẽ riêng cả 5 món.
+const Map<String, Set<String>> _smallThemeVariants = <String, Set<String>>{
+  'gau-bong': {'tet', 'ngan_ha'},
+  'den-sao': {'tet'},
+  'chau-cay': {'tet', 'ngan_ha'},
+  'binh-hoa': {'tet', 'ngan_ha'},
+  'coc-sao': {'tet'},
+};
 
-/// 8 món cửa hàng chỉ có biến thể Phòng Rồng (Tết/Ngân hà chưa có hình).
-const Set<String> _dragonOnlyVariants = <String>{'rong'};
+/// 8 món Cửa hàng có biến thể ở cả 3 phòng chủ đề.
+const Set<String> _shopThemeVariants = <String>{'rong', 'tet', 'ngan_ha'};
 
 /// Món kéo thả của phòng v4: 7 món lớn + 5 món nhỏ + 8 món Cửa hàng.
 List<RoomPlaceable> _roomPlaceablesV4() => [
@@ -964,7 +1199,11 @@ List<RoomPlaceable> _roomPlaceablesV4() => [
       kind: f.key == 'room-furniture-chau-cay'
           ? RoomPlaceKind.floor
           : RoomPlaceKind.surface,
-      variantThemes: _noThemeVariants,
+      variantArt:
+          roomVariantArt[f.key.substring('room-furniture-'.length)] ?? const {},
+      variantThemes:
+          _smallThemeVariants[f.key.substring('room-furniture-'.length)] ??
+          const <String>{},
     ),
   for (final f in roomShopFurnitureV4)
     RoomPlaceable(
@@ -974,7 +1213,7 @@ List<RoomPlaceable> _roomPlaceablesV4() => [
       shopId: roomShopFurnitureId(f),
       tier: roomShopFurnitureTier[roomShopFurnitureId(f)] ?? RoomItemTier.small,
       variantArt: roomVariantArt[roomShopFurnitureId(f)] ?? const {},
-      variantThemes: _dragonOnlyVariants,
+      variantThemes: _shopThemeVariants,
     ),
 ];
 

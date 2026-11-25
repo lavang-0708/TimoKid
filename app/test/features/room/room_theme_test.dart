@@ -186,19 +186,28 @@ void main() {
     expect(assetOf(bg(tester)!), roomThemeBackground('tet'));
     expect(await setting(roomBackgroundSettingsKey), 'tet');
     final variants = decodeRoomVariants(await setting(roomVariantsSettingsKey));
-    // Có bộ => 7 món lớn/vừa có biến thể Tết; món nhỏ không có biến thể.
+    // Có bộ Tết => 7 món lớn/vừa + 8 món Cửa hàng + 5 món nhỏ = 20 món.
     expect(variants.length, _variantsIn('tet').length);
-    expect(variants.length, 7);
+    expect(variants.length, 20);
     expect(variants.values.toSet(), {'tet'});
-    expect(variants.containsKey('gau-bong'), isFalse);
-    // Món nhỏ vẫn vẽ (nền chủ đề không "nướng" món nào).
+    // "Thay cả bộ" đổi cả món nhỏ (cả 5 món nhỏ đều có bản Tết).
+    for (final id in [
+      'gau-bong',
+      'den-sao',
+      'chau-cay',
+      'binh-hoa',
+      'coc-sao',
+    ]) {
+      expect(variants[id], 'tet', reason: id);
+    }
     expect(find.byKey(const Key('room-furniture-gau-bong')), findsOneWidget);
-    expect(slotAssets(tester, 'gau-bong').first, _p('gau-bong').item.asset);
+    expect(slotAssets(tester, 'gau-bong').first, contains('tet_gau_bong'));
+    expect(slotAssets(tester, 'den-sao').first, contains('tet_den_sao'));
     expect(slotAssets(tester, 'noi_giuong').first, contains('tet_giuong'));
-    // Nhà cho pet chưa có bản Tết: vẫn ảnh gốc.
+    // Nhà cho pet (đã mua) đổi sang bản Tết.
     expect(
       slotAssets(tester, 'noi_nha_pet').first,
-      _p('noi_nha_pet').item.asset,
+      'assets/images/furniture/tet_nha_pet.webp',
     );
     await teardown(tester);
   });
@@ -227,8 +236,15 @@ void main() {
     expect(assetOf(bg(tester)!), roomThemeBackground('ngan_ha'));
     final variants = decodeRoomVariants(await setting(roomVariantsSettingsKey));
     expect(variants['noi_giuong'], 'ngan_ha');
+    // Ngân hà: 7 + 8 món + 3 món nhỏ vẽ riêng (gấu, chậu cây, bình hoa).
     expect(variants.length, _variantsIn('ngan_ha').length);
-    expect(variants.containsKey('gau-bong'), isFalse);
+    expect(variants.length, 18);
+    expect(variants['gau-bong'], 'ngan_ha');
+    expect(variants['chau-cay'], 'ngan_ha');
+    expect(variants['binh-hoa'], 'ngan_ha');
+    // Đèn sao, cốc bút dùng lại bản gốc: không có biến thể Ngân hà.
+    expect(variants.containsKey('den-sao'), isFalse);
+    expect(variants.containsKey('coc-sao'), isFalse);
     await teardown(tester);
   });
 
@@ -255,9 +271,9 @@ void main() {
     await pumpRoom(tester);
     expect(assetOf(bg(tester)!), roomThemeBackground('tet'));
     expect(slotAssets(tester, 'noi_giuong').first, contains('tet_giuong'));
-    final posBefore = tester.getTopLeft(
-      find.byKey(const Key('room-furniture-noi_tu_ao')),
-    );
+    final bottomBefore = tester
+        .getRect(find.byKey(const Key('room-furniture-noi_tu_ao')))
+        .bottomCenter;
 
     await openPicker(tester);
     await tester.tap(find.byKey(const Key('room-theme-classic')));
@@ -266,9 +282,12 @@ void main() {
     expect(await setting(roomBackgroundSettingsKey), 'classic');
     expect(decodeRoomVariants(await setting(roomVariantsSettingsKey)), isEmpty);
     expect(slotAssets(tester, 'noi_giuong').first, _p('noi_giuong').item.asset);
+    // Điểm neo (đáy-giữa) giữ nguyên; góc trên-trái dời theo cỡ hộp.
     expect(
-      tester.getTopLeft(find.byKey(const Key('room-furniture-noi_tu_ao'))),
-      posBefore,
+      tester
+          .getRect(find.byKey(const Key('room-furniture-noi_tu_ao')))
+          .bottomCenter,
+      bottomBefore,
     );
     await teardown(tester);
   });
@@ -310,6 +329,41 @@ void main() {
     await tester.pumpAndSettle();
     expect(decodeRoomVariants(await setting(roomVariantsSettingsKey)), isEmpty);
     expect(slotAssets(tester, 'noi_tu_ao').first, _p('noi_tu_ao').item.asset);
+    await teardown(tester);
+  });
+
+  testWidgets('Sắp xếp: món nhỏ cũng có bảng biến thể, giữ chỗ khi đổi', (
+    tester,
+  ) async {
+    await setUpPet('dog', xp: 100);
+    await grant(roomThemeVariantItemId('tet', 'gau-bong'));
+    await grant(roomThemeVariantItemId('ngan_ha', 'gau-bong'));
+    await pumpRoom(tester);
+    final key = find.byKey(const Key('room-furniture-gau-bong'));
+    final bottomBefore = tester.getRect(key).bottomCenter;
+    await tester.tap(find.byKey(const Key('room-arrange-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(key);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('room-variant-sheet')), findsOneWidget);
+    expect(find.byKey(const Key('room-variant-classic')), findsOneWidget);
+    expect(find.byKey(const Key('room-variant-tet')), findsOneWidget);
+    expect(find.byKey(const Key('room-variant-ngan_ha')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('room-variant-ngan_ha')));
+    await tester.pumpAndSettle();
+    expect(decodeRoomVariants(await setting(roomVariantsSettingsKey)), {
+      'gau-bong': 'ngan_ha',
+    });
+    expect(slotAssets(tester, 'gau-bong').first, contains('ngan_ha_gau_bong'));
+    // Gấu vẫn ngồi đúng chỗ trên giường (điểm neo giữ nguyên).
+    expect(
+      (tester.getRect(key).bottomCenter - bottomBefore).distance,
+      lessThan(0.6),
+    );
+    // Đèn sao chưa mua bản nào: chạm không mở bảng.
+    await tester.tap(find.byKey(const Key('room-furniture-den-sao')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('room-variant-sheet')), findsNothing);
     await teardown(tester);
   });
 
@@ -358,7 +412,7 @@ void main() {
     await teardown(tester);
   });
 
-  testWidgets('thiếu ảnh biến thể: về ảnh gốc của món', (tester) async {
+  testWidgets('ảnh biến thể có dự phòng về ảnh gốc của món', (tester) async {
     await setUpPet('dog', xp: 100);
     await grant(roomThemeVariantItemId('tet', 'noi_tu_ao'));
     await db.settingsDao.setValue(
@@ -368,9 +422,15 @@ void main() {
     );
     await pumpRoom(tester);
     final assets = slotAssets(tester, 'noi_tu_ao');
-    // Thử ảnh Tết (chưa có file), lỗi thì vẽ ảnh gốc.
     expect(assets.first, 'assets/images/furniture/tet_tu_ao.webp');
-    expect(assets, contains(_p('noi_tu_ao').item.asset));
+    // Ảnh Tết lỗi/thiếu file thì vẽ ảnh gốc (errorBuilder).
+    final images = tester.widgetList<Image>(
+      find.descendant(
+        of: find.byKey(Key(_p('noi_tu_ao').item.key)),
+        matching: find.byType(Image),
+      ),
+    );
+    expect(images.first.errorBuilder, isNotNull);
     await teardown(tester);
   });
 
@@ -410,10 +470,10 @@ void main() {
     );
     await pumpRoom(tester);
     expect(assetOf(bg(tester)!), roomThemeBackground('tet'));
-    // Tết chưa có bản vẽ riêng cho món cửa hàng: vẫn ảnh gốc.
+    // Máy cũ ở phòng Tết: món Cửa hàng đã mua vẽ bản Tết.
     expect(
       slotAssets(tester, 'noi_nha_pet').first,
-      _p('noi_nha_pet').item.asset,
+      'assets/images/furniture/tet_nha_pet.webp',
     );
     expect(await setting(roomBackgroundSettingsKey), 'tet');
     expect(
@@ -436,17 +496,26 @@ void main() {
       roomThemeFurnitureAsset(roomThemeClassic, 'noi_nha_pet'),
       'assets/images/furniture/noi_nha_pet.webp',
     );
-    // Món nhỏ không có biến thể: mọi chủ đề đều ra ảnh gốc.
+    // Món nhỏ: Tết/Ngân hà vẽ riêng; Rồng dùng lại ảnh gốc.
     final bear = _p('gau-bong');
     expect(bear.assetFor(roomThemeClassic), bear.item.asset);
     expect(bear.assetFor('rong'), bear.item.asset);
     expect(bear.hasVariant('rong'), isFalse);
-    // Món lớn: ảnh theo chủ đề; món cửa hàng chỉ có Rồng.
+    expect(bear.hasVariant('tet'), isTrue);
+    expect(bear.assetFor('tet'), 'assets/images/furniture/tet_gau_bong.webp');
+    // Đèn sao, cốc bút: chỉ Tết vẽ riêng; Ngân hà dùng lại bản gốc.
+    for (final id in ['den-sao', 'coc-sao']) {
+      expect(_p(id).hasVariant('tet'), isTrue, reason: id);
+      expect(_p(id).hasVariant('ngan_ha'), isFalse, reason: id);
+      expect(_p(id).assetFor('ngan_ha'), _p(id).item.asset, reason: id);
+    }
+    // Món lớn: ảnh theo chủ đề; món cửa hàng có cả 3 chủ đề.
     expect(
       _p('noi_giuong').assetFor('rong'),
       'assets/images/furniture/rong_giuong.webp',
     );
-    expect(_p('noi_nha_pet').hasVariant('rong'), isTrue);
-    expect(_p('noi_nha_pet').hasVariant('tet'), isFalse);
+    for (final t in ['rong', 'tet', 'ngan_ha']) {
+      expect(_p('noi_nha_pet').hasVariant(t), isTrue, reason: t);
+    }
   });
 }

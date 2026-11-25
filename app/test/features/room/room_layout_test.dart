@@ -45,6 +45,9 @@ Rect _visibleBox(
   );
 }
 
+/// Mọi biến thể: phòng gốc + 3 phòng chủ đề.
+const _variants = ['classic', 'rong', 'tet', 'ngan_ha'];
+
 RoomPlaceable _p(String id) => roomPlaceables.firstWhere((p) => p.id == id);
 
 /// Hai hình chữ nhật có phần chung có diện tích dương không.
@@ -103,9 +106,12 @@ void main() {
         final leu = _p('noi_leu');
         expect(leu.assetFor('classic'), 'assets/images/furniture/noi_leu.webp');
         expect(leu.assetFor('rong'), 'assets/images/furniture/rong_leu.webp');
-        // Tết/Ngân hà chưa có hình món cửa hàng: dùng ảnh gốc.
-        expect(leu.hasVariant('tet'), isFalse);
-        expect(leu.assetFor('tet'), leu.item.asset);
+        expect(leu.hasVariant('tet'), isTrue);
+        expect(leu.assetFor('tet'), 'assets/images/furniture/tet_leu.webp');
+        expect(
+          leu.assetFor('ngan_ha'),
+          'assets/images/furniture/ngan_ha_leu.webp',
+        );
         final bed = _p('noi_giuong');
         expect(
           bed.assetFor('rong'),
@@ -115,10 +121,18 @@ void main() {
           _p('noi_tu_dau_giuong').assetFor('rong'),
           'assets/images/furniture/rong_tu_dau_giuong.webp',
         );
-        // 5 món nhỏ không có biến thể chủ đề: luôn ảnh gốc.
+        // Món nhỏ: Rồng dùng lại ảnh gốc; Tết/Ngân hà vẽ riêng.
         final gau = _p('gau-bong');
         expect(gau.hasVariant('rong'), isFalse);
         expect(gau.assetFor('rong'), gau.item.asset);
+        expect(
+          gau.assetFor('tet'),
+          'assets/images/furniture/tet_gau_bong.webp',
+        );
+        expect(
+          gau.assetFor('ngan_ha'),
+          'assets/images/furniture/ngan_ha_gau_bong.webp',
+        );
         expect(bed.hasVariant('rong'), isTrue);
       },
     );
@@ -146,6 +160,132 @@ void main() {
       // Biến thể chưa vẽ (Tết/Ngân hà): như phòng gốc.
       expect(shelf.kindFor('tet'), RoomPlaceKind.wall);
       expect(shelf.artFor('tet').width, 270);
+    });
+
+    test('biến thể Tết/Ngân hà: cỡ hộp đúng doc, kệ lớn treo tường', () {
+      const expected = {
+        'tet': {
+          'noi_giuong': (500.0, 339.0),
+          'noi_tu_dau_giuong': (194.0, 189.0),
+          'noi_tu_ao': (320.0, 817.0),
+          'noi_ban_hoc': (320.0, 256.0),
+          'noi_ghe': (160.0, 241.0),
+          'noi_ke_lon': (270.0, 386.0),
+          'noi_tham': (590.0, 160.0),
+        },
+        'ngan_ha': {
+          'noi_giuong': (500.0, 340.0),
+          'noi_tu_dau_giuong': (194.0, 190.0),
+          'noi_tu_ao': (320.0, 820.0),
+          'noi_ban_hoc': (320.0, 269.0),
+          'noi_ghe': (160.0, 240.0),
+          'noi_ke_lon': (270.0, 360.0),
+          'noi_tham': (590.0, 160.0),
+        },
+      };
+      for (final t in expected.entries) {
+        for (final e in t.value.entries) {
+          final art = _p(e.key).artFor(t.key);
+          expect(art.width, e.value.$1, reason: '${t.key} ${e.key}');
+          expect(art.height, e.value.$2, reason: '${t.key} ${e.key}');
+          expect(art.cropped, isTrue, reason: '${t.key} ${e.key}');
+          expect(art.anchor, Offset(art.width / 2, art.height));
+        }
+        expect(_p('noi_ke_lon').kindFor(t.key), RoomPlaceKind.wall);
+      }
+      // 8 món Cửa hàng: ô 512x512 tỉ lệ 0,45, neo đáy ảnh nhìn thấy.
+      for (final t in ['tet', 'ngan_ha']) {
+        for (final id in [
+          'noi_nha_pet',
+          'noi_ke_sach',
+          'noi_be_ca',
+          'noi_cay_cao',
+          'noi_ghe_luoi',
+          'noi_leu',
+          'noi_den_trang',
+          'noi_tranh',
+        ]) {
+          final art = _p(id).artFor(t);
+          expect(art.width, 230.4, reason: '$t $id');
+          expect(art.anchor.dy, inInclusiveRange(197, 199), reason: '$t $id');
+          expect(art.cropped, isFalse);
+        }
+      }
+    });
+
+    test('món nhỏ theo chủ đề: cùng cỡ với bản gốc, neo đáy ảnh nhìn thấy', () {
+      for (final e in {
+        'gau-bong': ['tet', 'ngan_ha'],
+        'den-sao': ['tet'],
+        'chau-cay': ['tet', 'ngan_ha'],
+        'binh-hoa': ['tet', 'ngan_ha'],
+        'coc-sao': ['tet'],
+      }.entries) {
+        final p = _p(e.key);
+        for (final t in e.value) {
+          expect(p.hasVariant(t), isTrue, reason: '${e.key} $t');
+          final art = p.artFor(t);
+          expect(art.width, p.size, reason: '${e.key} $t');
+          expect(art.height, p.size, reason: '${e.key} $t');
+          // Cùng điểm neo => đổi biến thể không làm món nhảy chỗ.
+          const pos = Offset(300, 300);
+          expect(
+            (p.boxAt(t, pos).topLeft + art.anchor - (pos + p.anchorOffset))
+                .distance,
+            lessThan(0.001),
+            reason: '${e.key} $t',
+          );
+        }
+      }
+      // Chậu cây vẫn chặn đường đi ở mọi biến thể.
+      for (final t in ['tet', 'ngan_ha']) {
+        expect(
+          _p('chau-cay').footprintAt(_p('chau-cay').defaultPos, variant: t),
+          isNotNull,
+        );
+      }
+    });
+
+    test('bố cục mặc định theo biến thể: món nhỏ nằm trên mặt phẳng', () {
+      // Mọi món nhỏ ở bố cục mặc định của từng phòng đứng đúng chỗ (mặt
+      // giường/tủ/bàn/bậu cửa hoặc sàn), không lơ lửng giữa không trung.
+      for (final t in ['tet', 'ngan_ha']) {
+        Rect? hostBox(String id) {
+          final h = _p(id);
+          final v = h.hasVariant(t) ? t : roomThemeClassic;
+          return h.boxAt(
+            v,
+            roomClampPlaceable(h, h.defaultPosFor(v), variant: v),
+          );
+        }
+
+        final surfaces = roomSurfacesFor(hostBox);
+        for (final p in roomPlaceables) {
+          final v = p.hasVariant(t) ? t : roomThemeClassic;
+          if (p.kindFor(v) != RoomPlaceKind.surface) continue;
+          final pos = roomClampPlaceable(
+            p,
+            p.defaultPosFor(v),
+            variant: v,
+            surfaces: surfaces,
+          );
+          final anchor = pos + p.anchorOffset;
+          expect(
+            roomSurfaceUnder(anchor, surfaces) != null ||
+                roomPointInFloor(anchor),
+            isTrue,
+            reason: '${p.id} $t',
+          );
+        }
+      }
+      // Đèn mặt trăng và tranh dời khỏi kệ treo/câu đối: theo defaultAnchor.
+      expect(
+        _p('noi_den_trang').defaultPosFor('ngan_ha') +
+            _p('noi_den_trang').anchorOffset,
+        isNot(
+          _p('noi_den_trang').defaultPos + _p('noi_den_trang').anchorOffset,
+        ),
+      );
     });
 
     test('đổi biến thể giữ điểm neo (món không nhảy chỗ)', () {
@@ -255,7 +395,7 @@ void main() {
 
     test('roomClampPlaceable giữ neo trong vùng của từng loại', () {
       for (final p in roomPlaceables) {
-        for (final variant in ['classic', 'rong']) {
+        for (final variant in _variants) {
           for (final tl in const [
             Offset(-900, -900),
             Offset(3000, -900),
@@ -324,7 +464,7 @@ void main() {
   group('bố cục mặc định', () {
     test('mọi món mặc định nằm đúng vùng (kẹp không đổi vị trí)', () {
       for (final p in roomPlaceables) {
-        for (final variant in ['classic', 'rong']) {
+        for (final variant in _variants) {
           final pos = p.defaultPosFor(variant);
           final c = roomClampPlaceable(p, pos, variant: variant);
           expect(
@@ -338,7 +478,7 @@ void main() {
 
     test('ảnh nằm trong khung 1600x900 (cả phòng gốc và phòng Rồng)', () {
       for (final p in roomPlaceables) {
-        for (final variant in ['classic', 'rong']) {
+        for (final variant in _variants) {
           final b = _visibleBox(p, p.defaultPosFor(variant), variant: variant);
           expect(b.left, greaterThanOrEqualTo(0), reason: '${p.id} $variant');
           expect(b.top, greaterThanOrEqualTo(0), reason: '${p.id} $variant');
@@ -349,7 +489,7 @@ void main() {
     });
 
     test('dấu chân trên sàn không đè nhau, nằm trong sàn', () {
-      for (final variant in ['classic', 'rong']) {
+      for (final variant in _variants) {
         final feet = <String, Rect>{
           for (final p in roomPlaceables)
             p.id: ?p.footprintAt(p.defaultPosFor(variant), variant: variant),
@@ -380,7 +520,7 @@ void main() {
     });
 
     test('lối đi trên thảm trống: chỗ bé và pet đứng không bị chặn', () {
-      for (final variant in ['classic', 'rong']) {
+      for (final variant in _variants) {
         final extra = [
           for (final p in roomPlaceables)
             ?p.footprintAt(p.defaultPosFor(variant), variant: variant),
