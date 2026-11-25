@@ -8,7 +8,11 @@
 /// `town_v2.webp` — xem mục "Thị trấn v3b" trong `docs/ASSETS.md`).
 library;
 
+import 'dart:convert';
+import 'dart:math' as math;
 import 'dart:ui';
+
+import 'room_themes.dart';
 
 /// Đường dẫn asset PNG nền phòng v3b.
 const String roomBackgroundAsset = 'assets/images/backgrounds/room_v3.webp';
@@ -162,7 +166,9 @@ const List<RoomFurniture> roomFurniture = [
 /// `assets/images/furniture/<mã>.webp` (512x512). CHỈ vẽ khi
 /// `furnitureShopArtReady` (Muse đang vẽ hình).
 ///
-/// Ô đặt TẠM, đo bằng mắt trên `room_v3_clean.webp` — dễ chỉnh: mỗi món
+/// Ô đặt MẶC ĐỊNH (bé kéo thả đổi được, xem [roomPlaceables]), xếp vào
+/// chỗ trống của `room_v3_clean.webp` (không đè giường, tủ đầu giường,
+/// bàn + ghế, kệ lớn, tủ áo, chậu cây vẽ sẵn; không đè 5 món nhỏ) — dễ chỉnh: mỗi món
 /// chỉ cần sửa [RoomFurniture.placeX]/[placeY]/[placeSize] (góc trên-trái
 /// + cỡ ảnh 512x512), [RoomFurniture.anchor] (điểm đáy: bóng đổ + thứ tự
 /// vẽ theo chân y so với nhân vật/pet) và [RoomFurniture.footprint]
@@ -175,72 +181,72 @@ const List<RoomFurniture> roomShopFurniture = [
     asset: 'assets/images/furniture/noi_nha_pet.webp',
     label: 'Nhà cho pet',
     reaction: 'Nhà của pet ấm áp quá!',
-    placeX: 1059,
-    placeY: 557,
-    placeSize: 282,
-    anchor: Offset(1200, 800),
+    placeX: 240,
+    placeY: 735,
+    placeSize: 180,
+    anchor: Offset(330, 890),
     bakedRect: Rect.zero,
-    footprint: Rect.fromLTRB(1130, 776, 1270, 800),
+    footprint: Rect.fromLTRB(285, 866, 375, 890),
   ),
   RoomFurniture(
     key: 'room-furniture-noi_ke_sach',
     asset: 'assets/images/furniture/noi_ke_sach.webp',
     label: 'Kệ sách',
     reaction: 'Nhiều sách hay quá!',
-    placeX: 179,
-    placeY: 587,
-    placeSize: 282,
-    anchor: Offset(320, 830),
+    placeX: 655,
+    placeY: 718,
+    placeSize: 200,
+    anchor: Offset(755, 890),
     bakedRect: Rect.zero,
-    footprint: Rect.fromLTRB(265, 806, 375, 830),
+    footprint: Rect.fromLTRB(701, 866, 809, 890),
   ),
   RoomFurniture(
     key: 'room-furniture-noi_be_ca',
     asset: 'assets/images/furniture/noi_be_ca.webp',
     label: 'Bể cá',
     reaction: 'Cá bơi lội vui quá!',
-    placeX: 579,
-    placeY: 457,
-    placeSize: 282,
-    anchor: Offset(720, 700),
+    placeX: 1170,
+    placeY: 744,
+    placeSize: 170,
+    anchor: Offset(1255, 890),
     bakedRect: Rect.zero,
-    footprint: Rect.fromLTRB(671, 676, 769, 700),
+    footprint: Rect.fromLTRB(1215, 866, 1295, 890),
   ),
   RoomFurniture(
     key: 'room-furniture-noi_cay_cao',
     asset: 'assets/images/furniture/noi_cay_cao.webp',
     label: 'Chậu cây lá to',
     reaction: 'Cây lá to xanh mướt!',
-    placeX: 796,
-    placeY: 530,
-    placeSize: 307,
-    anchor: Offset(950, 795),
+    placeX: 780,
+    placeY: 692,
+    placeSize: 230,
+    anchor: Offset(895, 890),
     bakedRect: Rect.zero,
-    footprint: Rect.fromLTRB(886, 771, 1014, 795),
+    footprint: Rect.fromLTRB(847, 866, 943, 890),
   ),
   RoomFurniture(
     key: 'room-furniture-noi_ghe_luoi',
     asset: 'assets/images/furniture/noi_ghe_luoi.webp',
     label: 'Ghế lười',
     reaction: 'Ghế lười êm ơi là êm!',
-    placeX: 19,
-    placeY: 602,
-    placeSize: 282,
-    anchor: Offset(160, 845),
+    placeX: 40,
+    placeY: 701,
+    placeSize: 220,
+    anchor: Offset(150, 890),
     bakedRect: Rect.zero,
-    footprint: Rect.fromLTRB(100, 821, 220, 845),
+    footprint: Rect.fromLTRB(103, 866, 197, 890),
   ),
   RoomFurniture(
     key: 'room-furniture-noi_leu',
     asset: 'assets/images/furniture/noi_leu.webp',
     label: 'Lều đồ chơi',
     reaction: 'Chui vào lều chơi nào!',
-    placeX: 1216,
-    placeY: 519,
-    placeSize: 384,
-    anchor: Offset(1409, 850),
+    placeX: 985,
+    placeY: 718,
+    placeSize: 200,
+    anchor: Offset(1085, 890),
     bakedRect: Rect.zero,
-    footprint: Rect.fromLTRB(1304, 826, 1514, 850),
+    footprint: Rect.fromLTRB(1030, 866, 1140, 890),
   ),
   // Món trên tường / mặt bàn / mặt tủ (`wall`: không bóng, không chặn
   // đường). Chỗ đặt theo tấm ghép Muse lô 10 (22/11).
@@ -249,10 +255,10 @@ const List<RoomFurniture> roomShopFurniture = [
     asset: 'assets/images/furniture/noi_den_trang.webp',
     label: 'Đèn mặt trăng',
     reaction: 'Đèn mặt trăng sáng dịu ghê!',
-    placeX: 590,
-    placeY: 324,
+    placeX: 300,
+    placeY: 146,
     placeSize: 179,
-    anchor: Offset(680, 478),
+    anchor: Offset(390, 300),
     bakedRect: Rect.zero,
     wall: true,
   ),
@@ -261,14 +267,85 @@ const List<RoomFurniture> roomShopFurniture = [
     asset: 'assets/images/furniture/noi_tranh.webp',
     label: 'Tranh cầu vồng',
     reaction: 'Cầu vồng đẹp quá!',
-    placeX: 232,
-    placeY: 110,
-    placeSize: 256,
-    anchor: Offset(360, 330),
+    placeX: 10,
+    placeY: 309,
+    placeSize: 150,
+    anchor: Offset(85, 438),
     bakedRect: Rect.zero,
     wall: true,
   ),
 ];
+
+/// Loại chỗ đặt của một món kéo thả được.
+enum RoomPlaceKind {
+  /// Đứng trên sàn: chân (đáy giữa) phải nằm trong vùng sàn.
+  floor,
+
+  /// Gắn tường: nằm trong vùng tường (trên đường chân tường, dưới trần).
+  wall,
+
+  /// Món nhỏ: đặt trên mặt giường/tủ đầu giường/bàn học HOẶC trên sàn.
+  surface,
+}
+
+/// Một món bé kéo thả được trong Phòng (dữ liệu, không code riêng từng
+/// món). Muốn thêm món mới (giường/tủ/bàn bằng ảnh, nền trống mới...) chỉ
+/// cần thêm một [RoomFurniture] + một dòng vào [roomPlaceables].
+class RoomPlaceable {
+  const RoomPlaceable({
+    required this.id,
+    required this.item,
+    required this.kind,
+    this.shopId,
+  });
+
+  /// Mã ổn định, khóa lưu vị trí trong settings.
+  final String id;
+
+  /// Kích thước + vị trí mặc định + phản ứng khi chạm.
+  final RoomFurniture item;
+  final RoomPlaceKind kind;
+
+  /// Mã món Cửa hàng (null: món có sẵn của phòng). Có thì chỉ vẽ khi bé
+  /// đã mua, và ảnh đổi theo chủ đề ([roomThemeFurnitureAsset]).
+  final String? shopId;
+
+  bool get wall => kind == RoomPlaceKind.wall;
+
+  /// Góc trên-trái mặc định (khung 1600x900).
+  Offset get defaultPos => Offset(item.placeX, item.placeY);
+
+  double get size => item.placeSize;
+
+  /// Điểm neo đáy so với góc trên-trái.
+  Offset get anchorOffset => item.anchor - defaultPos;
+
+  /// Ảnh của món theo chủ đề phòng [themeId].
+  String assetFor(String themeId) =>
+      shopId == null ? item.asset : roomThemeFurnitureAsset(themeId, shopId!);
+
+  /// Dấu chân chặn đường đi khi món nằm với góc trên-trái [pos].
+  Rect? footprintAt(Offset pos) => item.footprint?.shift(pos - defaultPos);
+}
+
+/// Mọi món kéo thả được: 4 món nhỏ vẽ bằng ảnh rời trên nền sạch (chậu
+/// cây còn vẽ sẵn trong nền nên không kéo được) + 8 món Cửa hàng.
+final List<RoomPlaceable> roomPlaceables = List.unmodifiable([
+  for (final f in roomFurniture)
+    if (!f.inCleanBackground)
+      RoomPlaceable(
+        id: f.key.substring('room-furniture-'.length),
+        item: f,
+        kind: RoomPlaceKind.surface,
+      ),
+  for (final f in roomShopFurniture)
+    RoomPlaceable(
+      id: roomShopFurnitureId(f),
+      item: f,
+      kind: f.wall ? RoomPlaceKind.wall : RoomPlaceKind.floor,
+      shopId: roomShopFurnitureId(f),
+    ),
+]);
 
 /// Mã món cửa hàng của một ô nội thất mua (khóa `room-furniture-<mã>`).
 String roomShopFurnitureId(RoomFurniture f) =>
@@ -362,4 +439,145 @@ bool roomPointInFloor(Offset p) {
     }
   }
   return inside;
+}
+
+// ---------------------------------------------------------------------
+// Vùng đặt đồ (kéo thả). Đo bằng PIL trên `room_v3_clean.webp` 1600x900:
+// chân tường (viền chân tường sau lưng, nơi sàn gỗ bắt đầu) ở y ~ 645
+// suốt đoạn giữa x 400..1200, rồi dốc xuống ~ 795 ở hai mép (cùng đa
+// giác [roomFloorPolygon]); sàn kéo tới sát đáy khung (y 900).
+// ---------------------------------------------------------------------
+
+/// Chân món trên sàn cách đường chân tường ít nhất bằng này (để dấu chân
+/// 24 px của món vẫn nằm trong sàn).
+const double roomFloorFeetInset = 30;
+
+/// Chân món trên sàn thấp nhất (đáy khung 900, chừa 5 px).
+const double roomFloorFeetBottom = 895;
+
+/// Chân/điểm neo của món không ra sát mép trái/phải hơn mức này.
+const double roomPlaceMinX = 20;
+const double roomPlaceMaxX = 1580;
+
+/// Vùng tường: dưới trần (đỉnh nhìn thấy của món y >= 30) và trên
+/// đường chân tường (đáy y <= [roomFloorTopAt] - 4); mép trái/phải là
+/// [roomPlaceMinX]/[roomPlaceMaxX]. Phần bottom của Rect là chân tường
+/// ở giữa phòng (y 645); hai mép phòng chân tường thấp hơn nên đáy thật
+/// là [roomFloorTopAt] - 4 (xem [roomClampWallAnchor]).
+const Rect roomWallRegion = Rect.fromLTRB(
+  roomPlaceMinX,
+  30,
+  roomPlaceMaxX,
+  645,
+);
+
+/// Ảnh 512x512 có phần trong suốt: đỉnh nhìn thấy của món nằm cách mép
+/// trên ảnh khoảng 16% cỡ ảnh (đo trên 13 ảnh nội thất).
+const double roomImageTopInset = 0.16;
+
+/// Đường chân tường (đỉnh vùng sàn) tại hoành độ [x] (khung 1600x900).
+double roomFloorTopAt(double x) {
+  final p = roomFloorPolygon;
+  // p[0]->p[1]: dốc trái; p[1]->p[2]: phẳng; p[2]->p[3]: dốc phải.
+  if (x <= p[1].dx) {
+    final t = (x - p[0].dx) / (p[1].dx - p[0].dx);
+    return p[0].dy + (p[1].dy - p[0].dy) * t.clamp(0.0, 1.0);
+  }
+  if (x >= p[2].dx) {
+    final t = (x - p[2].dx) / (p[3].dx - p[2].dx);
+    return p[2].dy + (p[3].dy - p[2].dy) * t.clamp(0.0, 1.0);
+  }
+  return p[1].dy;
+}
+
+/// Kẹp chân món sàn [feet] vào vùng sàn.
+Offset roomClampFloorFeet(Offset feet) {
+  final x = feet.dx.clamp(roomPlaceMinX, roomPlaceMaxX).toDouble();
+  final y = feet.dy
+      .clamp(roomFloorTopAt(x) + roomFloorFeetInset, roomFloorFeetBottom)
+      .toDouble();
+  return Offset(x, y);
+}
+
+/// Kẹp điểm neo đáy món gắn tường [anchor] vào vùng tường; [visibleHeight]
+/// là chiều cao phần nhìn thấy của món (đáy tới đỉnh) để đỉnh không chạm
+/// trần.
+Offset roomClampWallAnchor(Offset anchor, {double visibleHeight = 0}) {
+  final x = anchor.dx.clamp(roomWallRegion.left, roomWallRegion.right);
+  final bottom = roomFloorTopAt(x) - 4;
+  final top = math.min(roomWallRegion.top + visibleHeight, bottom);
+  return Offset(x.toDouble(), anchor.dy.clamp(top, bottom).toDouble());
+}
+
+/// Các mặt phẳng món nhỏ ([RoomPlaceKind.surface]) đặt lên được.
+const List<Rect> roomSurfaces = <Rect>[
+  roomBedSurface,
+  roomNightstandSurface,
+  roomDeskSurface,
+];
+
+/// Điểm gần [p] nhất thuộc hình chữ nhật [r].
+Offset _nearestInRect(Rect r, Offset p) => Offset(
+  p.dx.clamp(r.left, r.right).toDouble(),
+  p.dy.clamp(r.top, r.bottom).toDouble(),
+);
+
+/// Kẹp điểm neo của món nhỏ: gần nhất giữa vùng sàn và các mặt phẳng.
+Offset roomClampSurfaceAnchor(Offset anchor) {
+  var best = roomClampFloorFeet(anchor);
+  var bestD = (best - anchor).distanceSquared;
+  for (final r in roomSurfaces) {
+    final c = _nearestInRect(r, anchor);
+    final d = (c - anchor).distanceSquared;
+    if (d < bestD) {
+      best = c;
+      bestD = d;
+    }
+  }
+  return best;
+}
+
+/// Kẹp góc trên-trái [topLeft] của [p] sao cho điểm neo nằm trong vùng
+/// hợp lệ của loại món đó; trả về góc trên-trái đã kẹp.
+Offset roomClampPlaceable(RoomPlaceable p, Offset topLeft) {
+  final off = p.anchorOffset;
+  final anchor = topLeft + off;
+  final clamped = switch (p.kind) {
+    RoomPlaceKind.floor => roomClampFloorFeet(anchor),
+    RoomPlaceKind.surface => roomClampSurfaceAnchor(anchor),
+    RoomPlaceKind.wall => roomClampWallAnchor(
+      anchor,
+      visibleHeight: off.dy - roomImageTopInset * p.size,
+    ),
+  };
+  return clamped - off;
+}
+
+/// Khóa settings (theo bé) lưu vị trí đồ của phòng chủ đề [themeId].
+String roomLayoutSettingsKey(String themeId) => 'room_layout_$themeId';
+
+/// Mã hóa vị trí (mã món -> góc trên-trái, khung 1600x900) thành JSON.
+String encodeRoomLayout(Map<String, Offset> layout) => jsonEncode({
+  for (final e in layout.entries) e.key: {'x': e.value.dx, 'y': e.value.dy},
+});
+
+/// Giải mã JSON vị trí; hỏng/thiếu thì bỏ qua món đó (dùng mặc định).
+Map<String, Offset> decodeRoomLayout(String? json) {
+  if (json == null || json.isEmpty) return const {};
+  try {
+    final raw = jsonDecode(json);
+    if (raw is! Map) return const {};
+    final out = <String, Offset>{};
+    for (final e in raw.entries) {
+      final v = e.value;
+      if (e.key is String && v is Map && v['x'] is num && v['y'] is num) {
+        final x = (v['x'] as num).toDouble();
+        final y = (v['y'] as num).toDouble();
+        if (x.isFinite && y.isFinite) out[e.key as String] = Offset(x, y);
+      }
+    }
+    return out;
+  } catch (_) {
+    return const {};
+  }
 }
