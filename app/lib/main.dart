@@ -5,6 +5,9 @@ import 'package:material_ui/material_ui.dart';
 
 import 'core/database/app_database.dart';
 import 'core/database/database_provider.dart';
+import 'core/sync/neon_client.dart';
+import 'core/sync/session_store.dart';
+import 'core/sync/sync_providers.dart';
 import 'core/router/app_router.dart';
 import 'core/test_build.dart';
 import 'core/theme/app_theme.dart';
@@ -32,13 +35,30 @@ Future<void> main() async {
   final showOnboarding = !await OnboardingService(db: db).isCompleted();
   final showHatch =
       !showOnboarding && await EggService(db: db).isHatchPending(childId);
+  // Đăng nhập lần đầu (T3-03): hỏi một lần nếu chưa đăng nhập và chưa
+  // bấm "Dùng không cần tài khoản".
+  final store = SecureSessionStore();
+  final signedIn =
+      (await store.read(NeonClient.cookieKey))?.isNotEmpty ?? false;
+  final promptDone =
+      await db.settingsDao.getValue(key: loginPromptDoneKey) != null;
+  final showLogin = !signedIn && !promptDone;
+  // Có từ 2 bé thì chọn bé trước khi vào Phòng.
+  final showPicker = await db.childrenDao.getAllChildren().then(
+    (c) => c.length >= 2,
+  );
   runApp(
     ProviderScope(
-      overrides: [databaseProvider.overrideWithValue(db)],
+      overrides: [
+        databaseProvider.overrideWithValue(db),
+        sessionStoreProvider.overrideWithValue(store),
+      ],
       child: TimoKidApp(
         router: AppRouter.create(
           showOnboarding: showOnboarding,
           showHatch: showHatch,
+          showLogin: showLogin,
+          showProfilePicker: showPicker,
           showSplash: true,
         ),
       ),
@@ -73,8 +93,9 @@ class TimoKidApp extends StatelessWidget {
       // Menu QA (T1-13): vùng nhấn giữ 5 giây ở góc trên-trái, chỉ
       // gắn khi bật QA (bản debug hoặc --dart-define=QA_MENU=true).
       // Bản release giao cho bé không có vùng này.
-      builder: (context, child) =>
-          QaMenuOpener(child: child ?? const SizedBox.shrink()),
+      builder: (context, child) => SyncHost(
+        child: QaMenuOpener(child: child ?? const SizedBox.shrink()),
+      ),
     );
   }
 }

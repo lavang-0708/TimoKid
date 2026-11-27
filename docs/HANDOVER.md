@@ -2,6 +2,12 @@
 
 Cập nhật cuối: 23/11/2026 (nhiệm vụ ngày + chuỗi; tháp nhiều tầng + boss; Pet D: bảng pets, xp theo câu đúng, chăm pet); trước đó 22/11/2026 (T2-06b: Đồ cho pet, Nội thất, bộ đồ cao cấp, nút Cho ăn/Chơi); trước đó 21/11/2026 (main `99a87cf` sau PR #34: nhân vật toàn thân + đi lại trong Phòng + pet lớn dần + Tủ đồ; PR #33 thêm 12 dạng bài; PR #32 (D) đã merge). Đọc mục "Hiện trạng sau PR #33/#34" ngay dưới trước; các dòng lịch sử phía sau giữ nguyên cách viết lúc đó.
 
+## Đồng bộ phía app (T3-03/T3-04/T3-06, nhánh `feature/v03-app-sync`, chờ review)
+
+- Đăng nhập Neon Auth, nhiều bé, bộ đồng bộ, hộp thư và quà: xem mục "Phía app" trong `docs/SYNC.md`. Drift schema **v5** (thêm `messages`, `review_tombstones`, trigger `synced`). Thêm gói `http` và `flutter_secure_storage`; thêm quyền `INTERNET` vào manifest chính (bản release trước đó không có).
+- `AppDatabase.ensureSeeded()` nay trả **bé đang chơi** (khóa `active_child_id`), không còn là "bé duy nhất"; màn mới cần biết bé nào thì cứ gọi hàm này như các màn cũ.
+- Việc chủ dự án phải làm tay: chạy `db/migrations/0002_app_tables.sql` trên Neon rồi đổi `syncExtraTablesEnabled` thành `true`; thử trên máy thật (đăng nhập, đồng bộ, gửi thư từ web admin và mở quà); kiểm tra Neon Auth chấp nhận `Origin` mà app gửi.
+
 ## Hiệu ứng rồng (24/11/2026, nhánh `feat/dragon-fx`, chờ review)
 
 - Code `app/lib/features/pet/`: `dragon_fx_config.dart` (mọi số + cờ `dragonFxArtReady = false`, `dragonMouth` tạm), `dragon_fx.dart` (`DragonAura`, `DragonPetView`, `DragonFxController`, `DragonActionMenu`, hàm thuần), `dragon_fx_preview.dart` (QA "Xem thử hiệu ứng rồng"). Tích hợp: `room_screen.dart` (chạm rồng, bảng nút, bay-đi, bóng co), `shop_screen.dart` + "Pet của bé" (vầng sáng), `pet_sprite.dart` (errorBuilder).

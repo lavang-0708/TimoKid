@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../core/sync/sync_status_icon.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/models.dart';
 import '../../core/database/tables.dart';
@@ -267,7 +268,7 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 4),
+                            const SyncStatusIcon(),
                           ],
                         ),
                       ),

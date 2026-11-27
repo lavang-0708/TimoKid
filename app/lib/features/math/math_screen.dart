@@ -51,6 +51,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/database/app_database.dart';
+import '../../core/sync/sync_providers.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/models.dart';
 import '../../core/widgets/round_back_button.dart';
@@ -172,6 +173,8 @@ class _MathScreenState extends ConsumerState<MathScreen>
     }
     if (session.finished && !_navigated) {
       _navigated = true;
+      // Xong chặng: đồng bộ nền (T3-04), không chờ, không chặn bé.
+      ref.read(syncControllerProvider.notifier).syncSoon();
       // Xong chặng: phát hợp âm rải sau 600 ms để tiếng "ting" và
       // tiếng xu của câu cuối dứt hẳn rồi mới tới tiếng xong chặng,
       // lúc này màn Kết quả chặng đã hiện.
