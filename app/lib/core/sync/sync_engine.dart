@@ -110,6 +110,7 @@ class _Spec {
     required this.insertOnly,
     required this.fetch,
     this.stampColumn = 'updated_at',
+    this.conflictTarget = 'id',
   });
 
   /// Tên bảng trên server.
@@ -122,6 +123,12 @@ class _Spec {
 
   /// Cột thời gian dùng để chắc dòng chưa bị sửa giữa lúc gửi.
   final String stampColumn;
+
+  /// Cột `on_conflict` khi upsert. Bảng có khóa duy nhất theo nghĩa (bé +
+  /// ngày, bé + dạng bài, bé + món, bé + loài) upsert theo khóa đó: máy thứ
+  /// hai hoặc QA xoá dữ liệu sinh id mới thì vẫn ghi đè đúng dòng, không
+  /// vướng 409 làm tắc đồng bộ.
+  final String conflictTarget;
 }
 
 class SyncEngine {
@@ -199,7 +206,7 @@ class SyncEngine {
       await client.api(
         'POST',
         spec.table,
-        query: const {'on_conflict': 'id'},
+        query: {'on_conflict': spec.conflictTarget},
         body: [for (final r in rows) r.json],
         prefer: spec.insertOnly
             ? 'resolution=ignore-duplicates,return=minimal'
@@ -247,6 +254,7 @@ class SyncEngine {
     ),
     _Spec(
       table: 'daily_sets',
+      conflictTarget: 'child_id,date',
       sqlTable: 'daily_sets',
       insertOnly: false,
       fetch: (n) async => [
@@ -310,6 +318,7 @@ class SyncEngine {
     ),
     _Spec(
       table: 'skill_progress',
+      conflictTarget: 'child_id,scope,key',
       sqlTable: 'skill_progress',
       insertOnly: false,
       fetch: (n) async => [
@@ -399,6 +408,7 @@ class SyncEngine {
     if (extraTables) ...[
       _Spec(
         table: 'inventory',
+        conflictTarget: 'child_id,item_id',
         sqlTable: 'inventory',
         insertOnly: false,
         fetch: (n) async => [
@@ -416,6 +426,7 @@ class SyncEngine {
       ),
       _Spec(
         table: 'pets',
+        conflictTarget: 'child_id,species',
         sqlTable: 'pets',
         insertOnly: false,
         fetch: (n) async => [

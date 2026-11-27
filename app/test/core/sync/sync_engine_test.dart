@@ -119,6 +119,15 @@ void main() {
       'review_queue',
       'settings',
     ]);
+    // Bảng có khóa duy nhất theo nghĩa upsert theo khóa đó (tránh 409 khi
+    // máy khác hoặc QA sinh id mới); còn lại upsert theo id.
+    final conflict = {
+      for (final p in neon.posts()) p.table: p.query['on_conflict'],
+    };
+    expect(conflict['daily_sets'], 'child_id,date');
+    expect(conflict['skill_progress'], 'child_id,scope,key');
+    expect(conflict['attempts'], 'id');
+    expect(conflict['review_queue'], 'id');
     // Bảng có sửa dùng merge-duplicates.
     for (final t in [
       'children',
