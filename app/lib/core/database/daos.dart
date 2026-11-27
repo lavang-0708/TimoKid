@@ -63,9 +63,24 @@ class ChildrenDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<ChildrenData>> getAllChildren() => select(db.children).get();
 
-  /// Hồ sơ bé đầu tiên (bản 0.1 chỉ có một bé mặc định).
+  /// Hồ sơ bé đầu tiên (tạo sớm nhất). Dữ liệu từ bản 0.1/0.2 (một bé
+  /// mặc định) luôn thuộc bé này khi có thêm bé khác (T3-03).
   Future<ChildrenData?> getFirstChild() =>
-      (select(db.children)..limit(1)).getSingleOrNull();
+      (select(db.children)
+            ..orderBy([
+              (t) => OrderingTerm.asc(t.createdAt),
+              (t) => OrderingTerm.asc(const CustomExpression<int>('rowid')),
+            ])
+            ..limit(1))
+          .getSingleOrNull();
+
+  /// Mọi bé, thứ tự tạo (bé đầu tiên trước).
+  Future<List<ChildrenData>> getChildrenInOrder() =>
+      (select(db.children)..orderBy([
+            (t) => OrderingTerm.asc(t.createdAt),
+            (t) => OrderingTerm.asc(const CustomExpression<int>('rowid')),
+          ]))
+          .get();
 
   /// Đổi tên / lớp của bé. `updatedAt` tự cập nhật.
   Future<void> updateChild(String id, {String? name, int? grade}) async {
@@ -636,6 +651,9 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
     }
     return query.get();
   }
+
+  /// Dòng cài đặt (cho bộ đồng bộ cần id và `updatedAt`).
+  Future<Setting?> getRow(String? childId, String key) => _find(childId, key);
 
   Future<Setting?> _find(String? childId, String key) {
     final query = select(db.settings)..where((t) => t.key.equals(key));
