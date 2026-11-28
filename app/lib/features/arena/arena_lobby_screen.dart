@@ -32,6 +32,7 @@ class _ArenaLobbyScreenState extends ConsumerState<ArenaLobbyScreen> {
   ArenaSummary? _summary;
   LeagueWeek? _week;
   String? _error;
+  ArenaFormat _format = ArenaFormat.heat;
 
   @override
   void initState() {
@@ -120,15 +121,36 @@ class _ArenaLobbyScreenState extends ConsumerState<ArenaLobbyScreen> {
                         : Row(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Expanded(flex: 6, child: _RulesCard()),
+                              Expanded(
+                                flex: 6,
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    _RoundChooser(
+                                      selected: _format,
+                                      finalUnlocked: summary.finalUnlocked,
+                                      onSelect: (f) =>
+                                          setState(() => _format = f),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Expanded(
+                                      child: _RulesCard(format: _format),
+                                    ),
+                                  ],
+                                ),
+                              ),
                               const SizedBox(width: 10),
                               Expanded(
                                 flex: 4,
                                 child: _StatusPanel(
                                   summary: summary,
                                   week: _week,
-                                  onStart: () =>
-                                      context.go(ArenaExamScreen.route),
+                                  format: _format,
+                                  onStart: () => context.go(
+                                    ArenaExamScreen.route,
+                                    extra: _format,
+                                  ),
                                 ),
                               ),
                             ],
@@ -146,6 +168,10 @@ class _ArenaLobbyScreenState extends ConsumerState<ArenaLobbyScreen> {
 
 /// Thẻ luật thi (cuộn được khi màn thấp).
 class _RulesCard extends StatelessWidget {
+  const _RulesCard({required this.format});
+
+  final ArenaFormat format;
+
   static const _inkText = TextStyle(
     fontSize: 16,
     height: 1.25,
@@ -171,7 +197,6 @@ class _RulesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const format = ArenaFormat.heat;
     final names = arenaSections.map((s) => s.name).join(', ');
     return Container(
       key: const Key('arena-rules'),
@@ -212,9 +237,9 @@ class _RulesCard extends StatelessWidget {
               Icons.diamond_rounded,
               const Color(0xFFA07BE0),
               'Thưởng kim cương cho bài đầu tiên mỗi ngày: '
-              'Vàng ${ArenaMedal.gold.gems}, Bạc ${ArenaMedal.silver.gems}, '
-              'Đồng ${ArenaMedal.bronze.gems}, '
-              'Tham gia ${ArenaMedal.participant.gems}.',
+              'Vàng ${format.gemsGold}, Bạc ${format.gemsSilver}, '
+              'Đồng ${format.gemsBronze}, '
+              'Tham gia ${format.gemsParticipant}.',
               key: const Key('arena-rule-rewards'),
             ),
           ],
@@ -229,17 +254,24 @@ class _StatusPanel extends StatelessWidget {
   const _StatusPanel({
     required this.summary,
     required this.week,
+    required this.format,
     required this.onStart,
   });
 
+  final ArenaFormat format;
   final ArenaSummary summary;
   final LeagueWeek? week;
   final VoidCallback onStart;
 
   @override
   Widget build(BuildContext context) {
-    final best = summary.bestScore;
-    final bestMedal = summary.bestMedal;
+    final isFinal = format.code == ArenaFormat.finalRound.code;
+    final best = isFinal ? summary.finalBestScore : summary.bestScore;
+    final bestMedal = isFinal ? summary.finalBestMedal : summary.bestMedal;
+    final rewarded = isFinal
+        ? summary.finalRewardedToday
+        : summary.rewardedToday;
+    final locked = isFinal && !summary.finalUnlocked;
     // Nút Bắt đầu ghim ở đáy để luôn thấy; thẻ phía trên cuộn được.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -272,7 +304,7 @@ class _StatusPanel extends StatelessWidget {
                         child: Text(
                           best == null
                               ? 'Bé chưa thi lần nào'
-                              : 'Điểm cao nhất: $best/${ArenaFormat.heat.maxScore}',
+                              : 'Điểm cao nhất: $best/${format.maxScore}',
                           key: const Key('arena-best-score'),
                           style: const TextStyle(
                             fontSize: 15,
@@ -286,7 +318,7 @@ class _StatusPanel extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  summary.rewardedToday
+                  rewarded
                       ? 'Hôm nay đã nhận thưởng, thi tiếp để luyện tập'
                       : 'Hôm nay chưa nhận kim cương. Thi ngay nhé!',
                   key: const Key('arena-today-status'),
@@ -303,9 +335,147 @@ class _StatusPanel extends StatelessWidget {
           text: 'Bắt đầu thi',
           height: 52,
           fontSize: 22,
-          onPressed: onStart,
+          onPressed: locked ? null : onStart,
         ),
       ],
+    );
+  }
+}
+
+/// Hai thẻ chọn vòng: Vòng loại và Chung kết (khóa tới khi bé có huy
+/// chương Bạc ở vòng loại, [arenaFinalUnlockMedal]).
+class _RoundChooser extends StatelessWidget {
+  const _RoundChooser({
+    required this.selected,
+    required this.finalUnlocked,
+    required this.onSelect,
+  });
+
+  final ArenaFormat selected;
+  final bool finalUnlocked;
+  final ValueChanged<ArenaFormat> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      key: const Key('arena-round-chooser'),
+      children: [
+        Expanded(
+          child: _RoundCard(
+            cardKey: const Key('arena-round-heat'),
+            format: ArenaFormat.heat,
+            description: 'Làm quen đề TIMO, 4 điểm mỗi câu.',
+            selected: selected.code == ArenaFormat.heat.code,
+            locked: false,
+            onTap: () => onSelect(ArenaFormat.heat),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: _RoundCard(
+            cardKey: const Key('arena-round-final'),
+            format: ArenaFormat.finalRound,
+            description: finalUnlocked
+                ? 'Đề dài và khó hơn, 5 điểm mỗi câu.'
+                : 'Cần huy chương ${arenaFinalUnlockMedal.label} ở Vòng loại.',
+            selected: selected.code == ArenaFormat.finalRound.code,
+            locked: !finalUnlocked,
+            onTap: () => onSelect(ArenaFormat.finalRound),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RoundCard extends StatelessWidget {
+  const _RoundCard({
+    required this.cardKey,
+    required this.format,
+    required this.description,
+    required this.selected,
+    required this.locked,
+    required this.onTap,
+  });
+
+  final Key cardKey;
+  final ArenaFormat format;
+  final String description;
+  final bool selected;
+  final bool locked;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = format.code == ArenaFormat.finalRound.code
+        ? const Color(0xFFF08A3C)
+        : const Color(0xFF7E63C9);
+    return GestureDetector(
+      key: cardKey,
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        decoration: BoxDecoration(
+          color: locked ? const Color(0xCCE6E1EF) : const Color(0xEEFFFFFF),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: selected ? accent : Colors.white,
+            width: selected ? 3 : 2,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      format.title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: locked ? const Color(0xFF8A819E) : accent,
+                      ),
+                    ),
+                  ),
+                ),
+                if (locked)
+                  const Icon(
+                    Icons.lock_rounded,
+                    key: Key('arena-round-final-lock'),
+                    size: 18,
+                    color: Color(0xFF8A819E),
+                  ),
+              ],
+            ),
+            Text(
+              '${format.totalQuestions} câu · ${format.minutes} phút',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: gameInk,
+              ),
+            ),
+            Text(
+              description,
+              key: locked ? const Key('arena-round-final-hint') : null,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 11,
+                height: 1.15,
+                fontWeight: FontWeight.w700,
+                color: gameInk,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

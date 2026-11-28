@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/arena/arena_config.dart';
 import '../../features/arena/arena_exam_screen.dart';
 import '../../features/arena/arena_lobby_screen.dart';
 import '../../features/arena/arena_result_screen.dart';
@@ -130,7 +131,11 @@ class AppRouter {
         ),
         GoRoute(
           path: ArenaExamScreen.route,
-          builder: (context, state) => const ArenaExamScreen(),
+          builder: (context, state) => ArenaExamScreen(
+            format: state.extra is ArenaFormat
+                ? state.extra! as ArenaFormat
+                : ArenaFormat.heat,
+          ),
         ),
         GoRoute(
           path: ArenaResultScreen.route,

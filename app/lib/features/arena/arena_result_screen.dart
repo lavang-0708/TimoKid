@@ -1,6 +1,6 @@
 /// Màn Kết quả Đấu trường (T2-10) — route `/arena/result`.
 ///
-/// CHỈ hiện số liệu tổng: "Đúng X/25", "Y/100 điểm", số câu đúng từng
+/// CHỈ hiện số liệu tổng: "Đúng X/25" (Chung kết X/30), "Y/100 điểm", số câu đúng từng
 /// phần, huy chương và kim cương thưởng. KHÔNG lộ câu nào đúng/sai và
 /// không có đáp án (yêu cầu của chủ dự án) — [ArenaResult] cũng không
 /// mang thông tin đó nên màn này không thể hiện ra được.
@@ -12,6 +12,7 @@ library;
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../core/widgets/fx_particles.dart';
 import '../../core/widgets/game_ui.dart';
 import '../../core/widgets/round_back_button.dart';
 import 'arena_config.dart';
@@ -87,7 +88,9 @@ class ArenaResultScreen extends StatelessWidget {
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'Kết quả Đấu trường',
+                            result.format.code == ArenaFormat.finalRound.code
+                                ? 'Kết quả Chung kết'
+                                : 'Kết quả Đấu trường',
                             style: gameOutlinedText(24),
                           ),
                         ),
@@ -291,8 +294,10 @@ class ArenaResultScreen extends StatelessWidget {
                                           text: 'Thi lại',
                                           height: 36,
                                           fontSize: 16,
-                                          onPressed: () =>
-                                              context.go(ArenaExamScreen.route),
+                                          onPressed: () => context.go(
+                                            ArenaExamScreen.route,
+                                            extra: result.format,
+                                          ),
                                         ),
                                         const SizedBox(height: 6),
                                         ArenaCandyButton(
@@ -322,6 +327,11 @@ class ArenaResultScreen extends StatelessWidget {
               ),
             ),
           ),
+          // Được huy chương (Vàng/Bạc/Đồng) thì bắn pháo giấy (T2-08).
+          if (medal != ArenaMedal.participant)
+            const Positioned.fill(
+              child: ConfettiBurst(key: Key('arena-medal-confetti')),
+            ),
         ],
       ),
     );

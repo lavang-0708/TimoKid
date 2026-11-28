@@ -5,7 +5,8 @@
 /// 5 phần x 5 câu theo thứ tự Tư duy logic, Số học, Lý thuyết số, Hình
 /// học, Tổ hợp; mỗi câu 4 điểm, tổng 100 điểm, 90 phút, sai không bị
 /// trừ điểm. [ArenaFormat.finalRound] (30 câu, mỗi phần 6 câu, 5 điểm,
-/// 120 phút) mới có số liệu, chưa có màn chọn vòng trong app.
+/// 120 phút) là vòng Chung kết, mở khi bé có huy chương Bạc trở lên ở
+/// vòng loại ([arenaFinalUnlockMedal]).
 library;
 
 import '../../core/database/tables.dart';
@@ -33,7 +34,49 @@ class ArenaFormat {
     required this.questionsPerSection,
     required this.pointsPerQuestion,
     required this.minutes,
+    required this.title,
+    required this.goldMin,
+    required this.silverMin,
+    required this.bronzeMin,
+    required this.gemsGold,
+    required this.gemsSilver,
+    required this.gemsBronze,
+    required this.gemsParticipant,
   });
+
+  /// Tên vòng hiển thị ("Vòng loại").
+  final String title;
+
+  /// Ngưỡng số câu đúng để được Vàng / Bạc / Đồng.
+  final int goldMin;
+  final int silverMin;
+  final int bronzeMin;
+
+  /// Kim cương thưởng theo huy chương (bài đầu tiên trong ngày của vòng).
+  final int gemsGold;
+  final int gemsSilver;
+  final int gemsBronze;
+  final int gemsParticipant;
+
+  /// Huy chương theo số câu đúng của vòng này.
+  ArenaMedal medalFor(int correct) {
+    if (correct >= goldMin) return ArenaMedal.gold;
+    if (correct >= silverMin) return ArenaMedal.silver;
+    if (correct >= bronzeMin) return ArenaMedal.bronze;
+    return ArenaMedal.participant;
+  }
+
+  /// Kim cương thưởng của huy chương [medal] ở vòng này.
+  int gemsFor(ArenaMedal medal) => switch (medal) {
+    ArenaMedal.gold => gemsGold,
+    ArenaMedal.silver => gemsSilver,
+    ArenaMedal.bronze => gemsBronze,
+    ArenaMedal.participant => gemsParticipant,
+  };
+
+  /// Đọc vòng từ mã đã lưu (`arena_attempts.mode`); mã lạ là vòng loại.
+  static ArenaFormat fromCode(String code) =>
+      code == finalRound.code ? finalRound : heat;
 
   /// Mã vòng, lưu vào `arena_attempts.mode`.
   final String code;
@@ -65,6 +108,14 @@ class ArenaFormat {
     questionsPerSection: 5,
     pointsPerQuestion: 4,
     minutes: 90,
+    title: 'Vòng loại',
+    goldMin: 21,
+    silverMin: 16,
+    bronzeMin: 11,
+    gemsGold: 5,
+    gemsSilver: 3,
+    gemsBronze: 2,
+    gemsParticipant: 1,
   );
 
   /// Vòng Chung kết: 30 câu, 5 điểm, 150 điểm, 120 phút.
@@ -73,6 +124,14 @@ class ArenaFormat {
     questionsPerSection: 6,
     pointsPerQuestion: 5,
     minutes: 120,
+    title: 'Chung kết',
+    goldMin: 25,
+    silverMin: 19,
+    bronzeMin: 13,
+    gemsGold: 8,
+    gemsSilver: 5,
+    gemsBronze: 3,
+    gemsParticipant: 2,
   );
 }
 
@@ -107,7 +166,8 @@ const List<ArenaSection> arenaSections = [
   ArenaSection(strand: Strand.comb, name: 'Tổ hợp', shortName: 'Tổ hợp'),
 ];
 
-/// Huy chương theo số câu đúng (vòng Chọn 25 câu).
+/// Huy chương theo số câu đúng. Kim cương ở [gems] là của vòng loại;
+/// vòng Chung kết dùng [ArenaFormat.gemsFor].
 enum ArenaMedal {
   gold('gold', 'Vàng', 5),
   silver('silver', 'Bạc', 3),
@@ -132,18 +192,19 @@ enum ArenaMedal {
   );
 }
 
-/// Ngưỡng số câu đúng: Vàng từ 21, Bạc từ 16, Đồng từ 11.
-const int arenaGoldMinCorrect = 21;
-const int arenaSilverMinCorrect = 16;
-const int arenaBronzeMinCorrect = 11;
+/// Huy chương theo số câu đúng của [format] (mặc định vòng loại:
+/// Vàng từ 21, Bạc từ 16, Đồng từ 11; Chung kết: 25 / 19 / 13).
+ArenaMedal arenaMedalFor(
+  int correct, {
+  ArenaFormat format = ArenaFormat.heat,
+}) => format.medalFor(correct);
 
-/// Huy chương theo số câu đúng.
-ArenaMedal arenaMedalFor(int correct) {
-  if (correct >= arenaGoldMinCorrect) return ArenaMedal.gold;
-  if (correct >= arenaSilverMinCorrect) return ArenaMedal.silver;
-  if (correct >= arenaBronzeMinCorrect) return ArenaMedal.bronze;
-  return ArenaMedal.participant;
-}
+/// Huy chương tối thiểu ở vòng loại để mở vòng Chung kết.
+const ArenaMedal arenaFinalUnlockMedal = ArenaMedal.silver;
+
+/// Huy chương [a] có tốt hơn hoặc bằng [b] không (Vàng > Bạc > Đồng >
+/// Tham gia).
+bool arenaMedalAtLeast(ArenaMedal a, ArenaMedal b) => a.index <= b.index;
 
 /// Khung bản đồ Thị trấn (1600x900): vị trí khu Đấu trường.
 ///

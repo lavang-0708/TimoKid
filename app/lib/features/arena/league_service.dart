@@ -3,7 +3,9 @@
 /// Điểm tuần = tổng số câu đúng của các ngày thi trong tuần (thứ Hai đến
 /// Chủ nhật, giờ Việt Nam, lấy từ `Clock` của database nên QA nhảy ngày
 /// thử được). Mỗi ngày chỉ tính bài đúng nhiều nhất, tối đa 25 câu, để
-/// thi lại luyện tập không làm phình điểm. Rương tuần trước nhận một lần:
+/// thi lại luyện tập không làm phình điểm. Bài Chung kết (30 câu) tính
+/// như vòng loại: lấy số câu đúng cao nhất trong ngày qua mọi vòng, nên
+/// một ngày tối đa 30 điểm (kẹp theo số câu của vòng đó). Rương tuần trước nhận một lần:
 /// khóa `settings` + `refId` trong `wallet_ledger` chống cộng hai lần.
 library;
 
@@ -122,7 +124,10 @@ class LeagueService {
     final bestByDay = <String, int>{};
     for (final a in rows) {
       if (a.date.compareTo(start) < 0 || a.date.compareTo(end) > 0) continue;
-      final c = a.correctCount.clamp(0, ArenaFormat.heat.totalQuestions);
+      final c = a.correctCount.clamp(
+        0,
+        ArenaFormat.fromCode(a.mode).totalQuestions,
+      );
       if (c > (bestByDay[a.date] ?? -1)) bestByDay[a.date] = c;
     }
     final points = bestByDay.values.fold<int>(0, (s, c) => s + c);

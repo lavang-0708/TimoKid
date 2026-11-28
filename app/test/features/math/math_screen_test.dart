@@ -773,6 +773,8 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
       await tester.pump();
       expect(find.byKey(const Key('math-coin-fly')), findsOneWidget);
+      // Vệt sao bay cùng đồng xu (T2-08).
+      expect(find.byKey(const Key('math-star-fly')), findsOneWidget);
 
       // Nút Tiếp trong băng xanh vẫn bấm được giữa lúc xu đang bay
       // (lớp phủ bay là IgnorePointer, không chặn thao tác).

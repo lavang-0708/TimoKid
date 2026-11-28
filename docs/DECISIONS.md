@@ -368,3 +368,13 @@ Chủ dự án chốt 24/11: khi thử thì mở hết, không khóa đề đầ
 ## Phòng chủ đề (24/11/2026)
 
 Chủ dự án giao: vẽ nội thất hợp các bộ đồ hiếm/siêu hiếm mới để decor cả phòng phong cách mới, không ăn theo phòng gốc. Chốt: mỗi chủ đề (Tết hiếm 1200 xu, Ngân hà hiếm 1800 xu, Rồng siêu hiếm 80 kim cương) là một nền 1600x900 cùng bố cục `room_v3` có sẵn món nhỏ theo chủ đề (không vẽ 5 món nhỏ của phòng gốc) + bản chủ đề của 8 món nội thất mua (`furniture/<chủ đề>_<chỗ>.webp`). Mua chủ đề ở tab Nội thất; đổi ở nút "Phong cách" trong Phòng (lưu `room_theme`). Món nội thất đã mua tự đổi kiểu theo chủ đề, không phải mua lại. Ẩn cho tới khi có hình (`roomThemeArtReady`).
+
+## Vòng Chung kết Đấu trường + hiệu ứng juice (28/11/2026)
+
+- **Chọn vòng**: sảnh có "Vòng loại" (25 câu, 90 phút) và "Chung kết" (30 câu, 120 phút, 5 điểm/câu, 150 điểm). Chung kết mở khi bé có ÍT NHẤT MỘT bài vòng loại được huy chương Bạc trở lên (một lần mở là mở mãi, kể cả ngày sau thi kém hơn). Huy chương của chính Chung kết không dùng để mở. Khóa thì hiện ổ khóa + "Cần huy chương Bạc ở Vòng loại." và nút Bắt đầu thi bị vô hiệu.
+- **Ngưỡng huy chương Chung kết** (tỉ lệ tương đương vòng loại 84%/64%/44%): Vàng từ 25/30 (83%), Bạc từ 19 (63%), Đồng từ 13 (43%), còn lại Tham gia. Kim cương Chung kết 8 / 5 / 3 / 2 (vòng loại 5 / 3 / 2 / 1) vì đề dài và khó hơn. Mọi số nằm trong `ArenaFormat` (`arena_config.dart`).
+- **Thưởng**: một lần mỗi ngày MỖI VÒNG (chọn thay vì "một lần cả ngày" để bé thi Chung kết cùng ngày vẫn có quà, không phải chọn giữa hai vòng). `refId` ví: vòng loại `arena_daily:<bé>:<ngày>` (giữ nguyên, tương thích dữ liệu cũ), Chung kết `arena_final_daily:<bé>:<ngày>`. XP pet = số câu đúng như cũ; suất ăn pet vẫn một lần mỗi ngày (refId `arena:<bé>:<ngày>`, dùng chung hai vòng).
+- **Lưu**: `arena_attempts.mode = 'final'` (schema không đổi, sync đã hỗ trợ). Sảnh hiện điểm cao nhất và "đã nhận thưởng" theo vòng đang chọn.
+- **Điểm hạng tuần**: tính cả bài Chung kết. Mỗi ngày lấy bài có số câu đúng cao nhất qua MỌI vòng (kẹp theo số câu của vòng đó, tối đa 30/ngày), cộng các ngày trong tuần; ngưỡng hạng 40/80/120 giữ nguyên.
+- **Hiệu ứng** (T2-08, phần hình; âm thanh làm ở nhánh khác): nút nảy `PressBounce` (co 0,94 trong 140 ms) thêm cho `RaisedAnswerButton`, nút Tiếp, nút màn Kết quả chặng; sao bay cùng xu về ví; pháo giấy (tối đa 48 mảnh, 1,8 giây) ở Kết quả chặng cuối đề ngày và Kết quả Đấu trường có huy chương Vàng/Bạc/Đồng (không có cho Tham gia). Tất cả vẽ bằng `CustomPainter`, chạy một lần, tắt hẳn khi `AnimationGate.enabled = false`.
+

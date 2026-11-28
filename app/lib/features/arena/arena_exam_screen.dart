@@ -6,6 +6,7 @@
 /// [RaisedAnswerButton] dùng lại của màn toán.
 ///
 /// Đầu màn: "Phần 2/5 · Số học", "Câu 7/25", đồng hồ đếm ngược 90:00
+/// (Chung kết: 30 câu, 120:00)
 /// và nút "Nộp bài". Dải 25 chấm là bản đồ câu hỏi: chấm đặc là đã
 /// trả lời, bấm chấm để nhảy tới câu đó; có nút Câu trước/Câu sau.
 /// TUYỆT ĐỐI không báo đúng sai, không gợi ý, không lời giải (yêu cầu
@@ -51,13 +52,20 @@ import 'arena_session.dart';
 import 'arena_widgets.dart';
 
 class ArenaExamScreen extends ConsumerStatefulWidget {
-  const ArenaExamScreen({super.key, this.session});
+  const ArenaExamScreen({
+    super.key,
+    this.session,
+    this.format = ArenaFormat.heat,
+  });
 
   static const String route = '/arena/exam';
 
   /// Phiên dựng sẵn (test dùng); bỏ trống thì màn tự dựng đề mới
   /// theo bậc hiện tại của bé.
   final ArenaSession? session;
+
+  /// Vòng thi khi màn tự dựng đề (bỏ qua nếu có [session]).
+  final ArenaFormat format;
 
   @override
   ConsumerState<ArenaExamScreen> createState() => _ArenaExamScreenState();
@@ -97,7 +105,12 @@ class _ArenaExamScreenState extends ConsumerState<ArenaExamScreen> {
           skillProgressDao: db.skillProgressDao,
         ).rungsFor(childId: _childId);
         session = ArenaSession(
-          questions: buildArenaExam(rungs: rungs, random: Random()),
+          questions: buildArenaExam(
+            rungs: rungs,
+            random: Random(),
+            format: widget.format,
+          ),
+          format: widget.format,
         );
       }
       if (!mounted) return;
@@ -119,7 +132,7 @@ class _ArenaExamScreenState extends ConsumerState<ArenaExamScreen> {
 
   Duration get _remaining {
     final session = _session;
-    final total = (session?.format ?? ArenaFormat.heat).duration;
+    final total = (session?.format ?? widget.format).duration;
     final left = total - _elapsed;
     return left.isNegative ? Duration.zero : left;
   }

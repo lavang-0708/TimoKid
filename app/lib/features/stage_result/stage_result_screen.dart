@@ -16,6 +16,8 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/database/app_database.dart';
 import '../../core/database/database_provider.dart';
+import '../../core/widgets/fx_particles.dart';
+import '../../core/widgets/press_bounce.dart';
 import '../math/math_decor.dart';
 import '../math/math_screen.dart';
 import '../math/math_session.dart' show strandNames;
@@ -57,6 +59,12 @@ class StageResultArgs {
 
   /// Kết quả leo tầng tháp; null nếu không phải tầng tháp.
   final TowerOutcome? tower;
+
+  /// Chặng này là chặng cuối (5/5) của đề ngày: bé vừa xong trọn đề ngày
+  /// nên màn Kết quả bắn pháo giấy (T2-08). Tầng tháp và chặng tự chọn
+  /// (`stageIndex` -1) không tính.
+  bool get completesDailySet =>
+      tower == null && stageIndex >= 0 && nextStageIndex == null;
 }
 
 /// Màn Kết quả chặng — route `/stage-result`.
@@ -358,107 +366,127 @@ class _StageResultScreenState extends State<StageResultScreen> {
         foregroundColor: MathColors.questionText,
       ),
       // Cuộn được để không tràn trên màn thấp (640x320 dp).
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(title, style: const TextStyle(fontSize: 30)),
-              const SizedBox(height: 16),
-              // Màn rộng (800x360...): số liệu bên trái, lời cư dân bên phải
-              // để hai nút vẫn nằm trong màn; màn hẹp thì xếp dọc.
-              LayoutBuilder(
-                builder: (context, c) {
-                  final stats = Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Đúng ${args.correctCount}/${args.totalQuestions} câu',
-                        key: const Key('stage-result-correct-count'),
-                        style: const TextStyle(fontSize: 26),
-                      ),
-                      Text(
-                        'Đúng ngay lần đầu: ${args.firstTryCorrectCount} câu',
-                        style: const TextStyle(fontSize: 22),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Nhận được ${args.xuEarned} xu',
-                        key: const Key('stage-result-xu'),
-                        style: const TextStyle(fontSize: 26),
-                      ),
-                    ],
-                  );
-                  final thanks = _thanks(
-                    firstTryCorrect: args.firstTryCorrectCount,
-                  );
-                  if (c.maxWidth >= 700) {
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(title, style: const TextStyle(fontSize: 30)),
+                    const SizedBox(height: 16),
+                    // Màn rộng (800x360...): số liệu bên trái, lời cư dân bên phải
+                    // để hai nút vẫn nằm trong màn; màn hẹp thì xếp dọc.
+                    LayoutBuilder(
+                      builder: (context, c) {
+                        final stats = Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Đúng ${args.correctCount}/${args.totalQuestions} câu',
+                              key: const Key('stage-result-correct-count'),
+                              style: const TextStyle(fontSize: 26),
+                            ),
+                            Text(
+                              'Đúng ngay lần đầu: ${args.firstTryCorrectCount} câu',
+                              style: const TextStyle(fontSize: 22),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Nhận được ${args.xuEarned} xu',
+                              key: const Key('stage-result-xu'),
+                              style: const TextStyle(fontSize: 26),
+                            ),
+                          ],
+                        );
+                        final thanks = _thanks(
+                          firstTryCorrect: args.firstTryCorrectCount,
+                        );
+                        if (c.maxWidth >= 700) {
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              stats,
+                              const SizedBox(width: 24),
+                              Flexible(child: thanks),
+                            ],
+                          );
+                        }
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [stats, const SizedBox(height: 8), thanks],
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    // Hai nút xuống dòng khi không vừa một hàng (màn hẹp /
+                    // font test DejaVu rộng hơn Nunito nên ở 608 dp hai nút
+                    // cộng lại vượt chiều rộng 127 px): màn cuộn dọc sẵn
+                    // nên xuống dòng vẫn thấy đủ nút; khi chạy app (Nunito)
+                    // vẫn một hàng như trước.
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 16,
+                      runSpacing: 16,
                       children: [
-                        stats,
-                        const SizedBox(width: 24),
-                        Flexible(child: thanks),
-                      ],
-                    );
-                  }
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [stats, const SizedBox(height: 8), thanks],
-                  );
-                },
-              ),
-              const SizedBox(height: 24),
-              // Hai nút xuống dòng khi không vừa một hàng (màn hẹp /
-              // font test DejaVu rộng hơn Nunito nên ở 608 dp hai nút
-              // cộng lại vượt chiều rộng 127 px): màn cuộn dọc sẵn
-              // nên xuống dòng vẫn thấy đủ nút; khi chạy app (Nunito)
-              // vẫn một hàng như trước.
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 16,
-                runSpacing: 16,
-                children: [
-                  ElevatedButton.icon(
-                    key: const Key('stage-result-back-button'),
-                    icon: const Text('←', style: TextStyle(fontSize: 24)),
-                    label: const Text(
-                      'Về Thị trấn',
-                      style: TextStyle(fontSize: 22),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(56, 56),
-                    ),
-                    onPressed: () =>
-                        _continue(context, next: () => context.go('/')),
-                  ),
-                  if (args.nextStageIndex != null)
-                    ElevatedButton.icon(
-                      key: const Key('stage-result-next-button'),
-                      icon: const Text('→', style: TextStyle(fontSize: 24)),
-                      label: const Text(
-                        'Chặng tiếp theo',
-                        style: TextStyle(fontSize: 22),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(56, 56),
-                      ),
-                      onPressed: () => _continue(
-                        context,
-                        next: () => context.go(
-                          MathScreen.route,
-                          extra: MathScreenArgs(
-                            stageIndex: args.nextStageIndex,
+                        PressBounce(
+                          child: ElevatedButton.icon(
+                            key: const Key('stage-result-back-button'),
+                            icon: const Text(
+                              '←',
+                              style: TextStyle(fontSize: 24),
+                            ),
+                            label: const Text(
+                              'Về Thị trấn',
+                              style: TextStyle(fontSize: 22),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(56, 56),
+                            ),
+                            onPressed: () =>
+                                _continue(context, next: () => context.go('/')),
                           ),
                         ),
-                      ),
+                        if (args.nextStageIndex != null)
+                          PressBounce(
+                            child: ElevatedButton.icon(
+                              key: const Key('stage-result-next-button'),
+                              icon: const Text(
+                                '→',
+                                style: TextStyle(fontSize: 24),
+                              ),
+                              label: const Text(
+                                'Chặng tiếp theo',
+                                style: TextStyle(fontSize: 22),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size(56, 56),
+                              ),
+                              onPressed: () => _continue(
+                                context,
+                                next: () => context.go(
+                                  MathScreen.route,
+                                  extra: MathScreenArgs(
+                                    stageIndex: args.nextStageIndex,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                ],
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
-        ),
+          if (args.completesDailySet)
+            const Positioned.fill(
+              child: ConfettiBurst(key: Key('daily-confetti')),
+            ),
+        ],
       ),
     );
   }

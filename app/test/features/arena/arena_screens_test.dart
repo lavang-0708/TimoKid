@@ -130,8 +130,9 @@ void main() {
       await pumpApp(tester);
       expect(find.text('Đấu trường TIMO'), findsOneWidget);
       expect(find.byKey(const Key('arena-rules')), findsOneWidget);
-      expect(find.textContaining('25 câu'), findsOneWidget);
-      expect(find.textContaining('90 phút'), findsOneWidget);
+      expect(find.textContaining('25 câu, chia 5 phần'), findsOneWidget);
+      expect(find.textContaining('90 phút, đồng hồ'), findsOneWidget);
+      expect(find.byKey(const Key('arena-round-chooser')), findsOneWidget);
       expect(find.textContaining('Không báo đúng sai'), findsOneWidget);
       expect(
         find.textContaining('Vàng 5, Bạc 3, Đồng 2, Tham gia 1'),

@@ -54,6 +54,8 @@ import '../../core/database/app_database.dart';
 import '../../core/sync/sync_providers.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/models.dart';
+import '../../core/widgets/fx_particles.dart';
+import '../../core/widgets/press_bounce.dart';
 import '../../core/widgets/round_back_button.dart';
 import '../daily_set/daily_set_config.dart';
 import '../daily_set/daily_set_service.dart';
@@ -894,15 +896,17 @@ class _AnswerColumn extends StatelessWidget {
                       const SizedBox(height: 12),
                       SizedBox(
                         height: 56,
-                        child: ElevatedButton(
-                          key: const Key('math-next-button'),
-                          onPressed: () => session.next(),
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              session.isLastQuestion ? 'Xem kết quả' : 'Tiếp',
-                              softWrap: false,
-                              style: const TextStyle(fontSize: 22),
+                        child: PressBounce(
+                          child: ElevatedButton(
+                            key: const Key('math-next-button'),
+                            onPressed: () => session.next(),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                session.isLastQuestion ? 'Xem kết quả' : 'Tiếp',
+                                softWrap: false,
+                                style: const TextStyle(fontSize: 22),
+                              ),
                             ),
                           ),
                         ),
@@ -1041,19 +1045,21 @@ class _CorrectBanner extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 180),
             child: SizedBox(
               height: 56,
-              child: ElevatedButton(
-                key: const Key('math-next-button'),
-                onPressed: () => session.next(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: MathColors.bannerGreenText,
-                ),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    session.isLastQuestion ? 'Xem kết quả' : 'Tiếp',
-                    softWrap: false,
-                    style: const TextStyle(fontSize: 22),
+              child: PressBounce(
+                child: ElevatedButton(
+                  key: const Key('math-next-button'),
+                  onPressed: () => session.next(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: MathColors.bannerGreenText,
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      session.isLastQuestion ? 'Xem kết quả' : 'Tiếp',
+                      softWrap: false,
+                      style: const TextStyle(fontSize: 22),
+                    ),
                   ),
                 ),
               ),
@@ -1316,6 +1322,15 @@ class _CoinFly extends StatelessWidget {
         final pos = _quadBezier(start, control, end, t);
         return Stack(
           children: [
+            // Vệt sao bay cùng đồng xu (tối đa 5 sao, vẽ bằng code).
+            Positioned.fill(
+              child: IgnorePointer(
+                child: CustomPaint(
+                  key: const Key('math-star-fly'),
+                  painter: StarTrailPainter(t: t, start: start, end: end),
+                ),
+              ),
+            ),
             Positioned(
               left: pos.dx - 14,
               top: pos.dy - 14,
@@ -1385,53 +1400,56 @@ class _RaisedAnswerButtonState extends State<RaisedAnswerButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
-      onPointerDown: (_) {
-        if (widget.enabled) setState(() => _pressed = true);
-      },
-      onPointerUp: (_) {
-        if (_pressed) setState(() => _pressed = false);
-      },
-      onPointerCancel: (_) {
-        if (_pressed) setState(() => _pressed = false);
-      },
-      // Chiều cao ngoài CỐ ĐỊNH (không hoạt hình): khi nút thu nhỏ
-      // theo trạng thái (64 -> 54 lúc đúng), AnimatedContainer cũ
-      // thu chiều cao dần trong 90 ms nên hàng nút vẫn cao trong lúc
-      // cột đã hẹp lại -> tràn 20 px ở 640x320. Chỉ padding mới
-      // hoạt hình: nhấn thì nút lún xuống 3 px (trên 0->3, dưới
-      // 4->1, tổng vẫn height+4).
-      child: Container(
-        height: widget.height + 4,
-        decoration: BoxDecoration(
-          color: widget.bottomColor,
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: AnimatedPadding(
-          duration: const Duration(milliseconds: 90),
-          padding: EdgeInsets.only(
-            top: _pressed ? 3 : 0,
-            bottom: _pressed ? 1 : 4,
+    // PressBounce: nút co nhẹ khi bấm (T2-08), tắt khi cổng hiệu ứng tắt.
+    return PressBounce(
+      child: Listener(
+        onPointerDown: (_) {
+          if (widget.enabled) setState(() => _pressed = true);
+        },
+        onPointerUp: (_) {
+          if (_pressed) setState(() => _pressed = false);
+        },
+        onPointerCancel: (_) {
+          if (_pressed) setState(() => _pressed = false);
+        },
+        // Chiều cao ngoài CỐ ĐỊNH (không hoạt hình): khi nút thu nhỏ
+        // theo trạng thái (64 -> 54 lúc đúng), AnimatedContainer cũ
+        // thu chiều cao dần trong 90 ms nên hàng nút vẫn cao trong lúc
+        // cột đã hẹp lại -> tràn 20 px ở 640x320. Chỉ padding mới
+        // hoạt hình: nhấn thì nút lún xuống 3 px (trên 0->3, dưới
+        // 4->1, tổng vẫn height+4).
+        child: Container(
+          height: widget.height + 4,
+          decoration: BoxDecoration(
+            color: widget.bottomColor,
+            borderRadius: BorderRadius.circular(18),
           ),
-          child: SizedBox(
-            height: widget.height,
-            child: ElevatedButton(
-              onPressed: widget.enabled ? widget.onPressed : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: widget.backgroundColor,
-                // Nút bị vô hiệu sau khi trả lời đúng/sai hai lần nên
-                // màu phải đặt ở cả hai chỗ, không thì nút nào cũng xám.
-                // Nút đúng giữ xanh, nút sai giữ đỏ; nút thường (nền
-                // null) dùng pastel rất nhạt thay cho màu nâu đất mặc
-                // định của theme (review PR #14).
-                disabledBackgroundColor:
-                    widget.backgroundColor ?? MathColors.disabledButtonBg,
-                padding: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+          child: AnimatedPadding(
+            duration: const Duration(milliseconds: 90),
+            padding: EdgeInsets.only(
+              top: _pressed ? 3 : 0,
+              bottom: _pressed ? 1 : 4,
+            ),
+            child: SizedBox(
+              height: widget.height,
+              child: ElevatedButton(
+                onPressed: widget.enabled ? widget.onPressed : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: widget.backgroundColor,
+                  // Nút bị vô hiệu sau khi trả lời đúng/sai hai lần nên
+                  // màu phải đặt ở cả hai chỗ, không thì nút nào cũng xám.
+                  // Nút đúng giữ xanh, nút sai giữ đỏ; nút thường (nền
+                  // null) dùng pastel rất nhạt thay cho màu nâu đất mặc
+                  // định của theme (review PR #14).
+                  disabledBackgroundColor:
+                      widget.backgroundColor ?? MathColors.disabledButtonBg,
+                  padding: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
+                child: widget.child,
               ),
-              child: widget.child,
             ),
           ),
         ),

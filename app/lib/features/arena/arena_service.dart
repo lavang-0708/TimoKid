@@ -1,10 +1,12 @@
 /// Lưu bài thi Đấu trường và cộng kim cương (T2-10).
 ///
 /// Thưởng kim cương chỉ cho bài ĐẦU TIÊN nộp xong mỗi ngày theo giờ
-/// Việt Nam (ngày lấy từ `Clock` của database): Vàng 5, Bạc 3, Đồng 2,
-/// Tham gia 1 ([ArenaMedal.gems]). Kim cương ghi vào `wallet_ledger`
-/// (loại `gem`, lý do `arena_reward`) với `refId` theo ngày nên không
-/// bao giờ cộng hai lần trong một ngày dù nộp lại. Bài thi bỏ dở không
+/// Việt Nam (ngày lấy từ `Clock` của database) CỦA TỪNG VÒNG: vòng loại
+/// Vàng 5, Bạc 3, Đồng 2, Tham gia 1; Chung kết 8 / 5 / 3 / 2
+/// ([ArenaFormat.gemsFor]). Kim cương ghi vào `wallet_ledger`
+/// (loại `gem`, lý do `arena_reward`) với `refId` theo ngày và vòng nên
+/// không bao giờ cộng hai lần một vòng trong một ngày dù nộp lại; bé
+/// vẫn nhận được thưởng của cả hai vòng nếu thi cả hai trong ngày. Bài thi bỏ dở không
 /// qua đây nên không được tính, không được thưởng.
 library;
 
@@ -22,7 +24,11 @@ class ArenaResult {
     required this.durationSec,
     required this.gemsAwarded,
     required this.alreadyRewardedToday,
+    this.format = ArenaFormat.heat,
   });
+
+  /// Vòng đã thi.
+  final ArenaFormat format;
 
   /// Điểm và số câu đúng (không có thông tin từng câu).
   final ArenaScore score;
@@ -47,9 +53,25 @@ class ArenaSummary {
     required this.rewardedToday,
     required this.xu,
     required this.gems,
+    this.finalUnlocked = false,
+    this.finalBestScore,
+    this.finalBestCorrect,
+    this.finalBestMedal,
+    this.finalRewardedToday = false,
   });
 
-  /// Điểm cao nhất (null nếu chưa thi).
+  /// Vòng Chung kết đã mở (có huy chương Bạc trở lên ở vòng loại).
+  final bool finalUnlocked;
+
+  /// Bài điểm cao nhất của Chung kết (null nếu chưa thi).
+  final int? finalBestScore;
+  final int? finalBestCorrect;
+  final ArenaMedal? finalBestMedal;
+
+  /// Hôm nay đã nhận thưởng Chung kết chưa.
+  final bool finalRewardedToday;
+
+  /// Điểm cao nhất của vòng loại (null nếu chưa thi).
   final int? bestScore;
 
   /// Số câu đúng của bài điểm cao nhất.
@@ -76,11 +98,30 @@ class ArenaService {
 
   final AppDatabase _db;
 
-  /// `refId` của thưởng Đấu trường: một lần mỗi ngày, mỗi bé.
+  /// `refId` của thưởng Đấu trường: một lần mỗi ngày, mỗi bé, mỗi vòng.
+  /// Vòng loại giữ dạng cũ `arena_daily:...` (tương thích dữ liệu đã
+  /// có); Chung kết là `arena_final_daily:...`.
   static String dailyRewardRefId({
     required String childId,
     required String date,
-  }) => 'arena_daily:$childId:$date';
+    ArenaFormat format = ArenaFormat.heat,
+  }) => format.code == ArenaFormat.finalRound.code
+      ? 'arena_final_daily:$childId:$date'
+      : 'arena_daily:$childId:$date';
+
+  /// Vòng Chung kết đã mở chưa: bé có ít nhất một bài vòng loại được
+  /// huy chương [arenaFinalUnlockMedal] (Bạc) trở lên.
+  Future<bool> isFinalUnlocked(String childId) async {
+    final rows = await _db.arenaAttemptsDao.getAll(childId);
+    return rows.any(
+      (a) =>
+          a.mode != ArenaFormat.finalRound.code &&
+          arenaMedalAtLeast(
+            ArenaMedal.fromCode(a.medal),
+            arenaFinalUnlockMedal,
+          ),
+    );
+  }
 
   /// Nộp bài: lưu `arena_attempts`, cộng kim cương nếu là bài đầu
   /// tiên trong ngày. Làm trong một transaction để hai lần nộp chồng
@@ -93,12 +134,16 @@ class ArenaService {
   }) {
     return _db.transaction(() async {
       final date = _db.clock.today();
-      final refId = dailyRewardRefId(childId: childId, date: date);
+      final refId = dailyRewardRefId(
+        childId: childId,
+        date: date,
+        format: format,
+      );
       final already = await _db.walletDao.hasEntryWithRefId(
         childId: childId,
         refId: refId,
       );
-      final gems = already ? 0 : score.medal.gems;
+      final gems = already ? 0 : format.gemsFor(score.medal);
       if (!already) {
         await _db.walletDao.addEntry(
           childId: childId,
@@ -129,6 +174,7 @@ class ArenaService {
         durationSec: duration.inSeconds,
         gemsAwarded: gems,
         alreadyRewardedToday: already,
+        format: format,
       );
     });
   }
@@ -141,21 +187,37 @@ class ArenaService {
   /// Tóm tắt cho màn sảnh.
   Future<ArenaSummary> summary(String childId) async {
     final date = _db.clock.today();
-    final best = await _db.arenaAttemptsDao.best(childId);
-    final today = await _db.arenaAttemptsDao.countOnDate(childId, date);
-    final rewarded = await _db.walletDao.hasEntryWithRefId(
+    final rows = await _db.arenaAttemptsDao.getAll(childId);
+    ArenaAttempt? bestOf(bool isFinal) {
+      ArenaAttempt? best;
+      for (final a in rows) {
+        if ((a.mode == ArenaFormat.finalRound.code) != isFinal) continue;
+        if (best == null || a.score > best.score) best = a;
+      }
+      return best;
+    }
+
+    final heat = bestOf(false);
+    final fin = bestOf(true);
+    final today = rows.where((a) => a.date == date).length;
+    Future<bool> rewarded(ArenaFormat f) => _db.walletDao.hasEntryWithRefId(
       childId: childId,
-      refId: dailyRewardRefId(childId: childId, date: date),
+      refId: dailyRewardRefId(childId: childId, date: date, format: f),
     );
     final balances = await _db.walletDao.balances(childId);
     return ArenaSummary(
-      bestScore: best?.score,
-      bestCorrect: best?.correctCount,
-      bestMedal: best == null ? null : ArenaMedal.fromCode(best.medal),
+      bestScore: heat?.score,
+      bestCorrect: heat?.correctCount,
+      bestMedal: heat == null ? null : ArenaMedal.fromCode(heat.medal),
       attemptsToday: today,
-      rewardedToday: rewarded,
+      rewardedToday: await rewarded(ArenaFormat.heat),
       xu: balances[Currency.xu] ?? 0,
       gems: balances[Currency.gem] ?? 0,
+      finalUnlocked: await isFinalUnlocked(childId),
+      finalBestScore: fin?.score,
+      finalBestCorrect: fin?.correctCount,
+      finalBestMedal: fin == null ? null : ArenaMedal.fromCode(fin.medal),
+      finalRewardedToday: await rewarded(ArenaFormat.finalRound),
     );
   }
 }
