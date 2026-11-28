@@ -13,9 +13,13 @@ import 'dart:io';
 
 import 'package:timokid/core/animation/animation_gate.dart';
 import 'package:timokid/features/residents/resident_content.dart';
+import 'package:timokid/features/seasons/season_service.dart';
 
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   AnimationGate.enabled = false;
+  // Mùa (T5-02) tắt mặc định để golden không đổi theo ngày chạy test;
+  // test mùa tự bật lại (`SeasonService.debugDisabled = false`).
+  SeasonService.debugDisabled = true;
   // Lời thoại cư dân (T4-02): nạp thẳng từ file nội dung để widget test
   // không phải đọc asset trong FakeAsync (cwd khi chạy test là `app/`).
   ResidentBook.debugOverride = ResidentBook.fromJsonString(

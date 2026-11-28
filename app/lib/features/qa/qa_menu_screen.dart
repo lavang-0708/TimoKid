@@ -27,6 +27,8 @@ import '../pet/dragon_fx_preview.dart';
 import '../math/math_session.dart' show strandNames;
 import '../pet/pet_config.dart';
 import '../quests/quest_service.dart';
+import '../seasons/season_config.dart';
+import '../seasons/season_service.dart';
 import '../questions/figure_svg.dart';
 import '../questions/question.dart';
 import '../questions/question_registry.dart';
@@ -505,6 +507,44 @@ class _QaMenuScreenState extends ConsumerState<QaMenuScreen> {
                       ),
                     ),
                   ],
+                  _sectionTitle('Giả lập mùa'),
+                  Text(
+                    SeasonService.forcedSeasonId == null
+                        ? 'Đang theo ngày: ${SeasonService.active(widget.db.clock)?.name ?? 'ngoài mùa'}'
+                        : 'Đang ép: ${SeasonConfig.byId(SeasonService.forcedSeasonId!)?.name}',
+                    key: const Key('qa-season-text'),
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    children: [
+                      for (final season in SeasonConfig.all)
+                        ElevatedButton(
+                          key: Key('qa-season-${season.id}'),
+                          onPressed: () => setState(
+                            () => SeasonService.forcedSeasonId = season.id,
+                          ),
+                          child: Text(season.name),
+                        ),
+                      ElevatedButton(
+                        key: const Key('qa-season-none'),
+                        onPressed: SeasonService.forcedSeasonId == null
+                            ? null
+                            : () => setState(
+                                () => SeasonService.forcedSeasonId = null,
+                              ),
+                        child: const Text('Theo ngày thật'),
+                      ),
+                    ],
+                  ),
+                  const Text(
+                    'Ép mùa chỉ trong bộ nhớ (tắt app là hết): hiện biển ở '
+                    'Thị trấn, tab Bộ sưu tập mùa + giảm giá ở Cửa hàng, '
+                    'và +50% xu đề ngày. Về Thị trấn/Cửa hàng để thấy.',
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
                   _sectionTitle('Rồng'),
                   Align(
                     alignment: Alignment.centerLeft,

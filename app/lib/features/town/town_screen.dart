@@ -23,6 +23,9 @@ import '../unlocks/unlock_config.dart';
 import '../unlocks/unlock_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
+import '../seasons/season_config.dart';
+import '../seasons/season_service.dart';
+import '../seasons/season_widgets.dart';
 import '../room/room_screen.dart';
 import 'town_map.dart';
 
@@ -70,6 +73,7 @@ class _TownScreenState extends ConsumerState<TownScreen> {
   CharacterProfile? _profile;
   bool _questDot = false;
   int _mastered = 0;
+  SeasonDef? _season;
 
   bool get _hasTitle => _mastered >= UnlockConfig.titleThreshold;
 
@@ -120,6 +124,7 @@ class _TownScreenState extends ConsumerState<TownScreen> {
       } catch (_) {}
       if (!mounted) return;
       setState(() {
+        _season = SeasonService.active(db.clock);
         _mastered = mastered;
         _questDot = questDot;
         _statuses = statuses;
@@ -317,6 +322,19 @@ class _TownScreenState extends ConsumerState<TownScreen> {
               ),
             ),
           ),
+          // Biển mùa (T5-02): chỉ trong mùa, ở giữa cạnh dưới.
+          if (_season case final season?)
+            Positioned(
+              left: 96,
+              right: 96,
+              bottom: 6,
+              child: Center(
+                child: SeasonBanner(
+                  key: const Key('season-banner'),
+                  season: season,
+                ),
+              ),
+            ),
           // Bản thử: nhãn nhỏ ở góc dưới-trái (chỉ hiện khi bật cờ).
           const Positioned(left: 6, bottom: 4, child: TestBuildBadge()),
         ],

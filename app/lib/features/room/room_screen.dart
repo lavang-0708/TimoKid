@@ -78,6 +78,7 @@ import '../unlocks/unlock_config.dart';
 import '../unlocks/unlock_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
+import '../seasons/season_service.dart';
 import '../shop/shop_catalog.dart';
 import '../shop/shop_screen.dart';
 import '../shop/shop_service.dart';
@@ -752,8 +753,12 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   );
 
   String _priceText(String gender, String itemId) {
-    final item = shopItemById(gender, itemId);
-    if (item == null) return '';
+    final listed = shopItemById(gender, itemId);
+    if (listed == null) return '';
+    final item = SeasonService.decorate(
+      listed,
+      SeasonService.active(ref.read(databaseProvider).clock),
+    );
     return item.usesGems ? '${item.price} kim cương' : '${item.price} xu';
   }
 

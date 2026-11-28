@@ -38,6 +38,7 @@ import '../review_book/review_book_service.dart';
 import '../stickers/sticker_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
+import '../seasons/season_service.dart';
 import '../tower/tower_service.dart';
 import '../unlocks/unlock_service.dart';
 
@@ -390,8 +391,18 @@ class StageSession extends ChangeNotifier {
         isReview: spec.isReview,
         refId: dailySetId,
       );
-      lastEarnedXu = xu;
-      xuEarned += xu;
+      var gained = xu;
+      // Mùa (T5-02): đề ngày được cộng thêm xu trong mùa.
+      if (dailySetId != null) {
+        gained += await SeasonService.awardBonus(
+          db: _db,
+          childId: childId,
+          baseXu: xu,
+          refId: dailySetId,
+        );
+      }
+      lastEarnedXu = gained;
+      xuEarned += gained;
       state = QuestionState.correct;
     } else {
       lastEarnedXu = 0;
@@ -418,11 +429,20 @@ class StageSession extends ChangeNotifier {
       towerOutcome = outcome;
       xuEarned += outcome.rewardXu;
     } else {
-      xuEarned += await _rewards.awardStageComplete(
+      final stageXu = await _rewards.awardStageComplete(
         childId: childId,
         dailySetId: dailySetId,
         stageIndex: stageIndex,
       );
+      xuEarned += stageXu;
+      if (dailySetId != null) {
+        xuEarned += await SeasonService.awardBonus(
+          db: _db,
+          childId: childId,
+          baseXu: stageXu,
+          refId: dailySetId,
+        );
+      }
     }
     // Nở trứng (T2-03): xong chặng (kể cả chặng tự chọn) mà bé đã
     // chọn trứng mà trứng chưa nở thì đặt cờ chờ nở — màn Kết quả
@@ -460,6 +480,12 @@ class StageSession extends ChangeNotifier {
       );
       if (dailyAwarded) {
         xuEarned += _rewards.config.dailySetCompleteBonusXu;
+        xuEarned += await SeasonService.awardBonus(
+          db: _db,
+          childId: childId,
+          baseXu: _rewards.config.dailySetCompleteBonusXu,
+          refId: dailySetId,
+        );
       }
     }
   }
