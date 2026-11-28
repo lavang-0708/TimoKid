@@ -14,10 +14,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../core/database/app_database.dart';
 import '../../core/database/database_provider.dart';
 import '../math/math_decor.dart';
 import '../math/math_screen.dart';
 import '../math/math_session.dart' show strandNames;
+import '../residents/resident_config.dart';
+import '../residents/resident_content.dart';
+import '../residents/resident_service.dart';
+import '../residents/resident_widgets.dart';
+import '../stickers/sticker_widgets.dart';
 import '../onboarding/egg_service.dart';
 import '../building/building_screen.dart';
 import '../onboarding/hatch_screen.dart';
@@ -54,7 +60,13 @@ class StageResultArgs {
 }
 
 /// Màn Kết quả chặng — route `/stage-result`.
-class StageResultScreen extends StatelessWidget {
+///
+/// Từ T4-02: lời cảm ơn là bong bóng của cư dân khu đó (câu động viên khi
+/// bé làm chặng còn vất vả), chọn theo ngày. Từ T4-03: nếu bé vừa thành
+/// thạo dạng bài mới (hoặc mở khóa mốc mới) thì hiện cửa sổ "Sticker mới!"
+/// MỘT lần sau khi màn hiện. Không có `ProviderScope` (test chỉ vẽ màn)
+/// thì giữ lời cảm ơn chung và không hiện cửa sổ.
+class StageResultScreen extends StatefulWidget {
   const StageResultScreen({super.key, this.result});
 
   static const String route = '/stage-result';
@@ -62,6 +74,84 @@ class StageResultScreen extends StatelessWidget {
   /// Kết quả chặng vừa xong. Bỏ trống: màn hiện thông báo chung
   /// (đi thẳng vào route mà không qua màn làm toán).
   final StageResultArgs? result;
+
+  @override
+  State<StageResultScreen> createState() => _StageResultScreenState();
+}
+
+class _StageResultScreenState extends State<StageResultScreen> {
+  ResidentContext? _resident;
+
+  StageResultArgs? get result => widget.result;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final AppDatabase db;
+    try {
+      db = ProviderScope.containerOf(
+        context,
+        listen: false,
+      ).read(databaseProvider);
+    } catch (_) {
+      return;
+    }
+    if (result == null) return;
+    try {
+      final childId = await db.ensureSeeded();
+      final ctx = await loadResidentContext(db, childId);
+      if (!mounted) return;
+      setState(() => _resident = ctx);
+      await showCelebrationIfAny(context, db);
+    } catch (_) {
+      // Lời cảm ơn và sticker chỉ là phần thêm; lỗi thì bỏ qua.
+    }
+  }
+
+  /// Bong bóng cư dân: cảm ơn, hoặc động viên khi bé làm còn vất vả.
+  /// Chưa có nội dung cư dân thì trả lời cảm ơn chung như trước.
+  Widget _thanks({required int firstTryCorrect, bool failed = false}) {
+    final args = result!;
+    final ctx = _resident;
+    final resident = ctx?.residentFor(args.strand);
+    if (ctx == null || resident == null) {
+      return const Text(
+        'Cảm ơn bé nhé, làm tốt lắm!',
+        style: TextStyle(fontSize: 22),
+      );
+    }
+    final struggled =
+        failed || firstTryCorrect <= ResidentConfig.struggleMaxFirstTryCorrect;
+    final text = pickResidentLine(
+      resident,
+      struggled ? LineKind.encourage : LineKind.thanks,
+      date: ctx.date,
+      childName: ctx.childName,
+      extra: 'stage:${args.stageIndex}',
+    );
+    if (text.isEmpty) {
+      return const Text(
+        'Cảm ơn bé nhé, làm tốt lắm!',
+        style: TextStyle(fontSize: 22),
+      );
+    }
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 520),
+      child: SizedBox(
+        height: 84,
+        child: ResidentSpeech(
+          resident: resident,
+          text: text,
+          bubbleKey: const Key('resident-thanks-bubble'),
+          fontSize: 17,
+        ),
+      ),
+    );
+  }
 
   /// Rời màn kết quả: nếu có lần nở trứng đang chờ (bé vừa xong
   /// chặng đầu tiên sau khi chọn trứng) thì rẽ sang màn nở trứng
@@ -275,25 +365,49 @@ class StageResultScreen extends StatelessWidget {
             children: [
               Text(title, style: const TextStyle(fontSize: 30)),
               const SizedBox(height: 16),
-              Text(
-                'Đúng ${args.correctCount}/${args.totalQuestions} câu',
-                key: const Key('stage-result-correct-count'),
-                style: const TextStyle(fontSize: 26),
-              ),
-              Text(
-                'Đúng ngay lần đầu: ${args.firstTryCorrectCount} câu',
-                style: const TextStyle(fontSize: 22),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Nhận được ${args.xuEarned} xu',
-                key: const Key('stage-result-xu'),
-                style: const TextStyle(fontSize: 26),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Cảm ơn bé nhé, làm tốt lắm!',
-                style: TextStyle(fontSize: 22),
+              // Màn rộng (800x360...): số liệu bên trái, lời cư dân bên phải
+              // để hai nút vẫn nằm trong màn; màn hẹp thì xếp dọc.
+              LayoutBuilder(
+                builder: (context, c) {
+                  final stats = Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Đúng ${args.correctCount}/${args.totalQuestions} câu',
+                        key: const Key('stage-result-correct-count'),
+                        style: const TextStyle(fontSize: 26),
+                      ),
+                      Text(
+                        'Đúng ngay lần đầu: ${args.firstTryCorrectCount} câu',
+                        style: const TextStyle(fontSize: 22),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Nhận được ${args.xuEarned} xu',
+                        key: const Key('stage-result-xu'),
+                        style: const TextStyle(fontSize: 26),
+                      ),
+                    ],
+                  );
+                  final thanks = _thanks(
+                    firstTryCorrect: args.firstTryCorrectCount,
+                  );
+                  if (c.maxWidth >= 700) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        stats,
+                        const SizedBox(width: 24),
+                        Flexible(child: thanks),
+                      ],
+                    );
+                  }
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [stats, const SizedBox(height: 8), thanks],
+                  );
+                },
               ),
               const SizedBox(height: 24),
               // Hai nút xuống dòng khi không vừa một hàng (màn hẹp /

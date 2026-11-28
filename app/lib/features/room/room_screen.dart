@@ -73,6 +73,9 @@ import '../pet/pet_config.dart';
 import '../pet/pet_service.dart';
 import '../quests/quest_service.dart';
 import '../quests/quest_widgets.dart';
+import '../stickers/sticker_widgets.dart';
+import '../unlocks/unlock_config.dart';
+import '../unlocks/unlock_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
 import '../shop/shop_catalog.dart';
@@ -129,6 +132,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   bool _hatchPending = false;
   int _xu = 0;
   bool _questDot = false;
+  bool _hasTitle = false;
   bool _mailDot = false;
   int _gems = 0;
   int _done = 0;
@@ -283,6 +287,13 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       try {
         questDot = await QuestService(db: db).hasClaimable(childId);
       } catch (_) {}
+      // Danh hiệu mở khóa (T4-04); lỗi ở đây không được làm hỏng Phòng.
+      var hasTitle = false;
+      try {
+        hasTitle =
+            await UnlockService(db: db).masteredCount(childId) >=
+            UnlockConfig.titleThreshold;
+      } catch (_) {}
       var mailDot = false;
       try {
         mailDot = await MailboxService(db: db).unreadCount(childId) > 0;
@@ -296,6 +307,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       setState(() {
         _childId = childId;
         _questDot = questDot;
+        _hasTitle = hasTitle;
         _mailDot = mailDot;
         _headAccessory = accessory;
         _glasses = glasses;
@@ -1549,12 +1561,21 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 4,
                                   ),
-                                  child: Text(
-                                    profile.name,
-                                    key: const Key('room-character-name'),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: gameOutlinedText(16),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        profile.name,
+                                        key: const Key('room-character-name'),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: gameOutlinedText(16),
+                                      ),
+                                      if (_hasTitle)
+                                        const FittedBox(
+                                          child: TitleChip(fontSize: 10),
+                                        ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -1670,6 +1691,23 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                     label: 'Sắp xếp',
                     onPressed: _toggleArranging,
                   ),
+                ),
+              ),
+            ),
+          // Sổ sticker (T4-03): nút góc dưới phải, chỗ trống của sàn phòng
+          // (hàng nút trên đã đầy ở màn nhỏ).
+          if (!_arranging)
+            Positioned(
+              right: 8,
+              bottom: 6,
+              child: SafeArea(
+                top: false,
+                child: StickerHudButton(
+                  key: const Key('sticker-book-button'),
+                  onPressed: () async {
+                    await context.push('/stickers');
+                    if (mounted) _refresh();
+                  },
                 ),
               ),
             ),

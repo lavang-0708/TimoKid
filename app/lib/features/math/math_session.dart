@@ -35,9 +35,11 @@ import '../pet/pet_service.dart';
 import '../questions/question.dart';
 import '../questions/question_registry.dart';
 import '../review_book/review_book_service.dart';
+import '../stickers/sticker_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
 import '../tower/tower_service.dart';
+import '../unlocks/unlock_service.dart';
 
 /// Tên tiếng Việt của từng mảng, hiện trên thanh tiêu đề màn làm toán
 /// và màn kết quả chặng.
@@ -427,6 +429,13 @@ class StageSession extends ChangeNotifier {
     // chặng sẽ rẽ sang màn nở trứng. Chỉ xảy ra một lần duy nhất
     // (xem `EggService.noteStageCompleted`).
     await _eggs.noteStageCompleted(childId);
+    // Sticker + mở khóa (T4-03/T4-04): dạng nào vừa thành thạo thì cấp
+    // sticker và 2 kim cương (một lần, chống trùng bằng refId), rồi cấp
+    // quà mốc. Lỗi ở đây không được làm hỏng việc kết thúc chặng.
+    try {
+      await StickerService(db: _db).awardPending(childId);
+      await UnlockService(db: _db).grantRewards(childId);
+    } catch (_) {}
     // Pet (D): mỗi chặng xong một suất ăn, chạy cho mọi loại chặng
     // (chặng ngày, chặng tự chọn, tầng tháp — dù qua hay trượt).
     // Chặng ngày nhận một lần cho mỗi (đề, chặng); tầng tháp một lần

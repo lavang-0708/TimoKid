@@ -39,6 +39,7 @@ import '../../core/database/models.dart';
 import '../../core/widgets/game_ui.dart';
 import '../../core/widgets/press_bounce.dart';
 import '../arena/arena_config.dart';
+import '../unlocks/unlock_config.dart';
 import 'town_assets.dart';
 import 'town_roads.dart';
 
@@ -54,6 +55,7 @@ class TownMap extends StatefulWidget {
     required this.onAreaTap,
     required this.onRoomTap,
     this.onArenaTap,
+    this.showFountain = false,
   });
 
   final List<String> statuses;
@@ -62,6 +64,10 @@ class TownMap extends StatefulWidget {
 
   /// Bấm khu Đấu trường (T2-10); null thì không hiện khu này.
   final VoidCallback? onArenaTap;
+
+  /// Hiện đài phun nước (phần thưởng mở khóa T4-04, khi bé thành thạo đủ
+  /// số dạng bài; xem `unlock_config.dart`).
+  final bool showFountain;
 
   @override
   State<TownMap> createState() => _TownMapState();
@@ -281,6 +287,64 @@ const List<_TreeSpec> _trees = [
   ),
 ];
 
+/// Chân đài phun nước (tọa độ khung nền 1600x900) và bề rộng hộp (tỉ lệ
+/// chiều rộng bản đồ). Chỉnh khi ảnh thật về (`town_fountain.webp`).
+const Offset _fountainFeet = Offset(900, 842);
+const double _fountainWidth = 0.075;
+
+/// Hình tạm của đài phun nước: bể tròn nhìn xiên, cột giữa, tia nước.
+class _FountainPlaceholder extends StatelessWidget {
+  const _FountainPlaceholder();
+
+  @override
+  Widget build(BuildContext context) =>
+      CustomPaint(painter: _FountainPainter());
+}
+
+class _FountainPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final basin = Rect.fromLTWH(w * 0.05, h * 0.62, w * 0.9, h * 0.3);
+    canvas.drawOval(
+      basin.shift(Offset(0, h * 0.03)),
+      Paint()..color = const Color(0x33000000),
+    );
+    canvas.drawOval(basin, Paint()..color = const Color(0xFFF4EFFA));
+    canvas.drawOval(
+      basin.deflate(w * 0.05),
+      Paint()..color = const Color(0xFF9ED8F2),
+    );
+    final column = Rect.fromLTWH(w * 0.44, h * 0.36, w * 0.12, h * 0.36);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(column, Radius.circular(w * 0.04)),
+      Paint()..color = const Color(0xFFE9E1F5),
+    );
+    final bowl = Rect.fromLTWH(w * 0.3, h * 0.3, w * 0.4, h * 0.14);
+    canvas.drawOval(bowl, Paint()..color = const Color(0xFFF4EFFA));
+    final spray = Paint()
+      ..color = const Color(0xCCBDE8FA)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.035
+      ..strokeCap = StrokeCap.round;
+    for (final dx in [-0.18, 0.0, 0.18]) {
+      final path = Path()
+        ..moveTo(w * 0.5, h * 0.32)
+        ..quadraticBezierTo(
+          w * (0.5 + dx * 0.9),
+          h * 0.04,
+          w * (0.5 + dx * 1.6),
+          h * 0.5,
+        );
+      canvas.drawPath(path, spray);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
   AnimationController? _cloudsController;
   AnimationController? _carsController;
@@ -349,6 +413,7 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
               height: h * arenaTownHeight / townFrameHeight,
               child: Image.asset(arenaBuildingAsset, fit: BoxFit.contain),
             ),
+          if (widget.showFountain) _fountainLayer(w, h),
           ..._dynamicLayers(w, h),
           ..._tapZones(w, h),
           ..._signs(w, h),
@@ -428,6 +493,28 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
           ),
         ),
     ];
+  }
+
+  /// Đài phun nước (mở khóa T4-04) ở khoảnh cỏ trống giữa đáy bản đồ.
+  /// Khi [unlockArtReady] tắt thì vẽ bằng code (bể + vòi nước).
+  Widget _fountainLayer(double w, double h) {
+    final size = w * _fountainWidth;
+    return Positioned(
+      key: const Key('town-fountain'),
+      left: _fountainFeet.dx / townFrameWidth * w - size / 2,
+      top: _fountainFeet.dy / townFrameHeight * h - size * 0.8,
+      width: size,
+      height: size,
+      child: IgnorePointer(
+        child: unlockArtReady
+            ? Image.asset(
+                UnlockConfig.fountainAsset,
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) => const _FountainPlaceholder(),
+              )
+            : const _FountainPlaceholder(),
+      ),
+    );
   }
 
   /// Vị trí x hiện tại của một đám mây (tỉ lệ chiều rộng bản đồ).

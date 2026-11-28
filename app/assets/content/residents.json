@@ -1,0 +1,241 @@
+{
+  "version": 1,
+  "note": "Lời thoại 5 cư dân Thị trấn Diệu Kỳ. Sửa trực tiếp file này, không cần sửa code. {ten} sẽ được thay bằng tên của bé. Mỗi nhóm lời thoại có 5 đến 8 câu (riêng nhóm special 3 đến 8 câu). Giới hạn độ dài xem app/lib/features/residents/resident_config.dart. Test app/test/features/residents/resident_content_test.dart kiểm tra file này.",
+  "residents": [
+    {
+      "id": "hiep_si_sang",
+      "name": "Hiệp sĩ Sáng",
+      "strand": "logic",
+      "building": "Lâu đài Lôgic",
+      "bio": "Hiệp sĩ canh gác Lâu đài Lôgic. Anh rất thích những câu đố hóc búa.",
+      "lines": {
+        "greeting": [
+          "Chào {ten}! Hiệp sĩ Sáng đây.",
+          "Ôi, {ten} đến rồi! Lâu đài vui quá.",
+          "Chào buổi mới, {ten} nhé!",
+          "{ten} ơi, cổng lâu đài mở rồi đó.",
+          "Chào mừng {ten} đến Lâu đài Lôgic!",
+          "Chào bạn nhỏ {ten}, mời vào nào."
+        ],
+        "ask": [
+          "Lâu đài có 5 câu đố hóc búa. {ten} giúp Hiệp sĩ giải với nhé?",
+          "Hiệp sĩ đang rối quá. {ten} thử giải mấy câu đố này giúp nhé?",
+          "Cần một bộ óc thông minh như {ten}! Giúp Hiệp sĩ nhé?",
+          "Có 5 câu đố chặn cổng lâu đài. {ten} giúp mở cổng nhé!",
+          "Hiệp sĩ nghĩ mãi chưa ra. {ten} nghĩ giúp nhé?",
+          "Bạn nhỏ {ten} ơi, giúp Hiệp sĩ gỡ 5 câu đố nào!"
+        ],
+        "thanks": [
+          "Cảm ơn {ten}! Cổng lâu đài mở rồi.",
+          "Giỏi quá, {ten}! Hiệp sĩ nợ bạn một lần giúp đó.",
+          "Nhờ {ten} mà Hiệp sĩ giải xong hết. Cảm ơn nhiều!",
+          "Hoan hô {ten}! Bạn là hiệp sĩ nhí của lâu đài.",
+          "Tuyệt vời! Cảm ơn {ten} đã nghĩ giúp.",
+          "Hiệp sĩ vui lắm. Cảm ơn {ten} nhé!"
+        ],
+        "encourage": [
+          "Câu đố khó mà. Hiệp sĩ cũng từng nghĩ mãi đó. Cố lên {ten}!",
+          "Không sao đâu {ten}. Mai mình thử lại, sẽ giỏi hơn.",
+          "Hiệp sĩ tin {ten} làm được. Mình cùng thử lại nhé!",
+          "Sai cũng là học thêm điều mới. Cảm ơn {ten} đã cố gắng!",
+          "Đừng buồn nha {ten}. Dũng cảm là dám thử lại.",
+          "{ten} đã rất cố gắng rồi. Hiệp sĩ tự hào lắm!"
+        ],
+        "special": [
+          "{ten} giỏi nhiều dạng toán rồi! Hiệp sĩ phong bạn làm Hiệp sĩ Toán nhí.",
+          "Bạn biết nhiều mẹo toán quá. Dạy Hiệp sĩ với, {ten} ơi!",
+          "Cả thị trấn đều khen {ten}. Hiệp sĩ cũng thế!",
+          "Lâu đài có thêm huy hiệu cho {ten} đó. Bạn xứng đáng lắm!"
+        ]
+      }
+    },
+    {
+      "id": "co_bong",
+      "name": "Cô Bông",
+      "strand": "arith",
+      "building": "Tiệm bánh Số học",
+      "bio": "Cô chủ Tiệm bánh Số học. Cô nướng bánh rất ngon nhưng hay quên đếm.",
+      "lines": {
+        "greeting": [
+          "Chào {ten}! Bánh vừa ra lò, thơm lắm.",
+          "{ten} ơi, hôm nay Cô Bông có bánh mới.",
+          "Ôi, khách quen {ten} đến rồi!",
+          "Chào {ten}, mời vào tiệm bánh nhé.",
+          "Xin chào {ten}! Cô đang nướng bánh đây.",
+          "{ten} đến đúng lúc quá!"
+        ],
+        "ask": [
+          "Cô cần đếm bánh mà bận quá. {ten} tính giúp Cô 5 bài nhé?",
+          "Khách đông quá! {ten} giúp Cô tính tiền và đếm bánh nhé?",
+          "Cô làm mấy khay bánh rồi lẫn số. {ten} giúp Cô nha!",
+          "Có 5 bài tính cho Cô nè. Xong Cô cảm ơn {ten} thật to!",
+          "{ten} giỏi tính nhẩm lắm. Giúp Cô đếm bánh nhé?",
+          "Tiệm đang cần một bạn giỏi số học. {ten} giúp Cô nhé!"
+        ],
+        "thanks": [
+          "Cảm ơn {ten}! Cô đếm đủ bánh rồi.",
+          "Nhờ {ten} mà tiệm bánh không bị nhầm. Cảm ơn nhiều nha!",
+          "Giỏi quá {ten}! Bánh thơm nhờ bạn đó.",
+          "Cô vui lắm. Cảm ơn {ten} đã giúp nhé!",
+          "Hoan hô {ten}! Tiệm bánh có thêm một trợ lý giỏi.",
+          "Tính chuẩn rồi! Cảm ơn {ten} nha."
+        ],
+        "encourage": [
+          "Bánh nào cũng cần thử vài lần mới ngon. {ten} cũng vậy nhé!",
+          "Không sao đâu {ten}. Tính lại từ từ là ra thôi.",
+          "Cô tin {ten} làm được. Mình thử lại nhé!",
+          "Sai một chút cũng không sao. Cảm ơn {ten} đã cố gắng nha!",
+          "Đừng lo {ten} ơi. Cô cũng hay tính nhầm đó!",
+          "{ten} chăm chỉ lắm. Mai sẽ giỏi hơn nữa!"
+        ],
+        "special": [
+          "{ten} giỏi tính quá! Cô gói tặng bạn một chiếc bánh vui nhé.",
+          "Bạn nhỏ {ten} làm Cô nhớ chiếc máy tính thần kỳ đó.",
+          "Cả tiệm bánh đều quý {ten}. Mai lại ghé nhé!",
+          "{ten} biết nhiều dạng toán rồi. Cô nể quá!"
+        ]
+      }
+    },
+    {
+      "id": "cu_tron",
+      "name": "Cú Tròn",
+      "strand": "number",
+      "building": "Tháp Con số",
+      "bio": "Chú cú giữ chuông Tháp Con số. Cú Tròn thích đếm sao mỗi đêm.",
+      "lines": {
+        "greeting": [
+          "Hú hú! Chào {ten}.",
+          "Chào {ten}! Cú Tròn trên tháp đây.",
+          "{ten} lên tháp rồi à? Hú hú!",
+          "Hú! Cú Tròn đang đếm sao đây.",
+          "Chào {ten}, trời đẹp để đếm số nhỉ?",
+          "Hú hú, bạn {ten} đến thăm tháp!"
+        ],
+        "ask": [
+          "Cú Tròn đếm số mãi mà buồn ngủ. {ten} đếm giúp Cú nhé?",
+          "Chuông tháp cần vài con số đúng. {ten} giúp Cú nha!",
+          "Hú hú! Có 5 bài về các con số. {ten} giúp Cú nhé?",
+          "Cú Tròn bị lẫn chữ số rồi. {ten} giúp Cú sắp xếp nhé!",
+          "Tháp có 5 câu đố số. {ten} giải giúp Cú nhé?",
+          "Giúp Cú đếm số cho chuông kêu đúng giờ nhé, {ten}!"
+        ],
+        "thanks": [
+          "Hú hú! Cảm ơn {ten}. Chuông tháp kêu đúng rồi.",
+          "Giỏi lắm {ten}! Cú Tròn không còn lẫn số.",
+          "Cảm ơn {ten} nhiều! Cú ngủ ngon được rồi.",
+          "Hú! {ten} đếm giỏi hơn cả Cú Tròn.",
+          "Nhờ {ten} mà các con số xếp ngay ngắn. Cảm ơn nhé!",
+          "Cảm ơn {ten}. Cú Tròn nhớ bạn lắm đó."
+        ],
+        "encourage": [
+          "Hú hú, con số khó đếm mà. Cú cũng đếm sai hoài. Cố lên {ten}!",
+          "Không sao {ten} ơi. Mình đếm lại từ từ nhé.",
+          "Cú Tròn tin {ten} làm được. Thử lại nào!",
+          "Đếm sai cũng là đang học. Cảm ơn {ten} đã cố gắng!",
+          "Đừng buồn nha {ten}. Mai Cú Tròn lại đợi bạn.",
+          "{ten} chăm chỉ lắm. Cú tự hào ghê!"
+        ],
+        "special": [
+          "Hú hú! {ten} biết nhiều dạng số rồi. Cú Tròn nể quá!",
+          "Cú Tròn kể {ten} nghe nè: các con số đều thích bạn.",
+          "Bạn {ten} giờ đếm giỏi như cú thông thái!",
+          "Chuông tháp reo mừng {ten} đó. Hú hú!"
+        ]
+      }
+    },
+    {
+      "id": "bac_vuong",
+      "name": "Bác Vuông",
+      "strand": "geo",
+      "building": "Vườn Hình học",
+      "bio": "Bác làm vườn ở Vườn Hình học. Bác trồng hoa thành đủ hình vuông, tròn, tam giác.",
+      "lines": {
+        "greeting": [
+          "Chào {ten}! Vườn hôm nay đẹp lắm.",
+          "{ten} đến chơi vườn à? Bác mừng quá.",
+          "Chào {ten}, ngửi thử mùi hoa không nè?",
+          "Ôi, bạn nhỏ {ten} đến rồi!",
+          "Chào cháu {ten}! Bác Vuông đang tỉa cây.",
+          "{ten} ơi, vào vườn hình học nào!"
+        ],
+        "ask": [
+          "Bác muốn xếp các luống hoa cho vuông vức. {ten} giúp Bác nhé?",
+          "Vườn có nhiều hình lạ. {ten} đếm giúp Bác với!",
+          "Bác cần đo hàng rào mà tay run quá. {ten} giúp Bác nhé?",
+          "Có 5 bài về hình cho vườn của Bác. {ten} giúp nhé?",
+          "Cháu {ten} giỏi nhìn hình lắm. Giúp Bác đếm nhé!",
+          "Giúp Bác sắp hình cho vườn thật đẹp nhé, {ten}!"
+        ],
+        "thanks": [
+          "Cảm ơn {ten}! Vườn đẹp hơn nhờ cháu.",
+          "Giỏi quá {ten}! Luống hoa vuông vức rồi.",
+          "Bác cảm ơn {ten} nhiều. Hoa cũng cảm ơn cháu.",
+          "Hoan hô {ten}! Cháu nhìn hình tinh thật.",
+          "Nhờ {ten} mà Bác đếm đủ hình rồi. Cảm ơn nhé!",
+          "Vườn vui lắm. Cảm ơn {ten} nha!"
+        ],
+        "encourage": [
+          "Hình khó nhìn mà. Bác cũng đếm nhầm hoài. Cố lên {ten}!",
+          "Không sao {ten} ơi. Mình đếm lại từng hình nhé.",
+          "Bác tin cháu làm được. Thử lại nào {ten}!",
+          "Sai một chút cũng không sao. Cảm ơn {ten} đã cố gắng!",
+          "Hoa cũng cần thời gian mới nở. {ten} cũng vậy nhé!",
+          "{ten} chăm chỉ lắm. Bác vui ghê!"
+        ],
+        "special": [
+          "{ten} biết nhiều dạng hình rồi. Bác nể quá!",
+          "Bác trồng tặng {ten} một bông hoa hình sao nhé.",
+          "Cả vườn đều khen {ten}. Giỏi lắm cháu!",
+          "Cháu {ten} nhìn hình giỏi hơn cả Bác Vuông."
+        ]
+      }
+    },
+    {
+      "id": "chu_xoay",
+      "name": "Chú Xoay",
+      "strand": "comb",
+      "building": "Hội chợ Tổ hợp",
+      "bio": "Chú quản lý Hội chợ Tổ hợp. Chú rất thích xếp trò chơi theo nhiều cách.",
+      "lines": {
+        "greeting": [
+          "Chào {ten}! Hội chợ đang vui lắm.",
+          "Mời {ten} lên vòng quay nào!",
+          "Ôi, {ten} đến rồi! Kèn vang lên nào.",
+          "Chào {ten}! Chú Xoay đây.",
+          "Hội chợ chào đón {ten}!",
+          "{ten} ơi, hôm nay có nhiều trò mới."
+        ],
+        "ask": [
+          "Chú xếp trò chơi mà có quá nhiều cách. {ten} đếm giúp Chú nhé?",
+          "Có 5 bài đếm cách xếp. {ten} giúp Chú Xoay nhé?",
+          "Chú đang chia quà cho các bạn. {ten} giúp Chú đếm nhé?",
+          "Hội chợ cần một bạn giỏi đếm cách. {ten} giúp Chú nhé!",
+          "Giúp Chú xếp hàng cho vui nào, {ten}!",
+          "Chú chọn mãi không xong. {ten} giúp Chú đếm các cách nhé?"
+        ],
+        "thanks": [
+          "Cảm ơn {ten}! Hội chợ vui hơn nhờ bạn.",
+          "Giỏi quá {ten}! Chú đếm đủ các cách rồi.",
+          "Hoan hô {ten}! Chú tặng bạn một tràng pháo tay.",
+          "Nhờ {ten} mà trò chơi xếp xong. Cảm ơn nhé!",
+          "Chú cảm ơn {ten} nhiều lắm!",
+          "Tuyệt quá! {ten} là trợ lý số một của Chú."
+        ],
+        "encourage": [
+          "Đếm cách khó mà. Chú cũng đếm sót hoài. Cố lên {ten}!",
+          "Không sao {ten} ơi. Mình liệt kê từ từ nhé.",
+          "Chú tin {ten} làm được. Thử lại nào!",
+          "Sai một chút cũng không sao. Cảm ơn {ten} đã cố gắng!",
+          "Đừng buồn nha {ten}. Mai hội chợ lại mở cửa đón bạn.",
+          "{ten} chăm chỉ lắm. Chú vỗ tay nè!"
+        ],
+        "special": [
+          "{ten} biết nhiều dạng đếm rồi. Chú nể quá!",
+          "Chú mời {ten} một vé chơi vòng quay miễn phí nhé!",
+          "Cả hội chợ đều khen {ten}. Giỏi lắm!",
+          "Bạn {ten} đếm cách giỏi như nhà ảo thuật."
+        ]
+      }
+    }
+  ]
+}

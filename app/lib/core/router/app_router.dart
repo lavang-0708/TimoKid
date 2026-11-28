@@ -20,6 +20,7 @@ import '../../features/qa/qa_config.dart';
 import '../../features/qa/qa_menu_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/stage_result/stage_result_screen.dart';
+import '../../features/stickers/sticker_book_screen.dart';
 import '../../features/town/town_screen.dart';
 import '../database/database_provider.dart';
 
@@ -90,6 +91,10 @@ class AppRouter {
         GoRoute(
           path: RoomScreen.route,
           builder: (context, state) => const RoomScreen(),
+        ),
+        GoRoute(
+          path: StickerBookScreen.route,
+          builder: (context, state) => const StickerBookScreen(),
         ),
         GoRoute(
           path: ShopScreen.route,

@@ -1,6 +1,14 @@
 # HANDOVER — TimoKid
 
-Cập nhật cuối: 23/11/2026 (nhiệm vụ ngày + chuỗi; tháp nhiều tầng + boss; Pet D: bảng pets, xp theo câu đúng, chăm pet); trước đó 22/11/2026 (T2-06b: Đồ cho pet, Nội thất, bộ đồ cao cấp, nút Cho ăn/Chơi); trước đó 21/11/2026 (main `99a87cf` sau PR #34: nhân vật toàn thân + đi lại trong Phòng + pet lớn dần + Tủ đồ; PR #33 thêm 12 dạng bài; PR #32 (D) đã merge). Đọc mục "Hiện trạng sau PR #33/#34" ngay dưới trước; các dòng lịch sử phía sau giữ nguyên cách viết lúc đó.
+Cập nhật cuối: 28/11/2026 (bản 0.4 thị trấn sống: cư dân, sổ sticker, mở khóa); trước đó 23/11/2026 (nhiệm vụ ngày + chuỗi; tháp nhiều tầng + boss; Pet D: bảng pets, xp theo câu đúng, chăm pet); trước đó 22/11/2026 (T2-06b: Đồ cho pet, Nội thất, bộ đồ cao cấp, nút Cho ăn/Chơi); trước đó 21/11/2026 (main `99a87cf` sau PR #34: nhân vật toàn thân + đi lại trong Phòng + pet lớn dần + Tủ đồ; PR #33 thêm 12 dạng bài; PR #32 (D) đã merge). Đọc mục "Hiện trạng sau PR #33/#34" ngay dưới trước; các dòng lịch sử phía sau giữ nguyên cách viết lúc đó.
+
+## Bản 0.4 thị trấn sống (T4-02/03/04, nhánh `feature/v04-town-life`, chờ review)
+
+- **Cư dân** (`app/lib/features/residents/`, nội dung ở `app/assets/content/residents.json`, sửa không cần code): Hiệp sĩ Sáng (Lôgic), Cô Bông (Số học), Cú Tròn (Con số), Bác Vuông (Hình học), Chú Xoay (Tổ hợp). Mỗi người 6 câu chào/nhờ giúp/cảm ơn/động viên + 4 câu đặc biệt, có `{ten}`. Câu chọn theo ngày bằng băm FNV-1a (hạt = ngày + cư dân + loại câu, không dùng childId) nên golden ổn định. Hiện ở màn Tòa nhà (bong bóng) và màn kết quả chặng (lời cảm ơn; động viên nếu đúng ngay ≤ 2 câu). Test tự kiểm nội dung (`validateResidentBook`).
+- **Sổ sticker** (`features/stickers/`, route `/stickers`, nút `sticker-book-button` ở Phòng và Thị trấn): mỗi dạng thành thạo = 1 sticker, +2 kim cương một lần (ledger refId `sticker:<formId>`). Cấp trong `_finishStage` (`StickerService.awardPending`) và khi vào màn kết quả; popup "sticker mới" hiện đúng một lần (`sticker_seen.*`). Lưu bằng `settings` (`sticker.<formId>`) + `wallet_ledger`: **không đổi schema (vẫn v5), không cần migration server**, đồng bộ theo cơ chế settings/ledger sẵn có.
+- **Mở khóa** (`features/unlocks/unlock_config.dart`, một chỗ): 5 dạng = khung vàng sổ + câu đặc biệt của cư dân; 12 = đài phun nước ở Thị trấn; 20 = Gấu bông Tết vào Tủ đồ; 30 = danh hiệu "Nhà toán học nhí". Header sổ ghi "Còn N dạng nữa để mở …".
+- **Hình**: chưa có, dùng hình vẽ bằng code sau các cờ `residentArtReady`, `stickerArtReady`, `stickerFormIconArtReady`, `unlockArtReady` (đều `false`). Danh sách ảnh và tên file: `docs/briefs/lot17_v04.md`.
+- Golden đã sinh lại vì HUD có thêm nút Sticker / bong bóng cư dân / bố cục màn kết quả: town, room, building, math_result. `integration_test/app_test.dart` chưa chạy được trên máy build (không có emulator); luồng của nó không đạt thành thạo nên không bật popup.
 
 ## Đồng bộ phía app (T3-03/T3-04/T3-06, nhánh `feature/v03-app-sync`, chờ review)
 
