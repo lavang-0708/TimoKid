@@ -3,7 +3,9 @@ import { http } from './client';
 import { ErrorBox, Spinner, useLoad } from './common';
 import { ensureFamily, listChildren, type Child } from './lib/data';
 import type { AuthUser } from './lib/http';
+import { cleanUrl, parseResetParams, type ResetParams } from './lib/authForm';
 import { AuthScreen } from './screens/AuthScreen';
+import { ResetPasswordScreen } from './screens/ResetPasswordScreen';
 import { ChildPicker, SyncLine } from './screens/ChildPicker';
 import { CustomQuestionsScreen } from './screens/CustomQuestionsScreen';
 import { FormsScreen } from './screens/FormsScreen';
@@ -27,6 +29,13 @@ export function App() {
   const [bootError, setBootError] = useState<unknown>(null);
   const [waking, setWaking] = useState(false);
   const [expired, setExpired] = useState(false);
+  // Liên kết trong email đặt lại mật khẩu: /TimoKid/?token=... (hoặc ?error=...).
+  const [reset, setReset] = useState<ResetParams>(() => parseResetParams(window.location.search));
+
+  function finishReset() {
+    window.history.replaceState(null, '', cleanUrl(window.location.href));
+    setReset(null);
+  }
 
   useEffect(() => http.subscribeWaking(setWaking), []);
   useEffect(() => {
@@ -52,6 +61,7 @@ export function App() {
 
   const wakingBanner = waking && <div className="banner warn">Đang đánh thức máy chủ… vài giây nữa là xong.</div>;
 
+  if (reset) return <ResetPasswordScreen params={reset} onDone={finishReset} />;
   if (booting) return <>{wakingBanner}<Spinner text="Đang kiểm tra đăng nhập…" /></>;
   if (bootError != null) return <ErrorBox error={bootError} onRetry={boot} />;
   if (!user) {
@@ -89,6 +99,7 @@ function Signed({ user, wakingBanner, onSignOut }: { user: AuthUser; wakingBanne
         <span className="brand">TimoKid<small>Phụ huynh</small></span>
         <button className="ghost" onClick={onSignOut}>Đăng xuất</button>
       </div>
+      <div className="muted account" title="Tài khoản đang đăng nhập">{user.email}</div>
       {wakingBanner}
       {child ? (
         <>
@@ -106,7 +117,7 @@ function Signed({ user, wakingBanner, onSignOut }: { user: AuthUser; wakingBanne
           {tab === 'forms' && <FormsScreen childId={child.id} />}
           {tab === 'custom' && <CustomQuestionsScreen kids={kids ?? []} />}
           {tab === 'mail' && <MessagesScreen childId={child.id} childName={child.name} />}
-          {tab === 'settings' && <SettingsScreen child={child} />}
+          {tab === 'settings' && <SettingsScreen child={child} kids={kids ?? []} email={user.email} onChildrenChanged={q.reload} />}
           <nav className="tabs">
             {TABS.map((t) => (
               <button key={t.id} className={tab === t.id ? 'on' : ''} onClick={() => setTab(t.id)}>{t.label}</button>

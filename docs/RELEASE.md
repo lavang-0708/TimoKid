@@ -96,3 +96,8 @@ APK debug chỉ để kiểm thử, không phát hành cho người dùng.
 - Từ `v0.2.0` trở đi là bản chính thức: build không cờ, mọi luật như cũ.
 - Cờ nằm ở `app/lib/core/test_build.dart`; mọi chỗ khóa hỏi
   `TestUnlocks.enabled`.
+
+## Phát hành bản chính thức đầu tiên (v0.3.0 trở đi)
+
+- Tag không phải `v0.0.x`: build không cờ. Lần mở đầu tiên trên máy từng cài bản thử, app xóa xu/kim cương tặng thử (xem `docs/SYNC.md`, mục "Bản chính thức"). Không cần cài lại từ đầu; dữ liệu học của bé giữ nguyên.
+- Trước khi phát hành, chủ dự án kiểm tra trong Neon Console > Auth: email provider đang bật (người gửi chung), `https://lavang-0708.github.io` nằm trong trusted origins (dùng cho liên kết đặt lại mật khẩu).

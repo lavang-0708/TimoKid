@@ -2,7 +2,8 @@ import { useState, type FormEvent } from 'react';
 import { http } from '../client';
 import { Card, ErrorBox, Spinner, errorText, useLoad } from '../common';
 import { deleteUnopenedMessage, listMessages, sendMessage } from '../lib/data';
-import { MESSAGE_MAX, MESSAGE_STATUS_VI, formatVnDateTime, messageStatus, validateMessage } from '../lib/logic';
+import { GIFT_ITEM_GROUPS, giftItemName } from '../lib/items';
+import { MESSAGE_MAX, formatVnDateTime, messageStatus, messageStatusText, validateMessage } from '../lib/logic';
 
 export function MessagesScreen({ childId, childName }: { childId: string; childName: string }) {
   const [body, setBody] = useState('');
@@ -66,8 +67,18 @@ export function MessagesScreen({ childId, childName }: { childId: string; childN
             <input id="gem" inputMode="numeric" value={gem} onChange={(e) => setGem(e.target.value)} placeholder="0" />
           </div>
         </div>
-        <label htmlFor="item">Mã món đồ tặng (không bắt buộc)</label>
-        <input id="item" value={item} onChange={(e) => setItem(e.target.value)} maxLength={60} />
+        <label htmlFor="item">Món đồ tặng (không bắt buộc)</label>
+        <select id="item" value={item} onChange={(e) => setItem(e.target.value)}>
+          <option value="">Không tặng món đồ</option>
+          {GIFT_ITEM_GROUPS.map((g) => (
+            <optgroup key={g.title} label={g.title}>
+              {g.items.map((i) => (
+                <option key={i.id} value={i.id}>{i.name}</option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+        <p className="muted" style={{ margin: '6px 0 0' }}>Bé nhận món vào Tủ đồ khi mở thư, chỉ một lần.</p>
         {notice && <div className={`banner ${notice.ok ? 'ok' : 'err'}`}>{notice.text}</div>}
         <div style={{ marginTop: 12 }}>
           <button type="submit" disabled={busy}>{busy ? 'Đang gửi…' : 'Gửi thư'}</button>
@@ -80,12 +91,12 @@ export function MessagesScreen({ childId, childName }: { childId: string; childN
         {q.data && q.data.length === 0 && <p className="muted">Chưa gửi thư nào.</p>}
         {q.data?.map((m) => {
           const st = messageStatus(m);
-          const gifts = [m.gift_xu > 0 && `${m.gift_xu} xu`, m.gift_gem > 0 && `${m.gift_gem} kim cương`, m.gift_item_id && `món ${m.gift_item_id}`].filter(Boolean);
+          const gifts = [m.gift_xu > 0 && `${m.gift_xu} xu`, m.gift_gem > 0 && `${m.gift_gem} kim cương`, m.gift_item_id && `món ${giftItemName(m.gift_item_id)}`].filter(Boolean);
           return (
             <div className="msg" key={m.id}>
               <div className="row" style={{ justifyContent: 'space-between' }}>
                 <span className="muted">{formatVnDateTime(m.created_at)}</span>
-                <span className={`pill ${st === 'unopened' ? 'warn' : 'mint'}`}>{MESSAGE_STATUS_VI[st]}</span>
+                <span className={`pill ${st === 'unopened' ? 'warn' : 'mint'}`}>{messageStatusText(m)}</span>
               </div>
               <p>{m.body}</p>
               {gifts.length > 0 && <div className="muted">Quà: {gifts.join(', ')}</div>}

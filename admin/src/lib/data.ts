@@ -7,7 +7,13 @@ import {
   countFullyDoneSets,
   dayRange,
   formStatsByStrand,
+  summarizeArena,
+  summarizeCustomUsage,
   summarizeStats,
+  sumBalances,
+  TEST_WALLET_REASONS,
+  type ArenaSummary,
+  type CustomUsage,
   vnStartOfDay,
   weakForms,
   type AttemptLite,
@@ -95,6 +101,14 @@ export async function listChildren(http: NeonHttp): Promise<Child[]> {
   return data;
 }
 
+/** Sửa tên và lớp của bé. `updated_at` mới để app (trigger keep_newest) nhận bản này về. */
+export async function updateChild(http: NeonHttp, id: string, v: { name: string; grade: number }): Promise<void> {
+  await http.api(`children?id=eq.${enc(id)}`, {
+    method: 'PATCH',
+    body: { name: v.name, grade: v.grade, updated_at: new Date().toISOString() },
+  });
+}
+
 // ---------------------------------------------------------- thống kê
 
 export interface StatsData {
@@ -105,27 +119,89 @@ export interface StatsData {
   balances: { xu: number; gem: number };
 }
 
+/** Bảng chưa có trên server (migration chưa chạy): coi như không có dữ liệu. */
+function isMissingTable(e: unknown): boolean {
+  return e instanceof ApiError && (e.status === 404 || e.code === 'PGRST205' || e.code === '42P01');
+}
+
+/** Gọi `fn`; bảng chưa tồn tại thì trả `null` (màn hình hiện "chưa có dữ liệu"). */
+async function orMissing<T>(fn: () => Promise<T>): Promise<T | null> {
+  try {
+    return await fn();
+  } catch (e) {
+    if (isMissingTable(e)) return null;
+    throw e;
+  }
+}
+
+export interface PetRow {
+  species: string;
+  xp: number;
+  stage_seen: 'egg' | 'newborn' | 'teen' | 'adult';
+  hatched: boolean;
+  active: boolean;
+}
+
+export interface ExtrasData {
+  /** null = server chưa có bảng `pets`. */
+  pets: PetRow[] | null;
+  /** null = server chưa có bảng `arena_attempts`. */
+  arena: ArenaSummary | null;
+  /** Số sticker = số dạng bài bé đã thành thạo. */
+  stickers: number;
+  custom: CustomUsage;
+  /** Số câu tự soạn đang bật áp dụng cho bé; null = server chưa có bảng. */
+  customActive: number | null;
+}
+
+/** Dữ liệu thêm cho màn Thống kê: pet, đấu trường, sticker, đề tự soạn. */
+export async function loadExtras(http: NeonHttp, childId: string): Promise<ExtrasData> {
+  const c = enc(childId);
+  const [pets, arena, mastered, customAttempts, customQs] = await Promise.all([
+    orMissing(() => getAll<PetRow>(http, `pets?child_id=eq.${c}&select=species,xp,stage_seen,hatched,active&order=created_at.asc`)),
+    orMissing(() => getAll<{ mode: string; medal: string; score: number; gems_awarded: number }>(http, `arena_attempts?child_id=eq.${c}&select=mode,medal,score,gems_awarded&order=created_at.desc`)),
+    getAll<{ key: string }>(http, `skill_progress?child_id=eq.${c}&scope=eq.form&mastered=is.true&select=key`),
+    getAll<{ form_id: string; correct_first_try: boolean }>(http, `attempts?child_id=eq.${c}&form_id=like.custom:*&select=form_id,correct_first_try`),
+    orMissing(() => getAll<{ id: string; active: boolean; child_id: string | null }>(http, `custom_questions?select=id,active,child_id&active=is.true`)),
+  ]);
+  return {
+    pets,
+    arena: arena ? summarizeArena(arena) : null,
+    stickers: new Set(mastered.map((m) => m.key)).size,
+    custom: summarizeCustomUsage(customAttempts),
+    customActive: customQs ? customQs.filter((q) => q.child_id === null || q.child_id === childId).length : null,
+  };
+}
+
+/** Số dư xu/kim cương từ sổ ví, không tính xu/kim cương tặng của bản thử. */
+export async function loadBalances(http: NeonHttp, childId: string): Promise<{ xu: number; gem: number }> {
+  const rows = await getAll<{ currency: string; amount: number; reason: string }>(
+    http,
+    `wallet_ledger?child_id=eq.${enc(childId)}&reason=not.in.(${TEST_WALLET_REASONS.join(',')})&select=currency,amount,reason`,
+  );
+  return sumBalances(rows);
+}
+
 export async function loadStats(http: NeonHttp, childId: string, rangeDays: number, now: number = Date.now()): Promise<StatsData> {
   const days = dayRange(rangeDays, now);
   const from = days[0];
   const c = enc(childId);
-  const [rows, sets, skills, bal] = await Promise.all([
+  const [rows, sets, skills, balances] = await Promise.all([
     getAll<DailyStatRow>(http, `child_daily_stats?child_id=eq.${c}&day=gte.${from}&select=day,strand,questions,correct_first_try,duration_ms`),
     getAll<{ date: string }>(http, `daily_sets?child_id=eq.${c}&date=gte.${from}&completed=is.true&select=date`),
     getAll<SkillRow>(http, `skill_progress?child_id=eq.${c}&scope=eq.strand&select=scope,key,rung,mastered,mastered_at`),
-    http.api<{ xu: number | string; gem: number | string }[]>(`child_balances?child_id=eq.${c}&select=xu,gem`),
+    loadBalances(http, childId),
   ]);
   const strandRung: Partial<Record<Strand, number>> = {};
   for (const s of skills) {
     if ((STRANDS as readonly string[]).includes(s.key) && s.rung !== null) strandRung[s.key as Strand] = s.rung;
   }
-  const b = bal.data[0];
   return {
     days,
     summary: summarizeStats(rows, days),
     doneDays: new Set(sets.map((s) => s.date).filter((d) => d >= from && d <= days[days.length - 1])).size,
     strandRung,
-    balances: { xu: Number(b?.xu ?? 0), gem: Number(b?.gem ?? 0) },
+    balances,
   };
 }
 
