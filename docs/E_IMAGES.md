@@ -4947,3 +4947,56 @@ Claude decode xong, soi fg ở độ phân giải gốc trên nền tối: bố 
 - r1 = 145 px là màu tím nội thất của chữ, không phải tàn dư (bright-rim = 0 là trọng tài theo skill).
 
 **Trạng thái: chủ dự án ĐÃ DUYỆT (28/11 ~18:20). Đã đẩy `app_icon_fg.png.b64` (515.028 B) + `app_icon_bg.png.b64` (7.368 B) đè tên cũ + mục doc này — chờ Claude decode thành `app/assets/images/ui/app_icon_fg.png` / `app_icon_bg.png`. Parent kiểm lại: semi 0, ngoài vòng 0 (xa nhất 321,1 px), cụm 540×397 căn giữa (511,5, 511); r1 = 145 px là tím nội thất chữ (cách mép ~29 px, theo tiền lệ v1–v5); viền hồng nhạt rất mờ ở mép lông trên khi soi 3× nền tối (thước rộng bắt 521 px, phần lớn là hồng thiết kế tai trong/má — không thấy ở cỡ app).**
+
+---
+
+# Lô 17 — Nhóm A: 5 CƯ DÂN (chân dung) — CHỦ DỰ ÁN ĐÃ DUYỆT (28/11) — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+> Chủ dự án đã duyệt 5 chân dung (28/11 ~18:47, Claude duyệt thay, chủ dự án ra ngoài): rất dễ thương, đúng phong cách app. Cả 3 nốt đều GIỮ NGUYÊN: mũ Bác Vuông xanh đậm (nổi khối hơn, áo đã đúng pastel), lông vũ Hiệp sĩ, đầu Chú Xoay nhỏ hơn chút (vẫn đọc rõ). File đích: `app/assets/images/residents/<id>_portrait.webp` (Claude convert webp khi decode).
+
+Phong cách: pastel, nét mềm, **viền trắng sticker 10 px** quanh hình, không chữ trong ảnh. Khung 512×512 nền trong suốt, lề trong 24 px, đầu to, đọc rõ ở 72 px. Màu từng mảng khớp `strandColor` trong code app (Logic #C9B8F0 đã đối chiếu trong `resident_widgets.dart` trên main; các màu còn lại theo `town_assets.dart`).
+
+| Cư dân | Mảng / tòa nhà | Màu app (`strandColor`) | File |
+| --- | --- | --- | --- |
+| Hiệp sĩ Sáng (`hiep_si_sang`) | Lôgic, Lâu đài Lôgic | #C9B8F0 tím nhạt | `hiep_si_sang_portrait.png` |
+| Cô Bông (`co_bong`) | Số học, Tiệm bánh Số học | #FFD9C0 hồng/cam nhạt | `co_bong_portrait.png` |
+| Cú Tròn (`cu_tron`) | Con số, Tháp Con số | #BFE0F5 xanh dương nhạt | `cu_tron_portrait.png` |
+| Bác Vuông (`bac_vuong`) | Hình học, Vườn Hình học | #BFE8CF xanh lá nhạt | `bac_vuong_portrait.png` |
+| Chú Xoay (`chu_xoay`) | Tổ hợp, Hội chợ Tổ hợp | #FFD166 vàng nhạt | `chu_xoay_portrait.png` |
+
+## File (PNG 512×512, nền trong suốt)
+
+| File | Byte | .b64 byte | SHA-256 |
+| --- | --- | --- | --- |
+| `hiep_si_sang_portrait.png` | 148.893 | 198.524 | `53d86bcde7b8dd45efc7b5dcca56cb8732effbe3f0fe16ec857bc8c333733603` |
+| `co_bong_portrait.png` | 171.889 | 229.188 | `34e0125e9f21483e990d663684093846ca748f392682d0aa4dfccf819150b417` |
+| `cu_tron_portrait.png` | 255.739 | 340.988 | `eaf994f59d6435e069d2ec02afa621f99a12bf2469ca55dc1d63e679ba7d0e28` |
+| `bac_vuong_portrait.png` | 191.608 | 255.480 | `560df4b9042103b4d3bb711abd333fbfdc4792cc3997f8ca34f7a21defd79f55` |
+| `chu_xoay_portrait.png` | 200.277 | 267.036 | `99d2a6f950905bfb703c0eb1b12cb75caef03b2360a3ac1b3faba13ae7ac6e61` |
+
+## Cổng kiểm (đo bằng code trên file cuối, cả 5 file — parent kiểm lại độc lập)
+
+- Semi alpha: **0**; magenta r1: **0**; vivid broad: **0**; bright-rim: **0**.
+- Lề trong: **24 px** (trên/dưới; trái/phải 37–106 px do art căn giữa trong khung 444 px); viền trắng sticker: **10 px** đều.
+- Màu trang phục (median) so với `strandColor`: Hiệp sĩ Sáng lệch 6, Cô Bông 25, Cú Tròn 39, Bác Vuông 64, Chú Xoay 45 (có shading nên lệch; cùng họ màu).
+
+## Cách vẽ
+
+5 lần tạo ảnh (lấy `cat_teen_sit` làm mẫu phong cách pastel 3D mềm của app, nền magenta phẳng) → tách nền bằng code (ngưỡng 52,5, erode 1 px, defringe) → resize premultiplied-alpha về vừa khung 444 px → viền trắng 10 px bằng code → alpha cứng. Sửa sau: vẽ lại pixel vivid magenta kẹt giữa sợi tóc/lông (299 px) và viền hồng do blend với nền key (5.607 px) bằng median donor.
+
+## Đã soi
+
+100% + 3× trên nền tối (60,60,80): mặt, mắt, phụ kiện đặc trưng đều sạch sau khi sửa viền hồng; viền trắng đều không lem; thu nhỏ 72 px (vuông như app thật + tròn như brief) đọc rõ mặt + mũ/kính/nơ.
+
+## Nốt nhỏ (đã chốt — GIỮ NGUYÊN, không sửa)
+
+- Hiệp sĩ Sáng: 156 px ở chùm lông vũ còn đọc "hồng" theo thước — đó là màu tím-lavender nhạt của thiết kế; thước không tách được lavender khỏi blend magenta, nhìn mắt sạch. **Claude 28/11 ~18:47: GIỮ.**
+- Cô Bông: 10 px viền hồng còn lại ở ngọn tóc mai, không thấy ở cỡ app.
+- Bác Vuông: mũ xanh đậm hơn pastel #BFE8CF (áo đúng pastel); vẫn đọc rõ là mũ làm vườn. **Claude 28/11 ~18:47: GIỮ (nổi khối hơn).**
+- Chú Xoay: bóng bay làm hình rộng nhất (418 px) nên đầu nhỏ hơn 4 người kia chút ở 72 px, vẫn đọc rõ; dây bóng mỏng 1–2 px nhưng còn nguyên. **Claude 28/11 ~18:47: GIỮ.**
+
+## Tiếp theo
+
+Tư thế "đang nói" (`*_talk`), nhóm B (sổ sticker), nhóm C (mở khóa), nhóm B2 (90 biểu tượng dạng) — vẽ tiếp, đẩy từng nhóm riêng + doc.
+
+**Trạng thái: chủ dự án ĐÃ DUYỆT (28/11 ~18:47). Đã đẩy 5 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/residents/*_portrait.webp`.**
