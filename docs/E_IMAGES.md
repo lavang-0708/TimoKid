@@ -5376,3 +5376,62 @@ vẽ lại bằng donor median, kiểm lại bằng code: đã sạch.
   vẫn đọc là đếm theo dãy/bậc.
 
 **Trạng thái: đã đẩy 19 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/stickers/sticker_base_number.webp` và `form_number_*.webp`.**
+
+---
+
+## Lô 17 nhóm B2 — mảng Tổ hợp: 18 biểu tượng dạng bài + đế huy hiệu — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+Phong cách: pastel 3D mềm, viền trắng sticker 8 px, lề trong 64 px, không chữ/số trong ảnh. Đế `sticker_base_comb.png`: viền trắng 12 px, nền #FFD166, lề trong 24 px. Cổng kiểm (đo bằng code từng file): semi 0, magenta r1 0, vivid 0, bright-rim 0, lề ≥ 64 px — ĐẠT cả 19 file.
+
+| Dạng | Nhãn | File | Byte | SHA-256 | Lề |
+| --- | --- | --- | ---: | --- | ---: |
+| `comb.outfit` | Chọn trang phục | `form_comb_outfit.png` | 102305 | `e5ee0f5b1ef466cb…` | 65 |
+| `comb.handshake` | Bắt tay | `form_comb_handshake.png` | 66462 | `def1cb8616ddad90…` | 65 |
+| `comb.tournament` | Thi đấu vòng tròn | `form_comb_tournament.png` | 129212 | `88cf444c4deeea56…` | 66 |
+| `comb.makenum` | Lập số | `form_comb_makenum.png` | 50481 | `08e3b183441d8dea…` | 66 |
+| `comb.routes` | Đếm đường đi | `form_comb_routes.png` | 70150 | `daf3bb6d645175c2…` | 65 |
+| `comb.pigeon` | Lấy tất | `form_comb_pigeon.png` | 119458 | `bd2aa76a3e14bd92…` | 65 |
+| `comb.arrange` | Xếp hàng ngang | `form_comb_arrange.png` | 104583 | `6a61419d92591988…` | 66 |
+| `comb.choose2` | Chọn 2 món | `form_comb_choose2.png` | 103061 | `e3ec74bf42245e84…` | 66 |
+| `comb.gridpath` | Đường trên lưới | `form_comb_gridpath.png` | 123210 | `f46e55b8dd21342b…` | 66 |
+| `comb.split` | Tách hai phần | `form_comb_split.png` | 109776 | `acb71c1bf24a0271…` | 69 |
+| `comb.coins` | Đổi tiền | `form_comb_coins.png` | 91808 | `b75e8c5ce5da8d4a…` | 65 |
+| `comb.makenumparity` | Lập số chẵn lẻ | `form_comb_makenumparity.png` | 68447 | `13fe9dd442238160…` | 65 |
+| `comb.minsum2` | Tổng nhỏ nhất | `form_comb_minsum2.png` | 68243 | `032332d02f63c0fd…` | 65 |
+| `comb.freebie` | Mua tặng thêm | `form_comb_freebie.png` | 82447 | `c5a24e5b861e3e82…` | 65 |
+| `comb.vases` | Cắm hoa vào lọ | `form_comb_vases.png` | 100749 | `d9b4e28e12b38dc3…` | 66 |
+| `comb.pick2` | Chọn 2 bạn | `form_comb_pick2.png` | 101413 | `62774e65008d8949…` | 65 |
+| `comb.dice` | Gieo xúc xắc | `form_comb_dice.png` | 60725 | `07b90230c4e80da9…` | 67 |
+| `comb.flag` | Tô màu cờ | `form_comb_flag.png` | 82338 | `e2b4df3aaa1397d5…` | 65 |
+| — | Đế huy hiệu trống | `sticker_base_comb.png` | 29358 | `8c58ec90fadade09…` | 24 |
+
+SHA-256 đầy đủ:
+- `form_comb_outfit.png`: `e5ee0f5b1ef466cb95f50c02255420a6970b8bdcfc7615c80c61a82135021b37`
+- `form_comb_handshake.png`: `def1cb8616ddad90ef3dabd27dbce7ef8e5756967dddadb6ee12333d137f17ba`
+- `form_comb_tournament.png`: `88cf444c4deeea561b98793c4b8450a1f8067f010f8e39d0635e32778f8c8c43`
+- `form_comb_makenum.png`: `08e3b183441d8dea94b04fe95c8a2cb45c7e0f8d7bf2b87dd701b4fa9e1f111f`
+- `form_comb_routes.png`: `daf3bb6d645175c223073c85475d4104f23e9be2c440f71d453e2611e079ab21`
+- `form_comb_pigeon.png`: `bd2aa76a3e14bd929197377e89dd58a0fa4b97923324795628d4ccb9aff888d1`
+- `form_comb_arrange.png`: `6a61419d92591988ede63e7ae1e47ab555bf7007dccf3f320b8ee475a85f4c64`
+- `form_comb_choose2.png`: `e3ec74bf42245e84360481058d8c5cadb28a62431d9235de23437a4822e7174a`
+- `form_comb_gridpath.png`: `f46e55b8dd21342b606854b2264f4c81023a628b374029fd277d7d85aa5c80a1`
+- `form_comb_split.png`: `acb71c1bf24a02719ccd4767ab0a29c4a08c85bccf19d005dcc433320c91f78f`
+- `form_comb_coins.png`: `b75e8c5ce5da8d4aed1c85907bd5bbc55a26a202c9098c0c8e73d8deaa313bda`
+- `form_comb_makenumparity.png`: `13fe9dd442238160daa027f406eb03f205f0707f43d05e209a826a69dcb3e1f2`
+- `form_comb_minsum2.png`: `032332d02f63c0fda47a668d1ce0028c0e7d2a94167ec1204019adef11ab3759`
+- `form_comb_freebie.png`: `c5a24e5b861e3e822d9ee500d7686343cd6d1b619ce3a4b6f62731dd3491206a`
+- `form_comb_vases.png`: `d9b4e28e12b38dc39227f45fd569bb6abadd213e110dade38d520a22d515bc86`
+- `form_comb_pick2.png`: `62774e65008d894943442c3c68b7efd4591295f2ecd11032a572464774b34092`
+- `form_comb_dice.png`: `07b90230c4e80da9bd9588040f8c12748ad27d6a83df14ba314d24cdb4a8d6bb`
+- `form_comb_flag.png`: `e2b4df3aaa1397d54c2d4b3ae92516d6900e2412ab56b482eca4e20937a1290d`
+- `sticker_base_comb.png`: `8c58ec90fadade09327fb34c34d08f45dda8bf7bf46ab52c69bde96066f9a2f3`
+
+Phương pháp: 2 tấm lưới 3×3 (1920×1280) trên nền magenta, cắt theo đường magenta sạch đo bằng code (tấm 1 y=432/854, tấm 2 y=415/876, x=640/1280); key (243,0,235) ngưỡng 52,5; erode 1 px; defringe donor median; art fit 368 px + viền trắng 8 px = 384 px. Bóng đổ nhuộm magenta được xóa trước khi vẽ viền (pixel vivid) rồi bóc từng lớp 2 px tối đa 8 lần (thước vivid + hồng + lõi tối g<50) — lõi tối r 110–170 mà thước vivid không bắt được là bài học của lô này. Viền hồng còn lại vẽ lại bằng median donor (không tô trắng khi hết donor).
+
+Đã soi: `preview.png` (nền sáng + nền tối 60,60,80 + trong huy hiệu 260 px + 120 px cỡ app) và `check3x_dark.png` (mép dưới 6 icon rủi ro cao phóng 3× trên nền tối).
+
+Nốt: `pink_fringe` còn 0–230 px/file là màu hồng/mauve của thiết kế (bóng hồng túi quà, tóc hồng), không phải vệt magenta (tiền lệ nhóm A chấp nhận 156). Còn 1–2 px chuyển màu tím-xanh ở mép vài icon, chỉ thấy ở 3×, không thấy ở cỡ app. `routes` đọc kém nhất ở cỡ nhỏ; `minsum2` ý “nhỏ nhất” yếu, nhãn app gánh.
+
+Đã đẩy GitHub.
+
+**Trạng thái: đã đẩy 19 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/stickers/sticker_base_comb.webp` và `form_comb_*.webp`.**
