@@ -6,10 +6,13 @@ import '../../features/arena/arena_lobby_screen.dart';
 import '../../features/arena/arena_result_screen.dart';
 import '../../features/arena/arena_service.dart';
 import '../../features/character/character_view.dart';
+import '../../features/auth/login_screen.dart';
+import '../../features/auth/parent_settings_screen.dart';
 import '../../features/building/building_screen.dart';
 import '../../features/math/math_screen.dart';
 import '../../features/onboarding/hatch_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
+import '../../features/profile/profile_picker_screen.dart';
 import '../../features/room/coming_soon_screen.dart';
 import '../../features/room/room_screen.dart';
 import '../../features/shop/shop_screen.dart';
@@ -42,13 +45,21 @@ class AppRouter {
     bool showOnboarding = false,
     bool showHatch = false,
     bool showSplash = false,
+    bool showLogin = false,
+    bool showProfilePicker = false,
     CharacterLayerLoader? previewLoader,
   }) {
-    final firstScreen = showOnboarding
+    // Màn đầu sau (có thể) màn đăng nhập lần đầu (T3-03): đang tạo bé
+    // mới thì mở đầu; có từ 2 bé thì chọn bé; có lần nở trứng chờ thì
+    // nở trứng; còn lại vào Phòng.
+    final afterLogin = showOnboarding
         ? OnboardingScreen.route
+        : showProfilePicker
+        ? ProfilePickerScreen.route
         : showHatch
         ? HatchScreen.route
         : RoomScreen.route;
+    final firstScreen = showLogin ? '${LoginScreen.route}?first=1' : afterLogin;
     // Góp ý 21/11: mở app thì qua màn khởi động có logo trước.
     final initialLocation = showSplash ? SplashScreen.route : firstScreen;
     return GoRouter(
@@ -57,6 +68,20 @@ class AppRouter {
         GoRoute(
           path: SplashScreen.route,
           builder: (context, state) => SplashScreen(next: firstScreen),
+        ),
+        GoRoute(
+          path: LoginScreen.route,
+          builder: (context, state) => LoginScreen(
+            next: state.uri.queryParameters['first'] == '1' ? afterLogin : null,
+          ),
+        ),
+        GoRoute(
+          path: ParentSettingsScreen.route,
+          builder: (context, state) => const ParentSettingsScreen(),
+        ),
+        GoRoute(
+          path: ProfilePickerScreen.route,
+          builder: (context, state) => const ProfilePickerScreen(),
         ),
         GoRoute(
           path: TownScreen.route,

@@ -419,3 +419,67 @@ class Pets extends Table {
     {childId, species},
   ];
 }
+
+/// Thư và quà từ bố (T3-06, schema v5): bản sao trên máy của bảng
+/// `messages` trên server. Dòng do bộ đồng bộ tải về; app chỉ ghi
+/// `openedAt`/`claimedAt` khi bé mở thư. `synced = false` nghĩa là app có
+/// thay đổi (đã mở thư) chưa gửi lên server; dòng vừa tải về luôn
+/// `synced = true`. `id` là id do server sinh (UUID).
+class Messages extends Table {
+  TextColumn get id => text()();
+
+  TextColumn get childId => text()();
+
+  /// Lời nhắn, tối đa 300 ký tự (server chặn).
+  TextColumn get body => text()();
+
+  IntColumn get giftXu => integer().withDefault(const Constant(0))();
+
+  IntColumn get giftGem => integer().withDefault(const Constant(0))();
+
+  /// Mã món đồ tặng (danh mục cửa hàng), null nếu không có.
+  TextColumn get giftItemId => text().nullable()();
+
+  /// Bé đã mở thư lúc nào (null = chưa mở, hiện chấm đỏ).
+  DateTimeColumn get openedAt => dateTime().nullable()();
+
+  /// Quà đã nhận lúc nào (null = chưa nhận hoặc thư không có quà).
+  DateTimeColumn get claimedAt => dateTime().nullable()();
+
+  DateTimeColumn get createdAt => dateTime()();
+
+  DateTimeColumn get updatedAt => dateTime()();
+
+  BoolColumn get synced => boolean().withDefault(const Constant(true))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Mục sổ ôn tập đã bị xóa trên máy, chờ gửi lên server (T3-04, schema
+/// v5). App xóa cứng mục khỏi `review_queue` (đúng 3 lần) còn server giữ
+/// `deleted_at`; trigger SQLite `review_queue_tombstone` ghi dòng ở đây
+/// mỗi khi một mục bị xóa, kèm đủ cột server yêu cầu để gửi được dù dòng
+/// gốc đã mất. Gửi xong thì `synced = true`.
+class ReviewTombstones extends Table {
+  /// Cùng id với dòng `review_queue` đã xóa.
+  TextColumn get id => text()();
+
+  TextColumn get childId => text()();
+
+  TextColumn get formId => text()();
+
+  IntColumn get rung => integer()();
+
+  DateTimeColumn get dueDate => dateTime()();
+
+  DateTimeColumn get createdAt => dateTime()();
+
+  /// Lúc xóa (cũng là `updated_at` gửi lên server).
+  DateTimeColumn get deletedAt => dateTime()();
+
+  BoolColumn get synced => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

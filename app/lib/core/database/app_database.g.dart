@@ -6183,6 +6183,1178 @@ class PetsCompanion extends UpdateCompanion<Pet> {
   }
 }
 
+class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MessagesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _childIdMeta = const VerificationMeta(
+    'childId',
+  );
+  @override
+  late final GeneratedColumn<String> childId = GeneratedColumn<String>(
+    'child_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  @override
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'body',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _giftXuMeta = const VerificationMeta('giftXu');
+  @override
+  late final GeneratedColumn<int> giftXu = GeneratedColumn<int>(
+    'gift_xu',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _giftGemMeta = const VerificationMeta(
+    'giftGem',
+  );
+  @override
+  late final GeneratedColumn<int> giftGem = GeneratedColumn<int>(
+    'gift_gem',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _giftItemIdMeta = const VerificationMeta(
+    'giftItemId',
+  );
+  @override
+  late final GeneratedColumn<String> giftItemId = GeneratedColumn<String>(
+    'gift_item_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _openedAtMeta = const VerificationMeta(
+    'openedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> openedAt = GeneratedColumn<DateTime>(
+    'opened_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _claimedAtMeta = const VerificationMeta(
+    'claimedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> claimedAt = GeneratedColumn<DateTime>(
+    'claimed_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    childId,
+    body,
+    giftXu,
+    giftGem,
+    giftItemId,
+    openedAt,
+    claimedAt,
+    createdAt,
+    updatedAt,
+    synced,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'messages';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Message> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('child_id')) {
+      context.handle(
+        _childIdMeta,
+        childId.isAcceptableOrUnknown(data['child_id']!, _childIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_childIdMeta);
+    }
+    if (data.containsKey('body')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyMeta);
+    }
+    if (data.containsKey('gift_xu')) {
+      context.handle(
+        _giftXuMeta,
+        giftXu.isAcceptableOrUnknown(data['gift_xu']!, _giftXuMeta),
+      );
+    }
+    if (data.containsKey('gift_gem')) {
+      context.handle(
+        _giftGemMeta,
+        giftGem.isAcceptableOrUnknown(data['gift_gem']!, _giftGemMeta),
+      );
+    }
+    if (data.containsKey('gift_item_id')) {
+      context.handle(
+        _giftItemIdMeta,
+        giftItemId.isAcceptableOrUnknown(
+          data['gift_item_id']!,
+          _giftItemIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('opened_at')) {
+      context.handle(
+        _openedAtMeta,
+        openedAt.isAcceptableOrUnknown(data['opened_at']!, _openedAtMeta),
+      );
+    }
+    if (data.containsKey('claimed_at')) {
+      context.handle(
+        _claimedAtMeta,
+        claimedAt.isAcceptableOrUnknown(data['claimed_at']!, _claimedAtMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Message map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Message(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      childId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}child_id'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body'],
+      )!,
+      giftXu: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}gift_xu'],
+      )!,
+      giftGem: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}gift_gem'],
+      )!,
+      giftItemId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gift_item_id'],
+      ),
+      openedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}opened_at'],
+      ),
+      claimedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}claimed_at'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
+    );
+  }
+
+  @override
+  $MessagesTable createAlias(String alias) {
+    return $MessagesTable(attachedDatabase, alias);
+  }
+}
+
+class Message extends DataClass implements Insertable<Message> {
+  final String id;
+  final String childId;
+
+  /// Lời nhắn, tối đa 300 ký tự (server chặn).
+  final String body;
+  final int giftXu;
+  final int giftGem;
+
+  /// Mã món đồ tặng (danh mục cửa hàng), null nếu không có.
+  final String? giftItemId;
+
+  /// Bé đã mở thư lúc nào (null = chưa mở, hiện chấm đỏ).
+  final DateTime? openedAt;
+
+  /// Quà đã nhận lúc nào (null = chưa nhận hoặc thư không có quà).
+  final DateTime? claimedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final bool synced;
+  const Message({
+    required this.id,
+    required this.childId,
+    required this.body,
+    required this.giftXu,
+    required this.giftGem,
+    this.giftItemId,
+    this.openedAt,
+    this.claimedAt,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.synced,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['child_id'] = Variable<String>(childId);
+    map['body'] = Variable<String>(body);
+    map['gift_xu'] = Variable<int>(giftXu);
+    map['gift_gem'] = Variable<int>(giftGem);
+    if (!nullToAbsent || giftItemId != null) {
+      map['gift_item_id'] = Variable<String>(giftItemId);
+    }
+    if (!nullToAbsent || openedAt != null) {
+      map['opened_at'] = Variable<DateTime>(openedAt);
+    }
+    if (!nullToAbsent || claimedAt != null) {
+      map['claimed_at'] = Variable<DateTime>(claimedAt);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
+    return map;
+  }
+
+  MessagesCompanion toCompanion(bool nullToAbsent) {
+    return MessagesCompanion(
+      id: Value(id),
+      childId: Value(childId),
+      body: Value(body),
+      giftXu: Value(giftXu),
+      giftGem: Value(giftGem),
+      giftItemId: giftItemId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(giftItemId),
+      openedAt: openedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(openedAt),
+      claimedAt: claimedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(claimedAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      synced: Value(synced),
+    );
+  }
+
+  factory Message.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Message(
+      id: serializer.fromJson<String>(json['id']),
+      childId: serializer.fromJson<String>(json['childId']),
+      body: serializer.fromJson<String>(json['body']),
+      giftXu: serializer.fromJson<int>(json['giftXu']),
+      giftGem: serializer.fromJson<int>(json['giftGem']),
+      giftItemId: serializer.fromJson<String?>(json['giftItemId']),
+      openedAt: serializer.fromJson<DateTime?>(json['openedAt']),
+      claimedAt: serializer.fromJson<DateTime?>(json['claimedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'childId': serializer.toJson<String>(childId),
+      'body': serializer.toJson<String>(body),
+      'giftXu': serializer.toJson<int>(giftXu),
+      'giftGem': serializer.toJson<int>(giftGem),
+      'giftItemId': serializer.toJson<String?>(giftItemId),
+      'openedAt': serializer.toJson<DateTime?>(openedAt),
+      'claimedAt': serializer.toJson<DateTime?>(claimedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
+    };
+  }
+
+  Message copyWith({
+    String? id,
+    String? childId,
+    String? body,
+    int? giftXu,
+    int? giftGem,
+    Value<String?> giftItemId = const Value.absent(),
+    Value<DateTime?> openedAt = const Value.absent(),
+    Value<DateTime?> claimedAt = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    bool? synced,
+  }) => Message(
+    id: id ?? this.id,
+    childId: childId ?? this.childId,
+    body: body ?? this.body,
+    giftXu: giftXu ?? this.giftXu,
+    giftGem: giftGem ?? this.giftGem,
+    giftItemId: giftItemId.present ? giftItemId.value : this.giftItemId,
+    openedAt: openedAt.present ? openedAt.value : this.openedAt,
+    claimedAt: claimedAt.present ? claimedAt.value : this.claimedAt,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
+  );
+  Message copyWithCompanion(MessagesCompanion data) {
+    return Message(
+      id: data.id.present ? data.id.value : this.id,
+      childId: data.childId.present ? data.childId.value : this.childId,
+      body: data.body.present ? data.body.value : this.body,
+      giftXu: data.giftXu.present ? data.giftXu.value : this.giftXu,
+      giftGem: data.giftGem.present ? data.giftGem.value : this.giftGem,
+      giftItemId: data.giftItemId.present
+          ? data.giftItemId.value
+          : this.giftItemId,
+      openedAt: data.openedAt.present ? data.openedAt.value : this.openedAt,
+      claimedAt: data.claimedAt.present ? data.claimedAt.value : this.claimedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Message(')
+          ..write('id: $id, ')
+          ..write('childId: $childId, ')
+          ..write('body: $body, ')
+          ..write('giftXu: $giftXu, ')
+          ..write('giftGem: $giftGem, ')
+          ..write('giftItemId: $giftItemId, ')
+          ..write('openedAt: $openedAt, ')
+          ..write('claimedAt: $claimedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    childId,
+    body,
+    giftXu,
+    giftGem,
+    giftItemId,
+    openedAt,
+    claimedAt,
+    createdAt,
+    updatedAt,
+    synced,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Message &&
+          other.id == this.id &&
+          other.childId == this.childId &&
+          other.body == this.body &&
+          other.giftXu == this.giftXu &&
+          other.giftGem == this.giftGem &&
+          other.giftItemId == this.giftItemId &&
+          other.openedAt == this.openedAt &&
+          other.claimedAt == this.claimedAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
+}
+
+class MessagesCompanion extends UpdateCompanion<Message> {
+  final Value<String> id;
+  final Value<String> childId;
+  final Value<String> body;
+  final Value<int> giftXu;
+  final Value<int> giftGem;
+  final Value<String?> giftItemId;
+  final Value<DateTime?> openedAt;
+  final Value<DateTime?> claimedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<bool> synced;
+  final Value<int> rowid;
+  const MessagesCompanion({
+    this.id = const Value.absent(),
+    this.childId = const Value.absent(),
+    this.body = const Value.absent(),
+    this.giftXu = const Value.absent(),
+    this.giftGem = const Value.absent(),
+    this.giftItemId = const Value.absent(),
+    this.openedAt = const Value.absent(),
+    this.claimedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MessagesCompanion.insert({
+    required String id,
+    required String childId,
+    required String body,
+    this.giftXu = const Value.absent(),
+    this.giftGem = const Value.absent(),
+    this.giftItemId = const Value.absent(),
+    this.openedAt = const Value.absent(),
+    this.claimedAt = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.synced = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       childId = Value(childId),
+       body = Value(body),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<Message> custom({
+    Expression<String>? id,
+    Expression<String>? childId,
+    Expression<String>? body,
+    Expression<int>? giftXu,
+    Expression<int>? giftGem,
+    Expression<String>? giftItemId,
+    Expression<DateTime>? openedAt,
+    Expression<DateTime>? claimedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (childId != null) 'child_id': childId,
+      if (body != null) 'body': body,
+      if (giftXu != null) 'gift_xu': giftXu,
+      if (giftGem != null) 'gift_gem': giftGem,
+      if (giftItemId != null) 'gift_item_id': giftItemId,
+      if (openedAt != null) 'opened_at': openedAt,
+      if (claimedAt != null) 'claimed_at': claimedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MessagesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? childId,
+    Value<String>? body,
+    Value<int>? giftXu,
+    Value<int>? giftGem,
+    Value<String?>? giftItemId,
+    Value<DateTime?>? openedAt,
+    Value<DateTime?>? claimedAt,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<bool>? synced,
+    Value<int>? rowid,
+  }) {
+    return MessagesCompanion(
+      id: id ?? this.id,
+      childId: childId ?? this.childId,
+      body: body ?? this.body,
+      giftXu: giftXu ?? this.giftXu,
+      giftGem: giftGem ?? this.giftGem,
+      giftItemId: giftItemId ?? this.giftItemId,
+      openedAt: openedAt ?? this.openedAt,
+      claimedAt: claimedAt ?? this.claimedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (childId.present) {
+      map['child_id'] = Variable<String>(childId.value);
+    }
+    if (body.present) {
+      map['body'] = Variable<String>(body.value);
+    }
+    if (giftXu.present) {
+      map['gift_xu'] = Variable<int>(giftXu.value);
+    }
+    if (giftGem.present) {
+      map['gift_gem'] = Variable<int>(giftGem.value);
+    }
+    if (giftItemId.present) {
+      map['gift_item_id'] = Variable<String>(giftItemId.value);
+    }
+    if (openedAt.present) {
+      map['opened_at'] = Variable<DateTime>(openedAt.value);
+    }
+    if (claimedAt.present) {
+      map['claimed_at'] = Variable<DateTime>(claimedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MessagesCompanion(')
+          ..write('id: $id, ')
+          ..write('childId: $childId, ')
+          ..write('body: $body, ')
+          ..write('giftXu: $giftXu, ')
+          ..write('giftGem: $giftGem, ')
+          ..write('giftItemId: $giftItemId, ')
+          ..write('openedAt: $openedAt, ')
+          ..write('claimedAt: $claimedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ReviewTombstonesTable extends ReviewTombstones
+    with TableInfo<$ReviewTombstonesTable, ReviewTombstone> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ReviewTombstonesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _childIdMeta = const VerificationMeta(
+    'childId',
+  );
+  @override
+  late final GeneratedColumn<String> childId = GeneratedColumn<String>(
+    'child_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _formIdMeta = const VerificationMeta('formId');
+  @override
+  late final GeneratedColumn<String> formId = GeneratedColumn<String>(
+    'form_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _rungMeta = const VerificationMeta('rung');
+  @override
+  late final GeneratedColumn<int> rung = GeneratedColumn<int>(
+    'rung',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dueDateMeta = const VerificationMeta(
+    'dueDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dueDate = GeneratedColumn<DateTime>(
+    'due_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    childId,
+    formId,
+    rung,
+    dueDate,
+    createdAt,
+    deletedAt,
+    synced,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'review_tombstones';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ReviewTombstone> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('child_id')) {
+      context.handle(
+        _childIdMeta,
+        childId.isAcceptableOrUnknown(data['child_id']!, _childIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_childIdMeta);
+    }
+    if (data.containsKey('form_id')) {
+      context.handle(
+        _formIdMeta,
+        formId.isAcceptableOrUnknown(data['form_id']!, _formIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_formIdMeta);
+    }
+    if (data.containsKey('rung')) {
+      context.handle(
+        _rungMeta,
+        rung.isAcceptableOrUnknown(data['rung']!, _rungMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_rungMeta);
+    }
+    if (data.containsKey('due_date')) {
+      context.handle(
+        _dueDateMeta,
+        dueDate.isAcceptableOrUnknown(data['due_date']!, _dueDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dueDateMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deletedAtMeta);
+    }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ReviewTombstone map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ReviewTombstone(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      childId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}child_id'],
+      )!,
+      formId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}form_id'],
+      )!,
+      rung: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}rung'],
+      )!,
+      dueDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}due_date'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
+    );
+  }
+
+  @override
+  $ReviewTombstonesTable createAlias(String alias) {
+    return $ReviewTombstonesTable(attachedDatabase, alias);
+  }
+}
+
+class ReviewTombstone extends DataClass implements Insertable<ReviewTombstone> {
+  /// Cùng id với dòng `review_queue` đã xóa.
+  final String id;
+  final String childId;
+  final String formId;
+  final int rung;
+  final DateTime dueDate;
+  final DateTime createdAt;
+
+  /// Lúc xóa (cũng là `updated_at` gửi lên server).
+  final DateTime deletedAt;
+  final bool synced;
+  const ReviewTombstone({
+    required this.id,
+    required this.childId,
+    required this.formId,
+    required this.rung,
+    required this.dueDate,
+    required this.createdAt,
+    required this.deletedAt,
+    required this.synced,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['child_id'] = Variable<String>(childId);
+    map['form_id'] = Variable<String>(formId);
+    map['rung'] = Variable<int>(rung);
+    map['due_date'] = Variable<DateTime>(dueDate);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['deleted_at'] = Variable<DateTime>(deletedAt);
+    map['synced'] = Variable<bool>(synced);
+    return map;
+  }
+
+  ReviewTombstonesCompanion toCompanion(bool nullToAbsent) {
+    return ReviewTombstonesCompanion(
+      id: Value(id),
+      childId: Value(childId),
+      formId: Value(formId),
+      rung: Value(rung),
+      dueDate: Value(dueDate),
+      createdAt: Value(createdAt),
+      deletedAt: Value(deletedAt),
+      synced: Value(synced),
+    );
+  }
+
+  factory ReviewTombstone.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ReviewTombstone(
+      id: serializer.fromJson<String>(json['id']),
+      childId: serializer.fromJson<String>(json['childId']),
+      formId: serializer.fromJson<String>(json['formId']),
+      rung: serializer.fromJson<int>(json['rung']),
+      dueDate: serializer.fromJson<DateTime>(json['dueDate']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      deletedAt: serializer.fromJson<DateTime>(json['deletedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'childId': serializer.toJson<String>(childId),
+      'formId': serializer.toJson<String>(formId),
+      'rung': serializer.toJson<int>(rung),
+      'dueDate': serializer.toJson<DateTime>(dueDate),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'deletedAt': serializer.toJson<DateTime>(deletedAt),
+      'synced': serializer.toJson<bool>(synced),
+    };
+  }
+
+  ReviewTombstone copyWith({
+    String? id,
+    String? childId,
+    String? formId,
+    int? rung,
+    DateTime? dueDate,
+    DateTime? createdAt,
+    DateTime? deletedAt,
+    bool? synced,
+  }) => ReviewTombstone(
+    id: id ?? this.id,
+    childId: childId ?? this.childId,
+    formId: formId ?? this.formId,
+    rung: rung ?? this.rung,
+    dueDate: dueDate ?? this.dueDate,
+    createdAt: createdAt ?? this.createdAt,
+    deletedAt: deletedAt ?? this.deletedAt,
+    synced: synced ?? this.synced,
+  );
+  ReviewTombstone copyWithCompanion(ReviewTombstonesCompanion data) {
+    return ReviewTombstone(
+      id: data.id.present ? data.id.value : this.id,
+      childId: data.childId.present ? data.childId.value : this.childId,
+      formId: data.formId.present ? data.formId.value : this.formId,
+      rung: data.rung.present ? data.rung.value : this.rung,
+      dueDate: data.dueDate.present ? data.dueDate.value : this.dueDate,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReviewTombstone(')
+          ..write('id: $id, ')
+          ..write('childId: $childId, ')
+          ..write('formId: $formId, ')
+          ..write('rung: $rung, ')
+          ..write('dueDate: $dueDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('synced: $synced')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    childId,
+    formId,
+    rung,
+    dueDate,
+    createdAt,
+    deletedAt,
+    synced,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ReviewTombstone &&
+          other.id == this.id &&
+          other.childId == this.childId &&
+          other.formId == this.formId &&
+          other.rung == this.rung &&
+          other.dueDate == this.dueDate &&
+          other.createdAt == this.createdAt &&
+          other.deletedAt == this.deletedAt &&
+          other.synced == this.synced);
+}
+
+class ReviewTombstonesCompanion extends UpdateCompanion<ReviewTombstone> {
+  final Value<String> id;
+  final Value<String> childId;
+  final Value<String> formId;
+  final Value<int> rung;
+  final Value<DateTime> dueDate;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> deletedAt;
+  final Value<bool> synced;
+  final Value<int> rowid;
+  const ReviewTombstonesCompanion({
+    this.id = const Value.absent(),
+    this.childId = const Value.absent(),
+    this.formId = const Value.absent(),
+    this.rung = const Value.absent(),
+    this.dueDate = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ReviewTombstonesCompanion.insert({
+    required String id,
+    required String childId,
+    required String formId,
+    required int rung,
+    required DateTime dueDate,
+    required DateTime createdAt,
+    required DateTime deletedAt,
+    this.synced = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       childId = Value(childId),
+       formId = Value(formId),
+       rung = Value(rung),
+       dueDate = Value(dueDate),
+       createdAt = Value(createdAt),
+       deletedAt = Value(deletedAt);
+  static Insertable<ReviewTombstone> custom({
+    Expression<String>? id,
+    Expression<String>? childId,
+    Expression<String>? formId,
+    Expression<int>? rung,
+    Expression<DateTime>? dueDate,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? deletedAt,
+    Expression<bool>? synced,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (childId != null) 'child_id': childId,
+      if (formId != null) 'form_id': formId,
+      if (rung != null) 'rung': rung,
+      if (dueDate != null) 'due_date': dueDate,
+      if (createdAt != null) 'created_at': createdAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (synced != null) 'synced': synced,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ReviewTombstonesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? childId,
+    Value<String>? formId,
+    Value<int>? rung,
+    Value<DateTime>? dueDate,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? deletedAt,
+    Value<bool>? synced,
+    Value<int>? rowid,
+  }) {
+    return ReviewTombstonesCompanion(
+      id: id ?? this.id,
+      childId: childId ?? this.childId,
+      formId: formId ?? this.formId,
+      rung: rung ?? this.rung,
+      dueDate: dueDate ?? this.dueDate,
+      createdAt: createdAt ?? this.createdAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      synced: synced ?? this.synced,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (childId.present) {
+      map['child_id'] = Variable<String>(childId.value);
+    }
+    if (formId.present) {
+      map['form_id'] = Variable<String>(formId.value);
+    }
+    if (rung.present) {
+      map['rung'] = Variable<int>(rung.value);
+    }
+    if (dueDate.present) {
+      map['due_date'] = Variable<DateTime>(dueDate.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReviewTombstonesCompanion(')
+          ..write('id: $id, ')
+          ..write('childId: $childId, ')
+          ..write('formId: $formId, ')
+          ..write('rung: $rung, ')
+          ..write('dueDate: $dueDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('synced: $synced, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -6196,6 +7368,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $InventoryTable inventory = $InventoryTable(this);
   late final $ArenaAttemptsTable arenaAttempts = $ArenaAttemptsTable(this);
   late final $PetsTable pets = $PetsTable(this);
+  late final $MessagesTable messages = $MessagesTable(this);
+  late final $ReviewTombstonesTable reviewTombstones = $ReviewTombstonesTable(
+    this,
+  );
   late final ChildrenDao childrenDao = ChildrenDao(this as AppDatabase);
   late final AttemptsDao attemptsDao = AttemptsDao(this as AppDatabase);
   late final SkillProgressDao skillProgressDao = SkillProgressDao(
@@ -6227,6 +7403,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     inventory,
     arenaAttempts,
     pets,
+    messages,
+    reviewTombstones,
   ];
 }
 
@@ -9262,6 +10440,595 @@ typedef $$PetsTableProcessedTableManager =
       Pet,
       PrefetchHooks Function()
     >;
+typedef $$MessagesTableCreateCompanionBuilder = MessagesCompanion Function({
+  required String id,
+  required String childId,
+  required String body,
+  Value<int> giftXu,
+  Value<int> giftGem,
+  Value<String?> giftItemId,
+  Value<DateTime?> openedAt,
+  Value<DateTime?> claimedAt,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<bool> synced,
+  Value<int> rowid,
+});
+typedef $$MessagesTableUpdateCompanionBuilder = MessagesCompanion Function({
+  Value<String> id,
+  Value<String> childId,
+  Value<String> body,
+  Value<int> giftXu,
+  Value<int> giftGem,
+  Value<String?> giftItemId,
+  Value<DateTime?> openedAt,
+  Value<DateTime?> claimedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<bool> synced,
+  Value<int> rowid,
+});
+
+class $$MessagesTableFilterComposer
+    extends Composer<_$AppDatabase, $MessagesTable> {
+  $$MessagesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get childId => $composableBuilder(
+    column: $table.childId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get giftXu => $composableBuilder(
+    column: $table.giftXu,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get giftGem => $composableBuilder(
+    column: $table.giftGem,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get giftItemId => $composableBuilder(
+    column: $table.giftItemId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get openedAt => $composableBuilder(
+    column: $table.openedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get claimedAt => $composableBuilder(
+    column: $table.claimedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MessagesTableOrderingComposer
+    extends Composer<_$AppDatabase, $MessagesTable> {
+  $$MessagesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get childId => $composableBuilder(
+    column: $table.childId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get giftXu => $composableBuilder(
+    column: $table.giftXu,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get giftGem => $composableBuilder(
+    column: $table.giftGem,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get giftItemId => $composableBuilder(
+    column: $table.giftItemId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get openedAt => $composableBuilder(
+    column: $table.openedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get claimedAt => $composableBuilder(
+    column: $table.claimedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MessagesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MessagesTable> {
+  $$MessagesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get childId =>
+      $composableBuilder(column: $table.childId, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+
+  GeneratedColumn<int> get giftXu =>
+      $composableBuilder(column: $table.giftXu, builder: (column) => column);
+
+  GeneratedColumn<int> get giftGem =>
+      $composableBuilder(column: $table.giftGem, builder: (column) => column);
+
+  GeneratedColumn<String> get giftItemId => $composableBuilder(
+    column: $table.giftItemId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get openedAt =>
+      $composableBuilder(column: $table.openedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get claimedAt =>
+      $composableBuilder(column: $table.claimedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+}
+
+class $$MessagesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MessagesTable,
+          Message,
+          $$MessagesTableFilterComposer,
+          $$MessagesTableOrderingComposer,
+          $$MessagesTableAnnotationComposer,
+          $$MessagesTableCreateCompanionBuilder,
+          $$MessagesTableUpdateCompanionBuilder,
+          (Message, BaseReferences<_$AppDatabase, $MessagesTable, Message>),
+          Message,
+          PrefetchHooks Function()
+        > {
+  $$MessagesTableTableManager(_$AppDatabase db, $MessagesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MessagesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MessagesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MessagesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> childId = const Value.absent(),
+                Value<String> body = const Value.absent(),
+                Value<int> giftXu = const Value.absent(),
+                Value<int> giftGem = const Value.absent(),
+                Value<String?> giftItemId = const Value.absent(),
+                Value<DateTime?> openedAt = const Value.absent(),
+                Value<DateTime?> claimedAt = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MessagesCompanion(
+                id: id,
+                childId: childId,
+                body: body,
+                giftXu: giftXu,
+                giftGem: giftGem,
+                giftItemId: giftItemId,
+                openedAt: openedAt,
+                claimedAt: claimedAt,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                synced: synced,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String childId,
+                required String body,
+                Value<int> giftXu = const Value.absent(),
+                Value<int> giftGem = const Value.absent(),
+                Value<String?> giftItemId = const Value.absent(),
+                Value<DateTime?> openedAt = const Value.absent(),
+                Value<DateTime?> claimedAt = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<bool> synced = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MessagesCompanion.insert(
+                id: id,
+                childId: childId,
+                body: body,
+                giftXu: giftXu,
+                giftGem: giftGem,
+                giftItemId: giftItemId,
+                openedAt: openedAt,
+                claimedAt: claimedAt,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                synced: synced,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$MessagesTable, Message>(table),
+                  BaseReferences<_$AppDatabase, $MessagesTable, Message>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MessagesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MessagesTable,
+      Message,
+      $$MessagesTableFilterComposer,
+      $$MessagesTableOrderingComposer,
+      $$MessagesTableAnnotationComposer,
+      $$MessagesTableCreateCompanionBuilder,
+      $$MessagesTableUpdateCompanionBuilder,
+      (Message, BaseReferences<_$AppDatabase, $MessagesTable, Message>),
+      Message,
+      PrefetchHooks Function()
+    >;
+typedef $$ReviewTombstonesTableCreateCompanionBuilder =
+    ReviewTombstonesCompanion Function({
+      required String id,
+      required String childId,
+      required String formId,
+      required int rung,
+      required DateTime dueDate,
+      required DateTime createdAt,
+      required DateTime deletedAt,
+      Value<bool> synced,
+      Value<int> rowid,
+    });
+typedef $$ReviewTombstonesTableUpdateCompanionBuilder =
+    ReviewTombstonesCompanion Function({
+      Value<String> id,
+      Value<String> childId,
+      Value<String> formId,
+      Value<int> rung,
+      Value<DateTime> dueDate,
+      Value<DateTime> createdAt,
+      Value<DateTime> deletedAt,
+      Value<bool> synced,
+      Value<int> rowid,
+    });
+
+class $$ReviewTombstonesTableFilterComposer
+    extends Composer<_$AppDatabase, $ReviewTombstonesTable> {
+  $$ReviewTombstonesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get childId => $composableBuilder(
+    column: $table.childId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get formId => $composableBuilder(
+    column: $table.formId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get rung => $composableBuilder(
+    column: $table.rung,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dueDate => $composableBuilder(
+    column: $table.dueDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ReviewTombstonesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ReviewTombstonesTable> {
+  $$ReviewTombstonesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get childId => $composableBuilder(
+    column: $table.childId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get formId => $composableBuilder(
+    column: $table.formId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get rung => $composableBuilder(
+    column: $table.rung,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dueDate => $composableBuilder(
+    column: $table.dueDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ReviewTombstonesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ReviewTombstonesTable> {
+  $$ReviewTombstonesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get childId =>
+      $composableBuilder(column: $table.childId, builder: (column) => column);
+
+  GeneratedColumn<String> get formId =>
+      $composableBuilder(column: $table.formId, builder: (column) => column);
+
+  GeneratedColumn<int> get rung =>
+      $composableBuilder(column: $table.rung, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dueDate =>
+      $composableBuilder(column: $table.dueDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+}
+
+class $$ReviewTombstonesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ReviewTombstonesTable,
+          ReviewTombstone,
+          $$ReviewTombstonesTableFilterComposer,
+          $$ReviewTombstonesTableOrderingComposer,
+          $$ReviewTombstonesTableAnnotationComposer,
+          $$ReviewTombstonesTableCreateCompanionBuilder,
+          $$ReviewTombstonesTableUpdateCompanionBuilder,
+          (
+            ReviewTombstone,
+            BaseReferences<
+              _$AppDatabase,
+              $ReviewTombstonesTable,
+              ReviewTombstone
+            >,
+          ),
+          ReviewTombstone,
+          PrefetchHooks Function()
+        > {
+  $$ReviewTombstonesTableTableManager(
+    _$AppDatabase db,
+    $ReviewTombstonesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ReviewTombstonesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ReviewTombstonesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ReviewTombstonesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> childId = const Value.absent(),
+                Value<String> formId = const Value.absent(),
+                Value<int> rung = const Value.absent(),
+                Value<DateTime> dueDate = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> deletedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ReviewTombstonesCompanion(
+                id: id,
+                childId: childId,
+                formId: formId,
+                rung: rung,
+                dueDate: dueDate,
+                createdAt: createdAt,
+                deletedAt: deletedAt,
+                synced: synced,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String childId,
+                required String formId,
+                required int rung,
+                required DateTime dueDate,
+                required DateTime createdAt,
+                required DateTime deletedAt,
+                Value<bool> synced = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ReviewTombstonesCompanion.insert(
+                id: id,
+                childId: childId,
+                formId: formId,
+                rung: rung,
+                dueDate: dueDate,
+                createdAt: createdAt,
+                deletedAt: deletedAt,
+                synced: synced,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ReviewTombstonesTable, ReviewTombstone>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ReviewTombstonesTable,
+                    ReviewTombstone
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ReviewTombstonesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ReviewTombstonesTable,
+      ReviewTombstone,
+      $$ReviewTombstonesTableFilterComposer,
+      $$ReviewTombstonesTableOrderingComposer,
+      $$ReviewTombstonesTableAnnotationComposer,
+      $$ReviewTombstonesTableCreateCompanionBuilder,
+      $$ReviewTombstonesTableUpdateCompanionBuilder,
+      (
+        ReviewTombstone,
+        BaseReferences<_$AppDatabase, $ReviewTombstonesTable, ReviewTombstone>,
+      ),
+      ReviewTombstone,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -9285,4 +11052,8 @@ class $AppDatabaseManager {
   $$ArenaAttemptsTableTableManager get arenaAttempts =>
       $$ArenaAttemptsTableTableManager(_db, _db.arenaAttempts);
   $$PetsTableTableManager get pets => $$PetsTableTableManager(_db, _db.pets);
+  $$MessagesTableTableManager get messages =>
+      $$MessagesTableTableManager(_db, _db.messages);
+  $$ReviewTombstonesTableTableManager get reviewTombstones =>
+      $$ReviewTombstonesTableTableManager(_db, _db.reviewTombstones);
 }

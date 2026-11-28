@@ -82,6 +82,10 @@ import '../town/town_screen.dart';
 import 'cropped_asset_image.dart';
 import 'pet_growth.dart';
 import 'pet_sprite.dart';
+import '../../core/sync/sync_providers.dart';
+import '../../core/sync/sync_status_icon.dart';
+import '../mailbox/mailbox_service.dart';
+import '../mailbox/mailbox_widgets.dart';
 import 'room_assets.dart';
 import 'room_themes.dart';
 import 'room_variants.dart';
@@ -125,6 +129,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   bool _hatchPending = false;
   int _xu = 0;
   bool _questDot = false;
+  bool _mailDot = false;
   int _gems = 0;
   int _done = 0;
   bool _unlocked = false;
@@ -278,6 +283,10 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       try {
         questDot = await QuestService(db: db).hasClaimable(childId);
       } catch (_) {}
+      var mailDot = false;
+      try {
+        mailDot = await MailboxService(db: db).unreadCount(childId) > 0;
+      } catch (_) {}
       final allPets = await petService.pets(childId);
       final canClaim = await petService.canClaimStarterEgg(childId);
       final claimSpecies = canClaim
@@ -287,6 +296,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       setState(() {
         _childId = childId;
         _questDot = questDot;
+        _mailDot = mailDot;
         _headAccessory = accessory;
         _glasses = glasses;
         _whiteShoes = whiteShoes;
@@ -1466,6 +1476,10 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Đồng bộ xong (thư mới về...) thì tải lại số dư và chấm đỏ.
+    ref.listen(syncControllerProvider.select((s) => s.revision), (_, _) {
+      if (mounted && !_loading) _refresh();
+    });
     if (_loading) {
       return const Scaffold(
         key: Key('room-screen'),
@@ -1567,6 +1581,17 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                                   : '$_done/$total',
                               textKey: const Key('room-progress-text'),
                             ),
+                            MailHudButton(
+                              key: const Key('room-mail-button'),
+                              showDot: _mailDot,
+                              onPressed: () async {
+                                final id = _childId;
+                                if (id == null) return;
+                                await showMailboxDialog(context, id);
+                                if (mounted) _refresh();
+                              },
+                            ),
+                            const SyncStatusIcon(),
                           ],
                         ),
                       ),

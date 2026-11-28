@@ -24,7 +24,7 @@ void main() {
 
   tearDown(() => dir.deleteSync(recursive: true));
 
-  test('mở DB v1 thì lên v4: có bảng inventory + arena_attempts, dữ liệu cũ còn nguyên', () async {
+  test('mở DB v1 thì lên v5: có bảng inventory + arena_attempts, dữ liệu cũ còn nguyên', () async {
     // 1) Tạo DB, ghi dữ liệu, rồi hạ về dạng v1.
     var db = AppDatabase(executor: NativeDatabase(file));
     final childId = await db.ensureSeeded();
@@ -59,7 +59,7 @@ void main() {
         .customSelect('PRAGMA user_version')
         .map((r) => r.read<int>('user_version'))
         .getSingle();
-    expect(version, 4);
+    expect(version, 5);
 
     // Dữ liệu cũ còn nguyên.
     final child = await db.childrenDao.getFirstChild();
@@ -105,7 +105,7 @@ void main() {
   });
 
   test(
-    'mở DB v2 thì lên v4: có bảng arena_attempts, dữ liệu cũ còn nguyên',
+    'mở DB v2 thì lên v5: có bảng arena_attempts, dữ liệu cũ còn nguyên',
     () async {
       // 1) DB có đủ dữ liệu v2 (ví, kho đồ, cài đặt), rồi hạ về dạng v2.
       var db = AppDatabase(executor: NativeDatabase(file));
@@ -145,7 +145,7 @@ void main() {
           .customSelect('PRAGMA user_version')
           .map((r) => r.read<int>('user_version'))
           .getSingle();
-      expect(version, 4);
+      expect(version, 5);
 
       // Dữ liệu cũ còn nguyên.
       expect((await db.childrenDao.getFirstChild())!.id, childId);
@@ -186,7 +186,7 @@ void main() {
   );
 
   test(
-    'DB mới tạo thẳng ở v4 có bảng inventory + arena_attempts + pets',
+    'DB mới tạo thẳng ở v5 có bảng inventory + arena_attempts + pets',
     () async {
       final db = AppDatabase(executor: NativeDatabase(file));
       addTearDown(db.close);
@@ -198,7 +198,7 @@ void main() {
           .customSelect('PRAGMA user_version')
           .map((r) => r.read<int>('user_version'))
           .getSingle();
-      expect(version, 4);
+      expect(version, 5);
     },
   );
 

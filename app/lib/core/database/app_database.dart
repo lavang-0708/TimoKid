@@ -1,5 +1,6 @@
 /// Database Drift của TimoKid: 7 bảng bản 0.1 + `inventory` (T2-06) +
-/// `arena_attempts` (T2-10) + `pets` (D), schema v4.
+/// `arena_attempts` (T2-10) + `pets` (D) + `messages` và
+/// `review_tombstones` (T3-04/T3-06), schema v5.
 ///
 /// Mở file `timokid.sqlite` trong thư mục tài liệu của app trên máy thật
 /// (qua `drift_flutter`). Test truyền executor riêng
@@ -46,6 +47,8 @@ const defaultRewardsJson =
     Inventory,
     ArenaAttempts,
     Pets,
+    Messages,
+    ReviewTombstones,
   ],
   daos: [
     ChildrenDao,
@@ -72,7 +75,7 @@ class AppDatabase extends _$AppDatabase {
   Clock clock;
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -87,6 +90,7 @@ class AppDatabase extends _$AppDatabase {
       // bộ với `OnboardingService.onboardingCompletedKey`.
       await _seedSetting('onboarding_completed', 'false');
       await _createPetIndexes();
+      await _createSyncTriggers();
     },
     onUpgrade: (migrator, from, to) async {
       // v1 → v2 (T2-06): thêm bảng `inventory`; mọi dữ liệu cũ giữ nguyên.
@@ -102,6 +106,15 @@ class AppDatabase extends _$AppDatabase {
         await migrator.createTable(pets);
         await _createPetIndexes();
         await _migrateLegacyPets();
+      }
+      // v4 → v5 (T3-04/T3-06): bảng `messages` + `review_tombstones`,
+      // trigger đồng bộ, và nới trigger append-only cho phép đánh dấu
+      // `synced`. Mọi dòng cũ giữ nguyên, `synced = false` (chưa gửi).
+      if (from < 5) {
+        await migrator.createTable(messages);
+        await migrator.createTable(reviewTombstones);
+        await _createAppendOnlyTriggers();
+        await _createSyncTriggers();
       }
     },
   );
@@ -181,12 +194,22 @@ class AppDatabase extends _$AppDatabase {
     // Chặn sửa/xóa lịch sử ở tầng SQLite (bổ sung cho việc DAO
     // không có hàm sửa/xóa). Trigger sống cùng file DB nên còn
     // hiệu lực cả sau khi tắt/mở lại app.
-    for (final name in [
-      attempts.actualTableName,
-      walletLedger.actualTableName,
-    ]) {
+    //
+    // Từ schema v5, UPDATE vẫn được phép khi CHỈ đổi cột `synced`
+    // (bộ đồng bộ đánh dấu đã gửi); đổi bất kỳ cột nào khác vẫn bị chặn.
+    // Tạo lại (DROP IF EXISTS) để migration v4 → v5 thay trigger cũ.
+    for (final table in <TableInfo<Table, dynamic>>[attempts, walletLedger]) {
+      final name = table.actualTableName;
+      final changed = table.$columns
+          .map((c) => c.name)
+          .where((c) => c != 'synced')
+          .map((c) => 'NEW.$c IS NOT OLD.$c')
+          .join(' OR ');
+      await customStatement('DROP TRIGGER IF EXISTS ${name}_no_update');
+      await customStatement('DROP TRIGGER IF EXISTS ${name}_no_delete');
       await customStatement(
         'CREATE TRIGGER ${name}_no_update BEFORE UPDATE ON $name '
+        'WHEN $changed '
         'BEGIN SELECT RAISE(ABORT, \'$name is append-only\'); END;',
       );
       await customStatement(
@@ -194,6 +217,42 @@ class AppDatabase extends _$AppDatabase {
         'BEGIN SELECT RAISE(ABORT, \'$name is append-only\'); END;',
       );
     }
+  }
+
+  /// Bảng có sửa (đồng bộ lên server bằng upsert): bất kỳ UPDATE nào
+  /// không tự đặt `synced` đều đặt lại `synced = 0` để lần đồng bộ sau
+  /// gửi lại dòng đó. Bộ đồng bộ đánh dấu đã gửi bằng UPDATE đổi
+  /// `synced` 0 → 1 nên không kích hoạt lại trigger. Thêm trigger xóa
+  /// mục sổ ôn tập → ghi `review_tombstones` (giờ lưu theo quy ước
+  /// của app: UTC + 7 giờ, đúng như `Clock.now`).
+  Future<void> _createSyncTriggers() async {
+    for (final t in <TableInfo<Table, dynamic>>[
+      children,
+      skillProgress,
+      reviewQueue,
+      dailySets,
+      settings,
+      inventory,
+      pets,
+      arenaAttempts,
+    ]) {
+      final name = t.actualTableName;
+      await customStatement('DROP TRIGGER IF EXISTS ${name}_unsync');
+      await customStatement(
+        'CREATE TRIGGER ${name}_unsync AFTER UPDATE ON $name '
+        'WHEN NEW.synced = OLD.synced '
+        'BEGIN UPDATE $name SET synced = 0 WHERE id = NEW.id; END;',
+      );
+    }
+    await customStatement('DROP TRIGGER IF EXISTS review_queue_tombstone');
+    await customStatement(
+      'CREATE TRIGGER review_queue_tombstone AFTER DELETE ON review_queue '
+      'BEGIN INSERT OR REPLACE INTO review_tombstones '
+      '(id, child_id, form_id, rung, due_date, created_at, deleted_at, synced) '
+      'VALUES (OLD.id, OLD.child_id, OLD.form_id, OLD.rung, OLD.due_date, '
+      'OLD.created_at, MAX(OLD.updated_at, CAST(strftime(\'%s\', \'now\') AS INTEGER) + 25200), 0); '
+      'END;',
+    );
   }
 
   /// Đặt lại toàn bộ database về trạng thái mới cài (CHỈ menu QA debug
@@ -211,15 +270,63 @@ class AppDatabase extends _$AppDatabase {
     await Migrator(this).createAll();
     await _createAppendOnlyTriggers();
     await _createPetIndexes();
+    await _createSyncTriggers();
     await ensureSeeded();
     // Về trạng thái mới cài: mở đầu chưa xong nên lần mở sau hiện
     // lại màn tạo nhân vật (để QA kiểm được luồng mở đầu).
     await settingsDao.setValue(key: 'onboarding_completed', value: 'false');
   }
 
+  /// Khóa cài đặt chung (chỉ trên máy, không đồng bộ): id của bé đang
+  /// chơi (T3-03). Chưa đặt hoặc trỏ tới bé không còn thì dùng bé đầu
+  /// tiên, nên máy 0.1/0.2 một bé chạy y như cũ.
+  static const activeChildKey = 'active_child_id';
+
+  /// Id bé đang chơi (không tạo gì). Null nếu chưa có bé nào.
+  Future<String?> activeChildId() async {
+    final saved = await settingsDao.getValue(key: activeChildKey);
+    if (saved != null) {
+      final id = _decodeId(saved);
+      if (id != null && await childrenDao.getChild(id) != null) return id;
+    }
+    return (await childrenDao.getFirstChild())?.id;
+  }
+
+  /// Chọn bé đang chơi.
+  Future<void> setActiveChild(String childId) =>
+      settingsDao.setValue(key: activeChildKey, value: jsonEncode(childId));
+
+  String? _decodeId(String raw) {
+    try {
+      final v = jsonDecode(raw);
+      return v is String ? v : null;
+    } on FormatException {
+      return raw;
+    }
+  }
+
+  /// Gieo bậc 1 cho 5 mảng của một bé (bỏ qua mảng đã có dòng).
+  Future<void> seedChildProgress(String childId) async {
+    for (final strand in Strand.all) {
+      final existing = await skillProgressDao.getStrandProgress(
+        childId,
+        strand,
+      );
+      if (existing == null) {
+        await skillProgressDao.setStrandRung(
+          childId: childId,
+          strand: strand,
+          rung: 1,
+        );
+      }
+    }
+  }
+
   /// Tạo dữ liệu lần đầu mở app: một hồ sơ bé mặc định lớp 2, bậc 1 cho
   /// cả 5 mảng, và cài đặt chung mặc định. Gọi lại nhiều lần cũng an toàn
-  /// (chỉ tạo phần còn thiếu). Trả về id của bé mặc định.
+  /// (chỉ tạo phần còn thiếu). Trả về id của BÉ ĐANG CHƠI (T3-03: có
+  /// nhiều bé thì là bé được chọn, xem [activeChildId]); mọi màn dùng
+  /// hàm này để biết đang là bé nào.
   ///
   /// Bọc trong transaction: hai lần gọi chồng nhau (vd test gọi
   /// `Future.wait`, hoặc `resetForQa` + khởi động app cùng lúc) đều
@@ -231,23 +338,12 @@ class AppDatabase extends _$AppDatabase {
   /// nên kiểm-tra-rồi-chèn trong này là nguyên tử.
   Future<String> ensureSeeded() async {
     return transaction(() async {
-      var child = await childrenDao.getFirstChild();
-      child ??= await childrenDao.createChild(name: 'Bé', grade: 2);
-      final childId = child.id;
-
-      for (final strand in Strand.all) {
-        final existing = await skillProgressDao.getStrandProgress(
-          childId,
-          strand,
-        );
-        if (existing == null) {
-          await skillProgressDao.setStrandRung(
-            childId: childId,
-            strand: strand,
-            rung: 1,
-          );
-        }
+      var childId = await activeChildId();
+      if (childId == null) {
+        final child = await childrenDao.createChild(name: 'Bé', grade: 2);
+        childId = child.id;
       }
+      await seedChildProgress(childId);
 
       await _seedSetting('rewards', defaultRewardsJson);
       await _seedSetting('sound_enabled', jsonEncode(true));

@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Đồng bộ với Neon (T3-04). Bản release trước đây không cần mạng. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="TimoKid"
         android:icon="@mipmap/ic_launcher"

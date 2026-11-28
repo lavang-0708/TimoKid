@@ -40,6 +40,8 @@ dependencies:
   # Âm thanh (PLAN điểm (m), T1-12): 4 file WAV trong assets/sounds/
   # đã có trên main; phát qua audioplayers, tắt theo `sound_enabled`.
   audioplayers: ^6.0.0
+  http: ^1.6.0
+  flutter_secure_storage: ^11.2.0
 
 dev_dependencies:
   flutter_test:
