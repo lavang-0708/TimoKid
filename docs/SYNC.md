@@ -105,3 +105,8 @@ Code nằm ở `app/lib/core/sync/` (cấu hình, máy khách Neon, bộ đồng
 - **Khi nào đồng bộ:** mở app, sau mỗi chặng (`MathScreen`), mỗi 15 phút khi đã đăng nhập, khi app quay lại từ nền, sau đăng nhập, sau mở thư/quà. Không kiểm tra kết nối trước: cứ thử, lỗi mạng thì hiện biểu tượng mất mạng. Trạng thái trong biểu tượng đám mây `sync-status-icon` ở HUD Phòng và Thị trấn: chưa đăng nhập, đang đồng bộ, đã đồng bộ, mất mạng, lỗi.
 - **Bảng thêm (`0002_app_tables.sql`):** `inventory`, `pets`, `arena_attempts`. App chỉ gửi ba bảng này khi `syncExtraTablesEnabled = true` (mặc định `false` trong `sync_config.dart`). Chủ dự án chạy `db/migrations/0002_app_tables.sql` trên Neon rồi đổi cờ thành `true`; bật cờ khi bảng chưa có sẽ làm mọi lượt đồng bộ báo lỗi 404.
 - **Kiểm thử app:** `app/test/core/sync/` (bộ đồng bộ, máy khách Neon, Neon giả `FakeNeon` dùng `MockClient`, không gọi mạng thật), `app/test/features/{auth,profile,mailbox}/`, `app/test/core/database_v5_migration_test.dart`.
+
+## Kiểm thử thật phía app (28/11/2026)
+
+- Đã chạy `db/migrations/0002_app_tables.sql` trên Neon (thêm `inventory`, `pets`, `arena_attempts`) và bật `syncExtraTablesEnabled`.
+- `app/test_real/neon_smoke_test.dart` (không chạy trong CI) đăng ký tài khoản `rls-app-*@example.com`, đồng bộ dữ liệu mẫu của mọi bảng, gửi lại không tạo dòng trùng, bố gửi thư có quà (50 xu, 2 kim cương), app tải thư về và mở quà hai lần: cộng đúng một lần, server ghi `claimed_at`. Kết quả: đạt. Sau đó dọn tài khoản thử bằng `db/tests/cleanup_test_accounts.sql` (mẫu `rls-%` gồm cả `rls-app-%`).

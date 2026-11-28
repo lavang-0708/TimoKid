@@ -38,4 +38,4 @@ class SyncConfig {
 /// TẮT cho tới khi chủ dự án chạy `db/migrations/0002_app_tables.sql` trên
 /// Neon (bảng chưa có thì server trả 404 và làm hỏng mọi lần đồng bộ).
 /// Bật bằng cách đổi thành `true` (hoặc `--dart-define` ở bước sau).
-const bool syncExtraTablesEnabled = false;
+const bool syncExtraTablesEnabled = true;
