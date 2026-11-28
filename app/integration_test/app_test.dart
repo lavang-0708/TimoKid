@@ -79,6 +79,11 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    // --- T3-03: máy mới hiện màn đăng nhập bố/mẹ; chọn dùng không cần
+    // tài khoản (CI không gọi Neon thật) ---
+    expect(find.byKey(const Key('login-screen')), findsOneWidget);
+    await tapVisible(const Key('login-skip'));
+
     // --- T2-03: màn mở đầu nữ (DB mới: chưa xong mở đầu) ---
     expect(find.byKey(const Key('onboarding-screen')), findsOneWidget);
     expect(find.text('Bước 1/4'), findsOneWidget);
