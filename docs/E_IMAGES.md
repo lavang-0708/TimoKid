@@ -5295,3 +5295,84 @@ thư mục `app/assets/images/unlocks/`. Đã đẩy.
   (215,104,95) đo bằng code là viền trong thiết kế, không phải magenta.
 
 **Trạng thái: đã đẩy 3 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/unlocks/*.webp`.**
+
+---
+
+## Lô 17 — Nhóm B2: biểu tượng dạng bài, mảng Con số (18 + 1 đế) — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+Mảng Con số (Tháp Con số), màu mảng #BFE0F5. Phong cách: soft 3D clay-render pastel,
+viền trắng sticker, xanh dương nhạt làm màu nhấn + phụ pastel (coral, mint, vàng,
+lavender). Không chữ, không chữ số trong ảnh — chỉ chấm/ô/khối/thanh; nhãn do app vẽ.
+Biểu tượng 512×512, lề trong 64 px; app đặt ở giữa huy hiệu, chiếm 62% khung.
+Đế vẽ bằng code; 18 biểu tượng vẽ theo tấm rồi cắt bằng code (xem `report.json`
+cùng thư mục). Đã đẩy GitHub.
+
+### Đế
+
+| File | Byte | SHA-256 |
+| --- | ---: | --- |
+| `app/assets/images/stickers/sticker_base_number.png` | 6544 | `16b6ef744cd2f702fbd858629b0468d8dedf67bb14a8b2ee8a11017d405f4f36` |
+
+Đế: đĩa trắng r=231 (lề 24 px), đĩa #BFE0F5 r=219, vòng trắng + tâm sáng #DCEFFB
+r=158 (đường kính 316 px ≈ 62% khung) để trống đặt biểu tượng.
+
+### 18 biểu tượng
+
+| Dạng | Nhãn | File | Byte | SHA-256 |
+| --- | --- | --- | ---: | --- |
+| `number.parity` | Chẵn lẻ | `app/assets/images/stickers/form_number_parity.png` | 123415 | `5607cebac98c1d9dfaebed2377ed00af83f848641e1ed40d0b5e0843592d2fed` |
+| `number.digitsum` | Tổng chữ số | `app/assets/images/stickers/form_number_digitsum.png` | 58056 | `fcfd0e7149b172caa511f09a0c003340b4889e4624f1e5cf7244cbbf128b1402` |
+| `number.cards` | Lập số từ thẻ | `app/assets/images/stickers/form_number_cards.png` | 100744 | `c27c64bac7226b6c6d0836a94022a6fd41175f08ce43a8046f940fdbd2e45b08` |
+| `number.digitcount` | Đếm chữ số | `app/assets/images/stickers/form_number_digitcount.png` | 106130 | `286253a6ec2d42a2fcbce18bc4662b1c6d1e274cf86475ff2688f701b4f2f31f` |
+| `number.digitfreq` | Chữ số lặp lại | `app/assets/images/stickers/form_number_digitfreq.png` | 94589 | `a56b0e0488614f7e3ccfb878a137e65f493f6cfe38e3a728a9f2fb0194e639f0` |
+| `number.clues` | Đoán số | `app/assets/images/stickers/form_number_clues.png` | 113186 | `268afac1dfc7b8db90cd630736fdcdedcd65e4bb79106952357674f24ba77c1f` |
+| `number.round` | Số tròn chục | `app/assets/images/stickers/form_number_round.png` | 117069 | `93483eb46e541f002b4c7680dff4d763ecd38c0ba0504a0466925ac2058723cd` |
+| `number.place` | Chục và đơn vị | `app/assets/images/stickers/form_number_place.png` | 95001 | `b0892f455ca1c15f16196a366f0565175923b30a96e4fab0b17c34cb4865d334` |
+| `number.fixed` | Số lớn, số bé | `app/assets/images/stickers/form_number_fixed.png` | 80132 | `1fae888d403db2e1e1a6563d456a6b8b5f5d340b36ea5d6417033aa2df45cf1f` |
+| `number.parityrule` | Luật chẵn lẻ | `app/assets/images/stickers/form_number_parityrule.png` | 77373 | `3a9c8110296fedc83523b7dcb4a262ae1199ee423099b678d3be6716cc6ee775` |
+| `number.digitcond` | Số theo điều kiện | `app/assets/images/stickers/form_number_digitcond.png` | 60915 | `f743b2a7139b11960b1f3a5aa856002082461d6adbb83200406e75fb6277805d` |
+| `number.parityops` | Kết quả chẵn lẻ | `app/assets/images/stickers/form_number_parityops.png` | 128325 | `02c246bca6e2205386feb9e25ed0b68f1a955f2100ee3d188086eabad13c6e04` |
+| `number.kth` | Số lớn thứ k | `app/assets/images/stickers/form_number_kth.png` | 59216 | `b0289fb18ba3e0e37ae3a4f6edcc2c16b6dbf1d81443d14198b59d215ab2f794` |
+| `number.giveequal` | Cho để bằng nhau | `app/assets/images/stickers/form_number_giveequal.png` | 75139 | `a653c9f56c771ab71d1057e54f03e563f0d954965ac9964ef3ae045d18786866` |
+| `number.pages` | Chia làm tròn lên | `app/assets/images/stickers/form_number_pages.png` | 74416 | `8edd67b950d2bcb6ffdb2076a19c0935e30dcf4a0bbef19e9900d7ff52adfce1` |
+| `number.countsteps` | Đếm số trong dãy | `app/assets/images/stickers/form_number_countsteps.png` | 71295 | `7cacdf3fca0709e69cdc3ad3fc96d955b985723189da77ac1877184f578227df` |
+| `number.between` | Số ở giữa | `app/assets/images/stickers/form_number_between.png` | 63351 | `5fa625ee4b236a6310e757a19c6edc4901c485ab68c95aba952d0e21dd4318b7` |
+| `number.multiples` | Số chia hết | `app/assets/images/stickers/form_number_multiples.png` | 139079 | `6f49ce117325a8a9a142c5f95426e256b2558925a7a209de0e6141d785f399c2` |
+
+### Cổng kiểm (đo bằng code, từng file)
+
+semi-alpha 0, magenta r1 0, vivid 0, bright-rim 0, pink-rim 0, lề trong 64 px —
+tất cả 19 file đều đạt. Pink-rim = pixel hồng-magenta trong dải dt≤6 của viền
+trắng (độ bão hòa >20, r và b đều > g+8); thước vivid chuẩn bỏ sót dải này
+(vd pixel (169,3,170) có rr=169<170), đã vẽ lại bằng donor trắng gần đó.
+Vết magenta trong hình ở countsteps (vệt 4×5 px tại x 173–176, y 291–295) đã
+vẽ lại bằng donor median, kiểm lại bằng code: đã sạch.
+
+### Cách vẽ
+
+- Tấm 1 (1920×1280, 9 icon: parity, digitsum, cards, digitcount, digitfreq, clues,
+  round, place, fixed) và tấm 2 (1600×1600, 9 icon: parityrule, digitcond, parityops,
+  kth, giveequal, pages, countsteps, between, multiples), nền magenta #FF00FF.
+- Tấm 3 làm lại (1536×1536): digitsum, digitcount, parityops — 3 icon đầu vẽ ngang
+  quá mỏng (dải 384×~110) nên vẽ lại dạng vuông để đọc tốt hơn ở cỡ huy hiệu.
+- Cắt bằng code (`cut.py`): key magenta, ngưỡng 60; mỗi icon là 1 connected
+  component (viền trắng nối các phần); erode alpha 1 px + defringe donor median;
+  fit bbox vào 384 px, căn giữa canvas 512 trong suốt, alpha cứng; không dilate
+  thêm viền vì icon đã có viền trắng sticker từ lúc vẽ.
+- Soi: lưới 280 px nền sáng + nền tối (60,60,80), trong huy hiệu thật 170 px ở 62%,
+  từng icon 512 px trên nền tối, mép dưới 4 icon phóng 3× NEAREST sau khi sửa.
+
+### Nốt
+
+- `round`: vòng có 12 chấm thay vì 10 — không đếm được ở cỡ app, không có số trong
+  ảnh, giữ.
+- `parityops` (bản vẽ lại): nhóm đầu 4+4 chấm nhưng kết quả có 5 chấm (4 + 1 chấm nhỏ
+  tách riêng) — đếm kỹ mới thấy lệch; ưu tiên đọc hiểu ở cỡ nhỏ nên giữ bản vuông.
+- `kth`: 5 cột không xếp theo chiều cao giảm dần, vương miện đặt trên cột cao thứ 4 —
+  vẫn đọc là 'thứ hạng/có vương miện', giữ.
+- `digitsum` (bản vẽ lại): cột dọc 98×384 — ở huy hiệu 170 px thành dải dọc mỏng
+  ~26 px, vẫn đọc được là chồng ô + dấu cộng; là phương án tốt nhất trong 2 bản.
+- `countsteps`: 3 chấm xanh 'nhảy' trên bậc thang, hơi trôi khỏi bậc — chấp nhận,
+  vẫn đọc là đếm theo dãy/bậc.
+
+**Trạng thái: đã đẩy 19 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/stickers/sticker_base_number.webp` và `form_number_*.webp`.**
