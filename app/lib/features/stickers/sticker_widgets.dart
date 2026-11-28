@@ -56,6 +56,7 @@ class StickerBadge extends StatelessWidget {
             StickerConfig.baseAsset(strand),
             width: size,
             height: size,
+            cacheWidth: 256,
             fit: BoxFit.contain,
             errorBuilder: (_, _, _) => _codeBody(color, strand),
           ),
@@ -63,6 +64,9 @@ class StickerBadge extends StatelessWidget {
             StickerConfig.formIconAsset(formId),
             width: size * StickerConfig.formIconScale,
             height: size * StickerConfig.formIconScale,
+            // Hình gốc 512 px mà hiện chỉ cỡ huy hiệu: giải mã nhỏ để 90
+            // biểu tượng không chiếm hàng trăm MB bộ đệm ảnh.
+            cacheWidth: 192,
             fit: BoxFit.contain,
             errorBuilder: (_, _, _) => const SizedBox.shrink(),
           ),
