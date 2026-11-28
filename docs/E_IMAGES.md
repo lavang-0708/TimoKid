@@ -4950,35 +4950,37 @@ Claude decode xong, soi fg ở độ phân giải gốc trên nền tối: bố 
 
 ---
 
-# Lô 17 — Nhóm A: 5 CƯ DÂN (chân dung) — CHỦ DỰ ÁN ĐÃ DUYỆT (28/11) — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+# Lô 17 — Nhóm A: 5 CƯ DÂN (chân dung) v2 — TÊN MỚI + HOÁN ĐỔI QUẢN GIA ↔ CÔNG TƯỚC — CHỦ DỰ ÁN ĐÃ DUYỆT (28/11) — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
 
 > Chủ dự án đã duyệt 5 chân dung (28/11 ~18:47, Claude duyệt thay, chủ dự án ra ngoài): rất dễ thương, đúng phong cách app. Cả 3 nốt đều GIỮ NGUYÊN: mũ Bác Vuông xanh đậm (nổi khối hơn, áo đã đúng pastel), lông vũ Hiệp sĩ, đầu Chú Xoay nhỏ hơn chút (vẫn đọc rõ). File đích: `app/assets/images/residents/<id>_portrait.webp` (Claude convert webp khi decode).
+
+> **VẼ LẠI v2 (28/11 ~22:45–22:53):** chủ dự án đổi tên cả 5 cư dân theo mô-típ các thời khắc trong ngày + duyệt 5 chân dung v2 (28/11 ~22:49): Hiệp sĩ Sáng → **Hiệp sĩ Bình Minh**, Cô Bông → **Tiểu thư Ánh Sáng**, Cú Tròn → **Hoàng tử Hoàng Hôn**, Bác Vuông → **Công tước Bóng Đêm**, Chú Xoay → **Quản gia Chạng Vạng**. Mảng / tòa nhà / tên file giữ nguyên. **Hoán đổi quản gia ↔ công tước (28/11 ~22:53, chủ dự án chọn "đổi nguyên cả hình sang vai kia"):** đổi file nguyên vẹn, không vẽ lại — `bac_vuong_portrait.png` hiện là cậu bé áo đuôi tôm (SHA `350d5989e0a0…`, trước là chu_xoay), `chu_xoay_portrait.png` hiện là cậu bé áo xanh đêm (SHA `d7d8308d3059…`, trước là bac_vuong); file gốc giữ local ở `residents_A_v2/backup_swap/`. Màu mảng đi theo người: Công tước mang điểm vàng (0 px xanh lá #BFE8CF), Quản gia mang khăn mint (10 px vàng #FFD166). Các mục Cách vẽ / Đã soi / Nốt nhỏ dưới đây mô tả bản v1 (đã bị đè tên) — chỉ còn giá trị lịch sử.
 
 Phong cách: pastel, nét mềm, **viền trắng sticker 10 px** quanh hình, không chữ trong ảnh. Khung 512×512 nền trong suốt, lề trong 24 px, đầu to, đọc rõ ở 72 px. Màu từng mảng khớp `strandColor` trong code app (Logic #C9B8F0 đã đối chiếu trong `resident_widgets.dart` trên main; các màu còn lại theo `town_assets.dart`).
 
 | Cư dân | Mảng / tòa nhà | Màu app (`strandColor`) | File |
 | --- | --- | --- | --- |
-| Hiệp sĩ Sáng (`hiep_si_sang`) | Lôgic, Lâu đài Lôgic | #C9B8F0 tím nhạt | `hiep_si_sang_portrait.png` |
-| Cô Bông (`co_bong`) | Số học, Tiệm bánh Số học | #FFD9C0 hồng/cam nhạt | `co_bong_portrait.png` |
-| Cú Tròn (`cu_tron`) | Con số, Tháp Con số | #BFE0F5 xanh dương nhạt | `cu_tron_portrait.png` |
-| Bác Vuông (`bac_vuong`) | Hình học, Vườn Hình học | #BFE8CF xanh lá nhạt | `bac_vuong_portrait.png` |
-| Chú Xoay (`chu_xoay`) | Tổ hợp, Hội chợ Tổ hợp | #FFD166 vàng nhạt | `chu_xoay_portrait.png` |
+| Hiệp sĩ Bình Minh (`hiep_si_sang`) | Lôgic, Lâu đài Lôgic | #C9B8F0 tím nhạt | `hiep_si_sang_portrait.png` |
+| Tiểu thư Ánh Sáng (`co_bong`) | Số học, Tiệm bánh Số học | #FFD9C0 hồng/cam nhạt | `co_bong_portrait.png` |
+| Hoàng tử Hoàng Hôn (`cu_tron`) | Con số, Tháp Con số | #BFE0F5 xanh dương nhạt | `cu_tron_portrait.png` |
+| Công tước Bóng Đêm (`bac_vuong`) | Hình học, Vườn Hình học | #BFE8CF xanh lá nhạt | `bac_vuong_portrait.png` |
+| Quản gia Chạng Vạng (`chu_xoay`) | Tổ hợp, Hội chợ Tổ hợp | #FFD166 vàng nhạt | `chu_xoay_portrait.png` |
 
 ## File (PNG 512×512, nền trong suốt)
 
 | File | Byte | .b64 byte | SHA-256 |
 | --- | --- | --- | --- |
-| `hiep_si_sang_portrait.png` | 148.893 | 198.524 | `53d86bcde7b8dd45efc7b5dcca56cb8732effbe3f0fe16ec857bc8c333733603` |
-| `co_bong_portrait.png` | 171.889 | 229.188 | `34e0125e9f21483e990d663684093846ca748f392682d0aa4dfccf819150b417` |
-| `cu_tron_portrait.png` | 255.739 | 340.988 | `eaf994f59d6435e069d2ec02afa621f99a12bf2469ca55dc1d63e679ba7d0e28` |
-| `bac_vuong_portrait.png` | 191.608 | 255.480 | `560df4b9042103b4d3bb711abd333fbfdc4792cc3997f8ca34f7a21defd79f55` |
-| `chu_xoay_portrait.png` | 200.277 | 267.036 | `99d2a6f950905bfb703c0eb1b12cb75caef03b2360a3ac1b3faba13ae7ac6e61` |
+| `hiep_si_sang_portrait.png` | 189.661 | 252.884 | `022490e160be63846121a9107bdfc53e76782f336b4e5890128ce0701eeeba74` |
+| `co_bong_portrait.png` | 203.528 | 271.372 | `ac9554d19c4e4c7870af3b98ff7204c920f30fb97562bb05acb5cc32a3edb087` |
+| `cu_tron_portrait.png` | 245.359 | 327.148 | `b36f81da985b8143cc9e62d15840caa6670fc2651a4f196c1e95bf2dc541590d` |
+| `bac_vuong_portrait.png` | 208.339 | 277.788 | `350d5989e0a0cbf3ba75d7fc6ebcc0dddad38126aa3bd2a9883f0ee913593155` |
+| `chu_xoay_portrait.png` | 227.206 | 302.944 | `d7d8308d30598360646b604fa8da2c79616a6cbf1747dd7f0d35fbe881d9cc8b` |
 
 ## Cổng kiểm (đo bằng code trên file cuối, cả 5 file — parent kiểm lại độc lập)
 
-- Semi alpha: **0**; magenta r1: **0**; vivid broad: **0**; bright-rim: **0**.
-- Lề trong: **24 px** (trên/dưới; trái/phải 37–106 px do art căn giữa trong khung 444 px); viền trắng sticker: **10 px** đều.
-- Màu trang phục (median) so với `strandColor`: Hiệp sĩ Sáng lệch 6, Cô Bông 25, Cú Tròn 39, Bác Vuông 64, Chú Xoay 45 (có shading nên lệch; cùng họ màu).
+- Semi alpha: **0**; magenta r1: **0**; vivid broad: **0**; bright-rim: **0** (đo lại bằng code trên file v2 cuối, parent kiểm độc lập).
+- Lề trong: **24 px** (trên/dưới); viền trắng sticker: **10 px** đều.
+- Màu mảng sau hoán đổi: Công tước (`bac_vuong`) mang điểm vàng — **0 px** xanh lá #BFE8CF; Quản gia (`chu_xoay`) mang khăn mint — **10 px** vàng #FFD166; đúng như cách B đã chọn (màu mảng đi theo người, không theo tòa nhà). 3 cư dân còn lại giữ điểm nhấn màu mảng của mình (Hiệp sĩ tím, Tiểu thư đào, Hoàng tử xanh dương).
 
 ## Cách vẽ
 
@@ -4999,7 +5001,7 @@ Phong cách: pastel, nét mềm, **viền trắng sticker 10 px** quanh hình, k
 
 Tư thế "đang nói" (`*_talk`), nhóm B (sổ sticker), nhóm C (mở khóa), nhóm B2 (90 biểu tượng dạng) — vẽ tiếp, đẩy từng nhóm riêng + doc.
 
-**Trạng thái: chủ dự án ĐÃ DUYỆT (28/11 ~18:47). Đã đẩy 5 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/residents/*_portrait.webp`.**
+**Trạng thái: bản v2 ĐÃ DUYỆT (5 chân dung v2, 28/11 ~22:49) + ĐÃ ĐẨY đè tên 5 file `.b64` v1 (commit `ffdd0431`) + mục doc này — chờ Claude decode thành `app/assets/images/residents/*_portrait.webp`. Bản v1 đã duyệt 28/11 ~18:47 (xem blockquote trên) — nay đã bị đè tên.**
 
 ---
 
@@ -5058,13 +5060,15 @@ Mảng Hình học (`geo`, màu `#BFE8CF`): `sticker_base_geo.png` + 19 file `fo
 
 ---
 
-# Lô 17 — Nhóm A: 5 TƯ THẾ "ĐANG NÓI" — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+# Lô 17 — Nhóm A: 5 TƯ THẾ "ĐANG NÓI" v2 — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
 
 > Đã đẩy. File đích:
 > `app/assets/images/residents/<id>_talk.webp` (Claude convert webp khi decode).
 
+> **v2 (28/11 ~22:55–22:59):** 5 dáng nói vẽ lại theo chân dung v2 (đã hoán đổi quản gia ↔ công tước), chủ dự án duyệt "ok" 28/11 ~23:02. Brief chỉ ghi "miệng mở, tay giơ" — KHÔNG ghi tay phải (đã đối chiếu brief gốc, dòng 21), nên tay giơ TRÁI của Hiệp sĩ Bình Minh, Công tước Bóng Đêm, Quản gia Chạng Vạng không vi phạm brief. Nốt nhỏ: mặt 2 dáng nói hoán đổi hẹp hơn chân dung ~16–20% theo chiều ngang (squeeze 0,84/0,797) do tay dang rộng — không thấy khác ở 72 px; đèn lồng Công tước hạ xuống ngang hông (tay phải hạ để tay trái giơ vẫy) — đọc tự nhiên. Hiệp sĩ: thước r1 chặt đếm 41 px nhưng tất cả cách mép ≥8,1 px — màu choàng tím/lông vũ lavender, bright-rim 0. Các mục Cách vẽ / Đã soi / Nốt nhỏ dưới đây mô tả bản v1 (đã bị đè tên) — chỉ còn giá trị lịch sử.
+
 Tư thế "đang nói": cùng nhân vật, cùng mặt/trang phục/phụ kiện với chân dung
-đã duyệt, miệng MỞ, một tay giơ lên sát má ra hiệu. **Cùng cỡ và cùng gốc
+đã duyệt, miệng MỞ, một tay giơ lên ra hiệu. **Cùng cỡ và cùng gốc
 với chân dung: bbox trùng 0 px cả 4 cạnh**, đổi qua lại chân dung ↔ đang nói
 không bị nhảy hình.
 
@@ -5073,38 +5077,38 @@ trong ảnh. Khung 512×512 nền trong suốt, lề trong 24 px, đầu to, đ�
 
 | Cư dân | File xem trước |
 | --- | --- |
-| Hiệp sĩ Sáng (`hiep_si_sang`) | `hiep_si_sang_talk.png` |
-| Cô Bông (`co_bong`) | `co_bong_talk.png` |
-| Cú Tròn (`cu_tron`) | `cu_tron_talk.png` |
-| Bác Vuông (`bac_vuong`) | `bac_vuong_talk.png` |
-| Chú Xoay (`chu_xoay`) | `chu_xoay_talk.png` |
+| Hiệp sĩ Bình Minh (`hiep_si_sang`) | `hiep_si_sang_talk.png` |
+| Tiểu thư Ánh Sáng (`co_bong`) | `co_bong_talk.png` |
+| Hoàng tử Hoàng Hôn (`cu_tron`) | `cu_tron_talk.png` |
+| Công tước Bóng Đêm (`bac_vuong`) | `bac_vuong_talk.png` |
+| Quản gia Chạng Vạng (`chu_xoay`) | `chu_xoay_talk.png` |
 
 ## File (PNG 512×512, nền trong suốt)
 
 | File | Byte | SHA-256 |
 | --- | --- | --- |
-| `hiep_si_sang_talk.png` | 149.452 | `019403aa6eebd57ecfefc037b5b88e677de2d6e10a6f031fcb95eebd836a5b33` |
-| `co_bong_talk.png` | 175.106 | `4863f7b3d60a4b2f0cd91ed0d26650503492b19a0853ee570c28f55e599080ca` |
-| `cu_tron_talk.png` | 244.570 | `f381c0b76b492e754ce8819a4aa91a37ba3046946391dc1866589ccf603fab82` |
-| `bac_vuong_talk.png` | 190.988 | `394453ad06bc5979ab7af6b627352caba41ea9a2313bb53c790479a919ab9fbc` |
-| `chu_xoay_talk.png` | 216.449 | `2dbcca32e8867ece1c333163e5f51ba52627b87562c09adeea9983e52341a72f` |
+| `hiep_si_sang_talk.png` | 181.848 | `7846c59a4dbd71b18075b5dd5588eda357bf26726c2080de181e8c24c323a78c` |
+| `co_bong_talk.png` | 202.995 | `aabb57d4ab5c48bc30ca6bc924a0bfc650d30ded0430f43030a51b3d5be3f75e` |
+| `cu_tron_talk.png` | 250.106 | `38d309181eed73bd6a5ab5b193176cf44ae1b89c68398498e0874e2973c39ad5` |
+| `bac_vuong_talk.png` | 194.108 | `317e64a958a63d6fc213bbdfd1a7e9651a32f02ca6ef3835ccb8d10a783b51fa` |
+| `chu_xoay_talk.png` | 209.346 | `6e3fa5b9339b896cea8b450554021fd1c40e6a49717288fe2008deed8aa8fb77` |
 
 ## Bbox tư thế nói so với chân dung (đo bằng code, cả 5 file)
 
 | Cư dân | Chân dung (x0,y0)-(x1,y1) | Đang nói (x0,y0)-(x1,y1) | Lệch L/T/R/B |
 | --- | --- | --- | --- |
-| Hiệp sĩ Sáng | (106,24)-(405,487) | (106,24)-(405,487) | 0 / 0 / 0 / 0 |
-| Cô Bông | (106,24)-(405,487) | (106,24)-(405,487) | 0 / 0 / 0 / 0 |
-| Cú Tròn | (53,24)-(457,487) | (53,24)-(457,487) | 0 / 0 / 0 / 0 |
-| Bác Vuông | (95,24)-(416,487) | (95,24)-(416,487) | 0 / 0 / 0 / 0 |
-| Chú Xoay | (37,24)-(474,487) | (37,24)-(474,487) | 0 / 0 / 0 / 0 |
+| Hiệp sĩ Bình Minh | (98,24)-(413,487) | (98,24)-(413,487) | 0 / 0 / 0 / 0 |
+| Tiểu thư Ánh Sáng | (107,24)-(403,487) | (107,24)-(403,487) | 0 / 0 / 0 / 0 |
+| Hoàng tử Hoàng Hôn | (47,24)-(464,487) | (47,24)-(464,487) | 0 / 0 / 0 / 0 |
+| Công tước Bóng Đêm | (72,24)-(438,487) | (72,24)-(438,487) | 0 / 0 / 0 / 0 |
+| Quản gia Chạng Vạng | (82,24)-(429,487) | (82,24)-(429,487) | 0 / 0 / 0 / 0 |
 
 ## Cổng kiểm (đo bằng code trên file cuối, cả 5 file)
 
-- Semi alpha: **0**; magenta r1: **0**; vivid broad: **0**; bright-rim: **0**.
+- Semi alpha: **0**; magenta r1: **0** (Hiệp sĩ: thước r1 chặt đếm 41 px nhưng tất cả cách mép ≥8,1 px — màu choàng tím/lông vũ lavender, không phải tàn dư); vivid broad: **0**; bright-rim: **0**.
 - Lề trong: **24 px** cả 4 phía; viền trắng sticker: **10 px** đều 4 phía.
-- Độ co ngang khi ép về đúng khung art chân dung: Hiệp sĩ Sáng 0,946;
-  Cô Bông 0,940; Cú Tròn 0,877; Bác Vuông 0,962; Chú Xoay 0,985.
+- Độ co ngang khi ép về đúng khung art chân dung (v2): Hiệp sĩ Bình Minh 0,863;
+  Tiểu thư Ánh Sáng 0,883; Hoàng tử Hoàng Hôn 0,977; Công tước Bóng Đêm 0,84; Quản gia Chạng Vạng 0,797.
 
 ## Cách vẽ
 
@@ -5142,7 +5146,7 @@ thu nhỏ 72 px (vuông + tròn) + 216 px tròn (3×) trong `preview.png`.
 
 Nhóm B (sổ sticker), nhóm C (mở khóa), B2 tùy chọn — không thuộc nhiệm vụ này.
 
-**Trạng thái: đã đẩy 5 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/residents/<id>_talk.webp`.**
+**Trạng thái: bản v2 ĐÃ DUYỆT ("ok" 28/11 ~23:02) + ĐÃ ĐẨY đè tên 5 file `.b64` v1 (commit `77e29e1a`) + mục doc này — chờ Claude decode thành `app/assets/images/residents/<id>_talk.webp`. Bản v1 (đã đẩy trước) nay đã bị đè tên.**
 
 ---
 
