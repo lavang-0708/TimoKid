@@ -4,13 +4,13 @@
   "residents": [
     {
       "id": "hiep_si_sang",
-      "name": "Hiệp sĩ Sáng",
+      "name": "Hiệp sĩ Bình minh",
       "strand": "logic",
       "building": "Lâu đài Lôgic",
-      "bio": "Hiệp sĩ canh gác Lâu đài Lôgic. Anh rất thích những câu đố hóc búa.",
+      "bio": "Hiệp sĩ canh gác Lâu đài Lôgic từ lúc mặt trời mọc. Anh rất thích những câu đố hóc búa.",
       "lines": {
         "greeting": [
-          "Chào {ten}! Hiệp sĩ Sáng đây.",
+          "Chào {ten}! Hiệp sĩ Bình minh đây.",
           "Ôi, {ten} đến rồi! Lâu đài vui quá.",
           "Chào buổi mới, {ten} nhé!",
           "{ten} ơi, cổng lâu đài mở rồi đó.",
@@ -51,14 +51,14 @@
     },
     {
       "id": "co_bong",
-      "name": "Cô Bông",
+      "name": "Tiểu thư Ánh sáng",
       "strand": "arith",
       "building": "Tiệm bánh Số học",
-      "bio": "Cô chủ Tiệm bánh Số học. Cô nướng bánh rất ngon nhưng hay quên đếm.",
+      "bio": "Tiểu thư chủ Tiệm bánh Số học. Bánh của cô lấp lánh nhưng cô hay quên đếm.",
       "lines": {
         "greeting": [
           "Chào {ten}! Bánh vừa ra lò, thơm lắm.",
-          "{ten} ơi, hôm nay Cô Bông có bánh mới.",
+          "{ten} ơi, hôm nay Tiểu thư Ánh sáng có bánh mới.",
           "Ôi, khách quen {ten} đến rồi!",
           "Chào {ten}, mời vào tiệm bánh nhé.",
           "Xin chào {ten}! Cô đang nướng bánh đây.",
@@ -98,46 +98,46 @@
     },
     {
       "id": "cu_tron",
-      "name": "Cú Tròn",
+      "name": "Hoàng tử Hoàng hôn",
       "strand": "number",
       "building": "Tháp Con số",
-      "bio": "Chú cú giữ chuông Tháp Con số. Cú Tròn thích đếm sao mỗi đêm.",
+      "bio": "Hoàng tử giữ chuông Tháp Con số. Mỗi chiều hoàng hôn, chàng cùng chú cú nhỏ đếm sao.",
       "lines": {
         "greeting": [
-          "Hú hú! Chào {ten}.",
-          "Chào {ten}! Cú Tròn trên tháp đây.",
+          "Ồ ồ! Chào {ten}.",
+          "Chào {ten}! Hoàng tử Hoàng hôn trên tháp đây.",
           "{ten} lên tháp rồi à? Hú hú!",
-          "Hú! Cú Tròn đang đếm sao đây.",
+          "Ồ! Hoàng tử Hoàng hôn đang đếm sao đây.",
           "Chào {ten}, trời đẹp để đếm số nhỉ?",
-          "Hú hú, bạn {ten} đến thăm tháp!"
+          "Ồ, bạn {ten} đến thăm tháp!"
         ],
         "ask": [
-          "Cú Tròn đếm số mãi mà buồn ngủ. {ten} đếm giúp Cú nhé?",
-          "Chuông tháp cần vài con số đúng. {ten} giúp Cú nha!",
-          "Hú hú! Có 5 bài về các con số. {ten} giúp Cú nhé?",
-          "Cú Tròn bị lẫn chữ số rồi. {ten} giúp Cú sắp xếp nhé!",
-          "Tháp có 5 câu đố số. {ten} giải giúp Cú nhé?",
-          "Giúp Cú đếm số cho chuông kêu đúng giờ nhé, {ten}!"
+          "Hoàng tử Hoàng hôn đếm số mãi mà buồn ngủ. {ten} đếm giúp Hoàng tử nhé?",
+          "Chuông tháp cần vài con số đúng. {ten} giúp Hoàng tử nha!",
+          "Ồ ồ! Có 5 bài về các con số. {ten} giúp Hoàng tử nhé?",
+          "Hoàng tử Hoàng hôn bị lẫn chữ số rồi. {ten} giúp Hoàng tử sắp xếp nhé!",
+          "Tháp có 5 câu đố số. {ten} giải giúp Hoàng tử nhé?",
+          "Giúp Hoàng tử đếm số cho chuông kêu đúng giờ nhé, {ten}!"
         ],
         "thanks": [
-          "Hú hú! Cảm ơn {ten}. Chuông tháp kêu đúng rồi.",
-          "Giỏi lắm {ten}! Cú Tròn không còn lẫn số.",
-          "Cảm ơn {ten} nhiều! Cú ngủ ngon được rồi.",
-          "Hú! {ten} đếm giỏi hơn cả Cú Tròn.",
+          "Ồ ồ! Cảm ơn {ten}. Chuông tháp kêu đúng rồi.",
+          "Giỏi lắm {ten}! Hoàng tử Hoàng hôn không còn lẫn số.",
+          "Cảm ơn {ten} nhiều! Hoàng tử ngủ ngon được rồi.",
+          "Ồ! {ten} đếm giỏi hơn cả Hoàng tử Hoàng hôn.",
           "Nhờ {ten} mà các con số xếp ngay ngắn. Cảm ơn nhé!",
-          "Cảm ơn {ten}. Cú Tròn nhớ bạn lắm đó."
+          "Cảm ơn {ten}. Hoàng tử Hoàng hôn nhớ bạn lắm đó."
         ],
         "encourage": [
-          "Hú hú, con số khó đếm mà. Cú cũng đếm sai hoài. Cố lên {ten}!",
+          "Ồ, con số khó đếm mà. Hoàng tử cũng đếm sai hoài. Cố lên {ten}!",
           "Không sao {ten} ơi. Mình đếm lại từ từ nhé.",
-          "Cú Tròn tin {ten} làm được. Thử lại nào!",
+          "Hoàng tử Hoàng hôn tin {ten} làm được. Thử lại nào!",
           "Đếm sai cũng là đang học. Cảm ơn {ten} đã cố gắng!",
-          "Đừng buồn nha {ten}. Mai Cú Tròn lại đợi bạn.",
-          "{ten} chăm chỉ lắm. Cú tự hào ghê!"
+          "Đừng buồn nha {ten}. Mai Hoàng tử Hoàng hôn lại đợi bạn.",
+          "{ten} chăm chỉ lắm. Hoàng tử tự hào ghê!"
         ],
         "special": [
-          "Hú hú! {ten} biết nhiều dạng số rồi. Cú Tròn nể quá!",
-          "Cú Tròn kể {ten} nghe nè: các con số đều thích bạn.",
+          "Ồ ồ! {ten} biết nhiều dạng số rồi. Hoàng tử Hoàng hôn nể quá!",
+          "Hoàng tử Hoàng hôn kể {ten} nghe nè: các con số đều thích bạn.",
           "Bạn {ten} giờ đếm giỏi như cú thông thái!",
           "Chuông tháp reo mừng {ten} đó. Hú hú!"
         ]
@@ -145,17 +145,17 @@
     },
     {
       "id": "bac_vuong",
-      "name": "Bác Vuông",
+      "name": "Công tước Bóng đêm",
       "strand": "geo",
       "building": "Vườn Hình học",
-      "bio": "Bác làm vườn ở Vườn Hình học. Bác trồng hoa thành đủ hình vuông, tròn, tam giác.",
+      "bio": "Công tước trông Vườn Hình học. Dưới trăng, bác tỉa hoa thành hình vuông, tròn, tam giác.",
       "lines": {
         "greeting": [
           "Chào {ten}! Vườn hôm nay đẹp lắm.",
           "{ten} đến chơi vườn à? Bác mừng quá.",
           "Chào {ten}, ngửi thử mùi hoa không nè?",
           "Ôi, bạn nhỏ {ten} đến rồi!",
-          "Chào cháu {ten}! Bác Vuông đang tỉa cây.",
+          "Chào cháu {ten}! Công tước Bóng đêm đang tỉa cây.",
           "{ten} ơi, vào vườn hình học nào!"
         ],
         "ask": [
@@ -186,28 +186,28 @@
           "{ten} biết nhiều dạng hình rồi. Bác nể quá!",
           "Bác trồng tặng {ten} một bông hoa hình sao nhé.",
           "Cả vườn đều khen {ten}. Giỏi lắm cháu!",
-          "Cháu {ten} nhìn hình giỏi hơn cả Bác Vuông."
+          "Cháu {ten} nhìn hình giỏi hơn cả Công tước Bóng đêm."
         ]
       }
     },
     {
       "id": "chu_xoay",
-      "name": "Chú Xoay",
+      "name": "Quản gia Chạng vạng",
       "strand": "comb",
       "building": "Hội chợ Tổ hợp",
-      "bio": "Chú quản lý Hội chợ Tổ hợp. Chú rất thích xếp trò chơi theo nhiều cách.",
+      "bio": "Quản gia lo Hội chợ Tổ hợp lúc chạng vạng. Chú rất thích xếp trò chơi theo nhiều cách.",
       "lines": {
         "greeting": [
           "Chào {ten}! Hội chợ đang vui lắm.",
           "Mời {ten} lên vòng quay nào!",
           "Ôi, {ten} đến rồi! Kèn vang lên nào.",
-          "Chào {ten}! Chú Xoay đây.",
+          "Chào {ten}! Quản gia Chạng vạng đây.",
           "Hội chợ chào đón {ten}!",
           "{ten} ơi, hôm nay có nhiều trò mới."
         ],
         "ask": [
           "Chú xếp trò chơi mà có quá nhiều cách. {ten} đếm giúp Chú nhé?",
-          "Có 5 bài đếm cách xếp. {ten} giúp Chú Xoay nhé?",
+          "Có 5 bài đếm cách xếp. {ten} giúp Quản gia Chạng vạng nhé?",
           "Chú đang chia quà cho các bạn. {ten} giúp Chú đếm nhé?",
           "Hội chợ cần một bạn giỏi đếm cách. {ten} giúp Chú nhé!",
           "Giúp Chú xếp hàng cho vui nào, {ten}!",

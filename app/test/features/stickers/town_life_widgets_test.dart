@@ -323,7 +323,7 @@ void main() {
           extra: const BuildingScreenArgs(stageIndex: 0),
         );
         final knight = book.forStrand('logic')!;
-        expect(knight.name, 'Hiệp sĩ Sáng');
+        expect(knight.name, 'Hiệp sĩ Bình minh');
         expect(
           find.byKey(const Key('resident-portrait-hiep_si_sang')),
           findsOneWidget,

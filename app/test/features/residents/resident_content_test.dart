@@ -33,11 +33,11 @@ void main() {
       expect(r!.building, area.name);
     }
     expect(book.residents.map((r) => r.name).toList(), [
-      'Hiệp sĩ Sáng',
-      'Cô Bông',
-      'Cú Tròn',
-      'Bác Vuông',
-      'Chú Xoay',
+      'Hiệp sĩ Bình minh',
+      'Tiểu thư Ánh sáng',
+      'Hoàng tử Hoàng hôn',
+      'Công tước Bóng đêm',
+      'Quản gia Chạng vạng',
     ]);
   });
 
