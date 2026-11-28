@@ -2,6 +2,8 @@
 /// async thật (`runAsync`) để ảnh chụp golden không thiếu nút/biển.
 library;
 
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -33,11 +35,19 @@ const List<String> uiImagePaths = <String>[
   'assets/images/items/gem_chest.webp',
 ];
 
+/// Ảnh lô 17 (cư dân, sổ sticker, mở khóa): lấy theo thư mục để thêm ảnh
+/// mới không phải sửa danh sách.
+List<String> lot17ImagePaths() => <String>[
+  for (final dir in const ['residents', 'stickers', 'unlocks'])
+    for (final f in Directory('assets/images/$dir').listSync())
+      if (f.path.endsWith('.webp')) f.path,
+];
+
 /// Nạp sẵn mọi ảnh giao diện rồi vẽ lại một khung.
 Future<void> precacheUiImages(WidgetTester tester) async {
   final context = tester.element(find.byType(Scaffold).first);
   await tester.runAsync(() async {
-    for (final path in uiImagePaths) {
+    for (final path in [...uiImagePaths, ...lot17ImagePaths()]) {
       await precacheImage(AssetImage(path), context);
     }
   });

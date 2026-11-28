@@ -15,7 +15,7 @@ import '../room/room_variants.dart';
 /// nước ở Thị trấn, huy hiệu danh hiệu) chưa. `false`: vẽ bằng code. Khi
 /// Muse giao lô 17 (`docs/briefs/lot17_v04.md`): thêm
 /// `assets/images/unlocks/` vào `pubspec.yaml` rồi đặt `true`.
-const bool unlockArtReady = false;
+const bool unlockArtReady = true;
 
 /// Loại phần thưởng của một mốc.
 enum UnlockReward { goldFrame, specialDialogue, townDecor, roomGift, title }

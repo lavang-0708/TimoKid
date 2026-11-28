@@ -4769,3 +4769,349 @@ plain và file _v3 cùng tên gốc nhưng là 2 ảnh khác nhau.
 Chưa decode (chờ Claude decode).
 
 > Nốt: file `.b64` của nền `room_tet` trúng mẫu secret scanning của GitHub (chuỗi base64 tình cờ chứa `AKID` + 32 ký tự, dương tính giả) nên đã mã lại PNG lossless `compress_level` 9 — pixel y hệt, byte 597.457 → 596.005, SHA-256 mới `2dc9450736d9…` (bản gốc ở `backup_secret_scan/room_tet.webp`).
+
+# Lô 17 — Nhóm A: 5 CƯ DÂN (chân dung) — CHỦ DỰ ÁN ĐÃ DUYỆT (28/11) — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+> Chủ dự án đã duyệt 5 chân dung (28/11 ~18:47, Claude duyệt thay, chủ dự án ra ngoài): rất dễ thương, đúng phong cách app. Cả 3 nốt đều GIỮ NGUYÊN: mũ Bác Vuông xanh đậm (nổi khối hơn, áo đã đúng pastel), lông vũ Hiệp sĩ, đầu Chú Xoay nhỏ hơn chút (vẫn đọc rõ). File đích: `app/assets/images/residents/<id>_portrait.webp` (Claude convert webp khi decode).
+
+Phong cách: pastel, nét mềm, **viền trắng sticker 10 px** quanh hình, không chữ trong ảnh. Khung 512×512 nền trong suốt, lề trong 24 px, đầu to, đọc rõ ở 72 px. Màu từng mảng khớp `strandColor` trong code app (Logic #C9B8F0 đã đối chiếu trong `resident_widgets.dart` trên main; các màu còn lại theo `town_assets.dart`).
+
+| Cư dân | Mảng / tòa nhà | Màu app (`strandColor`) | File |
+| --- | --- | --- | --- |
+| Hiệp sĩ Sáng (`hiep_si_sang`) | Lôgic, Lâu đài Lôgic | #C9B8F0 tím nhạt | `hiep_si_sang_portrait.webp` |
+| Cô Bông (`co_bong`) | Số học, Tiệm bánh Số học | #FFD9C0 hồng/cam nhạt | `co_bong_portrait.webp` |
+| Cú Tròn (`cu_tron`) | Con số, Tháp Con số | #BFE0F5 xanh dương nhạt | `cu_tron_portrait.webp` |
+| Bác Vuông (`bac_vuong`) | Hình học, Vườn Hình học | #BFE8CF xanh lá nhạt | `bac_vuong_portrait.webp` |
+| Chú Xoay (`chu_xoay`) | Tổ hợp, Hội chợ Tổ hợp | #FFD166 vàng nhạt | `chu_xoay_portrait.webp` |
+
+## File (PNG 512×512, nền trong suốt)
+
+| File | Byte | .b64 byte | SHA-256 |
+| --- | --- | --- | --- |
+| `hiep_si_sang_portrait.webp` | 148.893 | 198.524 | `53d86bcde7b8dd45efc7b5dcca56cb8732effbe3f0fe16ec857bc8c333733603` |
+| `co_bong_portrait.webp` | 171.889 | 229.188 | `34e0125e9f21483e990d663684093846ca748f392682d0aa4dfccf819150b417` |
+| `cu_tron_portrait.webp` | 255.739 | 340.988 | `eaf994f59d6435e069d2ec02afa621f99a12bf2469ca55dc1d63e679ba7d0e28` |
+| `bac_vuong_portrait.webp` | 191.608 | 255.480 | `560df4b9042103b4d3bb711abd333fbfdc4792cc3997f8ca34f7a21defd79f55` |
+| `chu_xoay_portrait.webp` | 200.277 | 267.036 | `99d2a6f950905bfb703c0eb1b12cb75caef03b2360a3ac1b3faba13ae7ac6e61` |
+
+## Cổng kiểm (đo bằng code trên file cuối, cả 5 file — parent kiểm lại độc lập)
+
+- Semi alpha: **0**; magenta r1: **0**; vivid broad: **0**; bright-rim: **0**.
+- Lề trong: **24 px** (trên/dưới; trái/phải 37–106 px do art căn giữa trong khung 444 px); viền trắng sticker: **10 px** đều.
+- Màu trang phục (median) so với `strandColor`: Hiệp sĩ Sáng lệch 6, Cô Bông 25, Cú Tròn 39, Bác Vuông 64, Chú Xoay 45 (có shading nên lệch; cùng họ màu).
+
+## Cách vẽ
+
+5 lần tạo ảnh (lấy `cat_teen_sit` làm mẫu phong cách pastel 3D mềm của app, nền magenta phẳng) → tách nền bằng code (ngưỡng 52,5, erode 1 px, defringe) → resize premultiplied-alpha về vừa khung 444 px → viền trắng 10 px bằng code → alpha cứng. Sửa sau: vẽ lại pixel vivid magenta kẹt giữa sợi tóc/lông (299 px) và viền hồng do blend với nền key (5.607 px) bằng median donor.
+
+## Đã soi
+
+100% + 3× trên nền tối (60,60,80): mặt, mắt, phụ kiện đặc trưng đều sạch sau khi sửa viền hồng; viền trắng đều không lem; thu nhỏ 72 px (vuông như app thật + tròn như brief) đọc rõ mặt + mũ/kính/nơ.
+
+## Nốt nhỏ (đã chốt — GIỮ NGUYÊN, không sửa)
+
+- Hiệp sĩ Sáng: 156 px ở chùm lông vũ còn đọc "hồng" theo thước — đó là màu tím-lavender nhạt của thiết kế; thước không tách được lavender khỏi blend magenta, nhìn mắt sạch. **Claude 28/11 ~18:47: GIỮ.**
+- Cô Bông: 10 px viền hồng còn lại ở ngọn tóc mai, không thấy ở cỡ app.
+- Bác Vuông: mũ xanh đậm hơn pastel #BFE8CF (áo đúng pastel); vẫn đọc rõ là mũ làm vườn. **Claude 28/11 ~18:47: GIỮ (nổi khối hơn).**
+- Chú Xoay: bóng bay làm hình rộng nhất (418 px) nên đầu nhỏ hơn 4 người kia chút ở 72 px, vẫn đọc rõ; dây bóng mỏng 1–2 px nhưng còn nguyên. **Claude 28/11 ~18:47: GIỮ.**
+
+## Tiếp theo
+
+Tư thế "đang nói" (`*_talk`), nhóm B (sổ sticker), nhóm C (mở khóa), nhóm B2 (90 biểu tượng dạng) — vẽ tiếp, đẩy từng nhóm riêng + doc.
+
+**Trạng thái: chủ dự án ĐÃ DUYỆT (28/11 ~18:47). Đã đẩy 5 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/residents/*_portrait.webp`.**
+
+---
+
+# Lô 17 — B2 Hình học: đế + 19 biểu tượng dạng bài — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+Mảng Hình học (`geo`, màu `#BFE8CF`): `sticker_base_geo.webp` + 19 file `form_geo_<mã>.webp`, 512×512, nền trong suốt, lề trong 64 px (art ≤384 px). App đặt biểu tượng giữa huy hiệu, chiếm 62% khung. Phong cách pastel, viền trắng sticker 5 px, không chữ/số trong ảnh.
+
+### Đế
+
+| File | Byte | SHA-256 | Ghi chú |
+| --- | --- | --- | --- |
+| `sticker_base_geo.webp` | 34134 | `c2127cc6e8d9a854556a1ae11ce4ed953e999838b1a0f20066f21d308f0bdf92` | Vẽ lại bằng code 28/11 (sửa đế vành): đĩa đầy như khung nhóm B — đĩa trắng r231, gradient xuyên tâm (219,242,228) → #BFE8CF r219, tâm nhạt, không lỗ trong suốt; margin 24 px, bbox (25,25)-(486,486) |
+
+### 19 biểu tượng
+
+| File | Nhãn | Byte | SHA-256 |
+| --- | --- | --- | --- |
+| `form_geo_countsq.webp` | Đếm hình vuông | 75860 | `3c926741caa834a21ab0da23d675189a8bacc6ce1affab2fab22e958a0285574` |
+| `form_geo_countrect.webp` | Đếm chữ nhật | 57177 | `855ddeea4462200a0e30642bbe27bcf2481bdd4097856e370661859a78c0da0f` |
+| `form_geo_counttri.webp` | Đếm tam giác | 69640 | `eebf85cb97a2a1bc4cf5681dbc3abb7e4d036d485713c096e68cd7751caa348f` |
+| `form_geo_perim.webp` | Chu vi | 53620 | `d2990657adcd00f1fd5032101318893da68c43d49fd35db23ba6b102ce89a2e9` |
+| `form_geo_matches.webp` | Xếp que diêm | 89127 | `b34182f826ee0464e4f5fa04e2bda26e625ed7e91cfda712e417cd7cee736f47` |
+| `form_geo_sides.webp` | Đếm cạnh | 56900 | `3254ba9f1c468c52a59663eeefe35c5a0367a2f1cc44a55832b6c10a98c78d6f` |
+| `form_geo_cubes.webp` | Tháp khối vuông | 79318 | `49b0b7f7f25ff05cc55c98f795d8dcd929b78c4867430c7eb89cff371ec94f2e` |
+| `form_geo_shapeperim.webp` | Chu vi hình ghép | 38909 | `fa02ce78e7be01380526d9f5da9f9ce3a79c4234220ec7af0d551c9a93d53f81` |
+| `form_geo_cutpaper.webp` | Cắt giấy | 87586 | `c658b451f6901fc1743e294b6d42c820166d633babe961f413a39f2d1cb46ad0` |
+| `form_geo_pointsegs.webp` | Điểm và đoạn | 40109 | `288408475c568285b5005fe1f4dd00ae02bc279ae58330591a5c41b4b630d10f` |
+| `form_geo_shapeparts.webp` | Cạnh và đỉnh | 42712 | `1fd6f728500086270c6fa0600c42c0bce7aeebd87ebd791eeb651017f23bb0ac` |
+| `form_geo_fence.webp` | Cắm cọc rào | 58052 | `0520d53dd7f2abf0f4df26d5c268dc7229c5c362498b268f7d079879b67cc9b6` |
+| `form_geo_segline.webp` | Đoạn thẳng | 21913 | `b5090013c0ab77b993241f43f52877b322d84d218b9f5da0be366da7415314cc` |
+| `form_geo_units.webp` | Đổi dm, cm | 25761 | `b42db1d64cd574864e5938fdf1a5f39b68a8772e0b2dbb6435bb75e2a7f88b73` |
+| `form_geo_cutsquares.webp` | Cắt ô vuông | 64500 | `d050b774e26924741077faa5f3b27f8fef07d69f568cfaab84381e19960812ca` |
+| `form_geo_cubefaces.webp` | Mặt khối vuông | 57116 | `201d38ae4385150e55fdeefa0b8ce60703a82d0813c96c1e474b50a62127509a` |
+| `form_geo_perimchange.webp` | Chu vi đổi | 21602 | `8f246a17e6c4806b464fc104b9136b28f2121d3e2eaf35ab2b0be16d9a1722c3` |
+| `form_geo_pyramid.webp` | Hình chóp | 54702 | `27d663fc23dc2a861dfe3e01f5655c1f1faec325eb8a9f7d2469d49782c4caf7` |
+| `form_geo_prism.webp` | Hình lăng trụ | 42596 | `aa6701117c7b301e66d8a3a43f4f463351a5a630a99106cc897e24f3925f3854` |
+
+### Cổng kiểm (đo bằng code, từng file)
+
+- `semi_alpha = 0`, `magenta_r1 = 0`, `bright_rim_vivid = 0`, `vivid_broad = 0` — cả 20 file.
+- Lề trong 64 px — cả 19 biểu tượng (art fit 374 px + viền trắng 5 px = ≤384 px). Đế là đĩa đầy, margin 24 px (bbox (25,25)-(486,486)), giữa đục (r<150: 70.661 px).
+- Soi 100% + 3× trên nền tối (60,60,80) và nền sáng: 19/19 đọc đúng nhãn, viền sạch, không vệt magenta; huy hiệu 96 px đọc rõ, 72 px vẫn nhận ra hình.
+
+### Phương pháp
+
+4 tấm lưới 3×2 nền magenta `#FF00FF` (mỗi tấm 4–5 biểu tượng) → key magenta ngưỡng 60 → tách component liên thông, gán slot theo centroid, gộp component cùng slot (perimchange 3 mảnh, cutsquares 2 mảnh) → erode alpha 1 px + defringe donor-median → fit 374 px + viền trắng 5 px → alpha cứng → repaint mọi pixel vivid-magenta còn sót. Đế vẽ bằng code. Không cắt-dán pixel từ chân dung cư dân.
+
+### Nốt
+
+- `counttri`: 3 lỗ tam giác ngược để trong suốt (nền huy hiệu hiện qua), đọc như lưới tam giác.
+- `shapeparts`: khung vuông rỗng, giữa trong suốt — đọc là hình vuông có cạnh + đỉnh đánh dấu.
+- `perimchange` / `segline` / `units` / `pointsegs` là icon rộng: giữ đúng tỉ lệ, cạnh dài fill 384 px nên trong huy hiệu 62% hiện nhỏ hơn icon vuông — đúng spec.
+- Lượt cắt đầu còn r1 1–34 px/icon (magenta lẩn trong khe hẹp sau resize); đã repaint hết bằng donor-median, lượt 2 về 0 mọi chỉ số.
+- **SỬA ĐẾ (28/11, sau khi đẩy):** đế bản đầu là vành có lỗ trong suốt giữa (Ø316) — không khớp khung nhóm B (đĩa đầy, tâm nhạt) và đế number (đĩa đầy); icon rộng sẽ lộ nền app qua lỗ. Đã vẽ lại thành đĩa đầy bằng code (gradient theo đúng tâm/mép khung geo), đẩy lại đè `sticker_base_geo.png.b64` cũ (6.827 B → 34.134 B, SHA mới ở bảng trên; bản vành cũ giữ ở `forms_B2_geo/backup_base_ring/` local).
+**Trạng thái: đã đẩy 20 file `.b64` (3 đợt: 8 + 8 + 4) + mục doc này — chờ Claude decode thành `app/assets/images/stickers/sticker_base_geo.webp` và `form_geo_*.webp`.**
+
+---
+
+# Lô 17 — Nhóm A: 5 TƯ THẾ "ĐANG NÓI" — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+> Đã đẩy. File đích:
+> `app/assets/images/residents/<id>_talk.webp` (Claude convert webp khi decode).
+
+Tư thế "đang nói": cùng nhân vật, cùng mặt/trang phục/phụ kiện với chân dung
+đã duyệt, miệng MỞ, một tay giơ lên sát má ra hiệu. **Cùng cỡ và cùng gốc
+với chân dung: bbox trùng 0 px cả 4 cạnh**, đổi qua lại chân dung ↔ đang nói
+không bị nhảy hình.
+
+Phong cách: pastel, nét mềm, **viền trắng sticker 10 px** quanh hình, không chữ
+trong ảnh. Khung 512×512 nền trong suốt, lề trong 24 px, đầu to, đọc rõ ở 72 px.
+
+| Cư dân | File xem trước |
+| --- | --- |
+| Hiệp sĩ Sáng (`hiep_si_sang`) | `hiep_si_sang_talk.webp` |
+| Cô Bông (`co_bong`) | `co_bong_talk.webp` |
+| Cú Tròn (`cu_tron`) | `cu_tron_talk.webp` |
+| Bác Vuông (`bac_vuong`) | `bac_vuong_talk.webp` |
+| Chú Xoay (`chu_xoay`) | `chu_xoay_talk.webp` |
+
+## File (PNG 512×512, nền trong suốt)
+
+| File | Byte | SHA-256 |
+| --- | --- | --- |
+| `hiep_si_sang_talk.webp` | 149.452 | `019403aa6eebd57ecfefc037b5b88e677de2d6e10a6f031fcb95eebd836a5b33` |
+| `co_bong_talk.webp` | 175.106 | `4863f7b3d60a4b2f0cd91ed0d26650503492b19a0853ee570c28f55e599080ca` |
+| `cu_tron_talk.webp` | 244.570 | `f381c0b76b492e754ce8819a4aa91a37ba3046946391dc1866589ccf603fab82` |
+| `bac_vuong_talk.webp` | 190.988 | `394453ad06bc5979ab7af6b627352caba41ea9a2313bb53c790479a919ab9fbc` |
+| `chu_xoay_talk.webp` | 216.449 | `2dbcca32e8867ece1c333163e5f51ba52627b87562c09adeea9983e52341a72f` |
+
+## Bbox tư thế nói so với chân dung (đo bằng code, cả 5 file)
+
+| Cư dân | Chân dung (x0,y0)-(x1,y1) | Đang nói (x0,y0)-(x1,y1) | Lệch L/T/R/B |
+| --- | --- | --- | --- |
+| Hiệp sĩ Sáng | (106,24)-(405,487) | (106,24)-(405,487) | 0 / 0 / 0 / 0 |
+| Cô Bông | (106,24)-(405,487) | (106,24)-(405,487) | 0 / 0 / 0 / 0 |
+| Cú Tròn | (53,24)-(457,487) | (53,24)-(457,487) | 0 / 0 / 0 / 0 |
+| Bác Vuông | (95,24)-(416,487) | (95,24)-(416,487) | 0 / 0 / 0 / 0 |
+| Chú Xoay | (37,24)-(474,487) | (37,24)-(474,487) | 0 / 0 / 0 / 0 |
+
+## Cổng kiểm (đo bằng code trên file cuối, cả 5 file)
+
+- Semi alpha: **0**; magenta r1: **0**; vivid broad: **0**; bright-rim: **0**.
+- Lề trong: **24 px** cả 4 phía; viền trắng sticker: **10 px** đều 4 phía.
+- Độ co ngang khi ép về đúng khung art chân dung: Hiệp sĩ Sáng 0,946;
+  Cô Bông 0,940; Cú Tròn 0,877; Bác Vuông 0,962; Chú Xoay 0,985.
+
+## Cách vẽ
+
+5 lần tạo ảnh (lấy chân dung đã duyệt làm canvas, nền magenta phẳng) →
+tách nền bằng code (ngưỡng 52,5, erode 1 px, defringe) → lấp lỗ hổng nền
+kẹt giữa tay/thân → resize premultiplied-alpha về **đúng (w,h) art +
+offset của chân dung** → viền trắng 10 px bằng code → alpha cứng. Sửa sau:
+vẽ lại pixel vivid magenta (1 px) và viền hồng do blend với nền key (238 px)
+bằng median donor.
+
+Bản vẽ đầu (tay chìa ra ngoài vai) đã loại: khung rộng hơn chân dung 10–19%,
+ép co ngang sẽ méo mặt — vẽ lại bản 2 với tay giơ sát má, trong bề rộng vai.
+
+## Đã soi
+
+100% + 3× trên nền tối (60,60,80) từng file: miệng mở đọc rõ "đang nói",
+tay/cánh giơ sát má đủ ngón không dính, vai/cổ tay khớp thân, viền trắng đều,
+không vệt magenta. Ảnh ghép chân dung + đang nói (nền sáng + nền tối) và
+thu nhỏ 72 px (vuông + tròn) + 216 px tròn (3×) trong `preview.webp`.
+
+## Nốt nhỏ (nói thật)
+
+- Cú Tròn: co ngang nhiều nhất (0,877) vì cánh giơ làm khung rộng nhất; soi
+  3× kính vẫn tròn, không thấy méo rõ.
+- Hiệp sĩ Sáng: 4 px hồng còn lại ở chùm lông vũ (x 218–220, y 102–103),
+  màu tím-lavender của thiết kế (chân dung cũng còn 156 px) — nhìn mắt sạch.
+- Cô Bông + Chú Xoay: khe tay/cổ có tam giác trắng nhỏ ~3–4 px (viền trắng
+  của ảnh gốc quanh khe nền sau khi lấp lỗ) — chỉ thấy ở 3×, không thấy ở 72 px.
+- Bác Vuông ở tư thế nói: tay giơ không cầm kéo tỉa (chân dung cầm kéo) —
+  đúng brief (tay giơ ra hiệu), không đổi thiết kế.
+- Ở 3× thấy vài chấm hồng nhạt 1 px trên mép ngoài viền trắng (dưới ngưỡng
+  thước) — không thấy ở 100% / 72 px.
+
+## Chưa làm trong lần này
+
+Nhóm B (sổ sticker), nhóm C (mở khóa), B2 tùy chọn — không thuộc nhiệm vụ này.
+
+**Trạng thái: đã đẩy 5 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/residents/<id>_talk.webp`.**
+
+---
+
+# Lô 17 nhóm B — Sổ sticker — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+> Đã đẩy 7 file PNG vào `app/assets/_incoming/` dạng `.b64`, Claude decode thành
+> `app/assets/images/stickers/*.webp`.
+
+## File
+
+| File | Cỡ | Byte | SHA-256 |
+| --- | --- | --- | --- |
+| `sticker_frame_logic.webp` | 512×512 | 54179 | `4662e1a2a7ea85d1639a676166f963f2e864c1fb3b2e10baaa0a3511a45b9e33` |
+| `sticker_frame_arith.webp` | 512×512 | 49289 | `7548fbdcbc315b37dbf6a4252f76e2a23eca5e8e185bd0acf1aea3dff9c5b457` |
+| `sticker_frame_number.webp` | 512×512 | 49808 | `f1b0ea9bd3ef4ef422c6e2acf27429fb6ea5f82f8e17506eabcfa7334e3d367e` |
+| `sticker_frame_geo.webp` | 512×512 | 52204 | `56abbdec699309d7b7ce33f09e387b40877068185c0de97840bfe64f309d9941` |
+| `sticker_frame_comb.webp` | 512×512 | 59146 | `208e97a1d9eef735b5743d189948fca9c71e8cc1d0ff5d01c0f2a0a47b6b8f42` |
+| `sticker_locked.webp` | 512×512 | 40294 | `2fa5b743905624df1f8717ec9f69a9f905d6ad6e16a721ccd4d75bd3f6a3d5bf` |
+| `sticker_book_cover.webp` | 1024×512 | 11243 | `690d09f394c65f91101ec83f6cefb86a8ec37ffffbdb50552f94697e4913a070` |
+
+## Màu mảng (đối chiếu code main)
+
+`strandColor()` trong `app/lib/features/residents/resident_widgets.dart` lấy
+từ `townAreas` trong `app/lib/features/town/town_assets.dart` — khớp hết với
+brief, không lệch:
+
+| Mảng | strandColor | Median fill vành r160–180 | Lệch vs gradient kỳ vọng |
+| --- | --- | --- | --- |
+| Lôgic | #C9B8F0 | (207,192,242) | 1,0 |
+| Số học | #FFD9C0 | (253,222,199) | 1,2 |
+| Con số | #BFE0F5 | (197,226,245) | 0,8 |
+| Hình học | #BFE8CF | (198,233,211) | 0,9 |
+| Tổ hợp | #FFD166 | (255,214,118) | 0,9 |
+
+Khung khóa: xám nhạt, median vành (225,225,231), chênh kênh tối đa 6 — trung
+tính, mờ đều, không vẽ "?" (app tự vẽ).
+
+## Thiết kế
+
+- Huy hiệu hoa thị 12 cánh, `r = 215 + 7·cos(12θ)` (208–222 px), giống hệt
+  nhau cho 5 mảng, chỉ khác màu. Viền trắng sticker 10 px (dilate alpha),
+  lề trong 24 px. Gradient xuyên tâm: giữa nhạt về trắng 45% → mép đúng màu
+  mảng; viền trong 3 px tông đậm hơn 18%.
+- Trang trí nhẹ chỉ ở vành ngoài: 12 chấm r6 ở R195 (mỗi 30°) + 8 chấm r4 ở
+  R200 (góc 15/75/105/165/195/255/285/345), tông đậm cùng màu mảng.
+- Vùng trống giữa: tròn Ø317 (r=158,5, = 62% khung) + vuông 317×317 — cả hai
+  đều 0 px trang trí (đo bằng code). Fill pastel + gradient vẫn phủ toàn huy
+  hiệu (đó là "nền màu pastel của mảng" theo brief); chỉ chấm trang trí mới
+  nằm ngoài vùng trống. Demo ngôi sao 62% đặt vào giữa vừa khít, không chạm
+  chấm vành (xem `preview.webp`).
+- Bìa sổ: giấy kem gradient dọc #FFF9E9 → #FBEFD2, kẻ ngang nhạt + chấm/sao
+  nhạt chu kỳ 128 px (128 | 1024), đặc 100% (alpha 255 toàn bộ — cố tình, vì
+  bất kỳ mép trong suốt nào cũng phá đường nối tile ngang). Không chữ.
+
+## Cổng kiểm (đo bằng code trên file cuối, `gates.py`)
+
+| Kiểm | Kết quả |
+| --- | --- |
+| Kích thước | 6 khung 512×512, bìa 1024×512 |
+| Semi alpha | 0 cả 7 file |
+| Magenta r1 (R>200, G<80, B>200) | 0 cả 7 file |
+| Vivid rộng / bright-rim (≤3 px mép) | 0 / 0 cả 6 khung |
+| Viền trắng (ray 24 hướng) | 7–10 px, median 8,5 (biến thiên do anti-alias ở biên cong hoa thị sau downscale; soi 3× trên nền tối thấy đều, không lem) |
+| Vùng trống tròn Ø317: px trang trí bên trong | 0 (cả 6 khung); fill trơn 100% diện tích tròn |
+| Vùng trống vuông 317×317: px trang trí bên trong | 0 (cả 6 khung) |
+| Lề trong (mép ngoài → mép canvas) | 24 px cả 6 khung |
+| Bìa sổ: bước màu tối đa ở đường nối (ghép đôi) | 0 (trung bình 0,0; 0 hàng > 5 — so với p99 bước trong tile là 43) |
+| Bìa sổ: lệch tuần hoàn 128 px | 0; opaque 100% |
+
+## Phương pháp
+
+Vẽ bằng code (`gen_frames.py`, PIL/numpy, supersample 4× → LANCZOS +
+alpha cứng), không generate AI: huy hiệu hình học cần 5 khung giống hệt nhau
++ vùng trống đo chính xác từng px — code đảm bảo hơn. Soi 100% (preview) +
+3× trên nền tối (60,60,80): viền trắng đều không lem, vùng trống giữa thật
+sự trống, khung khóa xám đều + mờ đều, bìa sổ ghép đôi không thấy đường nối
+(kể cả soi 3× dải nối).
+
+## Chưa ưng / lưu ý
+
+- Không có điểm nào chưa ưng về hình. Hai lưu ý nhỏ để Claude biết khi decode:
+  (1) rim đo 7–10 px thay vì đúng 10 px — chỉ là anti-alias ở biên cong,
+  mắt thường 3× không phân biệt được; (2) bìa sổ đặc 100% là cố tình để
+  tile ngang liền mạch.
+- Chưa đẩy GitHub, chưa chạm doc repo. Nhóm C/B2 chưa vẽ.
+
+**Trạng thái: đã đẩy 7 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/stickers/*.webp`.**
+
+---
+
+# Lô 17 — Nhóm C: Đồ mở khóa — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+Cờ `unlockArtReady` (`app/lib/features/unlocks/unlock_config.dart`),
+thư mục `app/assets/images/unlocks/`. Đã đẩy.
+
+## sticker_book_gold_frame.webp — 192×192, 35.546 byte
+
+- SHA-256: `1813933202ca433bb391c061d0e7bfc2347dad62a24d41f5e94955c2549feba6`
+- Khung viền vàng cho trang sổ sticker, chia 9 mảnh: viền **48 px mỗi cạnh**
+  (đo dọc cột x=96 và hàng y=96: đoạn đục [0,47] và [144,191]),
+  ruột trong suốt **96×96 px, alpha = 0** toàn bộ.
+- 4 góc trang trí sao vàng giống nhau, đối xứng (so flip: mean abs diff
+  6,6–12,4/255 — chênh do shading gradient vàng khác hướng mỗi góc).
+- Cổng kiểm: semi 0, magenta r1 0, vivid 0, bright-rim 0, pink_fringe 0.
+- Cách làm: dựng lại 9 mảnh từ bản thô theo bbox lỗ trong đo bằng code
+  (941×923, không vuông — scale đều thường sẽ cho viền ~40 px, sai brief);
+  góc 48×48, cạnh giữa 96×48 / 48×96, ruột trong suốt.
+- Đã sửa bằng code: 163 px viền trắng bị nhuốm hồng nhạt ở mép ngoài
+  vẽ lại bằng trắng thuần.
+
+## town_fountain.webp — 512×512, 249.488 byte
+
+- SHA-256: `d7b018be0dcbcd7435020b907131827e6dfd99d0edb047c110b4c5a42b40768f`
+- Đài phun nước pastel trên bản đồ Thị trấn; **chân đài ở đáy giữa ảnh**:
+  hàng đáy y=511, đoạn đục x=223–286, **tâm x=254,5** (mục tiêu 256;
+  lệch 1,5 px do hình đối xứng không tuyệt đối). Bbox x 25–485, y 48–511.
+- Nước phun + bọt nước mềm, màu pastel, viền trắng sticker; không chữ.
+- Cổng kiểm: semi 0, magenta r1 0, vivid 0, bright-rim 0.
+  pink_fringe 105 px còn lại là hoa hồng thiết kế sát viền trắng
+  (tối đa 2 px/màu) — giữ; vệt magenta sát mép silhouette còn 0.
+- Đã sửa bằng code: 4 px khe magenta hẹp sau downscale, 2.182 px viền
+  trắng nhuốm hồng nhạt, 111 px magenta sát mép silhouette (dt≤2,5).
+
+## title_badge.webp — 256×256, 59.558 byte
+
+- SHA-256: `0385a122297a7bcd136e6451b5d9f16015d8bf2dc803e2e110db555ec57f0481`
+- Huy hiệu "Nhà toán học nhí": sao vàng + mũ cử nhân xanh pastel,
+  sao nhỏ hồng/xanh lá quanh, viền trắng sticker; **không chữ**.
+  Bbox x 16–239, y 18–237, lề trong 16 px; đọc rõ ở 64 px.
+- Cổng kiểm: semi 0, magenta r1 0, vivid 0, bright-rim 0.
+  pink_fringe 280 px còn lại là sao/hoa hồng thiết kế sát viền trắng
+  (màu (219,141,170), tối đa 3 px/màu) — giữ theo tiền lệ lô A;
+  vệt magenta sát mép silhouette còn 0.
+- Đã sửa bằng code: 416 px khe magenta hẹp sau downscale, 197 px viền
+  trắng nhuốm hồng nhạt, 171 px magenta sát mép silhouette (dt≤2,5).
+
+## Phương pháp chung
+
+- 3× `media.generate_image` (chân dung Hiệp sĩ Sáng làm style ref,
+  nền magenta #FF00FF) → key (249,0,245) ngưỡng 52,5 → erode alpha 1 px
+  → defringe donor-median → alpha cứng. Không thêm viền trắng bằng code
+  (ảnh gốc đã có viền trắng sticker sẵn).
+- Soi 100% + 3× trên nền tối (60,60,80): khung vàng, tia nước, chân đài,
+  huy hiệu — xem `preview.webp` (1.259.223 byte,
+  SHA `6796ec078dde71a8ba63e5398ebc6e08c613fc363dd78183fd7412b34ec1513b`)
+  và 4 ảnh `check3x_*_dark.webp`.
+- Nốt: huy hiệu còn 28 px hồng nhạt (237,188,237) sát mép ngoài, mỗi px
+  rời rạc — blend viền trắng với sao hồng, chỉ thấy ở 3×, không thấy
+  ở cỡ app 64 px; giữ. Viền trong khung vàng có đường viền nâu-đỏ
+  (215,104,95) đo bằng code là viền trong thiết kế, không phải magenta.
+
+**Trạng thái: đã đẩy 3 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/unlocks/*.webp`.**

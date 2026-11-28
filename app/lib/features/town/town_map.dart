@@ -502,7 +502,10 @@ class _TownMapState extends State<TownMap> with TickerProviderStateMixin {
     return Positioned(
       key: const Key('town-fountain'),
       left: _fountainFeet.dx / townFrameWidth * w - size / 2,
-      top: _fountainFeet.dy / townFrameHeight * h - size * 0.8,
+      // Ảnh thật: chân đài ở đáy ảnh (brief lô 17); hình vẽ code: 80% chiều cao.
+      top:
+          _fountainFeet.dy / townFrameHeight * h -
+          size * (unlockArtReady ? 1.0 : 0.8),
       width: size,
       height: size,
       child: IgnorePointer(
