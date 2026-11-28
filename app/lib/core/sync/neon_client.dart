@@ -232,12 +232,70 @@ class NeonClient {
       throw NeonException(
         res.statusCode >= 500 ? NeonErrorKind.server : NeonErrorKind.auth,
         res.statusCode,
-        authMessageVi(e.code, e.message),
+        authMessageVi(e.code, e.message, status: res.statusCode),
         code: e.code,
       );
     }
     await _absorbCookies(res);
     await _store.write(emailKey, email);
+  }
+
+  /// Xin email đặt lại mật khẩu (Better Auth `request-password-reset`, bản
+  /// cũ tên `forget-password`). Server luôn trả thành công dù email có tài
+  /// khoản hay không (không lộ email nào đã đăng ký). [redirectTo] là trang
+  /// web admin hoàn tất việc đặt lại (phải thuộc domain được phép của Neon
+  /// Auth). Ném [NeonException] khi mất mạng hoặc server từ chối.
+  Future<void> requestPasswordReset(
+    String email, {
+    String redirectTo = SyncConfig.resetRedirect,
+  }) async {
+    for (final path in const ['request-password-reset', 'forget-password']) {
+      final res = await _send(
+        'POST',
+        Uri.parse('$authUrl/$path'),
+        headers: _authHeaders(),
+        body: {'email': email, 'redirectTo': redirectTo},
+      );
+      if (res.statusCode >= 200 && res.statusCode < 300) return;
+      // Bản Better Auth cũ chưa có đường dẫn mới: thử tên cũ.
+      if (res.statusCode == 404 && path == 'request-password-reset') continue;
+      final e = _toError(res.statusCode, _decode(res));
+      throw NeonException(
+        res.statusCode >= 500 ? NeonErrorKind.server : NeonErrorKind.client,
+        res.statusCode,
+        authMessageVi(e.code, e.message, status: res.statusCode),
+        code: e.code,
+      );
+    }
+  }
+
+  /// Đổi mật khẩu khi đang đăng nhập (Better Auth `change-password`).
+  /// Sai mật khẩu hiện tại thì ném [NeonException] có `code` `INVALID_PASSWORD`.
+  Future<void> changePassword(String current, String next) async {
+    final res = await _send(
+      'POST',
+      Uri.parse('$authUrl/change-password'),
+      headers: await _authHeadersWithCookie(),
+      body: {
+        'currentPassword': current,
+        'newPassword': next,
+        'revokeOtherSessions': false,
+      },
+    );
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      final e = _toError(res.statusCode, _decode(res));
+      throw NeonException(
+        res.statusCode >= 500
+            ? NeonErrorKind.server
+            : res.statusCode == 401
+            ? NeonErrorKind.auth
+            : NeonErrorKind.client,
+        res.statusCode,
+        authMessageVi(e.code, e.message, status: res.statusCode),
+        code: e.code,
+      );
+    }
+    await _absorbCookies(res);
   }
 
   /// Đăng xuất: xóa phiên trên máy (kể cả khi gọi server lỗi).
@@ -343,7 +401,7 @@ class NeonClient {
       api('POST', 'rpc/ensure_family', body: {'p_display_name': ''});
 }
 
-String authMessageVi(String? code, String fallback) {
+String authMessageVi(String? code, String fallback, {int? status}) {
   switch (code) {
     case 'INVALID_EMAIL_OR_PASSWORD':
       return 'Email hoặc mật khẩu không đúng.';
@@ -356,10 +414,17 @@ String authMessageVi(String? code, String fallback) {
       return 'Mật khẩu quá ngắn (cần ít nhất 8 ký tự).';
     case 'PASSWORD_TOO_LONG':
       return 'Mật khẩu quá dài.';
+    case 'INVALID_PASSWORD':
+      return 'Mật khẩu hiện tại chưa đúng.';
+    case 'EMAIL_NOT_VERIFIED':
+      return 'Email chưa được xác nhận.';
+    case 'RESET_PASSWORD_DISABLED':
+      return 'Máy chủ chưa bật tính năng quên mật khẩu.';
   }
+  if (status == 429) return 'Thử quá nhiều lần. Hãy đợi một lúc rồi thử lại.';
   final f = fallback.toLowerCase();
   if (f.contains('password') && f.contains('short')) {
     return 'Mật khẩu quá ngắn (cần ít nhất 8 ký tự).';
   }
-  return 'Không đăng nhập được: $fallback';
+  return 'Không thực hiện được: $fallback';
 }

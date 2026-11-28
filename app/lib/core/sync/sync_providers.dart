@@ -45,6 +45,10 @@ final syncEngineProvider = Provider<SyncEngine>(
 /// nên không bao giờ đồng bộ.
 const loginPromptDoneKey = 'sync_login_prompt_done';
 
+/// Khóa `settings` (chung, chỉ trên máy): mốc đồng bộ thành công gần nhất
+/// (ISO-8601 UTC) để Cài đặt của bố/mẹ hiện được cả sau khi mở lại app.
+const lastSyncedKey = 'sync_last_synced_at';
+
 // ------------------------------------------------------------- đăng nhập
 
 class AuthState {
@@ -105,10 +109,26 @@ class AuthController extends Notifier<AuthState> {
     unawaited(sync.syncNow());
   }
 
+  /// Gửi email đặt lại mật khẩu. Ném [NeonException] khi lỗi.
+  Future<void> requestPasswordReset(String email) =>
+      _client.requestPasswordReset(email);
+
+  /// Đổi mật khẩu khi đang đăng nhập. Ném [NeonException] khi lỗi.
+  Future<void> changePassword(String current, String next) =>
+      _client.changePassword(current, next);
+
   Future<void> signOut() async {
     await _client.signOut();
     state = const AuthState();
     ref.read(syncControllerProvider.notifier).reset();
+    try {
+      await ref
+          .read(databaseProvider)
+          .settingsDao
+          .deleteSetting(key: lastSyncedKey);
+    } on Object {
+      // bỏ qua
+    }
   }
 }
 
@@ -118,7 +138,7 @@ final authProvider = NotifierProvider<AuthController, AuthState>(
 
 // ------------------------------------------------------------- đồng bộ
 
-enum SyncStatus { signedOut, syncing, synced, offline, error }
+enum SyncStatus { signedOut, syncing, synced, offline, error, needsLogin }
 
 class SyncState {
   const SyncState({
@@ -165,6 +185,12 @@ class SyncController extends Notifier<SyncState> {
     state = const SyncState();
   }
 
+  /// Nạp mốc đồng bộ đã lưu (lúc mở app), nếu chưa có mốc nào trong phiên.
+  void seedLastSynced(DateTime at) {
+    if (state.lastSyncedAt != null) return;
+    state = state.copyWith(lastSyncedAt: at, message: state.message);
+  }
+
   /// Bắt đầu đồng bộ định kỳ (mỗi 15 phút khi app đang mở).
   void startPeriodic() {
     _timer?.cancel();
@@ -175,6 +201,17 @@ class SyncController extends Notifier<SyncState> {
   void syncSoon() {
     // microtask: có nơi gọi từ trong lúc dựng giao diện.
     unawaited(Future.microtask(syncNow));
+  }
+
+  Future<void> _saveLastSynced(DateTime at) async {
+    try {
+      await ref
+          .read(databaseProvider)
+          .settingsDao
+          .setValue(key: lastSyncedKey, value: at.toUtc().toIso8601String());
+    } on Object {
+      // không lưu được mốc thì thôi, việc đồng bộ vẫn xong
+    }
   }
 
   Future<SyncResult> syncNow() async {
@@ -192,11 +229,13 @@ class SyncController extends Notifier<SyncState> {
     }
     switch (result.outcome) {
       case SyncOutcome.ok:
+        final at = DateTime.now();
         state = SyncState(
           status: SyncStatus.synced,
-          lastSyncedAt: DateTime.now(),
+          lastSyncedAt: at,
           revision: state.revision + 1,
         );
+        unawaited(_saveLastSynced(at));
       case SyncOutcome.offline:
         state = before.copyWith(
           status: SyncStatus.offline,
@@ -204,7 +243,7 @@ class SyncController extends Notifier<SyncState> {
         );
       case SyncOutcome.needsLogin:
         state = before.copyWith(
-          status: SyncStatus.error,
+          status: SyncStatus.needsLogin,
           message: 'Cần đăng nhập lại.',
         );
       case SyncOutcome.error:
@@ -246,6 +285,19 @@ class _SyncHostState extends ConsumerState<SyncHost>
   Future<void> _start() async {
     await ref.read(authProvider.notifier).refresh();
     if (!mounted || !ref.read(authProvider).signedIn) return;
+    try {
+      final raw = await ref
+          .read(databaseProvider)
+          .settingsDao
+          .getValue(key: lastSyncedKey);
+      final at = raw == null ? null : DateTime.tryParse(raw);
+      if (at != null && mounted) {
+        ref.read(syncControllerProvider.notifier).seedLastSynced(at.toLocal());
+      }
+    } on Object {
+      // bỏ qua
+    }
+    if (!mounted) return;
     ref.read(syncControllerProvider.notifier).startPeriodic();
     await ref.read(syncControllerProvider.notifier).syncNow();
   }

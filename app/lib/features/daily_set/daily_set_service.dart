@@ -20,6 +20,7 @@
 /// kiểu này, không theo `Question.answerType` thô của generator.
 library;
 
+import 'dart:convert';
 import 'dart:math';
 
 import '../../core/database/app_database.dart';
@@ -111,6 +112,7 @@ class DailySetService {
     required this._clock,
     Random? random,
     this.customQuestionsDao,
+    this.settingsDao,
     bool? customQuestions,
   }) : _random = random ?? Random(),
        _customEnabled = customQuestions ?? customQuestionsEnabled;
@@ -119,6 +121,49 @@ class DailySetService {
   /// `customQuestionsEnabled`; test truyền `customQuestions: true`) và
   /// DAO có mặt; không thì đề ngày y như cũ.
   final CustomQuestionsDao? customQuestionsDao;
+
+  /// Cài đặt (T3-05): khóa `answer_type_lock` do bố đặt trên web admin
+  /// (theo bé, theo mảng: `choice` = luôn trắc nghiệm, `number` = luôn điền
+  /// số, null/thiếu = theo bậc). Thiếu DAO thì không khóa gì.
+  final SettingsDao? settingsDao;
+  Map<String, AnswerType> _lock = const {};
+
+  /// Đọc khóa kiểu trả lời của bé trước khi sinh câu hỏi. Giá trị lỗi hoặc
+  /// không hiểu thì bỏ qua (theo bậc).
+  Future<void> _loadAnswerLock(String childId) async {
+    final dao = settingsDao;
+    if (dao == null) {
+      _lock = const {};
+      return;
+    }
+    final raw = await dao.getEffectiveValue(
+      childId: childId,
+      key: answerTypeLockKey,
+    );
+    _lock = parseAnswerTypeLock(raw);
+  }
+
+  /// Khóa `settings` của khóa kiểu trả lời (khớp web admin).
+  static const String answerTypeLockKey = 'answer_type_lock';
+
+  /// `{"logic":"choice","number":null,...}` → mảng → kiểu bị khóa.
+  static Map<String, AnswerType> parseAnswerTypeLock(String? raw) {
+    if (raw == null) return const {};
+    try {
+      final parsed = jsonDecode(raw);
+      if (parsed is! Map) return const {};
+      return {
+        for (final e in parsed.entries)
+          if (Strand.all.contains(e.key) && e.value == 'choice')
+            e.key as String: AnswerType.choice
+          else if (Strand.all.contains(e.key) && e.value == 'number')
+            e.key as String: AnswerType.number,
+      };
+    } on FormatException {
+      return const {};
+    }
+  }
+
   final bool _customEnabled;
 
   final DailySetsDao _dailySetsDao;
@@ -164,6 +209,7 @@ class DailySetService {
     if (!Strand.all.contains(strand)) {
       throw ArgumentError('Không có mảng nào mang mã $strand');
     }
+    await _loadAnswerLock(childId);
     final rung = await _ladderService.rungFor(childId: childId, strand: strand);
     final usage = await _formUsageLast7Days(childId: childId);
     final dueByStrand = await _dueReviewByStrand(childId: childId);
@@ -189,9 +235,10 @@ class DailySetService {
     if (!Strand.all.contains(strand)) {
       throw ArgumentError('Không có mảng nào mang mã $strand');
     }
+    await _loadAnswerLock(childId);
     final usage = await _formUsageLast7Days(childId: childId);
     final level = LadderConfig.levelForRung(rung);
-    final answerType = LadderConfig.answerTypeForRung(rung);
+    final answerType = _lock[strand] ?? LadderConfig.answerTypeForRung(rung);
     final usedFormIds = <String>{};
     final questions = <DailySetQuestion>[];
     for (var i = 0; i < DailySetConfig.questionsPerStage; i++) {
@@ -228,6 +275,7 @@ class DailySetService {
   Future<List<DailySetQuestion>> _buildDailyQuestions({
     required String childId,
   }) async {
+    await _loadAnswerLock(childId);
     final rungs = await _ladderService.rungsFor(childId: childId);
     final usage = await _formUsageLast7Days(childId: childId);
     final dueByStrand = await _dueReviewByStrand(childId: childId);
@@ -365,7 +413,8 @@ class DailySetService {
     for (var i = 0; i < DailySetConfig.questionsPerStage; i++) {
       final slotRung = slotRungs[i];
       var level = LadderConfig.levelForRung(slotRung);
-      final answerType = LadderConfig.answerTypeForRung(slotRung);
+      final answerType =
+          _lock[strand] ?? LadderConfig.answerTypeForRung(slotRung);
       if (i == DailySetConfig.reviewSlotIndex && reviewEntry != null) {
         questions.add(
           _makeQuestion(

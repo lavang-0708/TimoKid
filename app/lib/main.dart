@@ -29,6 +29,9 @@ Future<void> main() async {
   // Bản thử (cờ TEST_UNLOCKS): tặng 10.000 xu + 10.000 kim cương (một lần).
   if (TestUnlocks.enabled) {
     await TestGrantService(db: db).grantIfNeeded(childId);
+  } else {
+    // Bản chính thức trên máy từng chạy bản thử: bỏ xu/kim cương tặng thử.
+    await TestGrantCleanup(db: db).runIfNeeded();
   }
   // Màn đầu (T2-03): chưa xong mở đầu thì vào màn tạo nhân vật;
   // máy 0.1 cũ (không có cờ mở đầu) thì bỏ qua. Có lần nở trứng

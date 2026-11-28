@@ -114,10 +114,171 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Bố/mẹ tạo tài khoản'), findsOneWidget);
     await fill(tester, 'moi@example.com', 'matkhau123');
+    await tester.enterText(
+      find.byKey(const Key('login-confirm')),
+      'matkhau123',
+    );
     await tester.ensureVisible(find.byKey(const Key('login-submit')));
     await tester.tap(find.byKey(const Key('login-submit')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('stub/next')), findsOneWidget);
+  });
+
+  Future<void> submit(WidgetTester tester) async {
+    await tester.ensureVisible(find.byKey(const Key('login-submit')));
+    await tester.tap(find.byKey(const Key('login-submit')));
+    await tester.pumpAndSettle();
+  }
+
+  group('đăng ký', () {
+    Future<void> toSignUp(WidgetTester tester) async {
+      await tester.tap(find.byKey(const Key('login-toggle-signup')));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('mật khẩu ngắn và hai mật khẩu lệch: báo lỗi, chưa gọi mạng', (
+      tester,
+    ) async {
+      await h.pump(tester, router());
+      await toSignUp(tester);
+      await fill(tester, 'moi@example.com', 'ngan');
+      await tester.enterText(find.byKey(const Key('login-confirm')), 'ngan');
+      await submit(tester);
+      expect(find.text('Mật khẩu cần ít nhất 8 ký tự.'), findsOneWidget);
+
+      await fill(tester, 'moi@example.com', 'matkhau123');
+      await tester.enterText(
+        find.byKey(const Key('login-confirm')),
+        'khac1234',
+      );
+      await submit(tester);
+      expect(find.text('Hai mật khẩu chưa giống nhau.'), findsOneWidget);
+      expect(h.neon.log, isEmpty);
+      expect(h.store.data, isEmpty);
+    });
+
+    testWidgets('email sai dạng bị chặn trước khi gọi mạng', (tester) async {
+      await h.pump(tester, router());
+      await fill(tester, 'khong-phai-email', 'matkhau123');
+      await submit(tester);
+      expect(find.textContaining('Email chưa đúng dạng'), findsOneWidget);
+      expect(h.store.data, isEmpty);
+    });
+
+    testWidgets('email đã dùng: báo "Email này đã có tài khoản"', (
+      tester,
+    ) async {
+      h.neon.existingEmails.add('co@example.com');
+      await h.pump(tester, router());
+      await toSignUp(tester);
+      await fill(tester, 'co@example.com', 'matkhau123');
+      await tester.enterText(
+        find.byKey(const Key('login-confirm')),
+        'matkhau123',
+      );
+      await submit(tester);
+      expect(
+        find.text('Email này đã có tài khoản. Hãy đăng nhập.'),
+        findsOneWidget,
+      );
+      expect(h.store.data, isEmpty);
+    });
+
+    testWidgets('mất mạng khi đăng ký: báo lỗi mạng', (tester) async {
+      h.neon.dropRequest = (_) => true;
+      await h.pump(tester, router());
+      await toSignUp(tester);
+      await fill(tester, 'moi@example.com', 'matkhau123');
+      await tester.enterText(
+        find.byKey(const Key('login-confirm')),
+        'matkhau123',
+      );
+      await submit(tester);
+      expect(find.textContaining('Không có mạng'), findsOneWidget);
+    });
+
+    testWidgets('server bận (503): báo máy chủ bận, không sập', (tester) async {
+      h.neon.authFailStatus = 503;
+      await h.pump(tester, router());
+      await fill(tester, 'bo@example.com', 'matkhau123');
+      await submit(tester);
+      expect(find.textContaining('Máy chủ đang bận'), findsOneWidget);
+      expect(find.byKey(const Key('login-screen')), findsOneWidget);
+    });
+  });
+
+  group('quên mật khẩu', () {
+    Future<void> open(WidgetTester tester) async {
+      await tester.ensureVisible(find.byKey(const Key('login-forgot')));
+      await tester.tap(find.byKey(const Key('login-forgot')));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('gửi thư đặt lại kèm redirectTo là trang web admin', (
+      tester,
+    ) async {
+      await h.pump(tester, router());
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        'bo@example.com',
+      );
+      await open(tester);
+      // Email đã nhập được điền sẵn.
+      expect(find.text('bo@example.com'), findsWidgets);
+      await tester.tap(find.byKey(const Key('forgot-send')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('forgot-sent')), findsOneWidget);
+      expect(h.neon.resetRequests, [
+        {
+          'email': 'bo@example.com',
+          'redirectTo': 'https://lavang-0708.github.io/TimoKid/',
+        },
+      ]);
+      // Không có phiên, không lưu gì.
+      expect(h.store.data, isEmpty);
+    });
+
+    testWidgets('email sai dạng: báo lỗi, không gửi', (tester) async {
+      await h.pump(tester, router());
+      await open(tester);
+      await tester.enterText(find.byKey(const Key('forgot-email')), 'abc');
+      await tester.tap(find.byKey(const Key('forgot-send')));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Email chưa đúng dạng'), findsOneWidget);
+      expect(h.neon.resetRequests, isEmpty);
+    });
+
+    testWidgets('mất mạng: báo lỗi mạng, hộp thoại còn mở để thử lại', (
+      tester,
+    ) async {
+      h.neon.dropRequest = (_) => true;
+      await h.pump(tester, router());
+      await open(tester);
+      await tester.enterText(
+        find.byKey(const Key('forgot-email')),
+        'bo@example.com',
+      );
+      await tester.tap(find.byKey(const Key('forgot-send')));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Không có mạng'), findsOneWidget);
+      expect(find.byKey(const Key('forgot-dialog')), findsOneWidget);
+    });
+
+    testWidgets('server Better Auth bản cũ: rơi về forget-password', (
+      tester,
+    ) async {
+      h.neon.resetPath = 'forget-password';
+      await h.pump(tester, router());
+      await open(tester);
+      await tester.enterText(
+        find.byKey(const Key('forgot-email')),
+        'bo@example.com',
+      );
+      await tester.tap(find.byKey(const Key('forgot-send')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('forgot-sent')), findsOneWidget);
+      expect(h.neon.resetRequests, hasLength(1));
+    });
   });
 
   for (final size in const [Size(608, 248), Size(640, 320), Size(800, 360)]) {

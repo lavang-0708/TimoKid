@@ -35,6 +35,11 @@ class SyncStatusIcon extends ConsumerWidget {
       const Color(0xFFFFA8A0),
       'Đồng bộ lỗi',
     ),
+    SyncStatus.needsLogin => (
+      Icons.lock_reset_rounded,
+      const Color(0xFFFFA8A0),
+      'Cần đăng nhập lại',
+    ),
     SyncStatus.signedOut => (
       Icons.cloud_queue_rounded,
       const Color(0x99FFFFFF),
