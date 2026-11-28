@@ -7355,6 +7355,1159 @@ class ReviewTombstonesCompanion extends UpdateCompanion<ReviewTombstone> {
   }
 }
 
+class $PhotosTable extends Photos with TableInfo<$PhotosTable, Photo> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PhotosTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _childIdMeta = const VerificationMeta(
+    'childId',
+  );
+  @override
+  late final GeneratedColumn<String> childId = GeneratedColumn<String>(
+    'child_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fileNameMeta = const VerificationMeta(
+    'fileName',
+  );
+  @override
+  late final GeneratedColumn<String> fileName = GeneratedColumn<String>(
+    'file_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _widthMeta = const VerificationMeta('width');
+  @override
+  late final GeneratedColumn<int> width = GeneratedColumn<int>(
+    'width',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _heightMeta = const VerificationMeta('height');
+  @override
+  late final GeneratedColumn<int> height = GeneratedColumn<int>(
+    'height',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    childId,
+    fileName,
+    width,
+    height,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'photos';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Photo> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('child_id')) {
+      context.handle(
+        _childIdMeta,
+        childId.isAcceptableOrUnknown(data['child_id']!, _childIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_childIdMeta);
+    }
+    if (data.containsKey('file_name')) {
+      context.handle(
+        _fileNameMeta,
+        fileName.isAcceptableOrUnknown(data['file_name']!, _fileNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fileNameMeta);
+    }
+    if (data.containsKey('width')) {
+      context.handle(
+        _widthMeta,
+        width.isAcceptableOrUnknown(data['width']!, _widthMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_widthMeta);
+    }
+    if (data.containsKey('height')) {
+      context.handle(
+        _heightMeta,
+        height.isAcceptableOrUnknown(data['height']!, _heightMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_heightMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Photo map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Photo(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      childId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}child_id'],
+      )!,
+      fileName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}file_name'],
+      )!,
+      width: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}width'],
+      )!,
+      height: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}height'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $PhotosTable createAlias(String alias) {
+    return $PhotosTable(attachedDatabase, alias);
+  }
+}
+
+class Photo extends DataClass implements Insertable<Photo> {
+  final String id;
+  final String childId;
+  final String fileName;
+  final int width;
+  final int height;
+  final DateTime createdAt;
+  const Photo({
+    required this.id,
+    required this.childId,
+    required this.fileName,
+    required this.width,
+    required this.height,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['child_id'] = Variable<String>(childId);
+    map['file_name'] = Variable<String>(fileName);
+    map['width'] = Variable<int>(width);
+    map['height'] = Variable<int>(height);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  PhotosCompanion toCompanion(bool nullToAbsent) {
+    return PhotosCompanion(
+      id: Value(id),
+      childId: Value(childId),
+      fileName: Value(fileName),
+      width: Value(width),
+      height: Value(height),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Photo.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Photo(
+      id: serializer.fromJson<String>(json['id']),
+      childId: serializer.fromJson<String>(json['childId']),
+      fileName: serializer.fromJson<String>(json['fileName']),
+      width: serializer.fromJson<int>(json['width']),
+      height: serializer.fromJson<int>(json['height']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'childId': serializer.toJson<String>(childId),
+      'fileName': serializer.toJson<String>(fileName),
+      'width': serializer.toJson<int>(width),
+      'height': serializer.toJson<int>(height),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Photo copyWith({
+    String? id,
+    String? childId,
+    String? fileName,
+    int? width,
+    int? height,
+    DateTime? createdAt,
+  }) => Photo(
+    id: id ?? this.id,
+    childId: childId ?? this.childId,
+    fileName: fileName ?? this.fileName,
+    width: width ?? this.width,
+    height: height ?? this.height,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  Photo copyWithCompanion(PhotosCompanion data) {
+    return Photo(
+      id: data.id.present ? data.id.value : this.id,
+      childId: data.childId.present ? data.childId.value : this.childId,
+      fileName: data.fileName.present ? data.fileName.value : this.fileName,
+      width: data.width.present ? data.width.value : this.width,
+      height: data.height.present ? data.height.value : this.height,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Photo(')
+          ..write('id: $id, ')
+          ..write('childId: $childId, ')
+          ..write('fileName: $fileName, ')
+          ..write('width: $width, ')
+          ..write('height: $height, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, childId, fileName, width, height, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Photo &&
+          other.id == this.id &&
+          other.childId == this.childId &&
+          other.fileName == this.fileName &&
+          other.width == this.width &&
+          other.height == this.height &&
+          other.createdAt == this.createdAt);
+}
+
+class PhotosCompanion extends UpdateCompanion<Photo> {
+  final Value<String> id;
+  final Value<String> childId;
+  final Value<String> fileName;
+  final Value<int> width;
+  final Value<int> height;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const PhotosCompanion({
+    this.id = const Value.absent(),
+    this.childId = const Value.absent(),
+    this.fileName = const Value.absent(),
+    this.width = const Value.absent(),
+    this.height = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PhotosCompanion.insert({
+    required String id,
+    required String childId,
+    required String fileName,
+    required int width,
+    required int height,
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       childId = Value(childId),
+       fileName = Value(fileName),
+       width = Value(width),
+       height = Value(height),
+       createdAt = Value(createdAt);
+  static Insertable<Photo> custom({
+    Expression<String>? id,
+    Expression<String>? childId,
+    Expression<String>? fileName,
+    Expression<int>? width,
+    Expression<int>? height,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (childId != null) 'child_id': childId,
+      if (fileName != null) 'file_name': fileName,
+      if (width != null) 'width': width,
+      if (height != null) 'height': height,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PhotosCompanion copyWith({
+    Value<String>? id,
+    Value<String>? childId,
+    Value<String>? fileName,
+    Value<int>? width,
+    Value<int>? height,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return PhotosCompanion(
+      id: id ?? this.id,
+      childId: childId ?? this.childId,
+      fileName: fileName ?? this.fileName,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (childId.present) {
+      map['child_id'] = Variable<String>(childId.value);
+    }
+    if (fileName.present) {
+      map['file_name'] = Variable<String>(fileName.value);
+    }
+    if (width.present) {
+      map['width'] = Variable<int>(width.value);
+    }
+    if (height.present) {
+      map['height'] = Variable<int>(height.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PhotosCompanion(')
+          ..write('id: $id, ')
+          ..write('childId: $childId, ')
+          ..write('fileName: $fileName, ')
+          ..write('width: $width, ')
+          ..write('height: $height, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CustomQuestionsTable extends CustomQuestions
+    with TableInfo<$CustomQuestionsTable, CustomQuestion> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CustomQuestionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _childIdMeta = const VerificationMeta(
+    'childId',
+  );
+  @override
+  late final GeneratedColumn<String> childId = GeneratedColumn<String>(
+    'child_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _strandMeta = const VerificationMeta('strand');
+  @override
+  late final GeneratedColumn<String> strand = GeneratedColumn<String>(
+    'strand',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _rungMeta = const VerificationMeta('rung');
+  @override
+  late final GeneratedColumn<int> rung = GeneratedColumn<int>(
+    'rung',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _gradeMeta = const VerificationMeta('grade');
+  @override
+  late final GeneratedColumn<int> grade = GeneratedColumn<int>(
+    'grade',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(2),
+  );
+  static const VerificationMeta _textViMeta = const VerificationMeta('textVi');
+  @override
+  late final GeneratedColumn<String> textVi = GeneratedColumn<String>(
+    'text_vi',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _textEnMeta = const VerificationMeta('textEn');
+  @override
+  late final GeneratedColumn<String> textEn = GeneratedColumn<String>(
+    'text_en',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _answerMeta = const VerificationMeta('answer');
+  @override
+  late final GeneratedColumn<String> answer = GeneratedColumn<String>(
+    'answer',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _choicesJsonMeta = const VerificationMeta(
+    'choicesJson',
+  );
+  @override
+  late final GeneratedColumn<String> choicesJson = GeneratedColumn<String>(
+    'choices_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _explanationViMeta = const VerificationMeta(
+    'explanationVi',
+  );
+  @override
+  late final GeneratedColumn<String> explanationVi = GeneratedColumn<String>(
+    'explanation_vi',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _activeMeta = const VerificationMeta('active');
+  @override
+  late final GeneratedColumn<bool> active = GeneratedColumn<bool>(
+    'active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    childId,
+    strand,
+    rung,
+    grade,
+    textVi,
+    textEn,
+    answer,
+    choicesJson,
+    explanationVi,
+    active,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'custom_questions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CustomQuestion> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('child_id')) {
+      context.handle(
+        _childIdMeta,
+        childId.isAcceptableOrUnknown(data['child_id']!, _childIdMeta),
+      );
+    }
+    if (data.containsKey('strand')) {
+      context.handle(
+        _strandMeta,
+        strand.isAcceptableOrUnknown(data['strand']!, _strandMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_strandMeta);
+    }
+    if (data.containsKey('rung')) {
+      context.handle(
+        _rungMeta,
+        rung.isAcceptableOrUnknown(data['rung']!, _rungMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_rungMeta);
+    }
+    if (data.containsKey('grade')) {
+      context.handle(
+        _gradeMeta,
+        grade.isAcceptableOrUnknown(data['grade']!, _gradeMeta),
+      );
+    }
+    if (data.containsKey('text_vi')) {
+      context.handle(
+        _textViMeta,
+        textVi.isAcceptableOrUnknown(data['text_vi']!, _textViMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_textViMeta);
+    }
+    if (data.containsKey('text_en')) {
+      context.handle(
+        _textEnMeta,
+        textEn.isAcceptableOrUnknown(data['text_en']!, _textEnMeta),
+      );
+    }
+    if (data.containsKey('answer')) {
+      context.handle(
+        _answerMeta,
+        answer.isAcceptableOrUnknown(data['answer']!, _answerMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_answerMeta);
+    }
+    if (data.containsKey('choices_json')) {
+      context.handle(
+        _choicesJsonMeta,
+        choicesJson.isAcceptableOrUnknown(
+          data['choices_json']!,
+          _choicesJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('explanation_vi')) {
+      context.handle(
+        _explanationViMeta,
+        explanationVi.isAcceptableOrUnknown(
+          data['explanation_vi']!,
+          _explanationViMeta,
+        ),
+      );
+    }
+    if (data.containsKey('active')) {
+      context.handle(
+        _activeMeta,
+        active.isAcceptableOrUnknown(data['active']!, _activeMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CustomQuestion map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CustomQuestion(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      childId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}child_id'],
+      ),
+      strand: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}strand'],
+      )!,
+      rung: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}rung'],
+      )!,
+      grade: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}grade'],
+      )!,
+      textVi: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}text_vi'],
+      )!,
+      textEn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}text_en'],
+      ),
+      answer: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}answer'],
+      )!,
+      choicesJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}choices_json'],
+      ),
+      explanationVi: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}explanation_vi'],
+      )!,
+      active: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}active'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CustomQuestionsTable createAlias(String alias) {
+    return $CustomQuestionsTable(attachedDatabase, alias);
+  }
+}
+
+class CustomQuestion extends DataClass implements Insertable<CustomQuestion> {
+  final String id;
+  final String? childId;
+  final String strand;
+  final int rung;
+  final int grade;
+  final String textVi;
+  final String? textEn;
+  final String answer;
+  final String? choicesJson;
+  final String explanationVi;
+  final bool active;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const CustomQuestion({
+    required this.id,
+    this.childId,
+    required this.strand,
+    required this.rung,
+    required this.grade,
+    required this.textVi,
+    this.textEn,
+    required this.answer,
+    this.choicesJson,
+    required this.explanationVi,
+    required this.active,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || childId != null) {
+      map['child_id'] = Variable<String>(childId);
+    }
+    map['strand'] = Variable<String>(strand);
+    map['rung'] = Variable<int>(rung);
+    map['grade'] = Variable<int>(grade);
+    map['text_vi'] = Variable<String>(textVi);
+    if (!nullToAbsent || textEn != null) {
+      map['text_en'] = Variable<String>(textEn);
+    }
+    map['answer'] = Variable<String>(answer);
+    if (!nullToAbsent || choicesJson != null) {
+      map['choices_json'] = Variable<String>(choicesJson);
+    }
+    map['explanation_vi'] = Variable<String>(explanationVi);
+    map['active'] = Variable<bool>(active);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  CustomQuestionsCompanion toCompanion(bool nullToAbsent) {
+    return CustomQuestionsCompanion(
+      id: Value(id),
+      childId: childId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(childId),
+      strand: Value(strand),
+      rung: Value(rung),
+      grade: Value(grade),
+      textVi: Value(textVi),
+      textEn: textEn == null && nullToAbsent
+          ? const Value.absent()
+          : Value(textEn),
+      answer: Value(answer),
+      choicesJson: choicesJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(choicesJson),
+      explanationVi: Value(explanationVi),
+      active: Value(active),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory CustomQuestion.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CustomQuestion(
+      id: serializer.fromJson<String>(json['id']),
+      childId: serializer.fromJson<String?>(json['childId']),
+      strand: serializer.fromJson<String>(json['strand']),
+      rung: serializer.fromJson<int>(json['rung']),
+      grade: serializer.fromJson<int>(json['grade']),
+      textVi: serializer.fromJson<String>(json['textVi']),
+      textEn: serializer.fromJson<String?>(json['textEn']),
+      answer: serializer.fromJson<String>(json['answer']),
+      choicesJson: serializer.fromJson<String?>(json['choicesJson']),
+      explanationVi: serializer.fromJson<String>(json['explanationVi']),
+      active: serializer.fromJson<bool>(json['active']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'childId': serializer.toJson<String?>(childId),
+      'strand': serializer.toJson<String>(strand),
+      'rung': serializer.toJson<int>(rung),
+      'grade': serializer.toJson<int>(grade),
+      'textVi': serializer.toJson<String>(textVi),
+      'textEn': serializer.toJson<String?>(textEn),
+      'answer': serializer.toJson<String>(answer),
+      'choicesJson': serializer.toJson<String?>(choicesJson),
+      'explanationVi': serializer.toJson<String>(explanationVi),
+      'active': serializer.toJson<bool>(active),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  CustomQuestion copyWith({
+    String? id,
+    Value<String?> childId = const Value.absent(),
+    String? strand,
+    int? rung,
+    int? grade,
+    String? textVi,
+    Value<String?> textEn = const Value.absent(),
+    String? answer,
+    Value<String?> choicesJson = const Value.absent(),
+    String? explanationVi,
+    bool? active,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => CustomQuestion(
+    id: id ?? this.id,
+    childId: childId.present ? childId.value : this.childId,
+    strand: strand ?? this.strand,
+    rung: rung ?? this.rung,
+    grade: grade ?? this.grade,
+    textVi: textVi ?? this.textVi,
+    textEn: textEn.present ? textEn.value : this.textEn,
+    answer: answer ?? this.answer,
+    choicesJson: choicesJson.present ? choicesJson.value : this.choicesJson,
+    explanationVi: explanationVi ?? this.explanationVi,
+    active: active ?? this.active,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  CustomQuestion copyWithCompanion(CustomQuestionsCompanion data) {
+    return CustomQuestion(
+      id: data.id.present ? data.id.value : this.id,
+      childId: data.childId.present ? data.childId.value : this.childId,
+      strand: data.strand.present ? data.strand.value : this.strand,
+      rung: data.rung.present ? data.rung.value : this.rung,
+      grade: data.grade.present ? data.grade.value : this.grade,
+      textVi: data.textVi.present ? data.textVi.value : this.textVi,
+      textEn: data.textEn.present ? data.textEn.value : this.textEn,
+      answer: data.answer.present ? data.answer.value : this.answer,
+      choicesJson: data.choicesJson.present
+          ? data.choicesJson.value
+          : this.choicesJson,
+      explanationVi: data.explanationVi.present
+          ? data.explanationVi.value
+          : this.explanationVi,
+      active: data.active.present ? data.active.value : this.active,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustomQuestion(')
+          ..write('id: $id, ')
+          ..write('childId: $childId, ')
+          ..write('strand: $strand, ')
+          ..write('rung: $rung, ')
+          ..write('grade: $grade, ')
+          ..write('textVi: $textVi, ')
+          ..write('textEn: $textEn, ')
+          ..write('answer: $answer, ')
+          ..write('choicesJson: $choicesJson, ')
+          ..write('explanationVi: $explanationVi, ')
+          ..write('active: $active, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    childId,
+    strand,
+    rung,
+    grade,
+    textVi,
+    textEn,
+    answer,
+    choicesJson,
+    explanationVi,
+    active,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CustomQuestion &&
+          other.id == this.id &&
+          other.childId == this.childId &&
+          other.strand == this.strand &&
+          other.rung == this.rung &&
+          other.grade == this.grade &&
+          other.textVi == this.textVi &&
+          other.textEn == this.textEn &&
+          other.answer == this.answer &&
+          other.choicesJson == this.choicesJson &&
+          other.explanationVi == this.explanationVi &&
+          other.active == this.active &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class CustomQuestionsCompanion extends UpdateCompanion<CustomQuestion> {
+  final Value<String> id;
+  final Value<String?> childId;
+  final Value<String> strand;
+  final Value<int> rung;
+  final Value<int> grade;
+  final Value<String> textVi;
+  final Value<String?> textEn;
+  final Value<String> answer;
+  final Value<String?> choicesJson;
+  final Value<String> explanationVi;
+  final Value<bool> active;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const CustomQuestionsCompanion({
+    this.id = const Value.absent(),
+    this.childId = const Value.absent(),
+    this.strand = const Value.absent(),
+    this.rung = const Value.absent(),
+    this.grade = const Value.absent(),
+    this.textVi = const Value.absent(),
+    this.textEn = const Value.absent(),
+    this.answer = const Value.absent(),
+    this.choicesJson = const Value.absent(),
+    this.explanationVi = const Value.absent(),
+    this.active = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CustomQuestionsCompanion.insert({
+    required String id,
+    this.childId = const Value.absent(),
+    required String strand,
+    required int rung,
+    this.grade = const Value.absent(),
+    required String textVi,
+    this.textEn = const Value.absent(),
+    required String answer,
+    this.choicesJson = const Value.absent(),
+    this.explanationVi = const Value.absent(),
+    this.active = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       strand = Value(strand),
+       rung = Value(rung),
+       textVi = Value(textVi),
+       answer = Value(answer),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<CustomQuestion> custom({
+    Expression<String>? id,
+    Expression<String>? childId,
+    Expression<String>? strand,
+    Expression<int>? rung,
+    Expression<int>? grade,
+    Expression<String>? textVi,
+    Expression<String>? textEn,
+    Expression<String>? answer,
+    Expression<String>? choicesJson,
+    Expression<String>? explanationVi,
+    Expression<bool>? active,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (childId != null) 'child_id': childId,
+      if (strand != null) 'strand': strand,
+      if (rung != null) 'rung': rung,
+      if (grade != null) 'grade': grade,
+      if (textVi != null) 'text_vi': textVi,
+      if (textEn != null) 'text_en': textEn,
+      if (answer != null) 'answer': answer,
+      if (choicesJson != null) 'choices_json': choicesJson,
+      if (explanationVi != null) 'explanation_vi': explanationVi,
+      if (active != null) 'active': active,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CustomQuestionsCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? childId,
+    Value<String>? strand,
+    Value<int>? rung,
+    Value<int>? grade,
+    Value<String>? textVi,
+    Value<String?>? textEn,
+    Value<String>? answer,
+    Value<String?>? choicesJson,
+    Value<String>? explanationVi,
+    Value<bool>? active,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return CustomQuestionsCompanion(
+      id: id ?? this.id,
+      childId: childId ?? this.childId,
+      strand: strand ?? this.strand,
+      rung: rung ?? this.rung,
+      grade: grade ?? this.grade,
+      textVi: textVi ?? this.textVi,
+      textEn: textEn ?? this.textEn,
+      answer: answer ?? this.answer,
+      choicesJson: choicesJson ?? this.choicesJson,
+      explanationVi: explanationVi ?? this.explanationVi,
+      active: active ?? this.active,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (childId.present) {
+      map['child_id'] = Variable<String>(childId.value);
+    }
+    if (strand.present) {
+      map['strand'] = Variable<String>(strand.value);
+    }
+    if (rung.present) {
+      map['rung'] = Variable<int>(rung.value);
+    }
+    if (grade.present) {
+      map['grade'] = Variable<int>(grade.value);
+    }
+    if (textVi.present) {
+      map['text_vi'] = Variable<String>(textVi.value);
+    }
+    if (textEn.present) {
+      map['text_en'] = Variable<String>(textEn.value);
+    }
+    if (answer.present) {
+      map['answer'] = Variable<String>(answer.value);
+    }
+    if (choicesJson.present) {
+      map['choices_json'] = Variable<String>(choicesJson.value);
+    }
+    if (explanationVi.present) {
+      map['explanation_vi'] = Variable<String>(explanationVi.value);
+    }
+    if (active.present) {
+      map['active'] = Variable<bool>(active.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustomQuestionsCompanion(')
+          ..write('id: $id, ')
+          ..write('childId: $childId, ')
+          ..write('strand: $strand, ')
+          ..write('rung: $rung, ')
+          ..write('grade: $grade, ')
+          ..write('textVi: $textVi, ')
+          ..write('textEn: $textEn, ')
+          ..write('answer: $answer, ')
+          ..write('choicesJson: $choicesJson, ')
+          ..write('explanationVi: $explanationVi, ')
+          ..write('active: $active, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -7370,6 +8523,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PetsTable pets = $PetsTable(this);
   late final $MessagesTable messages = $MessagesTable(this);
   late final $ReviewTombstonesTable reviewTombstones = $ReviewTombstonesTable(
+    this,
+  );
+  late final $PhotosTable photos = $PhotosTable(this);
+  late final $CustomQuestionsTable customQuestions = $CustomQuestionsTable(
     this,
   );
   late final ChildrenDao childrenDao = ChildrenDao(this as AppDatabase);
@@ -7388,6 +8545,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this as AppDatabase,
   );
   late final PetsDao petsDao = PetsDao(this as AppDatabase);
+  late final PhotosDao photosDao = PhotosDao(this as AppDatabase);
+  late final CustomQuestionsDao customQuestionsDao = CustomQuestionsDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7405,6 +8566,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     pets,
     messages,
     reviewTombstones,
+    photos,
+    customQuestions,
   ];
 }
 
@@ -11029,6 +12192,597 @@ typedef $$ReviewTombstonesTableProcessedTableManager =
       ReviewTombstone,
       PrefetchHooks Function()
     >;
+typedef $$PhotosTableCreateCompanionBuilder = PhotosCompanion Function({
+  required String id,
+  required String childId,
+  required String fileName,
+  required int width,
+  required int height,
+  required DateTime createdAt,
+  Value<int> rowid,
+});
+typedef $$PhotosTableUpdateCompanionBuilder = PhotosCompanion Function({
+  Value<String> id,
+  Value<String> childId,
+  Value<String> fileName,
+  Value<int> width,
+  Value<int> height,
+  Value<DateTime> createdAt,
+  Value<int> rowid,
+});
+
+class $$PhotosTableFilterComposer
+    extends Composer<_$AppDatabase, $PhotosTable> {
+  $$PhotosTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get childId => $composableBuilder(
+    column: $table.childId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fileName => $composableBuilder(
+    column: $table.fileName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get width => $composableBuilder(
+    column: $table.width,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get height => $composableBuilder(
+    column: $table.height,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PhotosTableOrderingComposer
+    extends Composer<_$AppDatabase, $PhotosTable> {
+  $$PhotosTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get childId => $composableBuilder(
+    column: $table.childId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fileName => $composableBuilder(
+    column: $table.fileName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get width => $composableBuilder(
+    column: $table.width,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get height => $composableBuilder(
+    column: $table.height,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PhotosTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PhotosTable> {
+  $$PhotosTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get childId =>
+      $composableBuilder(column: $table.childId, builder: (column) => column);
+
+  GeneratedColumn<String> get fileName =>
+      $composableBuilder(column: $table.fileName, builder: (column) => column);
+
+  GeneratedColumn<int> get width =>
+      $composableBuilder(column: $table.width, builder: (column) => column);
+
+  GeneratedColumn<int> get height =>
+      $composableBuilder(column: $table.height, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$PhotosTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PhotosTable,
+          Photo,
+          $$PhotosTableFilterComposer,
+          $$PhotosTableOrderingComposer,
+          $$PhotosTableAnnotationComposer,
+          $$PhotosTableCreateCompanionBuilder,
+          $$PhotosTableUpdateCompanionBuilder,
+          (Photo, BaseReferences<_$AppDatabase, $PhotosTable, Photo>),
+          Photo,
+          PrefetchHooks Function()
+        > {
+  $$PhotosTableTableManager(_$AppDatabase db, $PhotosTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PhotosTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PhotosTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PhotosTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> childId = const Value.absent(),
+                Value<String> fileName = const Value.absent(),
+                Value<int> width = const Value.absent(),
+                Value<int> height = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PhotosCompanion(
+                id: id,
+                childId: childId,
+                fileName: fileName,
+                width: width,
+                height: height,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String childId,
+                required String fileName,
+                required int width,
+                required int height,
+                required DateTime createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PhotosCompanion.insert(
+                id: id,
+                childId: childId,
+                fileName: fileName,
+                width: width,
+                height: height,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PhotosTable, Photo>(table),
+                  BaseReferences<_$AppDatabase, $PhotosTable, Photo>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PhotosTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PhotosTable,
+      Photo,
+      $$PhotosTableFilterComposer,
+      $$PhotosTableOrderingComposer,
+      $$PhotosTableAnnotationComposer,
+      $$PhotosTableCreateCompanionBuilder,
+      $$PhotosTableUpdateCompanionBuilder,
+      (Photo, BaseReferences<_$AppDatabase, $PhotosTable, Photo>),
+      Photo,
+      PrefetchHooks Function()
+    >;
+typedef $$CustomQuestionsTableCreateCompanionBuilder =
+    CustomQuestionsCompanion Function({
+      required String id,
+      Value<String?> childId,
+      required String strand,
+      required int rung,
+      Value<int> grade,
+      required String textVi,
+      Value<String?> textEn,
+      required String answer,
+      Value<String?> choicesJson,
+      Value<String> explanationVi,
+      Value<bool> active,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$CustomQuestionsTableUpdateCompanionBuilder =
+    CustomQuestionsCompanion Function({
+      Value<String> id,
+      Value<String?> childId,
+      Value<String> strand,
+      Value<int> rung,
+      Value<int> grade,
+      Value<String> textVi,
+      Value<String?> textEn,
+      Value<String> answer,
+      Value<String?> choicesJson,
+      Value<String> explanationVi,
+      Value<bool> active,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$CustomQuestionsTableFilterComposer
+    extends Composer<_$AppDatabase, $CustomQuestionsTable> {
+  $$CustomQuestionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get childId => $composableBuilder(
+    column: $table.childId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get strand => $composableBuilder(
+    column: $table.strand,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get rung => $composableBuilder(
+    column: $table.rung,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get grade => $composableBuilder(
+    column: $table.grade,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get textVi => $composableBuilder(
+    column: $table.textVi,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get textEn => $composableBuilder(
+    column: $table.textEn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get answer => $composableBuilder(
+    column: $table.answer,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get choicesJson => $composableBuilder(
+    column: $table.choicesJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get explanationVi => $composableBuilder(
+    column: $table.explanationVi,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get active => $composableBuilder(
+    column: $table.active,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CustomQuestionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CustomQuestionsTable> {
+  $$CustomQuestionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get childId => $composableBuilder(
+    column: $table.childId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get strand => $composableBuilder(
+    column: $table.strand,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get rung => $composableBuilder(
+    column: $table.rung,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get grade => $composableBuilder(
+    column: $table.grade,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get textVi => $composableBuilder(
+    column: $table.textVi,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get textEn => $composableBuilder(
+    column: $table.textEn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get answer => $composableBuilder(
+    column: $table.answer,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get choicesJson => $composableBuilder(
+    column: $table.choicesJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get explanationVi => $composableBuilder(
+    column: $table.explanationVi,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get active => $composableBuilder(
+    column: $table.active,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CustomQuestionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CustomQuestionsTable> {
+  $$CustomQuestionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get childId =>
+      $composableBuilder(column: $table.childId, builder: (column) => column);
+
+  GeneratedColumn<String> get strand =>
+      $composableBuilder(column: $table.strand, builder: (column) => column);
+
+  GeneratedColumn<int> get rung =>
+      $composableBuilder(column: $table.rung, builder: (column) => column);
+
+  GeneratedColumn<int> get grade =>
+      $composableBuilder(column: $table.grade, builder: (column) => column);
+
+  GeneratedColumn<String> get textVi =>
+      $composableBuilder(column: $table.textVi, builder: (column) => column);
+
+  GeneratedColumn<String> get textEn =>
+      $composableBuilder(column: $table.textEn, builder: (column) => column);
+
+  GeneratedColumn<String> get answer =>
+      $composableBuilder(column: $table.answer, builder: (column) => column);
+
+  GeneratedColumn<String> get choicesJson => $composableBuilder(
+    column: $table.choicesJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get explanationVi => $composableBuilder(
+    column: $table.explanationVi,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get active =>
+      $composableBuilder(column: $table.active, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$CustomQuestionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CustomQuestionsTable,
+          CustomQuestion,
+          $$CustomQuestionsTableFilterComposer,
+          $$CustomQuestionsTableOrderingComposer,
+          $$CustomQuestionsTableAnnotationComposer,
+          $$CustomQuestionsTableCreateCompanionBuilder,
+          $$CustomQuestionsTableUpdateCompanionBuilder,
+          (
+            CustomQuestion,
+            BaseReferences<
+              _$AppDatabase,
+              $CustomQuestionsTable,
+              CustomQuestion
+            >,
+          ),
+          CustomQuestion,
+          PrefetchHooks Function()
+        > {
+  $$CustomQuestionsTableTableManager(
+    _$AppDatabase db,
+    $CustomQuestionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CustomQuestionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CustomQuestionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CustomQuestionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> childId = const Value.absent(),
+                Value<String> strand = const Value.absent(),
+                Value<int> rung = const Value.absent(),
+                Value<int> grade = const Value.absent(),
+                Value<String> textVi = const Value.absent(),
+                Value<String?> textEn = const Value.absent(),
+                Value<String> answer = const Value.absent(),
+                Value<String?> choicesJson = const Value.absent(),
+                Value<String> explanationVi = const Value.absent(),
+                Value<bool> active = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CustomQuestionsCompanion(
+                id: id,
+                childId: childId,
+                strand: strand,
+                rung: rung,
+                grade: grade,
+                textVi: textVi,
+                textEn: textEn,
+                answer: answer,
+                choicesJson: choicesJson,
+                explanationVi: explanationVi,
+                active: active,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> childId = const Value.absent(),
+                required String strand,
+                required int rung,
+                Value<int> grade = const Value.absent(),
+                required String textVi,
+                Value<String?> textEn = const Value.absent(),
+                required String answer,
+                Value<String?> choicesJson = const Value.absent(),
+                Value<String> explanationVi = const Value.absent(),
+                Value<bool> active = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CustomQuestionsCompanion.insert(
+                id: id,
+                childId: childId,
+                strand: strand,
+                rung: rung,
+                grade: grade,
+                textVi: textVi,
+                textEn: textEn,
+                answer: answer,
+                choicesJson: choicesJson,
+                explanationVi: explanationVi,
+                active: active,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CustomQuestionsTable, CustomQuestion>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $CustomQuestionsTable,
+                    CustomQuestion
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CustomQuestionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CustomQuestionsTable,
+      CustomQuestion,
+      $$CustomQuestionsTableFilterComposer,
+      $$CustomQuestionsTableOrderingComposer,
+      $$CustomQuestionsTableAnnotationComposer,
+      $$CustomQuestionsTableCreateCompanionBuilder,
+      $$CustomQuestionsTableUpdateCompanionBuilder,
+      (
+        CustomQuestion,
+        BaseReferences<_$AppDatabase, $CustomQuestionsTable, CustomQuestion>,
+      ),
+      CustomQuestion,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -11056,4 +12810,8 @@ class $AppDatabaseManager {
       $$MessagesTableTableManager(_db, _db.messages);
   $$ReviewTombstonesTableTableManager get reviewTombstones =>
       $$ReviewTombstonesTableTableManager(_db, _db.reviewTombstones);
+  $$PhotosTableTableManager get photos =>
+      $$PhotosTableTableManager(_db, _db.photos);
+  $$CustomQuestionsTableTableManager get customQuestions =>
+      $$CustomQuestionsTableTableManager(_db, _db.customQuestions);
 }

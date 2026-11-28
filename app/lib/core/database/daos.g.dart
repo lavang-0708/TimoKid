@@ -122,3 +122,30 @@ class PetsDaoManager {
   $$PetsTableTableManager get pets =>
       $$PetsTableTableManager(_db.attachedDatabase, _db.pets);
 }
+
+mixin _$PhotosDaoMixin on DatabaseAccessor<AppDatabase> {
+  $PhotosTable get photos => attachedDatabase.photos;
+  PhotosDaoManager get managers => PhotosDaoManager(this);
+}
+
+class PhotosDaoManager {
+  final _$PhotosDaoMixin _db;
+  PhotosDaoManager(this._db);
+  $$PhotosTableTableManager get photos =>
+      $$PhotosTableTableManager(_db.attachedDatabase, _db.photos);
+}
+
+mixin _$CustomQuestionsDaoMixin on DatabaseAccessor<AppDatabase> {
+  $CustomQuestionsTable get customQuestions => attachedDatabase.customQuestions;
+  CustomQuestionsDaoManager get managers => CustomQuestionsDaoManager(this);
+}
+
+class CustomQuestionsDaoManager {
+  final _$CustomQuestionsDaoMixin _db;
+  CustomQuestionsDaoManager(this._db);
+  $$CustomQuestionsTableTableManager get customQuestions =>
+      $$CustomQuestionsTableTableManager(
+        _db.attachedDatabase,
+        _db.customQuestions,
+      );
+}

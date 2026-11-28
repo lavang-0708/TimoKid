@@ -80,7 +80,10 @@ enum ShopCategory {
   accessories('accessories', 'Phụ kiện'),
   pet('pet', 'Đồ cho pet'),
   pets('pets', 'Pet'),
-  furniture('furniture', 'Nội thất');
+  furniture('furniture', 'Nội thất'),
+
+  /// Chỉ hiện trong mùa (T5-02): gom món thuộc mùa đang diễn ra.
+  seasonal('seasonal', 'Bộ sưu tập mùa');
 
   const ShopCategory(this.key, this.label);
 
@@ -127,7 +130,43 @@ class ShopItem {
     this.placeableId,
     this.assetCrop,
     this.assetAspect,
+    this.seasonId,
+    this.listPrice,
   });
+
+  /// Mã mùa đang gắn nhãn cho món (T5-02): có thì thẻ hiện ruy băng mùa.
+  /// Chỉ đặt bởi `SeasonShop.decorate` khi món thuộc mùa đang diễn ra.
+  final String? seasonId;
+
+  /// Giá gốc (cùng loại tiền với [price]) khi món đang giảm giá mùa; null
+  /// nếu không giảm.
+  final int? listPrice;
+
+  /// Bản sao của món với giá và nhãn mùa (dùng cho giảm giá mùa).
+  ShopItem withSeason({
+    required String seasonId,
+    required int priceXu,
+    required int priceGems,
+    required int? listPrice,
+  }) => ShopItem(
+    id: id,
+    category: category,
+    kind: kind,
+    name: name,
+    priceXu: priceXu,
+    priceGems: priceGems,
+    outfit: outfit,
+    accessory: accessory,
+    asset: asset,
+    species: species,
+    rarity: rarity,
+    roomThemeId: roomThemeId,
+    placeableId: placeableId,
+    assetCrop: assetCrop,
+    assetAspect: assetAspect,
+    seasonId: seasonId,
+    listPrice: listPrice,
+  );
 
   /// Phần ảnh [asset] được hiện (tỉ lệ 0..1) khi ảnh có viền trong suốt rộng
   /// (món nội thất lớn lô 15); null = cả ảnh.

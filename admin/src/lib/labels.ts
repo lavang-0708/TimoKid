@@ -18,7 +18,7 @@ export const STRAND_COLORS: Record<Strand, string> = {
 };
 
 // Tên dạng bài tiếng Việt. Mã không có trong bảng thì hiện nguyên mã.
-// labels.test.ts đối chiếu bảng này với mã nguồn Dart của app (84 dạng).
+// labels.test.ts đối chiếu bảng này với mã nguồn Dart của app (90 dạng).
 export const FORM_LABELS: Record<string, string> = {
   'logic.age': 'Tuổi',
   'logic.backward': 'Tính ngược',
@@ -38,6 +38,7 @@ export const FORM_LABELS: Record<string, string> = {
   'logic.laps': 'Chạy vòng và nghỉ',
   'logic.clock': 'Xem giờ đồng hồ',
   'logic.calendar': 'Ngày tháng trên lịch',
+  'logic.table': 'Bảng quy luật',
   'arith.blank': 'Điền số vào chỗ trống',
   'arith.money': 'Tiền và đổi tiền',
   'arith.multiply': 'Bảng nhân',
@@ -53,6 +54,7 @@ export const FORM_LABELS: Record<string, string> = {
   'arith.arrowchain': 'Chuỗi mũi tên',
   'arith.flowerx': 'Phép tính bông hoa',
   'arith.factorout': 'Đặt thừa số chung',
+  'arith.pairsum': 'Ghép cặp',
   'number.cards': 'Ghép thẻ số',
   'number.clues': 'Đoán số theo gợi ý',
   'number.digitcount': 'Đếm số chữ số',
@@ -70,6 +72,7 @@ export const FORM_LABELS: Record<string, string> = {
   'number.giveequal': 'Cho đi để bằng nhau',
   'number.kth': 'Số thứ k',
   'number.pages': 'Đánh số trang',
+  'number.multiples': 'Số chia hết',
   'geo.countrect': 'Đếm hình chữ nhật',
   'geo.countsq': 'Đếm hình vuông',
   'geo.counttri': 'Đếm hình tam giác',
@@ -87,6 +90,8 @@ export const FORM_LABELS: Record<string, string> = {
   'geo.cutsquares': 'Cắt hình vuông từ giấy',
   'geo.cubefaces': 'Đếm mặt khối lập phương',
   'geo.perimchange': 'Chu vi thay đổi',
+  'geo.pyramid': 'Hình chóp',
+  'geo.prism': 'Hình lăng trụ',
   'comb.arrange': 'Xếp chỗ',
   'comb.choose2': 'Chọn 2 trong nhóm',
   'comb.coins': 'Ghép đồng xu',
@@ -104,6 +109,7 @@ export const FORM_LABELS: Record<string, string> = {
   'comb.minsum2': 'Tổng nhỏ nhất của hai số',
   'comb.vases': 'Cắm hoa vào lọ',
   'comb.dice': 'Gieo hai xúc xắc',
+  'comb.flag': 'Tô màu cờ',
 };
 
 export function formLabel(formId: string): string {

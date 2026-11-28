@@ -16,6 +16,7 @@ class DailySetQuestion {
     required this.answerType,
     this.isReview = false,
     this.seed,
+    this.custom,
   });
 
   /// Dạng bài, vd: `logic.balance`.
@@ -39,6 +40,14 @@ class DailySetQuestion {
   /// Seed sinh câu, để tái hiện đúng câu hỏi.
   final int? seed;
 
+  /// Nội dung câu tự soạn (T5-03), chụp lại lúc tạo đề để đề ngày tự đủ
+  /// (sửa hay tắt câu sau đó không làm đổi đề đã tạo). Có thì [formId] là
+  /// `custom:<id>` và câu KHÔNG sinh từ generator.
+  final CustomQuestionSnapshot? custom;
+
+  /// Câu tự soạn hay không.
+  bool get isCustom => custom != null;
+
   Map<String, Object?> toJson() => {
     'formId': formId,
     'strand': strand,
@@ -47,6 +56,7 @@ class DailySetQuestion {
     'answerType': answerType,
     'isReview': isReview,
     if (seed != null) 'seed': seed,
+    if (custom != null) 'custom': custom!.toJson(),
   };
 
   factory DailySetQuestion.fromJson(Map<String, Object?> json) {
@@ -58,6 +68,55 @@ class DailySetQuestion {
       answerType: json['answerType'] as String,
       isReview: json['isReview'] as bool? ?? false,
       seed: json['seed'] as int?,
+      custom: json['custom'] == null
+          ? null
+          : CustomQuestionSnapshot.fromJson(
+              (json['custom'] as Map).cast<String, Object?>(),
+            ),
+    );
+  }
+}
+
+/// Mã `formId` của câu tự soạn: `custom:<id>`.
+String customFormId(String id) => 'custom:$id';
+
+/// Nội dung một câu tự soạn trong đề ngày. [choices] null = câu điền số
+/// ([answer] là số nguyên); có = trắc nghiệm ([answer] là một trong
+/// [choices]).
+class CustomQuestionSnapshot {
+  const CustomQuestionSnapshot({
+    required this.id,
+    required this.textVi,
+    required this.answer,
+    this.textEn,
+    this.choices,
+    this.explanationVi = '',
+  });
+
+  final String id;
+  final String textVi;
+  final String? textEn;
+  final String answer;
+  final List<String>? choices;
+  final String explanationVi;
+
+  Map<String, Object?> toJson() => {
+    'id': id,
+    'textVi': textVi,
+    if (textEn != null) 'textEn': textEn,
+    'answer': answer,
+    if (choices != null) 'choices': choices,
+    if (explanationVi.isNotEmpty) 'explanationVi': explanationVi,
+  };
+
+  factory CustomQuestionSnapshot.fromJson(Map<String, Object?> json) {
+    return CustomQuestionSnapshot(
+      id: json['id'] as String,
+      textVi: json['textVi'] as String,
+      textEn: json['textEn'] as String?,
+      answer: json['answer'] as String,
+      choices: (json['choices'] as List?)?.cast<String>(),
+      explanationVi: json['explanationVi'] as String? ?? '',
     );
   }
 }

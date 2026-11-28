@@ -5,15 +5,17 @@ import { ensureFamily, listChildren, type Child } from './lib/data';
 import type { AuthUser } from './lib/http';
 import { AuthScreen } from './screens/AuthScreen';
 import { ChildPicker, SyncLine } from './screens/ChildPicker';
+import { CustomQuestionsScreen } from './screens/CustomQuestionsScreen';
 import { FormsScreen } from './screens/FormsScreen';
 import { MessagesScreen } from './screens/MessagesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { StatsScreen } from './screens/StatsScreen';
 
-type Tab = 'stats' | 'forms' | 'mail' | 'settings';
+type Tab = 'stats' | 'forms' | 'custom' | 'mail' | 'settings';
 const TABS: { id: Tab; label: string }[] = [
   { id: 'stats', label: 'Thống kê' },
   { id: 'forms', label: 'Dạng bài' },
+  { id: 'custom', label: 'Đề tự soạn' },
   { id: 'mail', label: 'Thư và quà' },
   { id: 'settings', label: 'Cài đặt' },
 ];
@@ -102,6 +104,7 @@ function Signed({ user, wakingBanner, onSignOut }: { user: AuthUser; wakingBanne
           </div>
           {tab === 'stats' && <StatsScreen childId={child.id} />}
           {tab === 'forms' && <FormsScreen childId={child.id} />}
+          {tab === 'custom' && <CustomQuestionsScreen kids={kids ?? []} />}
           {tab === 'mail' && <MessagesScreen childId={child.id} childName={child.name} />}
           {tab === 'settings' && <SettingsScreen child={child} />}
           <nav className="tabs">

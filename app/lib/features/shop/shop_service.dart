@@ -26,6 +26,7 @@ import '../pet/pet_config.dart';
 import '../pet/pet_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
+import '../seasons/season_service.dart';
 import 'shop_catalog.dart';
 
 /// Kết quả một lần mua.
@@ -148,14 +149,17 @@ class ShopService {
     required String gender,
     required String itemId,
   }) async {
-    final item = shopItemById(
+    final listed = shopItemById(
       gender,
       itemId,
       furnitureReady: furnitureReady,
       premiumOutfitsReady: premiumOutfitsReady,
       roomThemesReady: roomThemesReady,
     );
-    if (item == null) return BuyResult.unknownItem;
+    if (listed == null) return BuyResult.unknownItem;
+    // Giảm giá mùa (T5-02): món thuộc mùa đang diễn ra tính giá đã giảm,
+    // đúng giá thẻ hiện trong Cửa hàng; ngoài mùa là giá thường.
+    final item = SeasonService.decorate(listed, SeasonService.active(db.clock));
     return db.transaction(() async {
       if (!item.consumable && await db.inventoryDao.has(childId, itemId)) {
         return BuyResult.alreadyOwned;

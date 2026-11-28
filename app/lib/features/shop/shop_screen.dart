@@ -41,6 +41,9 @@ import '../room/cropped_asset_image.dart';
 import '../room/room_screen.dart';
 import '../room/room_themes.dart';
 import '../room/room_variants.dart';
+import '../seasons/season_config.dart';
+import '../seasons/season_service.dart';
+import '../seasons/season_widgets.dart';
 import 'shop_catalog.dart';
 import 'shop_service.dart';
 
@@ -106,9 +109,20 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       tab = GoRouterState.of(context).uri.queryParameters['tab'];
     } catch (_) {}
     for (final c in ShopCategory.values) {
-      if (c.key == tab) _category = c;
+      if (c.key == tab && (c != ShopCategory.seasonal || _season != null)) {
+        _category = c;
+      }
     }
   }
+
+  /// Mùa đang diễn ra (T5-02), tính lại mỗi lần vẽ; null ngoài mùa.
+  SeasonDef? get _season =>
+      SeasonService.active(ref.read(databaseProvider).clock);
+
+  List<ShopCategory> get _categories => [
+    for (final c in ShopCategory.values)
+      if (c != ShopCategory.seasonal || _season != null) c,
+  ];
 
   @override
   void dispose() {
@@ -253,15 +267,22 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
         body: Center(child: Text('Không tải được Cửa hàng: $_error')),
       );
     }
+    final season = _season;
+    if (_category == ShopCategory.seasonal && season == null) {
+      _category = ShopCategory.outfits;
+    }
+    List<ShopItem> allItems() => shopItemsFor(
+      _gender,
+      furnitureReady: widget.furnitureReady,
+      premiumOutfitsReady: widget.premiumOutfitsReady,
+      roomThemesReady: widget.roomThemesReady,
+    );
     final items = _category == ShopCategory.pets
         ? shopPetEggItems()
+        : _category == ShopCategory.seasonal
+        ? SeasonService.itemsOf(allItems(), season!)
         : [
-            for (final i in shopItemsFor(
-              _gender,
-              furnitureReady: widget.furnitureReady,
-              premiumOutfitsReady: widget.premiumOutfitsReady,
-              roomThemesReady: widget.roomThemesReady,
-            ))
+            for (final i in SeasonService.decorateAll(allItems(), season))
               if (i.category == _category) i,
           ];
     return Scaffold(
@@ -342,14 +363,14 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                for (final c in ShopCategory.values) ...[
+                for (final c in _categories) ...[
                   _TabPill(
                     key: Key('shop-tab-${c.key}'),
                     category: c,
                     selected: c == _category,
                     onTap: () => setState(() => _category = c),
                   ),
-                  if (c != ShopCategory.values.last) const SizedBox(width: 8),
+                  if (c != _categories.last) const SizedBox(width: 8),
                 ],
               ],
             ),
@@ -406,6 +427,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
 
   Widget _grid(List<ShopItem> items) {
     final soon = _category == ShopCategory.furniture && !widget.furnitureReady;
+    final seasonEmpty = _category == ShopCategory.seasonal && items.isEmpty;
     return Container(
       decoration: BoxDecoration(
         color: const Color(0x99FFFFFF),
@@ -414,7 +436,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: soon
+        child: seasonEmpty
+            ? const SeasonEmptyCard()
+            : soon
             ? _comingSoon()
             : SingleChildScrollView(
                 key: const Key('shop-grid'),
@@ -490,6 +514,11 @@ class _TabPill extends StatelessWidget {
       ),
       ShopCategory.furniture => Icon(
         Icons.weekend_rounded,
+        size: 26,
+        color: iconColor,
+      ),
+      ShopCategory.seasonal => Icon(
+        Icons.celebration_rounded,
         size: 26,
         color: iconColor,
       ),
@@ -677,7 +706,7 @@ class _Price extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final row = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Image.asset(
@@ -686,16 +715,35 @@ class _Price extends StatelessWidget {
           height: size + 6,
         ),
         const SizedBox(width: 3),
+        if (item.listPrice != null) ...[
+          Text(
+            '${item.listPrice}',
+            key: Key('shop-list-price-${item.id}'),
+            style: TextStyle(
+              fontSize: size - 4,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF8A8296),
+              decoration: TextDecoration.lineThrough,
+            ),
+          ),
+          const SizedBox(width: 3),
+        ],
         Text(
           '${item.price}',
+          key: Key('shop-price-${item.id}'),
           style: TextStyle(
             fontSize: size,
             fontWeight: FontWeight.w900,
-            color: gameInk,
+            color: item.listPrice != null ? const Color(0xFFD32F2F) : gameInk,
           ),
         ),
       ],
     );
+    // Giá giảm dài hơn (giá gạch + giá mới): co lại cho vừa thẻ; giá
+    // thường giữ nguyên bố cục cũ (golden).
+    return item.listPrice == null
+        ? row
+        : FittedBox(fit: BoxFit.scaleDown, child: row);
   }
 }
 
@@ -901,6 +949,15 @@ class _ItemCard extends StatelessWidget {
                               rarity: item.rarity!,
                               compact: true,
                               tilted: true,
+                            ),
+                          ),
+                        if (item.seasonId != null)
+                          Positioned(
+                            right: -10,
+                            top: -12,
+                            child: SeasonRibbon(
+                              key: Key('shop-season-ribbon-${item.id}'),
+                              seasonId: item.seasonId!,
                             ),
                           ),
                         if (count != null)

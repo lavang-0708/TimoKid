@@ -42,6 +42,9 @@ dependencies:
   audioplayers: ^6.0.0
   http: ^1.6.0
   flutter_secure_storage: ^11.2.0
+  # Album ảnh (T5-05): thư mục tài liệu của app. Đã nằm trong pubspec.lock
+  # (drift_flutter kéo theo), chỉ nâng lên phụ thuộc trực tiếp.
+  path_provider: ^2.1.6
 
 dev_dependencies:
   flutter_test:

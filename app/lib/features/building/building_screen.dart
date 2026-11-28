@@ -84,6 +84,7 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
   DailySetService _dailySetService(AppDatabase db) => DailySetService(
     dailySetsDao: db.dailySetsDao,
     reviewQueueDao: db.reviewQueueDao,
+    customQuestionsDao: db.customQuestionsDao,
     ladderService: LadderService(
       attemptsDao: db.attemptsDao,
       skillProgressDao: db.skillProgressDao,

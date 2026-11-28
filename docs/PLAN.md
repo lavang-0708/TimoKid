@@ -301,10 +301,10 @@ Hai bản này mới ghi ở mức nhiệm vụ. Claude sẽ viết tiêu chí n
 | Mã | Nhiệm vụ |
 | --- | --- |
 | T5-01 | Gói nội dung: app tải danh mục và hình mới từ Cloudflare Pages, không cần cài lại app |
-| T5-02 | Bộ sưu tập theo mùa có ngày bắt đầu, kết thúc (Tết, Trung thu, Giáng sinh) |
-| T5-03 | Nạp đề từ web admin bằng file CSV hoặc nhập từng câu, gắn mảng, bậc và lớp |
+| T5-02 | Bộ sưu tập theo mùa có ngày bắt đầu, kết thúc (Tết, Trung thu, Giáng sinh) (Xong trên nhánh `feature/v05-content`, chờ review; cấu hình một chỗ `app/lib/features/seasons/season_config.dart`; Trung thu và Giáng sinh chưa có hình riêng) |
+| T5-03 | Nạp đề từ web admin bằng file CSV hoặc nhập từng câu, gắn mảng, bậc và lớp (Xong trên nhánh `feature/v05-content`, chờ review; app tắt sau cờ `customQuestionsEnabled = false` cho tới khi chủ dự án chạy `db/migrations/0003_custom_questions.sql`) |
 | T5-04 | Thi thử 25 câu bấm giờ: 60 phút trắc nghiệm kiểu vòng loại hoặc 90 phút điền số kiểu vòng quốc gia |
-| T5-05 | Chụp ảnh nhân vật, lưu vào album trong app |
+| T5-05 | Chụp ảnh nhân vật, lưu vào album trong app (Xong trên nhánh `feature/v05-content`, chờ review; chưa có nút chia sẻ vì app chưa có gói chia sẻ) |
 | T5-06 | Nghiệm thu và phát hành v0.5.0 |
 
 ## Nghiệm thu và bàn giao

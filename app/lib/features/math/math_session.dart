@@ -32,12 +32,14 @@ import '../ladder/ladder_service.dart';
 import '../onboarding/egg_service.dart';
 import '../pet/pet_care_service.dart';
 import '../pet/pet_service.dart';
+import '../custom_questions/custom_question_service.dart';
 import '../questions/question.dart';
 import '../questions/question_registry.dart';
 import '../review_book/review_book_service.dart';
 import '../stickers/sticker_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
+import '../seasons/season_service.dart';
 import '../tower/tower_service.dart';
 import '../unlocks/unlock_service.dart';
 
@@ -93,11 +95,17 @@ class ResolvedQuestion {
   });
 
   factory ResolvedQuestion.resolve(DailySetQuestion spec) {
-    final generator = questionGeneratorFor(spec.formId);
-    if (generator == null) {
-      throw ArgumentError('Không có dạng bài nào mang mã ${spec.formId}');
+    // Câu tự soạn (T5-03): nội dung nằm sẵn trong đề, không có generator.
+    final Question question;
+    if (spec.custom != null) {
+      question = customToQuestion(spec);
+    } else {
+      final generator = questionGeneratorFor(spec.formId);
+      if (generator == null) {
+        throw ArgumentError('Không có dạng bài nào mang mã ${spec.formId}');
+      }
+      question = generator.generate(spec.level, Random(spec.seed ?? 0));
     }
-    final question = generator.generate(spec.level, Random(spec.seed ?? 0));
     final displayType = AnswerType.values.byName(spec.answerType);
     if (displayType != AnswerType.choice) {
       return ResolvedQuestion._(
@@ -355,11 +363,17 @@ class StageSession extends ChangeNotifier {
       questionSeed: spec.seed,
     );
     await _ladder.evaluateStrand(childId: childId, strand: spec.strand);
-    await _ladder.evaluateFormMastery(childId: childId, formId: spec.formId);
+    // Câu tự soạn (T5-03) không có dạng bài để thành thạo và không vào sổ
+    // ôn tập (sổ ôn tập sinh lại câu từ generator).
+    if (!spec.isCustom) {
+      await _ladder.evaluateFormMastery(childId: childId, formId: spec.formId);
+    }
     // Sổ ôn tập (T1-10): câu thường ghi qua recordAnswer (sai hoặc
     // đúng sau gợi ý thì vào sổ), câu ôn tập ghi qua recordReviewAnswer
     // (đúng ngay thì tăng chuỗi, sai thì quay về mốc 1 ngày).
-    if (spec.isReview) {
+    if (spec.isCustom) {
+      // Không ghi sổ ôn tập cho câu tự soạn.
+    } else if (spec.isReview) {
       await _reviewBook.recordReviewAnswer(
         childId: childId,
         formId: spec.formId,
@@ -390,8 +404,18 @@ class StageSession extends ChangeNotifier {
         isReview: spec.isReview,
         refId: dailySetId,
       );
-      lastEarnedXu = xu;
-      xuEarned += xu;
+      var gained = xu;
+      // Mùa (T5-02): đề ngày được cộng thêm xu trong mùa.
+      if (dailySetId != null) {
+        gained += await SeasonService.awardBonus(
+          db: _db,
+          childId: childId,
+          baseXu: xu,
+          refId: dailySetId,
+        );
+      }
+      lastEarnedXu = gained;
+      xuEarned += gained;
       state = QuestionState.correct;
     } else {
       lastEarnedXu = 0;
@@ -418,11 +442,20 @@ class StageSession extends ChangeNotifier {
       towerOutcome = outcome;
       xuEarned += outcome.rewardXu;
     } else {
-      xuEarned += await _rewards.awardStageComplete(
+      final stageXu = await _rewards.awardStageComplete(
         childId: childId,
         dailySetId: dailySetId,
         stageIndex: stageIndex,
       );
+      xuEarned += stageXu;
+      if (dailySetId != null) {
+        xuEarned += await SeasonService.awardBonus(
+          db: _db,
+          childId: childId,
+          baseXu: stageXu,
+          refId: dailySetId,
+        );
+      }
     }
     // Nở trứng (T2-03): xong chặng (kể cả chặng tự chọn) mà bé đã
     // chọn trứng mà trứng chưa nở thì đặt cờ chờ nở — màn Kết quả
@@ -460,6 +493,12 @@ class StageSession extends ChangeNotifier {
       );
       if (dailyAwarded) {
         xuEarned += _rewards.config.dailySetCompleteBonusXu;
+        xuEarned += await SeasonService.awardBonus(
+          db: _db,
+          childId: childId,
+          baseXu: _rewards.config.dailySetCompleteBonusXu,
+          refId: dailySetId,
+        );
       }
     }
   }

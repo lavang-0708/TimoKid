@@ -27,6 +27,8 @@ import '../../core/database/daos.dart';
 import '../../core/database/models.dart';
 import '../../core/database/tables.dart' hide AnswerType;
 import '../../core/time/clock.dart';
+import '../../core/sync/sync_config.dart' show customQuestionsEnabled;
+import '../custom_questions/custom_question_service.dart';
 import '../ladder/ladder_config.dart';
 import '../ladder/ladder_service.dart';
 import '../questions/question.dart';
@@ -108,7 +110,16 @@ class DailySetService {
     required this._ladderService,
     required this._clock,
     Random? random,
-  }) : _random = random ?? Random();
+    this.customQuestionsDao,
+    bool? customQuestions,
+  }) : _random = random ?? Random(),
+       _customEnabled = customQuestions ?? customQuestionsEnabled;
+
+  /// Câu tự soạn đã tải về (T5-03). Chỉ dùng khi [_customEnabled] (cờ
+  /// `customQuestionsEnabled`; test truyền `customQuestions: true`) và
+  /// DAO có mặt; không thì đề ngày y như cũ.
+  final CustomQuestionsDao? customQuestionsDao;
+  final bool _customEnabled;
 
   final DailySetsDao _dailySetsDao;
   final ReviewQueueDao _reviewQueueDao;
@@ -222,16 +233,51 @@ class DailySetService {
     final dueByStrand = await _dueReviewByStrand(childId: childId);
     final questions = <DailySetQuestion>[];
     for (final strand in Strand.all) {
-      questions.addAll(
-        _buildStage(
-          strand: strand,
-          rung: rungs[strand] ?? LadderConfig.initialRung,
-          reviewEntry: dueByStrand[strand],
-          usageLast7Days: usage,
-        ),
+      final rung = rungs[strand] ?? LadderConfig.initialRung;
+      final stage = _buildStage(
+        strand: strand,
+        rung: rung,
+        reviewEntry: dueByStrand[strand],
+        usageLast7Days: usage,
       );
+      await _mixCustom(
+        stage: stage,
+        childId: childId,
+        strand: strand,
+        rung: rung,
+      );
+      questions.addAll(stage);
     }
     return questions;
+  }
+
+  /// Trộn tối đa [DailySetConfig.maxCustomPerStage] câu tự soạn vào chặng
+  /// [stage] (T5-03): thay câu [DailySetConfig.customSlotIndex] bằng câu
+  /// của mảng này đúng bậc [rung] của bé, nếu có. Tắt cờ hoặc không có câu
+  /// phù hợp thì giữ nguyên chặng.
+  Future<void> _mixCustom({
+    required List<DailySetQuestion> stage,
+    required String childId,
+    required String strand,
+    required int rung,
+  }) async {
+    final dao = customQuestionsDao;
+    if (!_customEnabled || dao == null) return;
+    final picker = CustomQuestionService(
+      db: dao.attachedDatabase,
+      random: _random,
+    );
+    final custom = await picker.pickForStage(
+      childId: childId,
+      strand: strand,
+      rung: rung,
+    );
+    if (custom == null) return;
+    stage[DailySetConfig.customSlotIndex] = picker.build(
+      custom: custom,
+      strand: strand,
+      rung: rung,
+    );
   }
 
   /// Các mục sổ ôn tập đến hạn, mỗi mảng giữ một mục (mục đến hạn sớm

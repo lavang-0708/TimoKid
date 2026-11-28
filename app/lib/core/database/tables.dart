@@ -483,3 +483,62 @@ class ReviewTombstones extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// Ảnh chụp trong Phòng (T5-05, schema v6). CHỈ TRÊN MÁY: không có cột
+/// `synced`, không có bảng tương ứng trên server, bộ đồng bộ không đụng
+/// tới (ảnh là file PNG trong thư mục tài liệu của app). `fileName` là
+/// tên file trong thư mục `photos/` (không lưu đường dẫn tuyệt đối vì
+/// thư mục app có thể đổi khi cài đè).
+class Photos extends Table {
+  TextColumn get id => text()();
+
+  TextColumn get childId => text()();
+
+  TextColumn get fileName => text()();
+
+  IntColumn get width => integer()();
+
+  IntColumn get height => integer()();
+
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Câu hỏi tự soạn tải từ server (T5-03, schema v7): bản sao trên máy của
+/// bảng `custom_questions` (bố/mẹ soạn ở web admin). CHỈ TẢI VỀ, app không
+/// ghi lên server nên không có cột `synced`. `childId` null = mọi bé.
+/// `choicesJson` null = câu điền số; có = mảng JSON các lựa chọn (đáp án là
+/// đúng một chuỗi trong đó). Bảng này chỉ có dòng khi bật
+/// `customQuestionsEnabled` và server đã có bảng (migration 0003).
+class CustomQuestions extends Table {
+  TextColumn get id => text()();
+
+  TextColumn get childId => text().nullable()();
+
+  TextColumn get strand => text()();
+
+  IntColumn get rung => integer()();
+
+  IntColumn get grade => integer().withDefault(const Constant(2))();
+
+  TextColumn get textVi => text()();
+
+  TextColumn get textEn => text().nullable()();
+
+  TextColumn get answer => text()();
+
+  TextColumn get choicesJson => text().nullable()();
+
+  TextColumn get explanationVi => text().withDefault(const Constant(''))();
+
+  BoolColumn get active => boolean().withDefault(const Constant(true))();
+
+  DateTimeColumn get createdAt => dateTime()();
+
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

@@ -39,3 +39,10 @@ class SyncConfig {
 /// Neon (bảng chưa có thì server trả 404 và làm hỏng mọi lần đồng bộ).
 /// Bật bằng cách đổi thành `true` (hoặc `--dart-define` ở bước sau).
 const bool syncExtraTablesEnabled = true;
+
+/// Tải câu hỏi tự soạn (`custom_questions`) từ server và trộn vào đề ngày
+/// (T5-03). TẮT cho tới khi chủ dự án chạy
+/// `db/migrations/0003_custom_questions.sql` trên Neon (bảng chưa có thì
+/// server trả 404 và làm hỏng mọi lần đồng bộ). Khi tắt: không gọi mạng cho
+/// bảng này và đề ngày không có câu tự soạn. Bật bằng cách đổi thành `true`.
+const bool customQuestionsEnabled = false;

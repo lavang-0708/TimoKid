@@ -81,7 +81,7 @@ void main() {
         .customSelect('PRAGMA user_version')
         .map((r) => r.read<int>('user_version'))
         .getSingle();
-    expect(version, 5);
+    expect(version, 7);
     expect(await db.ensureSeeded(), childId);
     expect((await db.childrenDao.getFirstChild())!.id, childId);
     expect(

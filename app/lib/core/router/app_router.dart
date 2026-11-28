@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/album/album_screen.dart';
 import '../../features/arena/arena_config.dart';
 import '../../features/arena/arena_exam_screen.dart';
 import '../../features/arena/arena_lobby_screen.dart';
@@ -92,6 +93,10 @@ class AppRouter {
         GoRoute(
           path: RoomScreen.route,
           builder: (context, state) => const RoomScreen(),
+        ),
+        GoRoute(
+          path: AlbumScreen.route,
+          builder: (context, state) => const AlbumScreen(),
         ),
         GoRoute(
           path: StickerBookScreen.route,

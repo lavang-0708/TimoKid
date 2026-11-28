@@ -32,6 +32,12 @@ class DailySetConfig {
   /// Vị trí (chỉ số 0-based) của câu ôn tập trong mỗi chặng: câu 4.
   static const int reviewSlotIndex = 3;
 
+  /// Câu tự soạn (T5-03) thay câu 3 của chặng (đúng bậc hiện tại của bé,
+  /// không đụng câu ôn tập ở câu 4), tối đa [maxCustomPerStage] câu mỗi
+  /// chặng.
+  static const int customSlotIndex = 2;
+  static const int maxCustomPerStage = 1;
+
   /// Số ngày gần đây dùng để ưu tiên dạng ít gặp khi phải lặp dạng
   /// (mục (g)): đếm số lần mỗi dạng đã xuất hiện trong các đề ngày
   /// của bé trong khoảng này.
