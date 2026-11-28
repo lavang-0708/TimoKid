@@ -4769,3 +4769,75 @@ plain và file _v3 cùng tên gốc nhưng là 2 ảnh khác nhau.
 Chưa decode (chờ Claude decode).
 
 > Nốt: file `.b64` của nền `room_tet` trúng mẫu secret scanning của GitHub (chuỗi base64 tình cờ chứa `AKID` + 32 ký tự, dương tính giả) nên đã mã lại PNG lossless `compress_level` 9 — pixel y hệt, byte 597.457 → 596.005, SHA-256 mới `2dc9450736d9…` (bản gốc ở `backup_secret_scan/room_tet.png`).
+
+# Lô 16 — ICON APP BẢN CUỐI (phác thảo số 2) — CHƯA DECODE (chờ Claude decode)
+
+> **BỎ HẾT v1–v5.** Bản cuối ghép đúng phác thảo số 2 (ô giữa, nền xanh): 3 pet `teen_sit` ngồi hàng ngang trên chữ "TimoKid" cắt từ `ui_logo`. KHÔNG vẽ mới, KHÔNG đổi dáng pet, KHÔNG đổi kiểu chữ. **Chủ dự án ĐÃ DUYỆT (28/11). Đã đẩy 2 file .b64 + mục doc này lên nhánh.**
+
+## File giao
+
+| File | Kích thước | Byte | SHA-256 |
+|---|---|---|---|
+| `fg.png` (lớp trước trong suốt) | 1024×1024 | 274.403 | `71fbc3d6bf756a23e13d09e6930ba39fb707c0bc975acd7b69e0fa51448fb563` |
+| `bg.png` (lớp nền) | 1024×1024 | 6.657 | `8831c084c3383df83b9beefd36941e59dbc8d3e711684ec3beff7d56cf46f6fd` |
+| `preview.png` (ảnh ghép xem trước) | 1400×1510 | 175.437 | `e7f2907bbb8bf5feb46600a5cfb6fffb1a07d4765e135cb181ef1f6406e4dfd5` |
+
+Ảnh ghép gồm: bản bo góc + bản cắt tròn (520 px), 96 px (1× + phóng 4×), 48 px (1× + phóng 4×).
+
+## File nguồn (tải từ MAIN — nhánh `task/E-nhan-vat-v3b` KHÔNG có `*_teen_sit`, Claude xử lý đồng bộ nhánh lúc decode)
+
+| File nguồn | Byte | Git blob SHA-1 (đối chiếu listing main — khớp 100%) |
+|---|---|---|
+| `app/assets/images/pets/dog_teen_sit.webp` | 39.584 | `a78fce154038afd0e38a44b575b05f30a7686b4d` |
+| `app/assets/images/pets/cat_teen_sit.webp` | 34.552 | `1d208e08daa4c98c855b70d78dbd3e21435b7d45` |
+| `app/assets/images/pets/rabbit_teen_sit.webp` | 33.600 | `bd80ef4efa9037955a5a7ac93087343cdc998866` |
+| `app/assets/images/ui/ui_logo.webp` | 67.630 | `657e4256c8dbe641e12eaf710f5a5c16762e7052` |
+
+- Chó: vàng, tai cụp, bbox 378×420, 111.738 px. Mèo: cam sọc, **vòng cổ xanh + chuông bạc**, bbox 291×421, 85.361 px. Thỏ: trắng, tai cụp, **khăn xanh**, bbox 324×406, 93.976 px. Pet khớp phác thảo 100% — không thêm/bớt phụ kiện, không đổi dáng.
+- Chữ "TimoKid" cắt từ `ui_logo` (1024×512): chữ trên (x 224–786, y 2–144), bé gái trái, bé trai phải, hàng pet dưới — chỉ lấy phần chữ.
+
+## Sửa chữ (tóc dính chân T và d)
+
+- Xóa sạch tóc bé gái (đường biên chéo + màu tóc, 7.827 px incl. 648 px sợi tóc nâu) và tóc bé trai; tóc còn sót 0 px.
+- Vẽ lại fill thân chữ T (x 254–302, gradient hồng riêng của T `(255,148,201)`, đáy tròn y=135) và bầu chữ d (đối xứng qua x=740, mirror-fill 569 px + fill cột đứng 1.028 px, gradient tím riêng của d `(179,168,250)`→`(164,139,250)`); vẽ lại viền (rim tím 2 px + trắng 8 px) chỉ trong vùng sửa, capped y≤144.
+- Viền tím thừa ở góc dưới-trái bầu d (do dilation) đã vẽ lại trắng (417 px). Lấp khe 1–2 px dọc biên sửa (gap-fill T 11 px, d 18 px).
+- **Vân tím sẫm dọc trong bầu chữ d (x 718–744, y 85–105) là VÂN GỐC của font** (chữ o/m/K cũng có 385–718 px tương tự) — KHÔNG phải lỗi sửa, giữ nguyên.
+- Đáy chữ T và d cùng y=669 trong fg (baseline thẳng).
+
+## Bố cục (đo bằng code)
+
+- Cụm 580×316 px (x 222–801, y 354–669), căn giữa tâm (512,512). Thứ tự vẽ: chó → mèo → thỏ → chữ (chữ trên cùng, đè chân pet).
+- Pet cao bằng nhau: 250 px (chó 225, mèo 173, thỏ 200 px rộng). Hàng pet 538 px (x 243–781), chân pet y=604.
+- Chồng pet: chó–mèo 30 px, mèo–thỏ 30 px (đo theo bbox).
+- Chữ 580×146 px (x 222–802, y 524–670), **đè chân pet 80 px**.
+- Nền: gradient dọc `#CDEEFF` (205,238,255) → `#AAD2FF` (170,210,255), không thêm gì khác.
+
+## Cổng kiểm (đo bằng code)
+
+| Cổng | Kết quả |
+|---|---|
+| Semi alpha | **0** |
+| Magenta r1 (r>200, g<80, b>200) | **0** |
+| Ngoài vòng an toàn (r338 quanh tâm) | **0 px** (khoảng cách xa nhất của pixel đục: 314,0 px) |
+| Gradient nền | khớp `#CDEEFF`/`#AAD2FF` (±1) |
+| Chính tả | "TimoKid" đúng (từ logo gốc) |
+| Vệt trắng lem dưới T/d | **KHÔNG** — soi 3× trên nền tối + xám 128: viền trắng sạch, 0 px đục dưới đáy chữ |
+| Pet chồng nhau | 30 / 30 px |
+| Chữ đè chân pet | 80 px |
+
+Sửa kỹ thuật trong lúc ghép: resize LANCZOS trực tiếp gây loang magenta (255,0,255) 37 px (RGB vùng trong suốt của WebP gốc còn sót màu key) + semi 9.025 px → sửa bằng resize premultiplied alpha + threshold alpha 128 (semi=0, r1=0, mép giữ ~0,5 px).
+
+## Khác biệt so với phác thảo
+
+- Nguồn từ **main**, không phải nhánh `task/E-nhan-vat-v3b` (nhánh thiếu `*_teen_sit`).
+- Chữ là chữ thật từ `ui_logo` trong app (theo brief), không phải chữ vẽ lại như phác thảo — nhưng kiểu chữ, gradient, viền trắng giống hệt phác thảo.
+- Cụm NHỎ HƠN so với phác thảo (316 px trong khung 1024, ~31% chiều cao) vì brief bắt buộc vòng an toàn Ø 66% (r338); phác thảo vẽ cụm to hơn khung an toàn.
+
+## Xem trước (soi mắt)
+
+- Lớn (bo góc / tròn): 3 pet ngồi hàng ngang, mắt to long lanh, cười; chữ "TimoKid" đầy đủ, gradient hồng→tím, viền trắng; cụm căn giữa, không bị cắt ở dạng tròn.
+- 96 px: nhận ra 3 pet + dải chữ hồng; chữ cái riêng lẻ không sắc (giới hạn vật lý — đã báo chủ dự án ở v1–v4).
+- 48 px: nhận ra dạng cụm + 3 pet + dải hồng; chữ cái không đọc được riêng lẻ (giới hạn vật lý).
+- Nốt nhỏ chỉ thấy ở 3×: bậc nhỏ ở đáy-trái thân chữ T; 1 tick tím 1–2 px ở góc dưới-phải thân T; chấm tối nhỏ dưới thanh ngang chữ T (vân rim gốc).
+
+**Trạng thái: Đã đẩy 2 file .b64 lên nhánh `task/E-nhan-vat-v3b` qua `app/assets/_incoming/ui/` (`app_icon_fg.png.b64`, `app_icon_bg.png.b64`) — chờ Claude decode thành `app/assets/images/ui/app_icon_fg.png` và `app/assets/images/ui/app_icon_bg.png`.**
