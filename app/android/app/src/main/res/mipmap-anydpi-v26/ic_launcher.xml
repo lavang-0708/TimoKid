@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Icon app TimoKid (T1-12): adaptive icon, mặt thỏ Thỏ Bánh Bao vẽ
-     bằng vector drawable (file text nên đẩy được qua MCP). Nền pastel
-     bạc hà, mặt thỏ trắng viền hồng — cùng tông sticker của app.
-     API 26+ dùng icon này; API 21-25 vẫn dùng PNG mặc định trong
-     mipmap-*/ (xem DECISIONS mục T1-12). -->
+<!-- Icon app TimoKid (lô 16): 3 pet khởi đầu ngồi trên chữ TimoKid, nền xanh
+     trời. Hai lớp PNG sinh bằng tools/assets/make_app_icon.py từ
+     assets/icon/app_icon_fg.png + app_icon_bg.png. -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@color/ic_launcher_background" />
-    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <background android:drawable="@mipmap/ic_launcher_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
 </adaptive-icon>
