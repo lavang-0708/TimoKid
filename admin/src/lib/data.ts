@@ -18,6 +18,7 @@ import {
   type ValidMessage,
   type WeakForm,
 } from './logic';
+import { chunk, IMPORT_BATCH, type CustomQuestionInput } from './customQuestions';
 import { ALL_FORM_IDS, REWARD_FIELDS, STRANDS, type Strand } from './labels';
 
 export interface Family {
@@ -260,4 +261,88 @@ export async function loadCharacter(http: NeonHttp, childId: string): Promise<Ch
   const settings: Record<string, unknown> = {};
   for (const r of rows) settings[r.key] = r.value;
   return buildCharacterView(settings, countFullyDoneSets(sets));
+}
+
+
+// ------------------------------------------------------------ đề tự soạn
+
+export interface CustomQuestionRow extends CustomQuestionInput {
+  id: string;
+  /** null = áp dụng cho mọi bé của gia đình. */
+  child_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+const CQ_SELECT =
+  'id,child_id,strand,rung,grade,text_vi,text_en,answer,choices,explanation_vi,active,created_at,updated_at';
+
+export async function listCustomQuestions(http: NeonHttp): Promise<CustomQuestionRow[]> {
+  return getAll<CustomQuestionRow>(http, `custom_questions?select=${CQ_SELECT}&order=created_at.desc`);
+}
+
+/** Thêm một câu (không có `id`) hoặc sửa câu đã có (có `id`). */
+export async function saveCustomQuestion(
+  http: NeonHttp,
+  q: { id?: string; childId: string | null; input: CustomQuestionInput },
+): Promise<void> {
+  const body = { child_id: q.childId, ...q.input };
+  if (q.id) {
+    await http.api(`custom_questions?id=eq.${enc(q.id)}`, {
+      method: 'PATCH',
+      body: { ...body, updated_at: new Date().toISOString() },
+    });
+  } else {
+    await http.api('custom_questions', { method: 'POST', body });
+  }
+}
+
+/** Bật hoặc tắt một câu (tắt thì app không đưa vào đề nữa; không xóa hẳn). */
+export async function setCustomQuestionActive(http: NeonHttp, id: string, active: boolean): Promise<void> {
+  await http.api(`custom_questions?id=eq.${enc(id)}`, {
+    method: 'PATCH',
+    body: { active, updated_at: new Date().toISOString() },
+  });
+}
+
+export interface ImportProgress {
+  done: number;
+  total: number;
+}
+
+/**
+ * Nhập nhiều câu theo lô IMPORT_BATCH. Mỗi lô là một lần gửi (một lệnh
+ * INSERT nên cả lô cùng thành công hoặc cùng thất bại). Lỗi giữa chừng thì
+ * dừng và ném lỗi kèm số câu đã nhập (`imported`) để bố/mẹ biết còn thiếu.
+ */
+export async function importCustomQuestions(
+  http: NeonHttp,
+  childId: string | null,
+  inputs: CustomQuestionInput[],
+  onProgress?: (p: ImportProgress) => void,
+): Promise<number> {
+  let imported = 0;
+  for (const batch of chunk(inputs, IMPORT_BATCH)) {
+    try {
+      await http.api('custom_questions', {
+        method: 'POST',
+        headers: { Prefer: 'return=minimal' },
+        body: batch.map((q) => ({ child_id: childId, ...q })),
+      });
+    } catch (e) {
+      throw new ImportError(imported, e);
+    }
+    imported += batch.length;
+    onProgress?.({ done: imported, total: inputs.length });
+  }
+  return imported;
+}
+
+export class ImportError extends Error {
+  constructor(
+    readonly imported: number,
+    readonly cause: unknown,
+  ) {
+    super(`Nhập dừng sau ${imported} câu`);
+  }
 }

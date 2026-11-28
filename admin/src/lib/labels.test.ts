@@ -11,7 +11,7 @@ const GEN_DIR = `${QUESTIONS_DIR}generators/`;
 const ID = String.raw`'((?:logic|arith|number|geo|comb)\.[a-z0-9_]+)'`;
 const PATTERNS = [
   new RegExp(String.raw`formId\s*=>\s*${ID}`, 'g'),
-  new RegExp(String.raw`Timo[23]Generator\(\s*${ID}`, 'g'),
+  new RegExp(String.raw`Timo[234]Generator\(\s*${ID}`, 'g'),
 ];
 
 function extractFormIds(): string[] {
