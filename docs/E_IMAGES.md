@@ -4772,17 +4772,17 @@ Chưa decode (chờ Claude decode).
 
 # Lô 17 — Nhóm A: 5 CƯ DÂN (chân dung) — CHỦ DỰ ÁN ĐÃ DUYỆT (28/11) — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
 
-> Chủ dự án đã duyệt 5 chân dung (28/11 ~18:47, Claude duyệt thay, chủ dự án ra ngoài): rất dễ thương, đúng phong cách app. Cả 3 nốt đều GIỮ NGUYÊN: mũ Bác Vuông xanh đậm (nổi khối hơn, áo đã đúng pastel), lông vũ Hiệp sĩ, đầu Chú Xoay nhỏ hơn chút (vẫn đọc rõ). File đích: `app/assets/images/residents/<id>_portrait.webp` (Claude convert webp khi decode).
+> Chủ dự án đã duyệt 5 chân dung (28/11 ~18:47, Claude duyệt thay, chủ dự án ra ngoài): rất dễ thương, đúng phong cách app. Cả 3 nốt đều GIỮ NGUYÊN: mũ Công tước Bóng đêm xanh đậm (nổi khối hơn, áo đã đúng pastel), lông vũ Hiệp sĩ, đầu Quản gia Chạng vạng nhỏ hơn chút (vẫn đọc rõ). File đích: `app/assets/images/residents/<id>_portrait.webp` (Claude convert webp khi decode).
 
 Phong cách: pastel, nét mềm, **viền trắng sticker 10 px** quanh hình, không chữ trong ảnh. Khung 512×512 nền trong suốt, lề trong 24 px, đầu to, đọc rõ ở 72 px. Màu từng mảng khớp `strandColor` trong code app (Logic #C9B8F0 đã đối chiếu trong `resident_widgets.dart` trên main; các màu còn lại theo `town_assets.dart`).
 
 | Cư dân | Mảng / tòa nhà | Màu app (`strandColor`) | File |
 | --- | --- | --- | --- |
-| Hiệp sĩ Sáng (`hiep_si_sang`) | Lôgic, Lâu đài Lôgic | #C9B8F0 tím nhạt | `hiep_si_sang_portrait.webp` |
-| Cô Bông (`co_bong`) | Số học, Tiệm bánh Số học | #FFD9C0 hồng/cam nhạt | `co_bong_portrait.webp` |
-| Cú Tròn (`cu_tron`) | Con số, Tháp Con số | #BFE0F5 xanh dương nhạt | `cu_tron_portrait.webp` |
-| Bác Vuông (`bac_vuong`) | Hình học, Vườn Hình học | #BFE8CF xanh lá nhạt | `bac_vuong_portrait.webp` |
-| Chú Xoay (`chu_xoay`) | Tổ hợp, Hội chợ Tổ hợp | #FFD166 vàng nhạt | `chu_xoay_portrait.webp` |
+| Hiệp sĩ Bình minh (`hiep_si_sang`) | Lôgic, Lâu đài Lôgic | #C9B8F0 tím nhạt | `hiep_si_sang_portrait.webp` |
+| Tiểu thư Ánh sáng (`co_bong`) | Số học, Tiệm bánh Số học | #FFD9C0 hồng/cam nhạt | `co_bong_portrait.webp` |
+| Hoàng tử Hoàng hôn (`cu_tron`) | Con số, Tháp Con số | #BFE0F5 xanh dương nhạt | `cu_tron_portrait.webp` |
+| Công tước Bóng đêm (`bac_vuong`) | Hình học, Vườn Hình học | #BFE8CF xanh lá nhạt | `bac_vuong_portrait.webp` |
+| Quản gia Chạng vạng (`chu_xoay`) | Tổ hợp, Hội chợ Tổ hợp | #FFD166 vàng nhạt | `chu_xoay_portrait.webp` |
 
 ## File (PNG 512×512, nền trong suốt)
 
@@ -4798,7 +4798,7 @@ Phong cách: pastel, nét mềm, **viền trắng sticker 10 px** quanh hình, k
 
 - Semi alpha: **0**; magenta r1: **0**; vivid broad: **0**; bright-rim: **0**.
 - Lề trong: **24 px** (trên/dưới; trái/phải 37–106 px do art căn giữa trong khung 444 px); viền trắng sticker: **10 px** đều.
-- Màu trang phục (median) so với `strandColor`: Hiệp sĩ Sáng lệch 6, Cô Bông 25, Cú Tròn 39, Bác Vuông 64, Chú Xoay 45 (có shading nên lệch; cùng họ màu).
+- Màu trang phục (median) so với `strandColor`: Hiệp sĩ Bình minh lệch 6, Tiểu thư Ánh sáng 25, Hoàng tử Hoàng hôn 39, Công tước Bóng đêm 64, Quản gia Chạng vạng 45 (có shading nên lệch; cùng họ màu).
 
 ## Cách vẽ
 
@@ -4810,10 +4810,10 @@ Phong cách: pastel, nét mềm, **viền trắng sticker 10 px** quanh hình, k
 
 ## Nốt nhỏ (đã chốt — GIỮ NGUYÊN, không sửa)
 
-- Hiệp sĩ Sáng: 156 px ở chùm lông vũ còn đọc "hồng" theo thước — đó là màu tím-lavender nhạt của thiết kế; thước không tách được lavender khỏi blend magenta, nhìn mắt sạch. **Claude 28/11 ~18:47: GIỮ.**
-- Cô Bông: 10 px viền hồng còn lại ở ngọn tóc mai, không thấy ở cỡ app.
-- Bác Vuông: mũ xanh đậm hơn pastel #BFE8CF (áo đúng pastel); vẫn đọc rõ là mũ làm vườn. **Claude 28/11 ~18:47: GIỮ (nổi khối hơn).**
-- Chú Xoay: bóng bay làm hình rộng nhất (418 px) nên đầu nhỏ hơn 4 người kia chút ở 72 px, vẫn đọc rõ; dây bóng mỏng 1–2 px nhưng còn nguyên. **Claude 28/11 ~18:47: GIỮ.**
+- Hiệp sĩ Bình minh: 156 px ở chùm lông vũ còn đọc "hồng" theo thước — đó là màu tím-lavender nhạt của thiết kế; thước không tách được lavender khỏi blend magenta, nhìn mắt sạch. **Claude 28/11 ~18:47: GIỮ.**
+- Tiểu thư Ánh sáng: 10 px viền hồng còn lại ở ngọn tóc mai, không thấy ở cỡ app.
+- Công tước Bóng đêm: mũ xanh đậm hơn pastel #BFE8CF (áo đúng pastel); vẫn đọc rõ là mũ làm vườn. **Claude 28/11 ~18:47: GIỮ (nổi khối hơn).**
+- Quản gia Chạng vạng: bóng bay làm hình rộng nhất (418 px) nên đầu nhỏ hơn 4 người kia chút ở 72 px, vẫn đọc rõ; dây bóng mỏng 1–2 px nhưng còn nguyên. **Claude 28/11 ~18:47: GIỮ.**
 
 ## Tiếp theo
 
@@ -4893,11 +4893,11 @@ trong ảnh. Khung 512×512 nền trong suốt, lề trong 24 px, đầu to, đ�
 
 | Cư dân | File xem trước |
 | --- | --- |
-| Hiệp sĩ Sáng (`hiep_si_sang`) | `hiep_si_sang_talk.webp` |
-| Cô Bông (`co_bong`) | `co_bong_talk.webp` |
-| Cú Tròn (`cu_tron`) | `cu_tron_talk.webp` |
-| Bác Vuông (`bac_vuong`) | `bac_vuong_talk.webp` |
-| Chú Xoay (`chu_xoay`) | `chu_xoay_talk.webp` |
+| Hiệp sĩ Bình minh (`hiep_si_sang`) | `hiep_si_sang_talk.webp` |
+| Tiểu thư Ánh sáng (`co_bong`) | `co_bong_talk.webp` |
+| Hoàng tử Hoàng hôn (`cu_tron`) | `cu_tron_talk.webp` |
+| Công tước Bóng đêm (`bac_vuong`) | `bac_vuong_talk.webp` |
+| Quản gia Chạng vạng (`chu_xoay`) | `chu_xoay_talk.webp` |
 
 ## File (PNG 512×512, nền trong suốt)
 
@@ -4913,18 +4913,18 @@ trong ảnh. Khung 512×512 nền trong suốt, lề trong 24 px, đầu to, đ�
 
 | Cư dân | Chân dung (x0,y0)-(x1,y1) | Đang nói (x0,y0)-(x1,y1) | Lệch L/T/R/B |
 | --- | --- | --- | --- |
-| Hiệp sĩ Sáng | (106,24)-(405,487) | (106,24)-(405,487) | 0 / 0 / 0 / 0 |
-| Cô Bông | (106,24)-(405,487) | (106,24)-(405,487) | 0 / 0 / 0 / 0 |
-| Cú Tròn | (53,24)-(457,487) | (53,24)-(457,487) | 0 / 0 / 0 / 0 |
-| Bác Vuông | (95,24)-(416,487) | (95,24)-(416,487) | 0 / 0 / 0 / 0 |
-| Chú Xoay | (37,24)-(474,487) | (37,24)-(474,487) | 0 / 0 / 0 / 0 |
+| Hiệp sĩ Bình minh | (106,24)-(405,487) | (106,24)-(405,487) | 0 / 0 / 0 / 0 |
+| Tiểu thư Ánh sáng | (106,24)-(405,487) | (106,24)-(405,487) | 0 / 0 / 0 / 0 |
+| Hoàng tử Hoàng hôn | (53,24)-(457,487) | (53,24)-(457,487) | 0 / 0 / 0 / 0 |
+| Công tước Bóng đêm | (95,24)-(416,487) | (95,24)-(416,487) | 0 / 0 / 0 / 0 |
+| Quản gia Chạng vạng | (37,24)-(474,487) | (37,24)-(474,487) | 0 / 0 / 0 / 0 |
 
 ## Cổng kiểm (đo bằng code trên file cuối, cả 5 file)
 
 - Semi alpha: **0**; magenta r1: **0**; vivid broad: **0**; bright-rim: **0**.
 - Lề trong: **24 px** cả 4 phía; viền trắng sticker: **10 px** đều 4 phía.
-- Độ co ngang khi ép về đúng khung art chân dung: Hiệp sĩ Sáng 0,946;
-  Cô Bông 0,940; Cú Tròn 0,877; Bác Vuông 0,962; Chú Xoay 0,985.
+- Độ co ngang khi ép về đúng khung art chân dung: Hiệp sĩ Bình minh 0,946;
+  Tiểu thư Ánh sáng 0,940; Hoàng tử Hoàng hôn 0,877; Công tước Bóng đêm 0,962; Quản gia Chạng vạng 0,985.
 
 ## Cách vẽ
 
@@ -4947,13 +4947,13 @@ thu nhỏ 72 px (vuông + tròn) + 216 px tròn (3×) trong `preview.webp`.
 
 ## Nốt nhỏ (nói thật)
 
-- Cú Tròn: co ngang nhiều nhất (0,877) vì cánh giơ làm khung rộng nhất; soi
+- Hoàng tử Hoàng hôn: co ngang nhiều nhất (0,877) vì cánh giơ làm khung rộng nhất; soi
   3× kính vẫn tròn, không thấy méo rõ.
-- Hiệp sĩ Sáng: 4 px hồng còn lại ở chùm lông vũ (x 218–220, y 102–103),
+- Hiệp sĩ Bình minh: 4 px hồng còn lại ở chùm lông vũ (x 218–220, y 102–103),
   màu tím-lavender của thiết kế (chân dung cũng còn 156 px) — nhìn mắt sạch.
-- Cô Bông + Chú Xoay: khe tay/cổ có tam giác trắng nhỏ ~3–4 px (viền trắng
+- Tiểu thư Ánh sáng + Quản gia Chạng vạng: khe tay/cổ có tam giác trắng nhỏ ~3–4 px (viền trắng
   của ảnh gốc quanh khe nền sau khi lấp lỗ) — chỉ thấy ở 3×, không thấy ở 72 px.
-- Bác Vuông ở tư thế nói: tay giơ không cầm kéo tỉa (chân dung cầm kéo) —
+- Công tước Bóng đêm ở tư thế nói: tay giơ không cầm kéo tỉa (chân dung cầm kéo) —
   đúng brief (tay giơ ra hiệu), không đổi thiết kế.
 - Ở 3× thấy vài chấm hồng nhạt 1 px trên mép ngoài viền trắng (dưới ngưỡng
   thước) — không thấy ở 100% / 72 px.
@@ -5101,7 +5101,7 @@ thư mục `app/assets/images/unlocks/`. Đã đẩy.
 
 ## Phương pháp chung
 
-- 3× `media.generate_image` (chân dung Hiệp sĩ Sáng làm style ref,
+- 3× `media.generate_image` (chân dung Hiệp sĩ Bình minh làm style ref,
   nền magenta #FF00FF) → key (249,0,245) ngưỡng 52,5 → erode alpha 1 px
   → defringe donor-median → alpha cứng. Không thêm viền trắng bằng code
   (ảnh gốc đã có viền trắng sticker sẵn).
