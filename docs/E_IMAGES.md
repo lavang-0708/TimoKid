@@ -5011,7 +5011,7 @@ Mảng Hình học (`geo`, màu `#BFE8CF`): `sticker_base_geo.png` + 19 file `fo
 
 | File | Byte | SHA-256 | Ghi chú |
 | --- | --- | --- | --- |
-| `sticker_base_geo.png` | 6827 | `e76c64531402a32b5bb94022c8ded15b760bb18a86521056e71e1e29d4dbd45d` | Vẽ bằng code: đĩa trắng r250, vành xanh lá r236, vòng trắng r166, giữa trong suốt r158 (Ø316 ≈ 62%); margin 5 px là đúng thiết kế full-frame |
+| `sticker_base_geo.png` | 34134 | `c2127cc6e8d9a854556a1ae11ce4ed953e999838b1a0f20066f21d308f0bdf92` | Vẽ lại bằng code 28/11 (sửa đế vành): đĩa đầy như khung nhóm B — đĩa trắng r231, gradient xuyên tâm (219,242,228) → #BFE8CF r219, tâm nhạt, không lỗ trong suốt; margin 24 px, bbox (25,25)-(486,486) |
 
 ### 19 biểu tượng
 
@@ -5040,7 +5040,7 @@ Mảng Hình học (`geo`, màu `#BFE8CF`): `sticker_base_geo.png` + 19 file `fo
 ### Cổng kiểm (đo bằng code, từng file)
 
 - `semi_alpha = 0`, `magenta_r1 = 0`, `bright_rim_vivid = 0`, `vivid_broad = 0` — cả 20 file.
-- Lề trong 64 px — cả 19 biểu tượng (art fit 374 px + viền trắng 5 px = ≤384 px). Đế là khung full-frame nên margin 5 px.
+- Lề trong 64 px — cả 19 biểu tượng (art fit 374 px + viền trắng 5 px = ≤384 px). Đế là đĩa đầy, margin 24 px (bbox (25,25)-(486,486)), giữa đục (r<150: 70.661 px).
 - Soi 100% + 3× trên nền tối (60,60,80) và nền sáng: 19/19 đọc đúng nhãn, viền sạch, không vệt magenta; huy hiệu 96 px đọc rõ, 72 px vẫn nhận ra hình.
 
 ### Phương pháp
@@ -5053,4 +5053,5 @@ Mảng Hình học (`geo`, màu `#BFE8CF`): `sticker_base_geo.png` + 19 file `fo
 - `shapeparts`: khung vuông rỗng, giữa trong suốt — đọc là hình vuông có cạnh + đỉnh đánh dấu.
 - `perimchange` / `segline` / `units` / `pointsegs` là icon rộng: giữ đúng tỉ lệ, cạnh dài fill 384 px nên trong huy hiệu 62% hiện nhỏ hơn icon vuông — đúng spec.
 - Lượt cắt đầu còn r1 1–34 px/icon (magenta lẩn trong khe hẹp sau resize); đã repaint hết bằng donor-median, lượt 2 về 0 mọi chỉ số.
+- **SỬA ĐẾ (28/11, sau khi đẩy):** đế bản đầu là vành có lỗ trong suốt giữa (Ø316) — không khớp khung nhóm B (đĩa đầy, tâm nhạt) và đế number (đĩa đầy); icon rộng sẽ lộ nền app qua lỗ. Đã vẽ lại thành đĩa đầy bằng code (gradient theo đúng tâm/mép khung geo), đẩy lại đè `sticker_base_geo.png.b64` cũ (6.827 B → 34.134 B, SHA mới ở bảng trên; bản vành cũ giữ ở `forms_B2_geo/backup_base_ring/` local).
 **Trạng thái: đã đẩy 20 file `.b64` (3 đợt: 8 + 8 + 4) + mục doc này — chờ Claude decode thành `app/assets/images/stickers/sticker_base_geo.webp` và `form_geo_*.webp`.**
