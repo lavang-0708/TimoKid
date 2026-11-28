@@ -33,6 +33,9 @@ import '../daily_set/daily_set_service.dart';
 import '../ladder/ladder_service.dart';
 import '../math/math_decor.dart';
 import '../math/math_screen.dart';
+import '../residents/resident_content.dart';
+import '../residents/resident_service.dart';
+import '../residents/resident_widgets.dart';
 import '../tower/tower_config.dart';
 import '../tower/tower_service.dart';
 import '../town/town_assets.dart';
@@ -67,6 +70,12 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
   int _highestFloor = 0;
 
   ScrollController _floorScroll = ScrollController();
+
+  /// Lời thoại cư dân của khu (T4-02); null nếu không đọc được nội dung.
+  ResidentContext? _resident;
+
+  /// Số lần bé chạm cư dân (mỗi lần nghe một câu chào khác).
+  int _residentTaps = 0;
 
   static const double _floorTileHeight = 34;
 
@@ -106,6 +115,7 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
         childId: childId,
         stageIndex: _stageIndex,
       );
+      final resident = await loadResidentContext(db, childId);
       final highest = await TowerService(db: db)
           .highestCleared(childId: childId, strand: Strand.all[_stageIndex]);
       if (!mounted) return;
@@ -118,6 +128,7 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
       setState(() {
         _stats = stats;
         _highestFloor = highest;
+        _resident = resident;
         _loading = false;
       });
     } catch (e) {
@@ -341,10 +352,37 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
     );
   }
 
+  /// Lời cư dân đang hiện: chưa xong chặng ngày thì "nhờ giúp"; xong rồi
+  /// thì câu chào (hoặc lời đặc biệt khi đã mở khóa). Bé chạm cư dân thì
+  /// nghe câu chào khác.
+  String? _residentText(BuildingStats stats, Resident resident) {
+    final ctx = _resident;
+    if (ctx == null) return null;
+    final kind = _residentTaps > 0
+        ? LineKind.greeting
+        : stats.status != StageStatus.done
+        ? LineKind.ask
+        : ctx.specialUnlocked
+        ? LineKind.special
+        : LineKind.greeting;
+    final text = pickResidentLine(
+      resident,
+      kind,
+      date: ctx.date,
+      childName: ctx.childName,
+      variant: _residentTaps,
+    );
+    return text.isEmpty ? null : text;
+  }
+
   Widget _statsCard(BuildingStats stats, String extraText, String statusText) {
+    final resident = _resident?.residentFor(Strand.all[_stageIndex]);
+    final residentText = resident == null
+        ? null
+        : _residentText(stats, resident);
     return Container(
       key: const Key('building-stats-card'),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -356,17 +394,19 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
           ),
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
+      child: LayoutBuilder(
+        builder: (context, c) {
+          // Màn thấp (608x248): thống kê gọn một hàng chữ, bỏ dòng "tự chọn".
+          final compact = c.maxHeight < 150;
+          final withResident = resident != null && residentText != null;
+          Widget statsRow() => Row(
             children: [
               Expanded(
                 child: _StatBlock(
                   label: 'Chặng',
                   value: statusText,
                   valueKey: const Key('building-status'),
+                  compact: compact,
                 ),
               ),
               Expanded(
@@ -374,6 +414,7 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
                   label: 'Câu đúng',
                   value: '${stats.correctCount}/5',
                   valueKey: const Key('building-correct'),
+                  compact: compact,
                 ),
               ),
               Expanded(
@@ -381,12 +422,12 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
                   label: 'Xu nhận',
                   value: '${stats.xuEarned} xu',
                   valueKey: const Key('building-xu'),
+                  compact: compact,
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 8),
-          Text(
+          );
+          final extra = Text(
             extraText,
             key: const Key('building-extra'),
             textAlign: TextAlign.center,
@@ -398,27 +439,79 @@ class _BuildingScreenState extends ConsumerState<BuildingScreen> {
               fontSize: 16,
               color: MathColors.questionText,
             ),
-          ),
-        ],
+          );
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (withResident) ...[
+                Expanded(
+                  child: ResidentSpeech(
+                    resident: resident,
+                    text: residentText,
+                    bubbleKey: const Key('building-resident-bubble'),
+                    onTap: () => setState(() => _residentTaps++),
+                  ),
+                ),
+                const SizedBox(height: 4),
+              ],
+              statsRow(),
+              if (!compact || !withResident) ...[
+                const SizedBox(height: 8),
+                extra,
+              ] else
+                // Giữ khóa để test/đọc màn hình: dòng tự chọn ẩn khi thấp.
+                const SizedBox.shrink(key: Key('building-extra')),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-/// Một ô thống kê trong thẻ trắng: nhãn nhỏ trên, giá trị to dưới.
+/// Một ô thống kê trong thẻ trắng: nhãn nhỏ trên, giá trị to dưới
+/// (hoặc nhãn + giá trị trên một dòng khi [compact]).
 class _StatBlock extends StatelessWidget {
   const _StatBlock({
     required this.label,
     required this.value,
     required this.valueKey,
+    this.compact = false,
   });
 
   final String label;
   final String value;
   final Key valueKey;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
+    if (compact) {
+      return FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '$label ',
+              maxLines: 1,
+              style: const TextStyle(fontSize: 12, color: Color(0xFF8A7FA6)),
+            ),
+            Text(
+              value,
+              key: valueKey,
+              maxLines: 1,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: MathColors.questionText,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return Column(
       children: [
         Text(

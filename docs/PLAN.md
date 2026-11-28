@@ -291,9 +291,9 @@ Hai bản này mới ghi ở mức nhiệm vụ. Claude sẽ viết tiêu chí n
 | Mã | Nhiệm vụ |
 | --- | --- |
 | T4-01 | Bản đồ Thị trấn Diệu Kỳ có hình, thay cho 5 nút tạm |
-| T4-02 | 5 cư dân nhờ giúp: câu thoại mở đầu và cảm ơn cho mỗi chặng, lưu trong file nội dung để sửa không cần code |
-| T4-03 | Sổ sticker: mỗi dạng bài thành thạo được một sticker, xếp theo 5 mảng, kèm 2 kim cương |
-| T4-04 | Mở khóa phòng và tòa nhà mới theo số dạng bài thành thạo |
+| T4-02 | 5 cư dân nhờ giúp: câu thoại mở đầu và cảm ơn cho mỗi chặng, lưu trong file nội dung để sửa không cần code (Xong trên nhánh `feature/v04-town-life`, chờ review; hình chờ lô 17) |
+| T4-03 | Sổ sticker: mỗi dạng bài thành thạo được một sticker, xếp theo 5 mảng, kèm 2 kim cương (Xong trên nhánh `feature/v04-town-life`, chờ review; hình chờ lô 17) |
+| T4-04 | Mở khóa phòng và tòa nhà mới theo số dạng bài thành thạo (Xong trên nhánh `feature/v04-town-life`, chờ review; hình chờ lô 17) |
 | T4-05 | Nghiệm thu và phát hành v0.4.0 |
 
 ### Bản 0.5: nội dung mở rộng

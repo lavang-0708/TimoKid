@@ -18,6 +18,9 @@ import '../onboarding/onboarding_model.dart';
 import '../onboarding/onboarding_service.dart';
 import '../quests/quest_service.dart';
 import '../quests/quest_widgets.dart';
+import '../stickers/sticker_widgets.dart';
+import '../unlocks/unlock_config.dart';
+import '../unlocks/unlock_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
 import '../room/room_screen.dart';
@@ -66,6 +69,9 @@ class _TownScreenState extends ConsumerState<TownScreen> {
   String? _error;
   CharacterProfile? _profile;
   bool _questDot = false;
+  int _mastered = 0;
+
+  bool get _hasTitle => _mastered >= UnlockConfig.titleThreshold;
 
   @override
   void initState() {
@@ -107,8 +113,14 @@ class _TownScreenState extends ConsumerState<TownScreen> {
       try {
         questDot = await QuestService(db: db).hasClaimable(childId);
       } catch (_) {}
+      // Số dạng thành thạo cho danh hiệu và đài phun nước (T4-04).
+      var mastered = 0;
+      try {
+        mastered = await UnlockService(db: db).masteredCount(childId);
+      } catch (_) {}
       if (!mounted) return;
       setState(() {
+        _mastered = mastered;
         _questDot = questDot;
         _statuses = statuses;
         _xu = balances[Currency.xu] ?? 0;
@@ -172,6 +184,7 @@ class _TownScreenState extends ConsumerState<TownScreen> {
               ),
               onRoomTap: () => context.go(RoomScreen.route),
               onArenaTap: () => context.go(ArenaLobbyScreen.route),
+              showFountain: _mastered >= UnlockConfig.townDecorThreshold,
             ),
           ),
           Positioned(
@@ -210,6 +223,14 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                           tooltip: 'Đấu trường TIMO',
                           onPressed: () => context.go(ArenaLobbyScreen.route),
                         ),
+                        const SizedBox(height: 4),
+                        StickerHudButton(
+                          key: const Key('sticker-book-button'),
+                          onPressed: () async {
+                            await context.push('/stickers');
+                            if (mounted) _refresh();
+                          },
+                        ),
                       ],
                     ),
                     // Chỉ số dồn sang phải để không che Lâu đài ở góc trái.
@@ -225,12 +246,21 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 4,
                                   ),
-                                  child: Text(
-                                    profile.name,
-                                    key: const Key('town-character-name'),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: gameOutlinedText(16),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        profile.name,
+                                        key: const Key('town-character-name'),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: gameOutlinedText(16),
+                                      ),
+                                      if (_hasTitle)
+                                        const FittedBox(
+                                          child: TitleChip(fontSize: 10),
+                                        ),
+                                    ],
                                   ),
                                 ),
                               ),

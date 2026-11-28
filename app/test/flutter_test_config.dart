@@ -9,10 +9,17 @@
 library;
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:timokid/core/animation/animation_gate.dart';
+import 'package:timokid/features/residents/resident_content.dart';
 
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   AnimationGate.enabled = false;
+  // Lời thoại cư dân (T4-02): nạp thẳng từ file nội dung để widget test
+  // không phải đọc asset trong FakeAsync (cwd khi chạy test là `app/`).
+  ResidentBook.debugOverride = ResidentBook.fromJsonString(
+    File('assets/content/residents.json').readAsStringSync(),
+  );
   await testMain();
 }

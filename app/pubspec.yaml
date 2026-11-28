@@ -73,6 +73,8 @@ flutter:
   # phong cách pastel viền trắng, xem assets/concept/README.md).
   assets:
     - assets/images/
+    # Nội dung sửa được không cần code (T4-02): lời thoại 5 cư dân.
+    - assets/content/
     # Lớp nhân vật nữ (Claude ghép 19/11, xem docs/ASSETS.md mục "Bộ nhân vật nữ 1").
     - assets/images/character/girl/
     # Ảnh toàn thân bé trai + phụ kiện (E, Muse vẽ 21/11, docs/E_IMAGES.md).

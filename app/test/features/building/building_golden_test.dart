@@ -39,6 +39,17 @@ Future<void> _loadTestFonts() async {
   final loader = FontLoader('Nunito')
     ..addFont(Future.value(ByteData.view(bytes.buffer)));
   await loader.load();
+  // Font biểu tượng để chân dung cư dân/ô khóa không thành ô vuông.
+  final testerExe = File(Platform.resolvedExecutable);
+  final iconsFile = File(
+    '${testerExe.parent.parent.parent.parent.path}/artifacts/material_fonts/MaterialIcons-Regular.otf',
+  );
+  if (await iconsFile.exists()) {
+    final icons = FontLoader(
+      'MaterialIcons',
+    )..addFont(Future.value(ByteData.view(iconsFile.readAsBytesSync().buffer)));
+    await icons.load();
+  }
 }
 
 void main() {
