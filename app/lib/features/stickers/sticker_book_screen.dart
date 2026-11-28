@@ -19,6 +19,7 @@ import '../residents/resident_widgets.dart' show strandColor, strandInk;
 import '../room/room_screen.dart';
 import '../unlocks/unlock_config.dart';
 import '../unlocks/unlock_service.dart';
+import 'sticker_config.dart';
 import 'sticker_service.dart';
 import 'sticker_widgets.dart';
 
@@ -288,35 +289,76 @@ class _StickerBookScreenState extends ConsumerState<StickerBookScreen> {
         ),
       ],
     );
-    final BoxDecoration decoration;
+    // Giấy nền trang sổ (lô 17): lặp theo chiều ngang, không có chữ.
+    final paper = stickerArtReady
+        ? const DecorationImage(
+            image: AssetImage(StickerConfig.bookCoverAsset),
+            fit: BoxFit.fitHeight,
+            repeat: ImageRepeat.repeatX,
+          )
+        : null;
     if (goldFrame && unlockArtReady) {
-      decoration = const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage(UnlockConfig.goldFrameAsset),
-          fit: BoxFit.fill,
-          // Ảnh 192x192, viền 48 px; scale 4 nên viền hiện 12 dp.
-          scale: 4,
-          centerSlice: Rect.fromLTRB(48, 48, 144, 144),
+      // Khung vàng 9 mảnh: ảnh 192x192, viền 48 px. `centerSlice` tính theo
+      // điểm ảnh nên vẽ ở cỡ x4 rồi thu 1/4 (viền hiện 12 dp).
+      const slice = 4.0;
+      return Container(
+        key: Key('sticker-gold-frame-$strand'),
+        margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFFBEF),
+          borderRadius: BorderRadius.circular(16),
+          image: paper,
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: IgnorePointer(
+                child: LayoutBuilder(
+                  builder: (context, c) => FittedBox(
+                    fit: BoxFit.fill,
+                    child: SizedBox(
+                      width: c.maxWidth * slice,
+                      height: c.maxHeight * slice,
+                      child: const DecoratedBox(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(UnlockConfig.goldFrameAsset),
+                            fit: BoxFit.fill,
+                            centerSlice: Rect.fromLTRB(48, 48, 144, 144),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Padding(padding: const EdgeInsets.all(18), child: inner),
+          ],
         ),
       );
-    } else if (goldFrame) {
+    }
+    final BoxDecoration decoration;
+    if (goldFrame) {
       decoration = BoxDecoration(
         color: const Color(0xFFFFFBEF),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE8B930), width: 4),
         boxShadow: const [BoxShadow(color: Color(0x55E8B930), blurRadius: 10)],
+        image: paper,
       );
     } else {
       decoration = BoxDecoration(
         color: Colors.white.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: strandColor(strand), width: 3),
+        image: paper,
       );
     }
     return Container(
       key: goldFrame ? Key('sticker-gold-frame-$strand') : null,
       margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-      padding: EdgeInsets.all(goldFrame && unlockArtReady ? 18 : 8),
+      padding: const EdgeInsets.all(8),
       decoration: decoration,
       child: inner,
     );

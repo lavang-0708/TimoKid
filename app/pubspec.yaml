@@ -98,6 +98,11 @@ flutter:
     - assets/images/ui/
     # Đồ cho pet (lô 7, 22/11): thức ăn + đồ chơi, PNG 512x512.
     - assets/images/items/
+    # Lô 17 (28/11, bản 0.4 "thị trấn sống"): chân dung + tư thế nói của
+    # 5 cư dân, khung/bìa sổ sticker, đồ mở khóa — xem docs/briefs/lot17_v04.md.
+    - assets/images/residents/
+    - assets/images/stickers/
+    - assets/images/unlocks/
     # Thư mục con KHÔNG tự động đi kèm theo mục thư mục cha (kiểm
     # chứng ở T2-03 với Flutter 3.50: `ManifestAssetBundle` chỉ liệt
     # kê file trực tiếp trong thư mục, không đệ quy) — mỗi thư mục

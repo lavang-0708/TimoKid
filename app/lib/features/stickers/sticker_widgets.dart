@@ -48,7 +48,7 @@ class StickerBadge extends StatelessWidget {
     Widget body;
     if (locked) {
       body = _lockedBody();
-    } else if (stickerArtReady && stickerFormIconArtReady) {
+    } else if (stickerFormIconReadyFor(strand)) {
       body = Stack(
         alignment: Alignment.center,
         children: [
@@ -88,16 +88,30 @@ class StickerBadge extends StatelessWidget {
   }
 
   Widget _lockedBody() {
-    final art = stickerArtReady
-        ? Image.asset(
-            StickerConfig.lockedAsset,
-            width: size,
-            height: size,
-            fit: BoxFit.contain,
-            errorBuilder: (_, _, _) => _silhouette(),
-          )
-        : _silhouette();
-    return art;
+    if (!stickerArtReady) return _silhouette();
+    // Ảnh khung xám không có chữ: app vẽ dấu "?" lên giữa (brief lô 17).
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Image.asset(
+          StickerConfig.lockedAsset,
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
+          errorBuilder: (_, _, _) => _silhouette(),
+        ),
+        Text(
+          '?',
+          style: TextStyle(
+            fontSize: size * 0.4,
+            fontWeight: FontWeight.w800,
+            color: const Color(0xFFFFFFFF),
+            height: 1,
+            shadows: const [Shadow(color: Color(0x66000000), blurRadius: 2)],
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _silhouette() => Container(
@@ -222,7 +236,6 @@ class StickerHudButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GameRoundButton(
       icon: Icons.auto_stories_rounded,
-      image: stickerArtReady ? StickerConfig.bookCoverAsset : null,
       color: const Color(0xFF6FC7A6),
       label: 'Sticker',
       tooltip: 'Sổ sticker',

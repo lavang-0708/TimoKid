@@ -64,6 +64,9 @@ KINDS = {
     "town_layer",
     "town_building",
     "ui",
+    "resident",
+    "sticker",
+    "unlock",
 }
 FORMS = {"girl", "boy", "any"}
 STATUSES = {"ready", "planned"}
@@ -79,6 +82,8 @@ FRAMES = {
     "item": (512, 512),
     "furniture": (512, 512),
     "town_layer": (512, 512),
+    "resident": (512, 512),
+    "sticker": (512, 512),  # riêng bìa sổ 1024x512 và khung vàng: trường "frame"
 }
 
 # Tên file cho từng loại (chỉ tên file, không tính thư mục — thư mục
@@ -120,6 +125,15 @@ NAME_PATTERNS = {
     "town_building": re.compile(r"^[a-z0-9_]+_building\.webp$"),
     # Huy chương Đấu trường (lô 11) cũng thuộc loại ui.
     "ui": re.compile(r"^(ui|medal)_[a-z0-9_]+\.webp$"),
+    # Lô 17 (bản 0.4): cư dân, sổ sticker, đồ mở khóa.
+    "resident": re.compile(r"^[a-z_]+_(portrait|talk)\.webp$"),
+    "sticker": re.compile(
+        r"^(sticker_(frame|base)_[a-z]+|sticker_locked|sticker_book_cover"
+        r"|form_[a-z0-9_]+)\.webp$"
+    ),
+    "unlock": re.compile(
+        r"^(sticker_book_gold_frame|town_fountain|title_badge)\.webp$"
+    ),
 }
 
 # Thư mục con cho từng loại (tính từ app/assets/images/); icon không
@@ -136,6 +150,9 @@ KIND_DIRS = {
     "town_layer": "town",
     "ui": "ui",
     "town_building": "town",
+    "resident": "residents",
+    "sticker": "stickers",
+    "unlock": "unlocks",
 }
 
 IMAGE_EXTS = {".png", ".webp", ".jpg", ".jpeg", ".svg"}
@@ -477,7 +494,7 @@ class Checker:
                 # như nền phòng: kiểm như background (không cần alpha).
                 solid = entry["kind"] == "background" or (
                     entry["kind"] == "ui" and entry["id"].endswith("_bg")
-                )
+                ) or entry["id"] == "sticker_book_cover"
                 self._check_webp(entry, path, require_alpha=not solid)
             elif entry["file"].endswith((".jpg", ".jpeg")):
                 if not path.read_bytes().startswith(JPEG_SOI):

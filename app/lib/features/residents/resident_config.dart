@@ -12,7 +12,7 @@ library;
 /// thiếu thì tự về hình vẽ bằng code. Khi Muse giao lô 17 (xem
 /// `docs/briefs/lot17_v04.md`): thêm `assets/images/residents/` vào
 /// `pubspec.yaml`, đặt cờ `true`.
-const bool residentArtReady = false;
+const bool residentArtReady = true;
 
 class ResidentConfig {
   const ResidentConfig._();
