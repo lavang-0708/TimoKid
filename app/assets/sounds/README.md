@@ -10,3 +10,10 @@ Claude tự tổng hợp bằng Python (sóng sin có hòa âm và đường bao
 | `stage_complete.wav` | Xong chặng | Hợp âm rải 4 nốt |
 
 Tôn trọng cài đặt `sound_enabled` trong `settings`. Muốn thay âm khác thì giữ nguyên tên file.
+
+## Bổ sung T2-08
+
+Hiệu ứng `tap`, `swoosh`, `hatch`, `level_up`, `purchase`, `gift_open`,
+`streak`, `error_soft` và nhạc nền `music_town.ogg`, `music_room.ogg` do
+`tools/audio/generate_audio.py` tạo (xem `docs/ASSETS.md`, mục "Âm thanh
+và nhạc nền"). Công tắc: `sound_enabled` và `music_enabled`.

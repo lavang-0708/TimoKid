@@ -5,6 +5,7 @@ library;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../sound/sound_service.dart';
 import '../../core/database/app_database.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/sync/sync_providers.dart';
@@ -228,6 +229,7 @@ class _MailLetterDialogState extends ConsumerState<MailLetterDialog> {
     }
     final m = await _service.get(widget.messageId);
     if (!mounted) return;
+    ref.read(soundServiceProvider).playGiftOpen();
     setState(() {
       _opening = false;
       _result = r;

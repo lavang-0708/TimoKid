@@ -15,6 +15,9 @@ import 'features/onboarding/egg_service.dart';
 import 'features/onboarding/onboarding_service.dart';
 import 'features/qa/qa_menu_opener.dart';
 import 'features/qa/test_grant_service.dart';
+import 'features/sound/music_host.dart';
+import 'features/sound/music_service.dart';
+import 'features/sound/sound_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,8 +55,12 @@ Future<void> main() async {
       overrides: [
         databaseProvider.overrideWithValue(db),
         sessionStoreProvider.overrideWithValue(store),
+        // Âm thanh thật (T2-08); test widget dùng player rỗng mặc định.
+        soundPlayerProvider.overrideWithValue(AudioPlayersSoundPlayer()),
+        musicPlayerProvider.overrideWithValue(AudioPlayersMusicPlayer()),
       ],
       child: TimoKidApp(
+        enableMusic: true,
         router: AppRouter.create(
           showOnboarding: showOnboarding,
           showHatch: showHatch,
@@ -78,7 +85,10 @@ Future<void> main() async {
 }
 
 class TimoKidApp extends StatelessWidget {
-  const TimoKidApp({super.key, this.router});
+  const TimoKidApp({super.key, this.router, this.enableMusic = false});
+
+  /// Bật nhạc nền theo màn/lifecycle ([MusicHost]); chỉ `main()` bật.
+  final bool enableMusic;
 
   /// Router của app; null = router mặc định (mở thẳng vào Phòng
   /// từ T2-04). Test widget bơm thẳng màn cần kiểm thì để null.
@@ -93,9 +103,13 @@ class TimoKidApp extends StatelessWidget {
       // Menu QA (T1-13): vùng nhấn giữ 5 giây ở góc trên-trái, chỉ
       // gắn khi bật QA (bản debug hoặc --dart-define=QA_MENU=true).
       // Bản release giao cho bé không có vùng này.
-      builder: (context, child) => SyncHost(
-        child: QaMenuOpener(child: child ?? const SizedBox.shrink()),
-      ),
+      builder: (context, child) {
+        Widget body = QaMenuOpener(child: child ?? const SizedBox.shrink());
+        if (enableMusic) {
+          body = MusicHost(router: router ?? AppRouter.router, child: body);
+        }
+        return SyncHost(child: body);
+      },
     );
   }
 }

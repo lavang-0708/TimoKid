@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../sound/sound_service.dart';
+import '../sound/sound_settings.dart';
 import '../../core/sync/sync_status_icon.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/models.dart';
@@ -82,6 +84,8 @@ class _TownScreenState extends ConsumerState<TownScreen> {
     super.initState();
     _refresh();
   }
+
+  void _tap() => ref.read(soundServiceProvider).playTap();
 
   @override
   void didUpdateWidget(covariant TownScreen oldWidget) {
@@ -184,12 +188,21 @@ class _TownScreenState extends ConsumerState<TownScreen> {
           Positioned.fill(
             child: TownMap(
               statuses: statuses,
-              onAreaTap: (i) => context.go(
-                BuildingScreen.route,
-                extra: BuildingScreenArgs(stageIndex: i),
-              ),
-              onRoomTap: () => context.go(RoomScreen.route),
-              onArenaTap: () => context.go(ArenaLobbyScreen.route),
+              onAreaTap: (i) {
+                _tap();
+                context.go(
+                  BuildingScreen.route,
+                  extra: BuildingScreenArgs(stageIndex: i),
+                );
+              },
+              onRoomTap: () {
+                _tap();
+                context.go(RoomScreen.route);
+              },
+              onArenaTap: () {
+                _tap();
+                context.go(ArenaLobbyScreen.route);
+              },
               showFountain: _mastered >= UnlockConfig.townDecorThreshold,
             ),
           ),
@@ -218,7 +231,10 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                           color: const Color(0xFFFFA65C),
                           label: 'Phòng',
                           tooltip: 'Về Phòng',
-                          onPressed: () => context.go(RoomScreen.route),
+                          onPressed: () {
+                            _tap();
+                            context.go(RoomScreen.route);
+                          },
                         ),
                         const SizedBox(height: 4),
                         GameRoundButton(
@@ -227,7 +243,10 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                           color: const Color(0xFFF0A23B),
                           label: 'Đấu trường',
                           tooltip: 'Đấu trường TIMO',
-                          onPressed: () => context.go(ArenaLobbyScreen.route),
+                          onPressed: () {
+                            _tap();
+                            context.go(ArenaLobbyScreen.route);
+                          },
                         ),
                         const SizedBox(height: 4),
                         StickerHudButton(
@@ -310,13 +329,21 @@ class _TownScreenState extends ConsumerState<TownScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    QuestHudButton(
-                      key: const Key('town-quest-button'),
-                      showDot: _questDot,
-                      onPressed: () async {
-                        await showQuestBoardDialog(context);
-                        if (mounted) _refresh();
-                      },
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        QuestHudButton(
+                          key: const Key('town-quest-button'),
+                          showDot: _questDot,
+                          onPressed: () async {
+                            _tap();
+                            await showQuestBoardDialog(context);
+                            if (mounted) _refresh();
+                          },
+                        ),
+                        const SizedBox(height: 4),
+                        const SoundHudButton(key: Key('sound-settings-button')),
+                      ],
                     ),
                   ],
                 ),

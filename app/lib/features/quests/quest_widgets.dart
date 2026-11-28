@@ -8,6 +8,7 @@ library;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../sound/sound_service.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/widgets/game_ui.dart';
 import '../arena/arena_widgets.dart';
@@ -127,6 +128,7 @@ class _QuestBoardDialogState extends ConsumerState<QuestBoardDialog> {
     final service = QuestService(db: ref.read(databaseProvider));
     final r = await service.claim(_childId!, q.id);
     if (!mounted) return;
+    if (r.ok) ref.read(soundServiceProvider).playStreak();
     _message = r.ok
         ? (r.gems > 0
               ? 'Nhận ${r.xu} xu và ${r.gems} kim cương thưởng!'
@@ -142,6 +144,7 @@ class _QuestBoardDialogState extends ConsumerState<QuestBoardDialog> {
     final gems = await QuestService(db: ref.read(databaseProvider))
         .claimStreakChest(_childId!);
     if (!mounted) return;
+    if (gems > 0) ref.read(soundServiceProvider).playStreak();
     _message = gems > 0 ? 'Rương chuỗi: $gems kim cương!' : null;
     await _load();
     if (mounted) setState(() => _busy = false);

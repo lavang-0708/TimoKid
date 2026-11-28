@@ -6,6 +6,7 @@ import 'package:timokid/core/animation/animation_gate.dart';
 import 'package:timokid/core/database/database_provider.dart';
 import 'package:timokid/features/daily_set/daily_set_config.dart';
 import 'package:timokid/features/math/math_session.dart';
+import 'package:timokid/features/sound/audio_gate.dart';
 import 'package:timokid/features/town/town_assets.dart';
 import 'package:timokid/main.dart' as app;
 
@@ -25,6 +26,9 @@ void main() {
   // AnimationController.repeat() nên pumpAndSettle không bao giờ
   // dừng khi Thị trấn/mở đầu đang hiện. Máy thật vẫn bật hiệu ứng.
   AnimationGate.enabled = false;
+  // Tắt hẳn âm thanh và nhạc nền (T2-08): audioplayers làm
+  // pumpAndSettle treo trên máy ảo CI, kể cả nhạc Thị trấn lúc khởi động.
+  AudioGate.enabled = false;
 
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 

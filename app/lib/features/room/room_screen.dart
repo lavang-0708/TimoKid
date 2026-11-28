@@ -52,6 +52,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../sound/sound_service.dart';
+import '../sound/sound_settings.dart';
 import '../../core/animation/animation_gate.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/tables.dart';
@@ -346,6 +348,9 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
         _canClaimEgg = canClaim;
         _claimSpecies = claimSpecies;
         _celebration = celebration;
+        if (celebration != null) {
+          ref.read(soundServiceProvider).playLevelUp();
+        }
         _profile = profile;
         _eggSpecies = eggSpecies;
         _hatched = hatched;
@@ -451,6 +456,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
 
   /// Nhắc mở khóa khi bé bấm nút đang khóa: SnackBar có nút ra Thị trấn.
   void _showLockedReminder(String featureName) {
+    ref.read(soundServiceProvider).playErrorSoft();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('$featureName mở khi xong đề ngày nhé!'),
@@ -524,6 +530,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   /// Tủ đồ (E): chọn 1 trong 3 bộ đồ và phụ kiện đầu, xem trước ngay
   /// trên nhân vật trong phòng, lưu ngay khi chọn.
   Future<void> _openWardrobe() async {
+    ref.read(soundServiceProvider).playSwoosh();
     final profile = _profile;
     final childId = _childId;
     if (profile == null || childId == null) return;
@@ -821,6 +828,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   Future<void> _openThemePicker() async {
     final childId = _childId;
     if (childId == null) return;
+    ref.read(soundServiceProvider).playSwoosh();
     final choice = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
@@ -1205,6 +1213,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   /// Sang Cửa hàng, quay lại thì tải lại số dư (mua xong xu giảm).
   /// [tab] (vd `pet`) mở thẳng nhóm hàng đó (`/shop?tab=pet`).
   Future<void> _openShop({String? tab}) async {
+    ref.read(soundServiceProvider).playSwoosh();
     await context.push(
       tab == null ? ShopScreen.route : '${ShopScreen.route}?tab=$tab',
     );
@@ -1600,13 +1609,17 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                           image: '$uiArt/ui_icon_town.webp',
                           color: const Color(0xFFA07BE0),
                           label: 'Thị trấn',
-                          onPressed: () => context.go(TownScreen.route),
+                          onPressed: () {
+                            ref.read(soundServiceProvider).playTap();
+                            context.go(TownScreen.route);
+                          },
                         ),
                         const SizedBox(height: 4),
                         QuestHudButton(
                           key: const Key('room-quest-button'),
                           showDot: _questDot,
                           onPressed: () async {
+                            ref.read(soundServiceProvider).playTap();
                             await showQuestBoardDialog(context);
                             if (mounted) _refresh();
                           },
@@ -1672,6 +1685,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                               onPressed: () async {
                                 final id = _childId;
                                 if (id == null) return;
+                                ref.read(soundServiceProvider).playTap();
                                 await showMailboxDialog(context, id);
                                 if (mounted) _refresh();
                               },
@@ -1748,12 +1762,21 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                 bottom: false,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 84),
-                  child: GameRoundButton(
-                    key: const Key('room-arrange-button'),
-                    icon: Icons.open_with_rounded,
-                    color: const Color(0xFFF2A65A),
-                    label: 'Sắp xếp',
-                    onPressed: _toggleArranging,
+                  // HUD hàng ngang đã đầy ở 608x248: nút loa nằm dưới
+                  // nút Sắp xếp.
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GameRoundButton(
+                        key: const Key('room-arrange-button'),
+                        icon: Icons.open_with_rounded,
+                        color: const Color(0xFFF2A65A),
+                        label: 'Sắp xếp',
+                        onPressed: _toggleArranging,
+                      ),
+                      const SizedBox(height: 2),
+                      const SoundHudButton(key: Key('sound-settings-button')),
+                    ],
                   ),
                 ),
               ),
