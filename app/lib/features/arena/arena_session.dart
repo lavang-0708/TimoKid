@@ -177,7 +177,7 @@ class ArenaSession extends ChangeNotifier {
       sectionTotal: per,
       points: correct * format.pointsPerQuestion,
       maxPoints: format.maxScore,
-      medal: arenaMedalFor(correct),
+      medal: format.medalFor(correct),
     );
   }
 }
