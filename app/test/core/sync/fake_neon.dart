@@ -42,6 +42,23 @@ class FakeNeon {
   bool Function(http.Request req)? loseResponse;
 
   String goodPassword = 'matkhau123';
+
+  /// Email đã có tài khoản: đăng ký trùng thì server trả USER_ALREADY_EXISTS.
+  final Set<String> existingEmails = {};
+
+  /// Nội dung các lệnh gọi `request-password-reset` / `change-password`.
+  final List<Map<String, Object?>> resetRequests = [];
+  final List<Map<String, Object?>> passwordChanges = [];
+
+  /// Tên đường dẫn đặt lại mật khẩu mà server giả hiểu (bản Better Auth cũ
+  /// dùng `forget-password`).
+  String resetPath = 'request-password-reset';
+
+  /// Ép Neon Auth trả mã HTTP này cho đăng nhập/đăng ký (vd 503).
+  int? authFailStatus;
+
+  /// Phiên hết hạn: `/token` trả 401 dù có cookie.
+  bool sessionExpired = false;
   int tokenCalls = 0;
 
   Map<String, Map<String, Object?>> table(String name) =>
@@ -85,6 +102,41 @@ class FakeNeon {
   http.Response _route(http.Request req) {
     final path = req.url.path;
     if (path.contains('/auth/')) {
+      if (authFailStatus != null &&
+          (path.endsWith('/sign-in/email') ||
+              path.endsWith('/sign-up/email'))) {
+        return _json({'message': 'unavailable'}, authFailStatus!);
+      }
+      if (path.endsWith('/$resetPath')) {
+        resetRequests.add((jsonDecode(req.body) as Map).cast());
+        return _json({'status': true});
+      }
+      if (path.endsWith('/request-password-reset') ||
+          path.endsWith('/forget-password')) {
+        return _json({'message': 'Not found'}, 404);
+      }
+      if (path.endsWith('/change-password')) {
+        final b = (jsonDecode(req.body) as Map).cast<String, Object?>();
+        if (!(req.headers['Cookie'] ?? '').contains('session_token')) {
+          return _json({'message': 'Unauthorized'}, 401);
+        }
+        if (b['currentPassword'] != goodPassword) {
+          return _json({
+            'code': 'INVALID_PASSWORD',
+            'message': 'Invalid password',
+          }, 400);
+        }
+        passwordChanges.add(b);
+        goodPassword = b['newPassword'] as String;
+        return _json({'status': true});
+      }
+      if (path.endsWith('/sign-up/email') &&
+          existingEmails.contains((jsonDecode(req.body) as Map)['email'])) {
+        return _json({
+          'code': 'USER_ALREADY_EXISTS',
+          'message': 'User already exists',
+        }, 422);
+      }
       if (path.endsWith('/sign-in/email') || path.endsWith('/sign-up/email')) {
         final b = jsonDecode(req.body) as Map;
         if (b['password'] != goodPassword) {
@@ -105,6 +157,7 @@ class FakeNeon {
       }
       if (path.endsWith('/token')) {
         tokenCalls++;
+        if (sessionExpired) return _json({'message': 'expired'}, 401);
         if (!(req.headers['Cookie'] ?? '').contains(
           'neon-auth.session_token=abc123',
         )) {

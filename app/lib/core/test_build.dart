@@ -35,3 +35,14 @@ class TestUnlocks {
   @visibleForTesting
   static set debugOverride(bool? value) => _override = value;
 }
+
+/// Lý do (`wallet_ledger.reason`) của mọi dòng ví do BẢN THỬ tạo ra: tặng
+/// ban đầu (`test_grant`), nạp lại (`test_topup`) và dòng bù số dư âm khi
+/// dọn (`test_cleanup`, xem `TestGrantCleanup`). Các dòng này KHÔNG BAO GIỜ
+/// được gửi lên server (xem `SyncEngine`) và bị dọn khỏi máy ở lần mở đầu
+/// tiên của bản chính thức, để không lẫn vào thống kê thật của bố/mẹ.
+const List<String> testWalletReasons = [
+  'test_grant',
+  'test_topup',
+  'test_cleanup',
+];

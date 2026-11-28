@@ -34,7 +34,15 @@ Chạy ở máy cần origin `localhost` được Neon Auth cho phép; bản dep
 
 ## Các màn hình
 
-Đăng nhập/Đăng ký, Chọn bé, Thống kê (7 hoặc 30 ngày, kèm thẻ Nhân vật và pet), Dạng bài (7, 30 hoặc 90 ngày), Thư và quà, Cài đặt. Trang không tạo được hồ sơ bé: hồ sơ xuất hiện sau khi app trên máy bé đăng nhập cùng tài khoản và đồng bộ.
+Đăng nhập / Đăng ký (nhập lại mật khẩu, tối thiểu 8 ký tự) / Quên mật khẩu, trang Đặt lại mật khẩu, Chọn bé, Thống kê (7, 14 hoặc 30 ngày; mặc định 14), Dạng bài (7, 30 hoặc 90 ngày), Đề tự soạn, Thư và quà, Cài đặt. Email đang đăng nhập hiện dưới thanh trên cùng. Trang không tạo được hồ sơ bé: hồ sơ xuất hiện sau khi app trên máy bé đăng nhập cùng tài khoản và đồng bộ.
+
+**Quên / đặt lại / đổi mật khẩu.** "Quên mật khẩu?" gọi `POST {AUTH}/request-password-reset {email, redirectTo}` (bản Better Auth cũ: `forget-password`). `redirectTo` là gốc của trang này (`https://lavang-0708.github.io/TimoKid/`, hoặc `http://localhost:5173/TimoKid/` khi chạy ở máy); domain phải nằm trong trusted origins của Neon Auth. Neon gửi thư (người gửi chung `auth@mail.myneon.app`) kèm liên kết; bấm vào thì Neon chuyển về `redirectTo?token=...` (hoặc `?error=INVALID_TOKEN` khi token sai/hết hạn). Trang đọc `token` từ URL, hiện form mật khẩu mới và gọi `POST {AUTH}/reset-password {token, newPassword}`; xong thì xóa token khỏi URL (`history.replaceState`). App của bé cũng có "Quên mật khẩu?" với cùng `redirectTo` (đổi bằng `--dart-define=TIMOKID_RESET_REDIRECT=...`), người dùng hoàn tất trên trình duyệt. "Đổi mật khẩu" (Cài đặt > Tài khoản) gọi `POST {AUTH}/change-password`.
+
+**Cài đặt > Hồ sơ các bé** liệt kê mọi bé của gia đình với "Đồng bộ lần cuối" (giờ Việt Nam), sửa tên và lớp (1-5): ghi `PATCH children` kèm `updated_at` mới; app tải về sau lần đồng bộ tiếp theo (`SyncEngine._pullChildren`). Mức thưởng và khóa kiểu trả lời ghi theo từng bé và app áp dụng (xem `docs/SYNC.md` mục "Cài đặt của bố").
+
+**Thống kê** thêm: pet (loài, giai đoạn, xp), đấu trường (số lượt và huy chương vòng loại/chung kết), sticker (số dạng thành thạo), lượt làm đề tự soạn. Bảng `pets`, `arena_attempts`, `custom_questions` chưa có trên server thì thẻ hiện "Chưa có dữ liệu". Số dư xu/kim cương tính từ `wallet_ledger` và BỎ các dòng của bản thử (`test_grant`, `test_topup`, `test_cleanup`).
+
+**Thư và quà**: lời nhắn tối đa 300 ký tự, xu (0-1000), kim cương (0-100), món đồ chọn từ danh mục `src/lib/items.ts` (khớp Cửa hàng của app, có test bên app). Trạng thái: "Chưa mở" / "Bé đã mở lúc …" / "Đã nhận quà lúc …".
 
 **Dạng bài** có mục "Thống kê từng dạng": với bé đang chọn và khoảng ngày đã chọn, mỗi mảng liệt kê đủ các dạng của app (84 dạng: logic 18, số học 15, lý thuyết số 17, hình học 17, tổ hợp 17) kèm số lượt và tỉ lệ đúng ngay lần đầu. Dạng yếu (từ 5 lượt trở lên, đúng dưới 60%) xếp trước, rồi theo tỉ lệ đúng tăng dần; dạng chưa làm lượt nào hiện "Chưa làm" ở cuối mỗi mảng. Dữ liệu lấy từ bảng `attempts`; phần tính nằm ở `formStatsByStrand` trong `src/lib/logic.ts`. Bảng tên tiếng Việt `FORM_LABELS` (`src/lib/labels.ts`) được `src/lib/labels.test.ts` đối chiếu với mã Dart trong `app/lib/features/questions/generators/`: thêm hoặc đổi mã dạng trong app mà quên cập nhật nhãn thì `npm test` báo lỗi.
 

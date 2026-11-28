@@ -156,6 +156,21 @@ export const PET_SPECIES_NAMES = {
   dog: 'Chó Tinh Anh',
   cat: 'Mèo Mũm Mĩm',
   rabbit: 'Thỏ Bánh Bao',
+  squirrel: 'Sóc',
+  capybara: 'Capybara',
+  dragon: 'Rồng con',
+} as const;
+
+/** Tên loài pet theo mã; mã lạ thì trả lại chính mã. */
+export function petSpeciesName(code: string): string {
+  return (PET_SPECIES_NAMES as Record<string, string>)[code] ?? code;
+}
+
+export const MEDAL_NAMES = {
+  gold: 'Vàng',
+  silver: 'Bạc',
+  bronze: 'Đồng',
+  participant: 'Tham gia',
 } as const;
 
 export const PET_STAGE_NAMES = {

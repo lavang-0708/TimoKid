@@ -365,11 +365,128 @@ export function messageStatus(m: { opened_at: string | null; claimed_at: string 
   return 'unopened';
 }
 
+/** "Chưa mở" / "Bé đã mở lúc 14:05 21/11/2026" / "Đã nhận quà lúc …" (giờ Việt Nam). */
+export function messageStatusText(m: { opened_at: string | null; claimed_at: string | null }): string {
+  const st = messageStatus(m);
+  if (st === 'claimed') return `Đã nhận quà lúc ${formatVnDateTime(m.claimed_at as string)}`;
+  if (st === 'opened') return `Bé đã mở lúc ${formatVnDateTime(m.opened_at as string)}`;
+  return MESSAGE_STATUS_VI.unopened;
+}
+
 export const MESSAGE_STATUS_VI: Record<MessageStatus, string> = {
   unopened: 'Chưa mở',
   opened: 'Bé đã mở',
   claimed: 'Đã nhận quà',
 };
+
+// ------------------------------------------------ ví, đấu trường, đề tự soạn
+
+/** Lý do dòng ví do bản thử của app tạo ra (app/lib/core/test_build.dart `testWalletReasons`). */
+export const TEST_WALLET_REASONS = ['test_grant', 'test_topup', 'test_cleanup'] as const;
+
+export interface LedgerRow {
+  currency: string;
+  amount: number | string;
+  reason?: string;
+}
+
+/**
+ * Số dư xu/kim cương từ sổ ví, BỎ các dòng của bản thử (kể cả khi server còn giữ dòng cũ
+ * do bản thử đã gửi lên). Dòng chi tiêu bằng xu thử có thể làm tổng âm: hiện 0.
+ */
+export function sumBalances(rows: LedgerRow[]): { xu: number; gem: number } {
+  const test = new Set<string>(TEST_WALLET_REASONS);
+  let xu = 0;
+  let gem = 0;
+  for (const r of rows) {
+    if (r.reason && test.has(r.reason)) continue;
+    const n = Number(r.amount);
+    if (r.currency === 'xu') xu += n;
+    else if (r.currency === 'gem') gem += n;
+  }
+  return { xu: Math.max(0, xu), gem: Math.max(0, gem) };
+}
+
+export interface ArenaRow {
+  mode: string;
+  medal: string;
+  score: number | string;
+  correct_count?: number | string;
+  gems_awarded?: number | string;
+}
+
+export interface ArenaSummary {
+  heats: number;
+  finals: number;
+  /** Số huy chương theo loại, tách vòng loại (heat) và chung kết (final). */
+  medals: Record<'heat' | 'final', Record<'gold' | 'silver' | 'bronze' | 'participant', number>>;
+  bestScore: number | null;
+  gems: number;
+}
+
+export function summarizeArena(rows: ArenaRow[]): ArenaSummary {
+  const out: ArenaSummary = {
+    heats: 0,
+    finals: 0,
+    medals: {
+      heat: { gold: 0, silver: 0, bronze: 0, participant: 0 },
+      final: { gold: 0, silver: 0, bronze: 0, participant: 0 },
+    },
+    bestScore: null,
+    gems: 0,
+  };
+  for (const r of rows) {
+    const mode = r.mode === 'final' ? 'final' : 'heat';
+    if (mode === 'final') out.finals++;
+    else out.heats++;
+    const medal = r.medal as keyof ArenaSummary['medals']['heat'];
+    if (medal in out.medals[mode]) out.medals[mode][medal]++;
+    const score = Number(r.score);
+    if (Number.isFinite(score) && (out.bestScore === null || score > out.bestScore)) out.bestScore = score;
+    out.gems += Number(r.gems_awarded ?? 0) || 0;
+  }
+  return out;
+}
+
+export interface CustomUsage {
+  /** Số lượt trả lời câu tự soạn. */
+  attempts: number;
+  correctFirstTry: number;
+  /** Số câu tự soạn khác nhau bé đã gặp. */
+  distinctQuestions: number;
+}
+
+/** Lượt làm câu tự soạn: `attempts.form_id = 'custom:<id>'`. */
+export function summarizeCustomUsage(rows: { form_id: string; correct_first_try: boolean }[]): CustomUsage {
+  const ids = new Set<string>();
+  let attempts = 0;
+  let correct = 0;
+  for (const r of rows) {
+    if (!r.form_id.startsWith('custom:')) continue;
+    attempts++;
+    if (r.correct_first_try) correct++;
+    ids.add(r.form_id);
+  }
+  return { attempts, correctFirstTry: correct, distinctQuestions: ids.size };
+}
+
+export const CHILD_NAME_MAX = 40;
+export const GRADE_MIN = 1;
+export const GRADE_MAX = 5;
+
+/** Kiểm tra sửa hồ sơ bé: tên 1-40 ký tự, lớp 1-5 (ràng buộc của bảng `children`). */
+export function validateChildEdit(name: string, grade: number | string):
+  | { ok: true; value: { name: string; grade: number } }
+  | { ok: false; error: string } {
+  const n = name.trim();
+  if (n.length === 0) return { ok: false, error: 'Hãy nhập tên bé.' };
+  if ([...n].length > CHILD_NAME_MAX) return { ok: false, error: `Tên bé tối đa ${CHILD_NAME_MAX} ký tự.` };
+  const g = typeof grade === 'number' ? grade : Number(grade);
+  if (!Number.isInteger(g) || g < GRADE_MIN || g > GRADE_MAX) {
+    return { ok: false, error: `Lớp phải là số từ ${GRADE_MIN} đến ${GRADE_MAX}.` };
+  }
+  return { ok: true, value: { name: n, grade: g } };
+}
 
 // ------------------------------------------------------------ định dạng
 

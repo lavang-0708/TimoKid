@@ -28,15 +28,63 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
+  final _confirm = TextEditingController();
   bool _signUp = false;
   bool _busy = false;
   String? _error;
 
   @override
+  void initState() {
+    super.initState();
+    // Đăng nhập lại khi phiên hết hạn: điền sẵn email đang dùng.
+    _email.text = ref.read(authProvider).email ?? '';
+  }
+
+  @override
   void dispose() {
     _email.dispose();
     _password.dispose();
+    _confirm.dispose();
     super.dispose();
+  }
+
+  static final _emailRe = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+
+  /// Độ dài mật khẩu tối thiểu của Neon Auth.
+  static const int minPassword = 8;
+
+  /// Kiểm tra trước khi gọi mạng; trả thông báo lỗi hoặc null nếu hợp lệ.
+  String? _validate(String email, String password) {
+    if (email.isEmpty || password.isEmpty) {
+      return 'Hãy nhập email và mật khẩu.';
+    }
+    if (!_emailRe.hasMatch(email)) {
+      return 'Email chưa đúng dạng (vd: ten@gmail.com).';
+    }
+    if (_signUp) {
+      if (password.length < minPassword) {
+        return 'Mật khẩu cần ít nhất $minPassword ký tự.';
+      }
+      if (password != _confirm.text) return 'Hai mật khẩu chưa giống nhau.';
+    }
+    return null;
+  }
+
+  static String errorText(NeonException e) => switch (e.kind) {
+    NeonErrorKind.network => 'Không có mạng. Kiểm tra kết nối rồi thử lại.',
+    NeonErrorKind.server =>
+      'Máy chủ đang bận hoặc vừa thức dậy. Thử lại sau ít giây nhé.',
+    _ => e.message,
+  };
+
+  Future<void> _forgot() async {
+    final sent = await showDialog<bool>(
+      context: context,
+      builder: (_) => ForgotPasswordDialog(initialEmail: _email.text.trim()),
+    );
+    if (sent == true && mounted) {
+      setState(() => _error = null);
+    }
   }
 
   Future<void> _markPromptDone() => ref
@@ -56,8 +104,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _submit() async {
     final email = _email.text.trim();
     final password = _password.text;
-    if (email.isEmpty || password.isEmpty) {
-      setState(() => _error = 'Hãy nhập email và mật khẩu.');
+    final invalid = _validate(email, password);
+    if (invalid != null) {
+      setState(() => _error = invalid);
       return;
     }
     setState(() {
@@ -74,9 +123,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (mounted) {
         setState(() {
           _busy = false;
-          _error = e.kind == NeonErrorKind.network
-              ? 'Không có mạng. Kiểm tra kết nối rồi thử lại.'
-              : e.message;
+          _error = errorText(e);
         });
       }
     }
@@ -120,9 +167,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         key: const Key('login-password'),
         controller: _password,
         obscureText: true,
-        onSubmitted: (_) => _submit(),
-        decoration: const InputDecoration(labelText: 'Mật khẩu', isDense: true),
+        onSubmitted: (_) => _signUp ? null : _submit(),
+        decoration: InputDecoration(
+          labelText: _signUp
+              ? 'Mật khẩu (ít nhất $minPassword ký tự)'
+              : 'Mật khẩu',
+          isDense: true,
+        ),
       ),
+      if (_signUp) ...[
+        const SizedBox(height: 6),
+        TextField(
+          key: const Key('login-confirm'),
+          controller: _confirm,
+          obscureText: true,
+          onSubmitted: (_) => _submit(),
+          decoration: const InputDecoration(
+            labelText: 'Nhập lại mật khẩu',
+            isDense: true,
+          ),
+        ),
+      ],
       if (_error != null)
         Padding(
           padding: const EdgeInsets.only(top: 6),
@@ -140,6 +205,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           _busy ? 'Đang xử lý...' : (_signUp ? 'Tạo tài khoản' : 'Đăng nhập'),
         ),
       ),
+      if (!_signUp)
+        TextButton(
+          key: const Key('login-forgot'),
+          onPressed: _busy ? null : _forgot,
+          child: const Text('Quên mật khẩu?'),
+        ),
       TextButton(
         key: const Key('login-toggle-signup'),
         onPressed: _busy
@@ -211,6 +282,128 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+/// Hộp "Quên mật khẩu?": nhập email, app xin Neon Auth gửi email đặt lại
+/// mật khẩu; bố/mẹ bấm liên kết trong email để đặt mật khẩu mới trên trang
+/// web của TimoKid (trình duyệt), rồi quay lại app đăng nhập.
+class ForgotPasswordDialog extends ConsumerStatefulWidget {
+  const ForgotPasswordDialog({super.key, this.initialEmail = ''});
+
+  final String initialEmail;
+
+  @override
+  ConsumerState<ForgotPasswordDialog> createState() =>
+      _ForgotPasswordDialogState();
+}
+
+class _ForgotPasswordDialogState extends ConsumerState<ForgotPasswordDialog> {
+  late final _email = TextEditingController(text: widget.initialEmail);
+  bool _busy = false;
+  bool _sent = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _email.dispose();
+    super.dispose();
+  }
+
+  Future<void> _send() async {
+    final email = _email.text.trim();
+    if (!_LoginScreenState._emailRe.hasMatch(email)) {
+      setState(() => _error = 'Email chưa đúng dạng (vd: ten@gmail.com).');
+      return;
+    }
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await ref.read(authProvider.notifier).requestPasswordReset(email);
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _sent = true;
+        });
+      }
+    } on NeonException catch (e) {
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _error = _LoginScreenState.errorText(e);
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      key: const Key('forgot-dialog'),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Quên mật khẩu?',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 6),
+              if (_sent)
+                const Text(
+                  'Nếu email này đã có tài khoản, TimoKid vừa gửi một thư kèm '
+                  'liên kết đặt lại mật khẩu (xem cả mục Thư rác). Bấm liên kết '
+                  'trong thư, đặt mật khẩu mới trên trang web rồi quay lại app '
+                  'đăng nhập.',
+                  key: Key('forgot-sent'),
+                )
+              else ...[
+                const Text(
+                  'Nhập email đã đăng ký. TimoKid sẽ gửi thư có liên kết để '
+                  'đặt mật khẩu mới.',
+                ),
+                TextField(
+                  key: const Key('forgot-email'),
+                  controller: _email,
+                  keyboardType: TextInputType.emailAddress,
+                  autocorrect: false,
+                  onSubmitted: (_) => _send(),
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    isDense: true,
+                    errorText: _error,
+                    errorMaxLines: 3,
+                  ),
+                ),
+              ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    key: const Key('forgot-close'),
+                    onPressed: () => Navigator.of(context).pop(_sent),
+                    child: Text(_sent ? 'Đóng' : 'Hủy'),
+                  ),
+                  if (!_sent)
+                    ElevatedButton(
+                      key: const Key('forgot-send'),
+                      onPressed: _busy ? null : _send,
+                      child: Text(_busy ? 'Đang gửi...' : 'Gửi thư'),
+                    ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

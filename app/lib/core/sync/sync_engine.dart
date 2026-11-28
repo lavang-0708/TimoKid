@@ -23,6 +23,7 @@ import '../database/app_database.dart';
 import '../time/clock.dart';
 import '../../features/custom_questions/custom_question_service.dart';
 import 'neon_client.dart';
+import '../test_build.dart' show testWalletReasons;
 import 'sync_config.dart';
 
 /// Khóa `settings` chỉ có ý nghĩa trên máy này: không gửi, không nhận.
@@ -33,8 +34,13 @@ bool isLocalOnlySettingKey(String key) =>
     key == 'music_enabled' ||
     key.startsWith('sync_');
 
+/// Điều kiện SQL loại các dòng ví của bản thử (xem `testWalletReasons`).
+final String _notTestReasonsSql =
+    ' AND reason NOT IN (${testWalletReasons.map((r) => "'$r'").join(', ')})';
+
 const settingsMarkKey = 'sync_settings_mark';
 const messagesMarkKey = 'sync_messages_mark';
+const childrenMarkKey = 'sync_children_mark';
 const customQuestionsMarkKey = 'sync_custom_questions_mark';
 
 /// Giờ app (UTC+7 gắn nhãn UTC) → ISO-8601 của thời điểm thật.
@@ -176,6 +182,8 @@ class SyncEngine {
       // `settings` là chỉ mục biểu thức nên không upsert theo khóa được)
       // và không gửi đè giá trị mới hơn của bố.
       final ps = await _pullSettings();
+      // Tên và lớp bố sửa trên web admin.
+      await _pullChildren();
       for (final spec in _specs()) {
         final n = await _push(spec);
         if (n > 0) pushed[spec.table] = n;
@@ -313,7 +321,12 @@ class SyncEngine {
       sqlTable: 'wallet_ledger',
       insertOnly: true,
       fetch: (n) async => [
-        for (final w in await _unsynced(db.walletLedger, n))
+        for (final w in await _unsynced(
+          db.walletLedger,
+          n,
+          // Xu/kim cương tặng của bản thử không bao giờ lên server.
+          extraWhere: _notTestReasonsSql,
+        ))
           _Pending(w.id, w.updatedAt, {
             'id': w.id,
             'child_id': w.childId,
@@ -481,10 +494,11 @@ class SyncEngine {
   /// Đọc tối đa [limit] dòng `synced = false` của bảng [table].
   Future<List<D>> _unsynced<T extends HasResultSet, D>(
     ResultSetImplementation<T, D> table,
-    int limit,
-  ) {
+    int limit, {
+    String extraWhere = '',
+  }) {
     final q = db.select(table)
-      ..where((_) => const CustomExpression<bool>('synced = 0'))
+      ..where((_) => CustomExpression<bool>('synced = 0$extraWhere'))
       ..limit(limit);
     return q.get();
   }
@@ -589,6 +603,54 @@ class SyncEngine {
       }
     }
     return best;
+  }
+
+  /// Tải tên và lớp của bé do bố/mẹ sửa trên web admin (`children` có
+  /// `updated_at` mới hơn mốc). Chỉ áp dụng khi dòng server mới hơn dòng
+  /// trên máy; dòng trên máy đang chờ gửi và mới hơn thì giữ nguyên. Lớp
+  /// 1–5 như ràng buộc của server. Trả số bé đã cập nhật.
+  Future<int> _pullChildren() async {
+    final mark = await _mark(childrenMarkKey);
+    final rows = await _fetchSince(
+      'children',
+      mark,
+      'id,name,grade,updated_at,deleted_at',
+    );
+    var applied = 0;
+    for (final r in rows) {
+      final id = r['id'] as String?;
+      final stamp = r['updated_at'] as String?;
+      final name = r['name'];
+      final grade = r['grade'];
+      if (id == null || stamp == null || r['deleted_at'] != null) continue;
+      if (name is! String || name.trim().isEmpty || grade is! int) continue;
+      final local = await db.childrenDao.getChild(id);
+      if (local == null) continue;
+      final serverAt = fromServerTime(stamp);
+      if (!serverAt.isAfter(local.updatedAt)) continue;
+      if (local.name == name && local.grade == grade) continue;
+      await db.customUpdate(
+        'UPDATE children SET name = ?, grade = ?, updated_at = ? WHERE id = ?',
+        variables: [
+          Variable.withString(name.trim()),
+          Variable.withInt(grade.clamp(1, 5)),
+          Variable.withInt(serverAt.millisecondsSinceEpoch ~/ 1000),
+          Variable.withString(id),
+        ],
+        updates: const {},
+      );
+      // Trigger `children_unsync` vừa đặt synced = 0; dòng đang đúng bằng
+      // server nên đánh dấu lại.
+      await db.customUpdate(
+        'UPDATE children SET synced = 1 WHERE id = ?',
+        variables: [Variable.withString(id)],
+        updates: const {},
+      );
+      applied++;
+    }
+    final next = _maxStamp(rows, mark);
+    if (next != null && next != mark) await _setMark(childrenMarkKey, next);
+    return applied;
   }
 
   /// Tải `settings` mới hơn mốc; dòng của bé: `updated_at` mới hơn thắng.

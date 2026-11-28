@@ -168,12 +168,46 @@ export class NeonHttp {
 
   private authFail(status: number, body: unknown): ApiError {
     const e = this.toError(status, body);
-    return new ApiError(status >= 500 ? 'server' : 'auth', status, authMessageVi(e.code, e.message), e.code);
+    const message = status === 429 ? 'Thử quá nhiều lần. Hãy đợi một lúc rồi thử lại.' : authMessageVi(e.code, e.message);
+    return new ApiError(status >= 500 ? 'server' : 'auth', status, message, e.code);
   }
 
   private userFrom(body: unknown): AuthUser {
     const u = ((body ?? {}) as { user?: { id?: string; email?: string } }).user;
     return { id: u?.id ?? '', email: u?.email ?? '' };
+  }
+
+  /**
+   * Xin email đặt lại mật khẩu (Better Auth `request-password-reset`, bản cũ tên
+   * `forget-password`). Server luôn trả thành công dù email có tài khoản hay không.
+   * `redirectTo` phải thuộc domain được phép (trusted origins) của Neon Auth; Neon gửi
+   * thư chứa liên kết, bấm vào thì chuyển tới `redirectTo?token=...`.
+   */
+  async requestPasswordReset(email: string, redirectTo: string): Promise<void> {
+    for (const path of ['request-password-reset', 'forget-password']) {
+      const res = await this.raw(`${this.authUrl}/${path}`, this.authInit('POST', { email, redirectTo }));
+      const body = await this.parse(res);
+      if (res.ok) return;
+      if (res.status === 404 && path === 'request-password-reset') continue;
+      throw this.authFail(res.status, body);
+    }
+  }
+
+  /** Hoàn tất đặt lại mật khẩu bằng token trong liên kết email. */
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const res = await this.raw(`${this.authUrl}/reset-password`, this.authInit('POST', { token, newPassword }));
+    const body = await this.parse(res);
+    if (!res.ok) throw this.authFail(res.status, body);
+  }
+
+  /** Đổi mật khẩu khi đang đăng nhập (sai mật khẩu hiện tại: code INVALID_PASSWORD). */
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    const res = await this.raw(
+      `${this.authUrl}/change-password`,
+      this.authInit('POST', { currentPassword, newPassword, revokeOtherSessions: false }),
+    );
+    const body = await this.parse(res);
+    if (!res.ok) throw this.authFail(res.status, body);
   }
 
   /** Khôi phục phiên từ cookie; trả null nếu chưa đăng nhập. */
@@ -280,9 +314,17 @@ function authMessageVi(code: string | undefined, fallback: string): string {
       return 'Mật khẩu quá ngắn (cần ít nhất 8 ký tự).';
     case 'PASSWORD_TOO_LONG':
       return 'Mật khẩu quá dài.';
+    case 'INVALID_PASSWORD':
+      return 'Mật khẩu hiện tại chưa đúng.';
+    case 'INVALID_TOKEN':
+      return 'Liên kết đặt lại mật khẩu không đúng hoặc đã hết hạn. Hãy xin liên kết mới.';
+    case 'RESET_PASSWORD_DISABLED':
+      return 'Máy chủ chưa bật tính năng quên mật khẩu.';
+    case 'EMAIL_NOT_VERIFIED':
+      return 'Email chưa được xác nhận.';
     default:
       return /password/i.test(fallback) && /short/i.test(fallback)
         ? 'Mật khẩu quá ngắn (cần ít nhất 8 ký tự).'
-        : 'Không đăng nhập được: ' + fallback;
+        : 'Không thực hiện được: ' + fallback;
   }
 }

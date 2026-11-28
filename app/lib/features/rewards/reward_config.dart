@@ -56,10 +56,15 @@ class RewardConfig {
     );
   }
 
-  /// Đọc bảng thưởng hiệu lực từ `settings` (khóa `rewards`).
+  /// Đọc bảng thưởng hiệu lực từ `settings` (khóa `rewards`): mức riêng
+  /// của bé (web admin ghi theo bé, app tải về sau mỗi lần đồng bộ) trước,
+  /// không có thì mức chung đã seed. [childId] mặc định là bé đang chơi.
   /// Settings thiếu, JSON lỗi hoặc không phải object thì dùng mặc định.
-  static Future<RewardConfig> load(AppDatabase db) async {
-    final raw = await db.settingsDao.getValue(key: 'rewards');
+  static Future<RewardConfig> load(AppDatabase db, {String? childId}) async {
+    final raw = await db.settingsDao.getEffectiveValue(
+      childId: childId ?? await db.activeChildId(),
+      key: 'rewards',
+    );
     if (raw == null) return RewardConfig.defaults();
     try {
       final parsed = jsonDecode(raw);

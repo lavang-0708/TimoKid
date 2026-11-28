@@ -27,6 +27,14 @@ class SyncConfig {
     defaultValue: 'https://lavang-0708.github.io',
   );
 
+  /// Trang web admin hoàn tất việc đặt lại mật khẩu: Neon Auth gửi email
+  /// chứa liên kết, bấm vào thì chuyển tới đây kèm `?token=...`. Phải nằm
+  /// trong domain được phép (trusted origins) của Neon Auth.
+  static const String resetRedirect = String.fromEnvironment(
+    'TIMOKID_RESET_REDIRECT',
+    defaultValue: 'https://lavang-0708.github.io/TimoKid/',
+  );
+
   /// Số dòng tối đa mỗi lô gửi lên (SYNC.md).
   static const int batchSize = 200;
 

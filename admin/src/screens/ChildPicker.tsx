@@ -5,7 +5,7 @@ import { Card, ErrorBox, Spinner } from '../common';
 export function SyncLine({ at }: { at: string | null }) {
   return (
     <span className="muted">
-      {at ? `Đồng bộ gần nhất: ${relativeVi(at)} (${formatVnDateTime(at)})` : 'Đồng bộ gần nhất: chưa có'}
+      {at ? `Đồng bộ lần cuối: ${formatVnDateTime(at)} (${relativeVi(at)})` : 'Đồng bộ lần cuối: chưa có'}
     </span>
   );
 }

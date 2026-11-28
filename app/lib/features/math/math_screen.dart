@@ -227,6 +227,7 @@ class _MathScreenState extends ConsumerState<MathScreen>
     dailySetsDao: db.dailySetsDao,
     reviewQueueDao: db.reviewQueueDao,
     customQuestionsDao: db.customQuestionsDao,
+    settingsDao: db.settingsDao,
     ladderService: LadderService(
       attemptsDao: db.attemptsDao,
       skillProgressDao: db.skillProgressDao,
@@ -298,6 +299,7 @@ class _MathScreenState extends ConsumerState<MathScreen>
         dailySetsDao: db.dailySetsDao,
         reviewQueueDao: db.reviewQueueDao,
         customQuestionsDao: db.customQuestionsDao,
+        settingsDao: db.settingsDao,
         ladderService: LadderService(
           attemptsDao: db.attemptsDao,
           skillProgressDao: db.skillProgressDao,

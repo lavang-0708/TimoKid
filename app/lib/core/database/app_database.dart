@@ -233,6 +233,29 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// Xóa các dòng `wallet_ledger` có `reason` thuộc [reasons] (CHỈ dùng cho
+  /// việc dọn dòng tặng của bản thử, xem `TestGrantCleanup`). Sổ ví chặn
+  /// DELETE bằng trigger nên tạm bỏ trigger trong MỘT giao dịch rồi tạo lại
+  /// ngay; giao dịch lỗi thì trigger và dữ liệu về như cũ. Trả số dòng đã xóa.
+  Future<int> purgeWalletRowsByReason(List<String> reasons) async {
+    if (reasons.isEmpty) return 0;
+    final marks = List.filled(reasons.length, '?').join(', ');
+    return transaction(() async {
+      await customStatement('DROP TRIGGER IF EXISTS wallet_ledger_no_delete');
+      final n = await customUpdate(
+        'DELETE FROM wallet_ledger WHERE reason IN ($marks)',
+        variables: [for (final r in reasons) Variable.withString(r)],
+        updates: {walletLedger},
+        updateKind: UpdateKind.delete,
+      );
+      await customStatement(
+        'CREATE TRIGGER wallet_ledger_no_delete BEFORE DELETE ON wallet_ledger '
+        'BEGIN SELECT RAISE(ABORT, \'wallet_ledger is append-only\'); END;',
+      );
+      return n;
+    });
+  }
+
   /// Bảng có sửa (đồng bộ lên server bằng upsert): bất kỳ UPDATE nào
   /// không tự đặt `synced` đều đặt lại `synced = 0` để lần đồng bộ sau
   /// gửi lại dòng đó. Bộ đồng bộ đánh dấu đã gửi bằng UPDATE đổi

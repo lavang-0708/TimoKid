@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { http } from '../client';
 import { Card, ErrorBox, RangePicker, Spinner, useLoad } from '../common';
-import { loadCharacter, loadStats } from '../lib/data';
+import { loadCharacter, loadExtras, loadStats, type ExtrasData } from '../lib/data';
 import {
   GENDER_NAMES,
+  MEDAL_NAMES,
+  petSpeciesName,
   HEAD_ACCESSORY_NAMES,
   OUTFIT_NAMES,
   PET_SPECIES_NAMES,
@@ -12,17 +14,17 @@ import {
   STRAND_COLORS,
   STRAND_NAMES,
 } from '../lib/labels';
-import { formatDuration, formatPercent, shortDay, type CharacterView } from '../lib/logic';
+import { formatDuration, formatPercent, shortDay, type ArenaSummary, type CharacterView } from '../lib/logic';
 
 export function StatsScreen({ childId }: { childId: string }) {
-  const [range, setRange] = useState(7);
+  const [range, setRange] = useState(14);
   const q = useLoad(() => loadStats(http, childId, range), [childId, range]);
   const d = q.data;
   return (
     <>
       <div className="row" style={{ justifyContent: 'space-between', marginTop: 12 }}>
         <h2 style={{ margin: 0 }}>Thống kê</h2>
-        <RangePicker value={range} onChange={setRange} />
+        <RangePicker value={range} onChange={setRange} options={[7, 14, 30]} />
       </div>
       {q.error != null && <ErrorBox error={q.error} onRetry={q.reload} />}
       {q.loading && !d && <Spinner />}
@@ -58,6 +60,7 @@ export function StatsScreen({ childId }: { childId: string }) {
           </Card>
 
           <CharacterCard childId={childId} />
+          <ExtrasCards childId={childId} />
 
           <div className="grid">
             <div className="stat" style={{ background: '#fff6d8' }}><b>{d.balances.xu}</b><span>Xu hiện có</span></div>
@@ -65,6 +68,78 @@ export function StatsScreen({ childId }: { childId: string }) {
           </div>
         </div>
       )}
+    </>
+  );
+}
+
+function ExtrasCards({ childId }: { childId: string }) {
+  const q = useLoad(() => loadExtras(http, childId), [childId]);
+  return (
+    <>
+      {q.error != null && <ErrorBox error={q.error} onRetry={q.reload} />}
+      {q.loading && !q.data && <Spinner />}
+      {q.data && <ExtrasBody d={q.data} />}
+    </>
+  );
+}
+
+const NO_DATA = 'Chưa có dữ liệu.';
+
+function ArenaMedals({ a }: { a: ArenaSummary }) {
+  const row = (label: string, n: number, m: ArenaSummary['medals']['heat']) => (
+    <li>
+      <span>{label} ({n} lượt)</span>
+      <b>
+        {(['gold', 'silver', 'bronze', 'participant'] as const).map((k) => `${MEDAL_NAMES[k]} ${m[k]}`).join(' · ')}
+      </b>
+    </li>
+  );
+  return (
+    <ul className="list">
+      {row('Vòng loại', a.heats, a.medals.heat)}
+      {row('Chung kết', a.finals, a.medals.final)}
+      <li><span>Điểm cao nhất</span><b>{a.bestScore ?? '—'}</b></li>
+      <li><span>Kim cương nhận từ đấu trường</span><b>{a.gems}</b></li>
+    </ul>
+  );
+}
+
+export function ExtrasBody({ d }: { d: ExtrasData }) {
+  const arenaCount = d.arena ? d.arena.heats + d.arena.finals : 0;
+  return (
+    <>
+      <Card title="Pet của bé">
+        {d.pets === null || d.pets.length === 0 ? (
+          <p className="muted" style={{ margin: 0 }}>{NO_DATA}</p>
+        ) : (
+          <ul className="list">
+            {d.pets.map((p) => (
+              <li key={p.species}>
+                <span>{petSpeciesName(p.species)}{p.active ? ' (đang nuôi)' : ''}</span>
+                <b>{p.hatched ? PET_STAGE_NAMES[p.stage_seen] ?? p.stage_seen : 'Trứng (chưa nở)'} · {p.xp} xp</b>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+      <Card title="Đấu trường">
+        {d.arena === null || arenaCount === 0 ? (
+          <p className="muted" style={{ margin: 0 }}>{NO_DATA}</p>
+        ) : (
+          <ArenaMedals a={d.arena} />
+        )}
+      </Card>
+      <div className="grid">
+        <div className="stat"><b>{d.stickers}</b><span>Sticker (dạng đã thành thạo)</span></div>
+        <div className="stat">
+          <b>{d.custom.attempts}</b>
+          <span>
+            Lượt làm đề tự soạn
+            {d.custom.attempts > 0 && ` (${d.custom.distinctQuestions} câu, đúng ngay ${d.custom.correctFirstTry})`}
+            {d.customActive !== null && ` · ${d.customActive} câu đang bật`}
+          </span>
+        </div>
+      </div>
     </>
   );
 }
