@@ -5055,3 +5055,91 @@ Mảng Hình học (`geo`, màu `#BFE8CF`): `sticker_base_geo.png` + 19 file `fo
 - Lượt cắt đầu còn r1 1–34 px/icon (magenta lẩn trong khe hẹp sau resize); đã repaint hết bằng donor-median, lượt 2 về 0 mọi chỉ số.
 - **SỬA ĐẾ (28/11, sau khi đẩy):** đế bản đầu là vành có lỗ trong suốt giữa (Ø316) — không khớp khung nhóm B (đĩa đầy, tâm nhạt) và đế number (đĩa đầy); icon rộng sẽ lộ nền app qua lỗ. Đã vẽ lại thành đĩa đầy bằng code (gradient theo đúng tâm/mép khung geo), đẩy lại đè `sticker_base_geo.png.b64` cũ (6.827 B → 34.134 B, SHA mới ở bảng trên; bản vành cũ giữ ở `forms_B2_geo/backup_base_ring/` local).
 **Trạng thái: đã đẩy 20 file `.b64` (3 đợt: 8 + 8 + 4) + mục doc này — chờ Claude decode thành `app/assets/images/stickers/sticker_base_geo.webp` và `form_geo_*.webp`.**
+
+---
+
+# Lô 17 — Nhóm A: 5 TƯ THẾ "ĐANG NÓI" — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+> Đã đẩy. File đích:
+> `app/assets/images/residents/<id>_talk.webp` (Claude convert webp khi decode).
+
+Tư thế "đang nói": cùng nhân vật, cùng mặt/trang phục/phụ kiện với chân dung
+đã duyệt, miệng MỞ, một tay giơ lên sát má ra hiệu. **Cùng cỡ và cùng gốc
+với chân dung: bbox trùng 0 px cả 4 cạnh**, đổi qua lại chân dung ↔ đang nói
+không bị nhảy hình.
+
+Phong cách: pastel, nét mềm, **viền trắng sticker 10 px** quanh hình, không chữ
+trong ảnh. Khung 512×512 nền trong suốt, lề trong 24 px, đầu to, đọc rõ ở 72 px.
+
+| Cư dân | File xem trước |
+| --- | --- |
+| Hiệp sĩ Sáng (`hiep_si_sang`) | `hiep_si_sang_talk.png` |
+| Cô Bông (`co_bong`) | `co_bong_talk.png` |
+| Cú Tròn (`cu_tron`) | `cu_tron_talk.png` |
+| Bác Vuông (`bac_vuong`) | `bac_vuong_talk.png` |
+| Chú Xoay (`chu_xoay`) | `chu_xoay_talk.png` |
+
+## File (PNG 512×512, nền trong suốt)
+
+| File | Byte | SHA-256 |
+| --- | --- | --- |
+| `hiep_si_sang_talk.png` | 149.452 | `019403aa6eebd57ecfefc037b5b88e677de2d6e10a6f031fcb95eebd836a5b33` |
+| `co_bong_talk.png` | 175.106 | `4863f7b3d60a4b2f0cd91ed0d26650503492b19a0853ee570c28f55e599080ca` |
+| `cu_tron_talk.png` | 244.570 | `f381c0b76b492e754ce8819a4aa91a37ba3046946391dc1866589ccf603fab82` |
+| `bac_vuong_talk.png` | 190.988 | `394453ad06bc5979ab7af6b627352caba41ea9a2313bb53c790479a919ab9fbc` |
+| `chu_xoay_talk.png` | 216.449 | `2dbcca32e8867ece1c333163e5f51ba52627b87562c09adeea9983e52341a72f` |
+
+## Bbox tư thế nói so với chân dung (đo bằng code, cả 5 file)
+
+| Cư dân | Chân dung (x0,y0)-(x1,y1) | Đang nói (x0,y0)-(x1,y1) | Lệch L/T/R/B |
+| --- | --- | --- | --- |
+| Hiệp sĩ Sáng | (106,24)-(405,487) | (106,24)-(405,487) | 0 / 0 / 0 / 0 |
+| Cô Bông | (106,24)-(405,487) | (106,24)-(405,487) | 0 / 0 / 0 / 0 |
+| Cú Tròn | (53,24)-(457,487) | (53,24)-(457,487) | 0 / 0 / 0 / 0 |
+| Bác Vuông | (95,24)-(416,487) | (95,24)-(416,487) | 0 / 0 / 0 / 0 |
+| Chú Xoay | (37,24)-(474,487) | (37,24)-(474,487) | 0 / 0 / 0 / 0 |
+
+## Cổng kiểm (đo bằng code trên file cuối, cả 5 file)
+
+- Semi alpha: **0**; magenta r1: **0**; vivid broad: **0**; bright-rim: **0**.
+- Lề trong: **24 px** cả 4 phía; viền trắng sticker: **10 px** đều 4 phía.
+- Độ co ngang khi ép về đúng khung art chân dung: Hiệp sĩ Sáng 0,946;
+  Cô Bông 0,940; Cú Tròn 0,877; Bác Vuông 0,962; Chú Xoay 0,985.
+
+## Cách vẽ
+
+5 lần tạo ảnh (lấy chân dung đã duyệt làm canvas, nền magenta phẳng) →
+tách nền bằng code (ngưỡng 52,5, erode 1 px, defringe) → lấp lỗ hổng nền
+kẹt giữa tay/thân → resize premultiplied-alpha về **đúng (w,h) art +
+offset của chân dung** → viền trắng 10 px bằng code → alpha cứng. Sửa sau:
+vẽ lại pixel vivid magenta (1 px) và viền hồng do blend với nền key (238 px)
+bằng median donor.
+
+Bản vẽ đầu (tay chìa ra ngoài vai) đã loại: khung rộng hơn chân dung 10–19%,
+ép co ngang sẽ méo mặt — vẽ lại bản 2 với tay giơ sát má, trong bề rộng vai.
+
+## Đã soi
+
+100% + 3× trên nền tối (60,60,80) từng file: miệng mở đọc rõ "đang nói",
+tay/cánh giơ sát má đủ ngón không dính, vai/cổ tay khớp thân, viền trắng đều,
+không vệt magenta. Ảnh ghép chân dung + đang nói (nền sáng + nền tối) và
+thu nhỏ 72 px (vuông + tròn) + 216 px tròn (3×) trong `preview.png`.
+
+## Nốt nhỏ (nói thật)
+
+- Cú Tròn: co ngang nhiều nhất (0,877) vì cánh giơ làm khung rộng nhất; soi
+  3× kính vẫn tròn, không thấy méo rõ.
+- Hiệp sĩ Sáng: 4 px hồng còn lại ở chùm lông vũ (x 218–220, y 102–103),
+  màu tím-lavender của thiết kế (chân dung cũng còn 156 px) — nhìn mắt sạch.
+- Cô Bông + Chú Xoay: khe tay/cổ có tam giác trắng nhỏ ~3–4 px (viền trắng
+  của ảnh gốc quanh khe nền sau khi lấp lỗ) — chỉ thấy ở 3×, không thấy ở 72 px.
+- Bác Vuông ở tư thế nói: tay giơ không cầm kéo tỉa (chân dung cầm kéo) —
+  đúng brief (tay giơ ra hiệu), không đổi thiết kế.
+- Ở 3× thấy vài chấm hồng nhạt 1 px trên mép ngoài viền trắng (dưới ngưỡng
+  thước) — không thấy ở 100% / 72 px.
+
+## Chưa làm trong lần này
+
+Nhóm B (sổ sticker), nhóm C (mở khóa), B2 tùy chọn — không thuộc nhiệm vụ này.
+
+**Trạng thái: đã đẩy 5 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/residents/<id>_talk.webp`.**
