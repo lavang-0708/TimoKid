@@ -30,6 +30,10 @@ thì không mở.
   "Sinh câu" để xem đề song ngữ, hình (nếu có), đáp án đúng, gợi ý và
   lời giải. Chỉ sinh để xem: không ghi lượt trả lời, không động vào
   bậc/thành thạo/sổ ôn tập. "Câu khác" sinh câu mới cùng dạng/mức.
+- **Giả lập mùa** (T5-02) — ép một mùa (Tết, Trung thu, Giáng sinh) hoặc
+  "Theo ngày thật". Ép mùa chỉ trong bộ nhớ (tắt app là hết): Thị trấn
+  hiện biển mùa, Cửa hàng có tab "Bộ sưu tập mùa" + ruy băng + giảm giá
+  20% món thuộc mùa, đề ngày được +50% xu. Về Thị trấn/Cửa hàng để thấy.
 - **Xóa dữ liệu** — xóa toàn bộ dữ liệu của bé (lượt trả lời, bậc,
   sổ ôn tập, đề ngày, xu/kim cương) về trạng thái mới cài, rồi về màn
   Thị trấn. Có hộp thoại xác nhận; không khôi phục được.
