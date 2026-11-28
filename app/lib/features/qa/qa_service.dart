@@ -152,6 +152,7 @@ class QaService {
     final set = await DailySetService(
       dailySetsDao: db.dailySetsDao,
       reviewQueueDao: db.reviewQueueDao,
+      customQuestionsDao: db.customQuestionsDao,
       ladderService: LadderService(
         attemptsDao: db.attemptsDao,
         skillProgressDao: db.skillProgressDao,

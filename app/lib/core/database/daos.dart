@@ -898,3 +898,49 @@ class PhotosDao extends DatabaseAccessor<AppDatabase> with _$PhotosDaoMixin {
   Future<void> deleteById(String id) =>
       (delete(db.photos)..where((t) => t.id.equals(id))).go();
 }
+
+/// Câu hỏi tự soạn đã tải về (T5-03). Chỉ tải về, xem [CustomQuestions].
+@DriftAccessor(tables: [CustomQuestions])
+class CustomQuestionsDao extends DatabaseAccessor<AppDatabase>
+    with _$CustomQuestionsDaoMixin {
+  CustomQuestionsDao(super.db);
+
+  /// Thêm hoặc cập nhật theo id (bộ đồng bộ tải về); dòng cũ hơn dòng đã
+  /// có thì bỏ qua.
+  Future<void> upsertFromServer(CustomQuestionsCompanion row) async {
+    final existing = await (select(
+      db.customQuestions,
+    )..where((t) => t.id.equals(row.id.value))).getSingleOrNull();
+    if (existing != null && existing.updatedAt.isAfter(row.updatedAt.value)) {
+      return;
+    }
+    await into(db.customQuestions).insertOnConflictUpdate(row);
+  }
+
+  /// Câu đang bật của [strand] đúng bậc [rung] dành cho bé [childId]
+  /// (câu của riêng bé hoặc của mọi bé), cũ nhất trước.
+  Future<List<CustomQuestion>> activeFor({
+    required String childId,
+    required String strand,
+    required int rung,
+  }) =>
+      (select(db.customQuestions)
+            ..where(
+              (t) =>
+                  t.active.equals(true) &
+                  t.strand.equals(strand) &
+                  t.rung.equals(rung) &
+                  (t.childId.isNull() | t.childId.equals(childId)),
+            )
+            ..orderBy([
+              (t) => OrderingTerm.asc(t.createdAt),
+              (t) => OrderingTerm.asc(t.id),
+            ]))
+          .get();
+
+  Future<List<CustomQuestion>> getAll() => select(db.customQuestions).get();
+
+  Future<CustomQuestion?> getById(String id) => (select(
+    db.customQuestions,
+  )..where((t) => t.id.equals(id))).getSingleOrNull();
+}

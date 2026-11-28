@@ -226,6 +226,7 @@ class _MathScreenState extends ConsumerState<MathScreen>
   DailySetService _dailySetService(AppDatabase db) => DailySetService(
     dailySetsDao: db.dailySetsDao,
     reviewQueueDao: db.reviewQueueDao,
+    customQuestionsDao: db.customQuestionsDao,
     ladderService: LadderService(
       attemptsDao: db.attemptsDao,
       skillProgressDao: db.skillProgressDao,
@@ -296,6 +297,7 @@ class _MathScreenState extends ConsumerState<MathScreen>
       final service = DailySetService(
         dailySetsDao: db.dailySetsDao,
         reviewQueueDao: db.reviewQueueDao,
+        customQuestionsDao: db.customQuestionsDao,
         ladderService: LadderService(
           attemptsDao: db.attemptsDao,
           skillProgressDao: db.skillProgressDao,
@@ -772,15 +774,20 @@ class _QuestionColumn extends StatelessWidget {
                                       color: MathColors.questionText,
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    question.question.questionEn,
-                                    key: const Key('math-question-text-en'),
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      color: MathColors.englishText,
+                                  if (question
+                                      .question
+                                      .questionEn
+                                      .isNotEmpty) ...[
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      question.question.questionEn,
+                                      key: const Key('math-question-text-en'),
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        color: MathColors.englishText,
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                   if (question.question.figure != null) ...[
                                     const SizedBox(height: 12),
                                     Center(

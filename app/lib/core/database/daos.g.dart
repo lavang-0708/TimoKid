@@ -134,3 +134,18 @@ class PhotosDaoManager {
   $$PhotosTableTableManager get photos =>
       $$PhotosTableTableManager(_db.attachedDatabase, _db.photos);
 }
+
+mixin _$CustomQuestionsDaoMixin on DatabaseAccessor<AppDatabase> {
+  $CustomQuestionsTable get customQuestions => attachedDatabase.customQuestions;
+  CustomQuestionsDaoManager get managers => CustomQuestionsDaoManager(this);
+}
+
+class CustomQuestionsDaoManager {
+  final _$CustomQuestionsDaoMixin _db;
+  CustomQuestionsDaoManager(this._db);
+  $$CustomQuestionsTableTableManager get customQuestions =>
+      $$CustomQuestionsTableTableManager(
+        _db.attachedDatabase,
+        _db.customQuestions,
+      );
+}

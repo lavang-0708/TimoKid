@@ -505,3 +505,40 @@ class Photos extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// Câu hỏi tự soạn tải từ server (T5-03, schema v7): bản sao trên máy của
+/// bảng `custom_questions` (bố/mẹ soạn ở web admin). CHỈ TẢI VỀ, app không
+/// ghi lên server nên không có cột `synced`. `childId` null = mọi bé.
+/// `choicesJson` null = câu điền số; có = mảng JSON các lựa chọn (đáp án là
+/// đúng một chuỗi trong đó). Bảng này chỉ có dòng khi bật
+/// `customQuestionsEnabled` và server đã có bảng (migration 0003).
+class CustomQuestions extends Table {
+  TextColumn get id => text()();
+
+  TextColumn get childId => text().nullable()();
+
+  TextColumn get strand => text()();
+
+  IntColumn get rung => integer()();
+
+  IntColumn get grade => integer().withDefault(const Constant(2))();
+
+  TextColumn get textVi => text()();
+
+  TextColumn get textEn => text().nullable()();
+
+  TextColumn get answer => text()();
+
+  TextColumn get choicesJson => text().nullable()();
+
+  TextColumn get explanationVi => text().withDefault(const Constant(''))();
+
+  BoolColumn get active => boolean().withDefault(const Constant(true))();
+
+  DateTimeColumn get createdAt => dateTime()();
+
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

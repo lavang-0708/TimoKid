@@ -98,6 +98,7 @@ class _TownScreenState extends ConsumerState<TownScreen> {
       final service = DailySetService(
         dailySetsDao: db.dailySetsDao,
         reviewQueueDao: db.reviewQueueDao,
+        customQuestionsDao: db.customQuestionsDao,
         ladderService: LadderService(
           attemptsDao: db.attemptsDao,
           skillProgressDao: db.skillProgressDao,

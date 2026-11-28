@@ -21,6 +21,7 @@ import 'package:drift/drift.dart';
 
 import '../database/app_database.dart';
 import '../time/clock.dart';
+import '../../features/custom_questions/custom_question_service.dart';
 import 'neon_client.dart';
 import 'sync_config.dart';
 
@@ -34,6 +35,7 @@ bool isLocalOnlySettingKey(String key) =>
 
 const settingsMarkKey = 'sync_settings_mark';
 const messagesMarkKey = 'sync_messages_mark';
+const customQuestionsMarkKey = 'sync_custom_questions_mark';
 
 /// Giờ app (UTC+7 gắn nhãn UTC) → ISO-8601 của thời điểm thật.
 String toServerTime(DateTime local) => DateTime.fromMillisecondsSinceEpoch(
@@ -82,6 +84,7 @@ class SyncResult {
     this.pushed = const {},
     this.pulledSettings = 0,
     this.pulledMessages = 0,
+    this.pulledCustomQuestions = 0,
   });
 
   final SyncOutcome outcome;
@@ -91,6 +94,7 @@ class SyncResult {
   final Map<String, int> pushed;
   final int pulledSettings;
   final int pulledMessages;
+  final int pulledCustomQuestions;
 
   bool get ok => outcome == SyncOutcome.ok;
   int get totalPushed => pushed.values.fold(0, (a, b) => a + b);
@@ -137,14 +141,19 @@ class SyncEngine {
     required this.client,
     this.batchSize = SyncConfig.batchSize,
     bool? extraTables,
+    bool? customQuestions,
     DateTime Function()? nowUtc,
   }) : extraTables = extraTables ?? syncExtraTablesEnabled,
+       customQuestions = customQuestions ?? customQuestionsEnabled,
        _nowUtc = nowUtc ?? (() => DateTime.now().toUtc());
 
   final AppDatabase db;
   final NeonClient client;
   final int batchSize;
   final bool extraTables;
+
+  /// Tải `custom_questions` (T5-03); mặc định theo `customQuestionsEnabled`.
+  final bool customQuestions;
   final DateTime Function() _nowUtc;
 
   bool _running = false;
@@ -177,11 +186,13 @@ class SyncEngine {
       }
       await _touchLastSynced();
       final pm = await _pullMessages();
+      final pc = customQuestions ? await _pullCustomQuestions() : 0;
       return SyncResult(
         SyncOutcome.ok,
         pushed: pushed,
         pulledSettings: ps,
         pulledMessages: pm,
+        pulledCustomQuestions: pc,
       );
     } on NeonException catch (e) {
       return SyncResult(switch (e.kind) {
@@ -707,6 +718,30 @@ class SyncEngine {
     }
     final next = _maxStamp(rows, mark);
     if (next != null && next != mark) await _setMark(messagesMarkKey, next);
+    return n;
+  }
+
+  /// Tải câu hỏi tự soạn (T5-03) có `updated_at` mới hơn mốc. Mốc lấy từ
+  /// chính `updated_at` của server. Câu bị tắt (`active = false`) cũng được
+  /// tải để máy ngừng dùng. App không ghi gì lên bảng này.
+  Future<int> _pullCustomQuestions() async {
+    final mark = await _mark(customQuestionsMarkKey);
+    final rows = await _fetchSince(
+      'custom_questions',
+      mark,
+      'id,child_id,strand,rung,grade,text_vi,text_en,answer,choices,explanation_vi,active,created_at,updated_at',
+    );
+    var n = 0;
+    for (final r in rows) {
+      final row = customQuestionFromServer(r, fromServerTime);
+      if (row == null) continue;
+      await db.customQuestionsDao.upsertFromServer(row);
+      n++;
+    }
+    final next = _maxStamp(rows, mark);
+    if (next != null && next != mark) {
+      await _setMark(customQuestionsMarkKey, next);
+    }
     return n;
   }
 }

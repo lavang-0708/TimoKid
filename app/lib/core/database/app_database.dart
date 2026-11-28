@@ -1,6 +1,6 @@
 /// Database Drift của TimoKid: 7 bảng bản 0.1 + `inventory` (T2-06) +
 /// `arena_attempts` (T2-10) + `pets` (D) + `messages` và
-/// `review_tombstones` (T3-04/T3-06) + `photos` (T5-05, chỉ trên máy), schema v6.
+/// `review_tombstones` (T3-04/T3-06) + `photos` (T5-05, chỉ trên máy) + `custom_questions` (T5-03, chỉ tải về), schema v7.
 ///
 /// Mở file `timokid.sqlite` trong thư mục tài liệu của app trên máy thật
 /// (qua `drift_flutter`). Test truyền executor riêng
@@ -50,6 +50,7 @@ const defaultRewardsJson =
     Messages,
     ReviewTombstones,
     Photos,
+    CustomQuestions,
   ],
   daos: [
     ChildrenDao,
@@ -63,6 +64,7 @@ const defaultRewardsJson =
     ArenaAttemptsDao,
     PetsDao,
     PhotosDao,
+    CustomQuestionsDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -77,7 +79,7 @@ class AppDatabase extends _$AppDatabase {
   Clock clock;
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -122,6 +124,11 @@ class AppDatabase extends _$AppDatabase {
       // đồng bộ). Mọi dữ liệu cũ giữ nguyên.
       if (from < 6) {
         await migrator.createTable(photos);
+      }
+      // v6 → v7 (T5-03): bảng `custom_questions` (câu tự soạn tải về từ
+      // server, chỉ tải về). Mọi dữ liệu cũ giữ nguyên.
+      if (from < 7) {
+        await migrator.createTable(customQuestions);
       }
     },
   );

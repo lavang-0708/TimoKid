@@ -32,6 +32,7 @@ import '../ladder/ladder_service.dart';
 import '../onboarding/egg_service.dart';
 import '../pet/pet_care_service.dart';
 import '../pet/pet_service.dart';
+import '../custom_questions/custom_question_service.dart';
 import '../questions/question.dart';
 import '../questions/question_registry.dart';
 import '../review_book/review_book_service.dart';
@@ -94,11 +95,17 @@ class ResolvedQuestion {
   });
 
   factory ResolvedQuestion.resolve(DailySetQuestion spec) {
-    final generator = questionGeneratorFor(spec.formId);
-    if (generator == null) {
-      throw ArgumentError('Không có dạng bài nào mang mã ${spec.formId}');
+    // Câu tự soạn (T5-03): nội dung nằm sẵn trong đề, không có generator.
+    final Question question;
+    if (spec.custom != null) {
+      question = customToQuestion(spec);
+    } else {
+      final generator = questionGeneratorFor(spec.formId);
+      if (generator == null) {
+        throw ArgumentError('Không có dạng bài nào mang mã ${spec.formId}');
+      }
+      question = generator.generate(spec.level, Random(spec.seed ?? 0));
     }
-    final question = generator.generate(spec.level, Random(spec.seed ?? 0));
     final displayType = AnswerType.values.byName(spec.answerType);
     if (displayType != AnswerType.choice) {
       return ResolvedQuestion._(
@@ -356,11 +363,17 @@ class StageSession extends ChangeNotifier {
       questionSeed: spec.seed,
     );
     await _ladder.evaluateStrand(childId: childId, strand: spec.strand);
-    await _ladder.evaluateFormMastery(childId: childId, formId: spec.formId);
+    // Câu tự soạn (T5-03) không có dạng bài để thành thạo và không vào sổ
+    // ôn tập (sổ ôn tập sinh lại câu từ generator).
+    if (!spec.isCustom) {
+      await _ladder.evaluateFormMastery(childId: childId, formId: spec.formId);
+    }
     // Sổ ôn tập (T1-10): câu thường ghi qua recordAnswer (sai hoặc
     // đúng sau gợi ý thì vào sổ), câu ôn tập ghi qua recordReviewAnswer
     // (đúng ngay thì tăng chuỗi, sai thì quay về mốc 1 ngày).
-    if (spec.isReview) {
+    if (spec.isCustom) {
+      // Không ghi sổ ôn tập cho câu tự soạn.
+    } else if (spec.isReview) {
       await _reviewBook.recordReviewAnswer(
         childId: childId,
         formId: spec.formId,
