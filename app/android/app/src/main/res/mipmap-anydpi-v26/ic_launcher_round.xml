@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Icon tròn của app TimoKid (T1-12), cùng hình với ic_launcher. -->
+<!-- Icon tròn TimoKid (lô 16): 3 pet khởi đầu ngồi trên chữ TimoKid, nền xanh
+     trời. Hai lớp PNG sinh bằng tools/assets/make_app_icon.py từ
+     assets/icon/app_icon_fg.png + app_icon_bg.png. -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@color/ic_launcher_background" />
-    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <background android:drawable="@mipmap/ic_launcher_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
 </adaptive-icon>
