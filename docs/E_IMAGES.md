@@ -5143,3 +5143,90 @@ thu nhỏ 72 px (vuông + tròn) + 216 px tròn (3×) trong `preview.png`.
 Nhóm B (sổ sticker), nhóm C (mở khóa), B2 tùy chọn — không thuộc nhiệm vụ này.
 
 **Trạng thái: đã đẩy 5 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/residents/<id>_talk.webp`.**
+
+---
+
+# Lô 17 nhóm B — Sổ sticker — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+> Đã đẩy 7 file PNG vào `app/assets/_incoming/` dạng `.b64`, Claude decode thành
+> `app/assets/images/stickers/*.webp`.
+
+## File
+
+| File | Cỡ | Byte | SHA-256 |
+| --- | --- | --- | --- |
+| `sticker_frame_logic.png` | 512×512 | 54179 | `4662e1a2a7ea85d1639a676166f963f2e864c1fb3b2e10baaa0a3511a45b9e33` |
+| `sticker_frame_arith.png` | 512×512 | 49289 | `7548fbdcbc315b37dbf6a4252f76e2a23eca5e8e185bd0acf1aea3dff9c5b457` |
+| `sticker_frame_number.png` | 512×512 | 49808 | `f1b0ea9bd3ef4ef422c6e2acf27429fb6ea5f82f8e17506eabcfa7334e3d367e` |
+| `sticker_frame_geo.png` | 512×512 | 52204 | `56abbdec699309d7b7ce33f09e387b40877068185c0de97840bfe64f309d9941` |
+| `sticker_frame_comb.png` | 512×512 | 59146 | `208e97a1d9eef735b5743d189948fca9c71e8cc1d0ff5d01c0f2a0a47b6b8f42` |
+| `sticker_locked.png` | 512×512 | 40294 | `2fa5b743905624df1f8717ec9f69a9f905d6ad6e16a721ccd4d75bd3f6a3d5bf` |
+| `sticker_book_cover.png` | 1024×512 | 11243 | `690d09f394c65f91101ec83f6cefb86a8ec37ffffbdb50552f94697e4913a070` |
+
+## Màu mảng (đối chiếu code main)
+
+`strandColor()` trong `app/lib/features/residents/resident_widgets.dart` lấy
+từ `townAreas` trong `app/lib/features/town/town_assets.dart` — khớp hết với
+brief, không lệch:
+
+| Mảng | strandColor | Median fill vành r160–180 | Lệch vs gradient kỳ vọng |
+| --- | --- | --- | --- |
+| Lôgic | #C9B8F0 | (207,192,242) | 1,0 |
+| Số học | #FFD9C0 | (253,222,199) | 1,2 |
+| Con số | #BFE0F5 | (197,226,245) | 0,8 |
+| Hình học | #BFE8CF | (198,233,211) | 0,9 |
+| Tổ hợp | #FFD166 | (255,214,118) | 0,9 |
+
+Khung khóa: xám nhạt, median vành (225,225,231), chênh kênh tối đa 6 — trung
+tính, mờ đều, không vẽ "?" (app tự vẽ).
+
+## Thiết kế
+
+- Huy hiệu hoa thị 12 cánh, `r = 215 + 7·cos(12θ)` (208–222 px), giống hệt
+  nhau cho 5 mảng, chỉ khác màu. Viền trắng sticker 10 px (dilate alpha),
+  lề trong 24 px. Gradient xuyên tâm: giữa nhạt về trắng 45% → mép đúng màu
+  mảng; viền trong 3 px tông đậm hơn 18%.
+- Trang trí nhẹ chỉ ở vành ngoài: 12 chấm r6 ở R195 (mỗi 30°) + 8 chấm r4 ở
+  R200 (góc 15/75/105/165/195/255/285/345), tông đậm cùng màu mảng.
+- Vùng trống giữa: tròn Ø317 (r=158,5, = 62% khung) + vuông 317×317 — cả hai
+  đều 0 px trang trí (đo bằng code). Fill pastel + gradient vẫn phủ toàn huy
+  hiệu (đó là "nền màu pastel của mảng" theo brief); chỉ chấm trang trí mới
+  nằm ngoài vùng trống. Demo ngôi sao 62% đặt vào giữa vừa khít, không chạm
+  chấm vành (xem `preview.png`).
+- Bìa sổ: giấy kem gradient dọc #FFF9E9 → #FBEFD2, kẻ ngang nhạt + chấm/sao
+  nhạt chu kỳ 128 px (128 | 1024), đặc 100% (alpha 255 toàn bộ — cố tình, vì
+  bất kỳ mép trong suốt nào cũng phá đường nối tile ngang). Không chữ.
+
+## Cổng kiểm (đo bằng code trên file cuối, `gates.py`)
+
+| Kiểm | Kết quả |
+| --- | --- |
+| Kích thước | 6 khung 512×512, bìa 1024×512 |
+| Semi alpha | 0 cả 7 file |
+| Magenta r1 (R>200, G<80, B>200) | 0 cả 7 file |
+| Vivid rộng / bright-rim (≤3 px mép) | 0 / 0 cả 6 khung |
+| Viền trắng (ray 24 hướng) | 7–10 px, median 8,5 (biến thiên do anti-alias ở biên cong hoa thị sau downscale; soi 3× trên nền tối thấy đều, không lem) |
+| Vùng trống tròn Ø317: px trang trí bên trong | 0 (cả 6 khung); fill trơn 100% diện tích tròn |
+| Vùng trống vuông 317×317: px trang trí bên trong | 0 (cả 6 khung) |
+| Lề trong (mép ngoài → mép canvas) | 24 px cả 6 khung |
+| Bìa sổ: bước màu tối đa ở đường nối (ghép đôi) | 0 (trung bình 0,0; 0 hàng > 5 — so với p99 bước trong tile là 43) |
+| Bìa sổ: lệch tuần hoàn 128 px | 0; opaque 100% |
+
+## Phương pháp
+
+Vẽ bằng code (`gen_frames.py`, PIL/numpy, supersample 4× → LANCZOS +
+alpha cứng), không generate AI: huy hiệu hình học cần 5 khung giống hệt nhau
++ vùng trống đo chính xác từng px — code đảm bảo hơn. Soi 100% (preview) +
+3× trên nền tối (60,60,80): viền trắng đều không lem, vùng trống giữa thật
+sự trống, khung khóa xám đều + mờ đều, bìa sổ ghép đôi không thấy đường nối
+(kể cả soi 3× dải nối).
+
+## Chưa ưng / lưu ý
+
+- Không có điểm nào chưa ưng về hình. Hai lưu ý nhỏ để Claude biết khi decode:
+  (1) rim đo 7–10 px thay vì đúng 10 px — chỉ là anti-alias ở biên cong,
+  mắt thường 3× không phân biệt được; (2) bìa sổ đặc 100% là cố tình để
+  tile ngang liền mạch.
+- Chưa đẩy GitHub, chưa chạm doc repo. Nhóm C/B2 chưa vẽ.
+
+**Trạng thái: đã đẩy 7 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/stickers/*.webp`.**
