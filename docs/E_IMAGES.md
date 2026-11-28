@@ -5435,3 +5435,105 @@ Nốt: `pink_fringe` còn 0–230 px/file là màu hồng/mauve của thiết k�
 Đã đẩy GitHub.
 
 **Trạng thái: đã đẩy 19 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/stickers/sticker_base_comb.webp` và `form_comb_*.webp`.**
+
+---
+
+# Lô 17 B2 — Mảng Số học (arith): 16 biểu tượng + 1 đế — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+Đã đẩy file. Thư mục làm việc:
+`~/workspace/timokid-review/f-pet-v3b/lot17/work/forms_B2_arith/`
+
+## Phương pháp
+
+- 16 biểu tượng: vẽ riêng từng cái trên nền magenta phẳng #F900F5 (1600×1600),
+  tách nền bằng code theo skill (key (249,0,245), ngưỡng 52.5; loại bóng magenta sẫm;
+  erode 2 px + defringe bằng pixel tốt gần nhất; fit bbox vào 364 px; viền trắng
+  sticker 10 px bằng code; alpha cứng). Hai biểu tượng vẽ lại lần 2 cho vuông hơn:
+  `runsum` (bản 1 chỉ cao 93 px → bản 2 hai hàng 364×313) và `altsum` (bản 1
+  364×173 → bản 2 lưới 2×2, 362×364). File thô giữ trong `raw/`.
+- Đế `sticker_base_arith.png`: **vẽ bằng code, đĩa đầy, KHÔNG có lỗ trong suốt**,
+  theo đúng cấu trúc đế mẫu `sticker_base_number.png` (đo trực tiếp): bbox
+  (25,25)–(487,487), lề trong 24 px; viền trắng ngoài 12 px; vành màu mảng #FFD9C0
+  dày 53 px; vòng trắng mỏng 8 px; đĩa trong Ø 317 px màu (255,236,224) = #FFD9C0
+  pha 50% trắng. Bản đế v1 (vành hoa có lỗ trong suốt) đã LOẠI — file thô dời vào
+  `raw/discarded_v1_ring/`, không đẩy. Script: `make_base.py` (PIL ellipse, 512 px).
+- Không chữ, không số trong ảnh (chỉ dấu "?" ở 4 biểu tượng: blank, cryptarith,
+  flowerx, missingdigits — theo gợi ý trong brief giao việc).
+
+## Đế (đĩa đầy — đo lại từ file cuối)
+
+| Hạng mục | Giá trị |
+| --- | --- |
+| bbox | (25,25)–(487,487) |
+| lề trong | 24 px |
+| viền trắng ngoài | 12 px |
+| vành #FFD9C0 | 53 px, RGB (255,217,192) |
+| vòng trắng mỏng | 8 px |
+| đĩa trong | Ø 317 px, RGB (255,236,224) |
+| pixel trong suốt kín ở giữa | 0 (đĩa đầy) |
+| semi / magenta r1 / vivid | 0 / 0 / 0 |
+
+## Bảng file (17 file, PNG 512×512, nền trong suốt)
+
+| File | Nhãn | Byte | SHA-256 |
+| --- | --- | ---: | --- |
+| `form_arith_pattern.png` | Dãy số | 50257 | `87ddac8b0e144b90f97361ff6a893cc79c8db80c2016d2b59c8def7a041836f2` |
+| `form_arith_quick.png` | Tính nhanh | 86105 | `86a1f0104aa92b7653ff125b4c965ed9fd68f889f212c2fa4c52b2a30de223b5` |
+| `form_arith_blank.png` | Ô trống | 107959 | `4295898a4ed2cae84f500caca21db6f0ff87a7c4920176bd0ba90468a20f9919` |
+| `form_arith_symbols.png` | Hình thay số | 52139 | `d95b178d5edada412d939660d641a5aff526c134d4ad9b7380ed65d208962680` |
+| `form_arith_word.png` | Toán đố | 101531 | `a0920aa0176103230aa66f79ef2b6eb4d1233657ef9deb0b85663e1d2779655f` |
+| `form_arith_multiply.png` | Phép nhân | 128376 | `5fc6c577252eb3f9c80ddca58420bcb405703262ab8ff8cd7c745d57d838434f` |
+| `form_arith_money.png` | Tiền và thối | 77995 | `1faed43fc5aecc8b5283e659f9485a17f2f90f7ad2d01e655f7b951984f9a1e0` |
+| `form_arith_altsum.png` | Cộng trừ xen kẽ | 137951 | `eb8e4fcd38834a61efb76bf35e5a719dfcaa2a8494284169d0f28855d95e4cd3` |
+| `form_arith_runsum.png` | Tổng dãy số | 97781 | `faea20e6c36190c47aa2edd77c1c776492b0b77c1afd8f1439956cc7beec4c5b` |
+| `form_arith_cryptarith.png` | Chữ số bí ẩn | 131998 | `07a2051e18bee06dd721aa67648c237f9414d48c15b88db2d2597a14b5685132` |
+| `form_arith_arrowchain.png` | Chuỗi mũi tên | 87671 | `56823151852f5df59f92cd75b20ccd35d01336b9f38f25ed198d1b2d77fb1c91` |
+| `form_arith_flowerx.png` | Bông hoa ẩn số | 114638 | `f5768246e3abba0e8b4f9108f0644de44e62270e68adea622fbd9f881ebf533a` |
+| `form_arith_factorout.png` | Nhân nhóm số | 108100 | `f2497025d5ccf0b6ed5abcb362fc9572248e3ae461efcf3edcce46aad272ee28` |
+| `form_arith_sametotal.png` | Tổng thay đổi | 67852 | `8f12cadb98691085ad7d58cc037d2ba75fce6430eb3aa24c9e9772cc8eef63bd` |
+| `form_arith_missingdigits.png` | Chữ số bị che | 77067 | `549d9dc4d76d8fc421d0b0ea7e0df4b1b377a1c53a428c81eccc6c5d59b4678b` |
+| `form_arith_pairsum.png` | Ghép cặp | 47667 | `9753e8649c9bb8d394bcb2cd6fe49df90451c6921570ba34cb80e7d826183723` |
+| `sticker_base_arith.png` | Đế huy hiệu | 6537 | `92385153118cb5cf3125db8e6180e4bafcea4235aeabe8237d0140aa30f66dfc` |
+
+## Cổng kiểm (đo bằng code trên file cuối, từng file)
+
+| Cổng | Ngưỡng | Kết quả 17/17 |
+| --- | --- | --- |
+| semi alpha (0<α<255) | 0 | 0 |
+| magenta r1 (R>200,G<80,B>200) | 0 | 0 |
+| vivid (R>170,G<90,B>140) | 0 | 0 |
+| bright-rim vivid (dt≤3) | 0 | 0 |
+| viền tím sẫm sát mép (dt≤14) | 0 | 0 |
+| bóng tím sẫm sát mép (dt≤14) | 0 | 0 |
+| lề trong | 64 px (icon) / 24 px (đế) | đúng hết |
+| viền trắng sticker | 10 px (icon) / 12 px (đế) | đúng hết |
+| lỗ trong suốt kín (chỉ đế) | 0 | 0 |
+
+Chi tiết từng file: `gates.json` (process.py) + `report.json` (kiểm chứng độc lập từ đĩa).
+
+Ba vòng finish đã chạy để về 0 (ghi lại để lô sau dùng): (1) loại bóng magenta sẫm
+ở full-res (R>150,B>130,G<0,55·min(R,B)); (2) vẽ lại pixel vivid-magenta sót
+sau thu nhỏ; (3) vẽ lại viền tím sẫm sát mép (dt≤14, donor loại hết pixel tím ở
+mọi độ sâu — donor gần nhất có thể chính là pixel tím ngay ngoài dải dt≤14).
+Kính lúp hồng của cryptarith (1.803 px tím, sâu trong hình) được GIỮ NGUYÊN —
+chỉ xử lý dải mép, không đụng chi tiết bên trong.
+
+## Đã soi bằng mắt
+
+- `preview_light.png` / `preview_dark.png`: lưới 16 biểu tượng 300 px, nền sáng + nền tối (60,60,80).
+- `preview_badge.png`: biểu tượng đặt giữa đế ở 62% khung, cỡ 300 px và 120 px (~cỡ trong sổ sticker) — cả 16 đều đọc được ở 120 px.
+- `check3x_base_dark.png`, `check3x_base_center_dark.png`: viền đế 3× trên nền tối — sạch, không vệt.
+- `check3x_word_dark.png`, `check3x_sametotal_dark.png`, `check3x_symbols_dark.png`, `check3x_runsum_dark.png`:
+  mép 3× trên nền tối. Vệt tím sẫm dưới các ô (bóng trên nền magenta) đã sửa hết ở finish 3.
+- Còn giữ (là shading thiết kế, đã kiểm bằng code): mép dưới bìa sách màu hồng sẫm (171,72,102),
+  2 px — không phải magenta (không pha được từ magenta + cam); kính lúp hồng của cryptarith.
+
+## Điểm chưa ưng / lưu ý
+
+- Nhỏ nhất ở 120 px vẫn là `pattern` (3 ô chấm) và `missingdigits` — vẫn đọc được
+  nhờ nhãn app vẽ kèm, nhưng nếu chủ dự án muốn đậm hơn thì vẽ lại 2 cái này dạng 2 hàng.
+- Đế mới là đĩa đầy phẳng (không vân 3D như bản vành v1) để khớp đúng chuẩn đế mẫu number;
+  viền đĩa ở 3× hơi răng cưa 1 px (PIL ellipse không AA) — giống cấu trúc đế mẫu, không thấy ở cỡ app.
+- Tổng 17 file: 1.484.841 byte (chưa webp — Claude convert khi decode).
+
+**Trạng thái: đã đẩy 17 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/stickers/sticker_base_arith.webp` và `form_arith_*.webp`.**
