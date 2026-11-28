@@ -5115,3 +5115,313 @@ thư mục `app/assets/images/unlocks/`. Đã đẩy.
   (215,104,95) đo bằng code là viền trong thiết kế, không phải magenta.
 
 **Trạng thái: đã đẩy 3 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/unlocks/*.webp`.**
+
+## Lô 17 — Nhóm B2: biểu tượng dạng bài, mảng Con số (18 + 1 đế) — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+Mảng Con số (Tháp Con số), màu mảng #BFE0F5. Phong cách: soft 3D clay-render pastel,
+viền trắng sticker, xanh dương nhạt làm màu nhấn + phụ pastel (coral, mint, vàng,
+lavender). Không chữ, không chữ số trong ảnh — chỉ chấm/ô/khối/thanh; nhãn do app vẽ.
+Biểu tượng 512×512, lề trong 64 px; app đặt ở giữa huy hiệu, chiếm 62% khung.
+Đế vẽ bằng code; 18 biểu tượng vẽ theo tấm rồi cắt bằng code (xem `report.json`
+cùng thư mục). Đã đẩy GitHub.
+
+### Đế
+
+| File | Byte | SHA-256 |
+| --- | ---: | --- |
+| `app/assets/images/stickers/sticker_base_number.webp` | 6544 | `16b6ef744cd2f702fbd858629b0468d8dedf67bb14a8b2ee8a11017d405f4f36` |
+
+Đế: đĩa trắng r=231 (lề 24 px), đĩa #BFE0F5 r=219, vòng trắng + tâm sáng #DCEFFB
+r=158 (đường kính 316 px ≈ 62% khung) để trống đặt biểu tượng.
+
+### 18 biểu tượng
+
+| Dạng | Nhãn | File | Byte | SHA-256 |
+| --- | --- | --- | ---: | --- |
+| `number.parity` | Chẵn lẻ | `app/assets/images/stickers/form_number_parity.webp` | 123415 | `5607cebac98c1d9dfaebed2377ed00af83f848641e1ed40d0b5e0843592d2fed` |
+| `number.digitsum` | Tổng chữ số | `app/assets/images/stickers/form_number_digitsum.webp` | 58056 | `fcfd0e7149b172caa511f09a0c003340b4889e4624f1e5cf7244cbbf128b1402` |
+| `number.cards` | Lập số từ thẻ | `app/assets/images/stickers/form_number_cards.webp` | 100744 | `c27c64bac7226b6c6d0836a94022a6fd41175f08ce43a8046f940fdbd2e45b08` |
+| `number.digitcount` | Đếm chữ số | `app/assets/images/stickers/form_number_digitcount.webp` | 106130 | `286253a6ec2d42a2fcbce18bc4662b1c6d1e274cf86475ff2688f701b4f2f31f` |
+| `number.digitfreq` | Chữ số lặp lại | `app/assets/images/stickers/form_number_digitfreq.webp` | 94589 | `a56b0e0488614f7e3ccfb878a137e65f493f6cfe38e3a728a9f2fb0194e639f0` |
+| `number.clues` | Đoán số | `app/assets/images/stickers/form_number_clues.webp` | 113186 | `268afac1dfc7b8db90cd630736fdcdedcd65e4bb79106952357674f24ba77c1f` |
+| `number.round` | Số tròn chục | `app/assets/images/stickers/form_number_round.webp` | 117069 | `93483eb46e541f002b4c7680dff4d763ecd38c0ba0504a0466925ac2058723cd` |
+| `number.place` | Chục và đơn vị | `app/assets/images/stickers/form_number_place.webp` | 95001 | `b0892f455ca1c15f16196a366f0565175923b30a96e4fab0b17c34cb4865d334` |
+| `number.fixed` | Số lớn, số bé | `app/assets/images/stickers/form_number_fixed.webp` | 80132 | `1fae888d403db2e1e1a6563d456a6b8b5f5d340b36ea5d6417033aa2df45cf1f` |
+| `number.parityrule` | Luật chẵn lẻ | `app/assets/images/stickers/form_number_parityrule.webp` | 77373 | `3a9c8110296fedc83523b7dcb4a262ae1199ee423099b678d3be6716cc6ee775` |
+| `number.digitcond` | Số theo điều kiện | `app/assets/images/stickers/form_number_digitcond.webp` | 60915 | `f743b2a7139b11960b1f3a5aa856002082461d6adbb83200406e75fb6277805d` |
+| `number.parityops` | Kết quả chẵn lẻ | `app/assets/images/stickers/form_number_parityops.webp` | 128325 | `02c246bca6e2205386feb9e25ed0b68f1a955f2100ee3d188086eabad13c6e04` |
+| `number.kth` | Số lớn thứ k | `app/assets/images/stickers/form_number_kth.webp` | 59216 | `b0289fb18ba3e0e37ae3a4f6edcc2c16b6dbf1d81443d14198b59d215ab2f794` |
+| `number.giveequal` | Cho để bằng nhau | `app/assets/images/stickers/form_number_giveequal.webp` | 75139 | `a653c9f56c771ab71d1057e54f03e563f0d954965ac9964ef3ae045d18786866` |
+| `number.pages` | Chia làm tròn lên | `app/assets/images/stickers/form_number_pages.webp` | 74416 | `8edd67b950d2bcb6ffdb2076a19c0935e30dcf4a0bbef19e9900d7ff52adfce1` |
+| `number.countsteps` | Đếm số trong dãy | `app/assets/images/stickers/form_number_countsteps.webp` | 71295 | `7cacdf3fca0709e69cdc3ad3fc96d955b985723189da77ac1877184f578227df` |
+| `number.between` | Số ở giữa | `app/assets/images/stickers/form_number_between.webp` | 63351 | `5fa625ee4b236a6310e757a19c6edc4901c485ab68c95aba952d0e21dd4318b7` |
+| `number.multiples` | Số chia hết | `app/assets/images/stickers/form_number_multiples.webp` | 139079 | `6f49ce117325a8a9a142c5f95426e256b2558925a7a209de0e6141d785f399c2` |
+
+### Cổng kiểm (đo bằng code, từng file)
+
+semi-alpha 0, magenta r1 0, vivid 0, bright-rim 0, pink-rim 0, lề trong 64 px —
+tất cả 19 file đều đạt. Pink-rim = pixel hồng-magenta trong dải dt≤6 của viền
+trắng (độ bão hòa >20, r và b đều > g+8); thước vivid chuẩn bỏ sót dải này
+(vd pixel (169,3,170) có rr=169<170), đã vẽ lại bằng donor trắng gần đó.
+Vết magenta trong hình ở countsteps (vệt 4×5 px tại x 173–176, y 291–295) đã
+vẽ lại bằng donor median, kiểm lại bằng code: đã sạch.
+
+### Cách vẽ
+
+- Tấm 1 (1920×1280, 9 icon: parity, digitsum, cards, digitcount, digitfreq, clues,
+  round, place, fixed) và tấm 2 (1600×1600, 9 icon: parityrule, digitcond, parityops,
+  kth, giveequal, pages, countsteps, between, multiples), nền magenta #FF00FF.
+- Tấm 3 làm lại (1536×1536): digitsum, digitcount, parityops — 3 icon đầu vẽ ngang
+  quá mỏng (dải 384×~110) nên vẽ lại dạng vuông để đọc tốt hơn ở cỡ huy hiệu.
+- Cắt bằng code (`cut.py`): key magenta, ngưỡng 60; mỗi icon là 1 connected
+  component (viền trắng nối các phần); erode alpha 1 px + defringe donor median;
+  fit bbox vào 384 px, căn giữa canvas 512 trong suốt, alpha cứng; không dilate
+  thêm viền vì icon đã có viền trắng sticker từ lúc vẽ.
+- Soi: lưới 280 px nền sáng + nền tối (60,60,80), trong huy hiệu thật 170 px ở 62%,
+  từng icon 512 px trên nền tối, mép dưới 4 icon phóng 3× NEAREST sau khi sửa.
+
+### Nốt
+
+- `round`: vòng có 12 chấm thay vì 10 — không đếm được ở cỡ app, không có số trong
+  ảnh, giữ.
+- `parityops` (bản vẽ lại): nhóm đầu 4+4 chấm nhưng kết quả có 5 chấm (4 + 1 chấm nhỏ
+  tách riêng) — đếm kỹ mới thấy lệch; ưu tiên đọc hiểu ở cỡ nhỏ nên giữ bản vuông.
+- `kth`: 5 cột không xếp theo chiều cao giảm dần, vương miện đặt trên cột cao thứ 4 —
+  vẫn đọc là 'thứ hạng/có vương miện', giữ.
+- `digitsum` (bản vẽ lại): cột dọc 98×384 — ở huy hiệu 170 px thành dải dọc mỏng
+  ~26 px, vẫn đọc được là chồng ô + dấu cộng; là phương án tốt nhất trong 2 bản.
+- `countsteps`: 3 chấm xanh 'nhảy' trên bậc thang, hơi trôi khỏi bậc — chấp nhận,
+  vẫn đọc là đếm theo dãy/bậc.
+
+**Trạng thái: đã đẩy 19 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/stickers/sticker_base_number.webp` và `form_number_*.webp`.**
+
+---
+
+## Lô 17 nhóm B2 — mảng Tổ hợp: 18 biểu tượng dạng bài + đế huy hiệu — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+Phong cách: pastel 3D mềm, viền trắng sticker 8 px, lề trong 64 px, không chữ/số trong ảnh. Đế `sticker_base_comb.webp`: viền trắng 12 px, nền #FFD166, lề trong 24 px. Cổng kiểm (đo bằng code từng file): semi 0, magenta r1 0, vivid 0, bright-rim 0, lề ≥ 64 px — ĐẠT cả 19 file.
+
+| Dạng | Nhãn | File | Byte | SHA-256 | Lề |
+| --- | --- | --- | ---: | --- | ---: |
+| `comb.outfit` | Chọn trang phục | `form_comb_outfit.webp` | 102305 | `e5ee0f5b1ef466cb…` | 65 |
+| `comb.handshake` | Bắt tay | `form_comb_handshake.webp` | 66462 | `def1cb8616ddad90…` | 65 |
+| `comb.tournament` | Thi đấu vòng tròn | `form_comb_tournament.webp` | 129212 | `88cf444c4deeea56…` | 66 |
+| `comb.makenum` | Lập số | `form_comb_makenum.webp` | 50481 | `08e3b183441d8dea…` | 66 |
+| `comb.routes` | Đếm đường đi | `form_comb_routes.webp` | 70150 | `daf3bb6d645175c2…` | 65 |
+| `comb.pigeon` | Lấy tất | `form_comb_pigeon.webp` | 119458 | `bd2aa76a3e14bd92…` | 65 |
+| `comb.arrange` | Xếp hàng ngang | `form_comb_arrange.webp` | 104583 | `6a61419d92591988…` | 66 |
+| `comb.choose2` | Chọn 2 món | `form_comb_choose2.webp` | 103061 | `e3ec74bf42245e84…` | 66 |
+| `comb.gridpath` | Đường trên lưới | `form_comb_gridpath.webp` | 123210 | `f46e55b8dd21342b…` | 66 |
+| `comb.split` | Tách hai phần | `form_comb_split.webp` | 109776 | `acb71c1bf24a0271…` | 69 |
+| `comb.coins` | Đổi tiền | `form_comb_coins.webp` | 91808 | `b75e8c5ce5da8d4a…` | 65 |
+| `comb.makenumparity` | Lập số chẵn lẻ | `form_comb_makenumparity.webp` | 68447 | `13fe9dd442238160…` | 65 |
+| `comb.minsum2` | Tổng nhỏ nhất | `form_comb_minsum2.webp` | 68243 | `032332d02f63c0fd…` | 65 |
+| `comb.freebie` | Mua tặng thêm | `form_comb_freebie.webp` | 82447 | `c5a24e5b861e3e82…` | 65 |
+| `comb.vases` | Cắm hoa vào lọ | `form_comb_vases.webp` | 100749 | `d9b4e28e12b38dc3…` | 66 |
+| `comb.pick2` | Chọn 2 bạn | `form_comb_pick2.webp` | 101413 | `62774e65008d8949…` | 65 |
+| `comb.dice` | Gieo xúc xắc | `form_comb_dice.webp` | 60725 | `07b90230c4e80da9…` | 67 |
+| `comb.flag` | Tô màu cờ | `form_comb_flag.webp` | 82338 | `e2b4df3aaa1397d5…` | 65 |
+| — | Đế huy hiệu trống | `sticker_base_comb.webp` | 29358 | `8c58ec90fadade09…` | 24 |
+
+SHA-256 đầy đủ:
+- `form_comb_outfit.webp`: `e5ee0f5b1ef466cb95f50c02255420a6970b8bdcfc7615c80c61a82135021b37`
+- `form_comb_handshake.webp`: `def1cb8616ddad90ef3dabd27dbce7ef8e5756967dddadb6ee12333d137f17ba`
+- `form_comb_tournament.webp`: `88cf444c4deeea561b98793c4b8450a1f8067f010f8e39d0635e32778f8c8c43`
+- `form_comb_makenum.webp`: `08e3b183441d8dea94b04fe95c8a2cb45c7e0f8d7bf2b87dd701b4fa9e1f111f`
+- `form_comb_routes.webp`: `daf3bb6d645175c223073c85475d4104f23e9be2c440f71d453e2611e079ab21`
+- `form_comb_pigeon.webp`: `bd2aa76a3e14bd929197377e89dd58a0fa4b97923324795628d4ccb9aff888d1`
+- `form_comb_arrange.webp`: `6a61419d92591988ede63e7ae1e47ab555bf7007dccf3f320b8ee475a85f4c64`
+- `form_comb_choose2.webp`: `e3ec74bf42245e84360481058d8c5cadb28a62431d9235de23437a4822e7174a`
+- `form_comb_gridpath.webp`: `f46e55b8dd21342b606854b2264f4c81023a628b374029fd277d7d85aa5c80a1`
+- `form_comb_split.webp`: `acb71c1bf24a02719ccd4767ab0a29c4a08c85bccf19d005dcc433320c91f78f`
+- `form_comb_coins.webp`: `b75e8c5ce5da8d4aed1c85907bd5bbc55a26a202c9098c0c8e73d8deaa313bda`
+- `form_comb_makenumparity.webp`: `13fe9dd442238160daa027f406eb03f205f0707f43d05e209a826a69dcb3e1f2`
+- `form_comb_minsum2.webp`: `032332d02f63c0fda47a668d1ce0028c0e7d2a94167ec1204019adef11ab3759`
+- `form_comb_freebie.webp`: `c5a24e5b861e3e822d9ee500d7686343cd6d1b619ce3a4b6f62731dd3491206a`
+- `form_comb_vases.webp`: `d9b4e28e12b38dc39227f45fd569bb6abadd213e110dade38d520a22d515bc86`
+- `form_comb_pick2.webp`: `62774e65008d894943442c3c68b7efd4591295f2ecd11032a572464774b34092`
+- `form_comb_dice.webp`: `07b90230c4e80da9bd9588040f8c12748ad27d6a83df14ba314d24cdb4a8d6bb`
+- `form_comb_flag.webp`: `e2b4df3aaa1397d54c2d4b3ae92516d6900e2412ab56b482eca4e20937a1290d`
+- `sticker_base_comb.webp`: `8c58ec90fadade09327fb34c34d08f45dda8bf7bf46ab52c69bde96066f9a2f3`
+
+Phương pháp: 2 tấm lưới 3×3 (1920×1280) trên nền magenta, cắt theo đường magenta sạch đo bằng code (tấm 1 y=432/854, tấm 2 y=415/876, x=640/1280); key (243,0,235) ngưỡng 52,5; erode 1 px; defringe donor median; art fit 368 px + viền trắng 8 px = 384 px. Bóng đổ nhuộm magenta được xóa trước khi vẽ viền (pixel vivid) rồi bóc từng lớp 2 px tối đa 8 lần (thước vivid + hồng + lõi tối g<50) — lõi tối r 110–170 mà thước vivid không bắt được là bài học của lô này. Viền hồng còn lại vẽ lại bằng median donor (không tô trắng khi hết donor).
+
+Đã soi: `preview.webp` (nền sáng + nền tối 60,60,80 + trong huy hiệu 260 px + 120 px cỡ app) và `check3x_dark.webp` (mép dưới 6 icon rủi ro cao phóng 3× trên nền tối).
+
+Nốt: `pink_fringe` còn 0–230 px/file là màu hồng/mauve của thiết kế (bóng hồng túi quà, tóc hồng), không phải vệt magenta (tiền lệ nhóm A chấp nhận 156). Còn 1–2 px chuyển màu tím-xanh ở mép vài icon, chỉ thấy ở 3×, không thấy ở cỡ app. `routes` đọc kém nhất ở cỡ nhỏ; `minsum2` ý “nhỏ nhất” yếu, nhãn app gánh.
+
+Đã đẩy GitHub.
+
+**Trạng thái: đã đẩy 19 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/stickers/sticker_base_comb.webp` và `form_comb_*.webp`.**
+
+---
+
+# Lô 17 B2 — Mảng Số học (arith): 16 biểu tượng + 1 đế — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+Đã đẩy file. Thư mục làm việc:
+`~/workspace/timokid-review/f-pet-v3b/lot17/work/forms_B2_arith/`
+
+## Phương pháp
+
+- 16 biểu tượng: vẽ riêng từng cái trên nền magenta phẳng #F900F5 (1600×1600),
+  tách nền bằng code theo skill (key (249,0,245), ngưỡng 52.5; loại bóng magenta sẫm;
+  erode 2 px + defringe bằng pixel tốt gần nhất; fit bbox vào 364 px; viền trắng
+  sticker 10 px bằng code; alpha cứng). Hai biểu tượng vẽ lại lần 2 cho vuông hơn:
+  `runsum` (bản 1 chỉ cao 93 px → bản 2 hai hàng 364×313) và `altsum` (bản 1
+  364×173 → bản 2 lưới 2×2, 362×364). File thô giữ trong `raw/`.
+- Đế `sticker_base_arith.webp`: **vẽ bằng code, đĩa đầy, KHÔNG có lỗ trong suốt**,
+  theo đúng cấu trúc đế mẫu `sticker_base_number.webp` (đo trực tiếp): bbox
+  (25,25)–(487,487), lề trong 24 px; viền trắng ngoài 12 px; vành màu mảng #FFD9C0
+  dày 53 px; vòng trắng mỏng 8 px; đĩa trong Ø 317 px màu (255,236,224) = #FFD9C0
+  pha 50% trắng. Bản đế v1 (vành hoa có lỗ trong suốt) đã LOẠI — file thô dời vào
+  `raw/discarded_v1_ring/`, không đẩy. Script: `make_base.py` (PIL ellipse, 512 px).
+- Không chữ, không số trong ảnh (chỉ dấu "?" ở 4 biểu tượng: blank, cryptarith,
+  flowerx, missingdigits — theo gợi ý trong brief giao việc).
+
+## Đế (đĩa đầy — đo lại từ file cuối)
+
+| Hạng mục | Giá trị |
+| --- | --- |
+| bbox | (25,25)–(487,487) |
+| lề trong | 24 px |
+| viền trắng ngoài | 12 px |
+| vành #FFD9C0 | 53 px, RGB (255,217,192) |
+| vòng trắng mỏng | 8 px |
+| đĩa trong | Ø 317 px, RGB (255,236,224) |
+| pixel trong suốt kín ở giữa | 0 (đĩa đầy) |
+| semi / magenta r1 / vivid | 0 / 0 / 0 |
+
+## Bảng file (17 file, PNG 512×512, nền trong suốt)
+
+| File | Nhãn | Byte | SHA-256 |
+| --- | --- | ---: | --- |
+| `form_arith_pattern.webp` | Dãy số | 50257 | `87ddac8b0e144b90f97361ff6a893cc79c8db80c2016d2b59c8def7a041836f2` |
+| `form_arith_quick.webp` | Tính nhanh | 86105 | `86a1f0104aa92b7653ff125b4c965ed9fd68f889f212c2fa4c52b2a30de223b5` |
+| `form_arith_blank.webp` | Ô trống | 107959 | `4295898a4ed2cae84f500caca21db6f0ff87a7c4920176bd0ba90468a20f9919` |
+| `form_arith_symbols.webp` | Hình thay số | 52139 | `d95b178d5edada412d939660d641a5aff526c134d4ad9b7380ed65d208962680` |
+| `form_arith_word.webp` | Toán đố | 101531 | `a0920aa0176103230aa66f79ef2b6eb4d1233657ef9deb0b85663e1d2779655f` |
+| `form_arith_multiply.webp` | Phép nhân | 128376 | `5fc6c577252eb3f9c80ddca58420bcb405703262ab8ff8cd7c745d57d838434f` |
+| `form_arith_money.webp` | Tiền và thối | 77995 | `1faed43fc5aecc8b5283e659f9485a17f2f90f7ad2d01e655f7b951984f9a1e0` |
+| `form_arith_altsum.webp` | Cộng trừ xen kẽ | 137951 | `eb8e4fcd38834a61efb76bf35e5a719dfcaa2a8494284169d0f28855d95e4cd3` |
+| `form_arith_runsum.webp` | Tổng dãy số | 97781 | `faea20e6c36190c47aa2edd77c1c776492b0b77c1afd8f1439956cc7beec4c5b` |
+| `form_arith_cryptarith.webp` | Chữ số bí ẩn | 131998 | `07a2051e18bee06dd721aa67648c237f9414d48c15b88db2d2597a14b5685132` |
+| `form_arith_arrowchain.webp` | Chuỗi mũi tên | 87671 | `56823151852f5df59f92cd75b20ccd35d01336b9f38f25ed198d1b2d77fb1c91` |
+| `form_arith_flowerx.webp` | Bông hoa ẩn số | 114638 | `f5768246e3abba0e8b4f9108f0644de44e62270e68adea622fbd9f881ebf533a` |
+| `form_arith_factorout.webp` | Nhân nhóm số | 108100 | `f2497025d5ccf0b6ed5abcb362fc9572248e3ae461efcf3edcce46aad272ee28` |
+| `form_arith_sametotal.webp` | Tổng thay đổi | 67852 | `8f12cadb98691085ad7d58cc037d2ba75fce6430eb3aa24c9e9772cc8eef63bd` |
+| `form_arith_missingdigits.webp` | Chữ số bị che | 77067 | `549d9dc4d76d8fc421d0b0ea7e0df4b1b377a1c53a428c81eccc6c5d59b4678b` |
+| `form_arith_pairsum.webp` | Ghép cặp | 47667 | `9753e8649c9bb8d394bcb2cd6fe49df90451c6921570ba34cb80e7d826183723` |
+| `sticker_base_arith.webp` | Đế huy hiệu | 6537 | `92385153118cb5cf3125db8e6180e4bafcea4235aeabe8237d0140aa30f66dfc` |
+
+## Cổng kiểm (đo bằng code trên file cuối, từng file)
+
+| Cổng | Ngưỡng | Kết quả 17/17 |
+| --- | --- | --- |
+| semi alpha (0<α<255) | 0 | 0 |
+| magenta r1 (R>200,G<80,B>200) | 0 | 0 |
+| vivid (R>170,G<90,B>140) | 0 | 0 |
+| bright-rim vivid (dt≤3) | 0 | 0 |
+| viền tím sẫm sát mép (dt≤14) | 0 | 0 |
+| bóng tím sẫm sát mép (dt≤14) | 0 | 0 |
+| lề trong | 64 px (icon) / 24 px (đế) | đúng hết |
+| viền trắng sticker | 10 px (icon) / 12 px (đế) | đúng hết |
+| lỗ trong suốt kín (chỉ đế) | 0 | 0 |
+
+Chi tiết từng file: `gates.json` (process.py) + `report.json` (kiểm chứng độc lập từ đĩa).
+
+Ba vòng finish đã chạy để về 0 (ghi lại để lô sau dùng): (1) loại bóng magenta sẫm
+ở full-res (R>150,B>130,G<0,55·min(R,B)); (2) vẽ lại pixel vivid-magenta sót
+sau thu nhỏ; (3) vẽ lại viền tím sẫm sát mép (dt≤14, donor loại hết pixel tím ở
+mọi độ sâu — donor gần nhất có thể chính là pixel tím ngay ngoài dải dt≤14).
+Kính lúp hồng của cryptarith (1.803 px tím, sâu trong hình) được GIỮ NGUYÊN —
+chỉ xử lý dải mép, không đụng chi tiết bên trong.
+
+## Đã soi bằng mắt
+
+- `preview_light.webp` / `preview_dark.webp`: lưới 16 biểu tượng 300 px, nền sáng + nền tối (60,60,80).
+- `preview_badge.webp`: biểu tượng đặt giữa đế ở 62% khung, cỡ 300 px và 120 px (~cỡ trong sổ sticker) — cả 16 đều đọc được ở 120 px.
+- `check3x_base_dark.webp`, `check3x_base_center_dark.webp`: viền đế 3× trên nền tối — sạch, không vệt.
+- `check3x_word_dark.webp`, `check3x_sametotal_dark.webp`, `check3x_symbols_dark.webp`, `check3x_runsum_dark.webp`:
+  mép 3× trên nền tối. Vệt tím sẫm dưới các ô (bóng trên nền magenta) đã sửa hết ở finish 3.
+- Còn giữ (là shading thiết kế, đã kiểm bằng code): mép dưới bìa sách màu hồng sẫm (171,72,102),
+  2 px — không phải magenta (không pha được từ magenta + cam); kính lúp hồng của cryptarith.
+
+## Điểm chưa ưng / lưu ý
+
+- Nhỏ nhất ở 120 px vẫn là `pattern` (3 ô chấm) và `missingdigits` — vẫn đọc được
+  nhờ nhãn app vẽ kèm, nhưng nếu chủ dự án muốn đậm hơn thì vẽ lại 2 cái này dạng 2 hàng.
+- Đế mới là đĩa đầy phẳng (không vân 3D như bản vành v1) để khớp đúng chuẩn đế mẫu number;
+  viền đĩa ở 3× hơi răng cưa 1 px (PIL ellipse không AA) — giống cấu trúc đế mẫu, không thấy ở cỡ app.
+- Tổng 17 file: 1.484.841 byte (chưa webp — Claude convert khi decode).
+
+**Trạng thái: đã đẩy 17 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/stickers/sticker_base_arith.webp` và `form_arith_*.webp`.**
+
+---
+
+# Lô 17 — B2 Lôgic: 19 biểu tượng dạng bài + 1 đế huy hiệu — ĐÃ ĐẨY (20 file), CHỜ CLAUDE DECODE
+
+> Đã đẩy 20 file (đế + 19 biểu tượng). 2 biểu tượng `classsize` và `weekday` đã vẽ lại to rõ hơn (~80% đế, 2 hàng 4+3) và đẩy sau đè tên bản cũ (Claude quyết 28/11 ~21:09).
+
+## Đế huy hiệu — `sticker_base_logic.webp` (28.190 B, SHA-256 `7a63f21da11577d9b9b0f3e1971c093509a5f0f4fd52417fe924437deea15f3c`)
+
+Đĩa đầy dựng bằng code theo chuẩn đế mẫu `sticker_base_number.webp` (không lỗ trong suốt ở giữa):
+
+| Vùng | Bán kính (tâm 256,256) | Màu |
+| --- | --- | --- |
+| Viền trắng ngoài | r 219–231 (12 px) | trắng |
+| Vành màu mảng | r 167–219 | **#C9B8F0** (median đo được đúng (201,184,240)) |
+| Vòng trắng mỏng | r 159–166 (8 px) | trắng |
+| Tâm nhạt | r 0–158 | (228,220,248) — 50% mix #C9B8F0 về trắng |
+
+- Bbox (25,25)–(486,486), lề trong 25 px; 0 px trong suốt trong r<200 (đĩa đầy); semi 0, magenta r1 0, vivid 0, bright-rim 0, 0 px đen.
+- Đoạn cắt ngang y=256 khớp đế mẫu number gần như từng px (trắng 25–36, mảng 37–89, trắng 90–97, tâm 98–413).
+- Đế vẽ bằng ảnh (vỏ sò) đã **loại**: tuy cũng là đĩa đầy nhưng mép vỏ sò khác chuẩn, tâm phẳng không nhạt, kèm 1090 px đen + bóng đỏ tím sẫm 2450 px bám ngoài viền trắng.
+
+## 19 biểu tượng `form_logic_<tên>.webp` (512×512, lề trong 64 px, không chữ/số)
+
+| Mã dạng | File | Nhãn | Byte | SHA-256 (12 ký tự đầu) |
+| --- | --- | --- | --- | --- |
+| logic.age | form_logic_age.webp | Tính tuổi | 120.768 | `b1514cfe5237` |
+| logic.queue | form_logic_queue.webp | Xếp hàng | 131.739 | `c7650297d948` |
+| logic.balance | form_logic_balance.webp | Cân thăng bằng | 81.276 | `03f4a02c407a` |
+| logic.backward | form_logic_backward.webp | Tính ngược | 94.417 | `3b4dbe13ed37` |
+| logic.weekday | form_logic_weekday.webp | Thứ trong tuần | 125.730 | `27af1aea5ab3` |
+| logic.cut | form_logic_cut.webp | Cưa khúc gỗ | 95.244 | `7329543fc0b7` |
+| logic.stairs | form_logic_stairs.webp | Bậc thang | 74.255 | `860fcab7e14f` |
+| logic.trees | form_logic_trees.webp | Trồng cây | 89.234 | `45c2357b92d0` |
+| logic.legs | form_logic_legs.webp | Đếm chân | 96.509 | `69d9e6e4d1c9` |
+| logic.compare | form_logic_compare.webp | So sánh người | 147.695 | `6bdf5f65b274` |
+| logic.equalize | form_logic_equalize.webp | Chia cho bằng | 78.949 | `fcbd0b382b26` |
+| logic.classsize | form_logic_classsize.webp | Sĩ số lớp | 200.028 | `abf8d97aaa6e` |
+| logic.seqgrow | form_logic_seqgrow.webp | Dãy tăng dần | 93.528 | `22674131f414` |
+| logic.interleave | form_logic_interleave.webp | Dãy xen kẽ | 45.373 | `0faf234f5e57` |
+| logic.cyclepattern | form_logic_cyclepattern.webp | Hình lặp lại | 49.261 | `b9282b3b8d6e` |
+| logic.laps | form_logic_laps.webp | Chạy vòng sân | 103.102 | `91cb44bfcf36` |
+| logic.clock | form_logic_clock.webp | Xem đồng hồ | 128.571 | `a34a2f4a9909` |
+| logic.calendar | form_logic_calendar.webp | Xem lịch | 102.045 | `f0a82df78980` |
+| logic.table | form_logic_table.webp | Bảng quy luật | 135.061 | `95bdf1217701` |
+
+SHA-256 đầy đủ từng file trong `report.json` (thư mục `lot17/work/forms_B2_logic/`); 2 icon vẽ lại trong `report_redraw.json` (thư mục `lot17/work/forms_B2_logic/redraw/`).
+
+## Cổng kiểm (đo bằng code, cả 20 file đều đạt)
+
+semi 0 · magenta r1 0 · vivid 0 · bright-rim 0 · fringe hồng nhạt mép 0 · bóng tím sẫm 0 · vết trong thân 0 · px đen 0 · lề trong icon 66–67 px (≥64) · lề đế 25 px (≥24). (Đo trên 18 file đã đẩy + 2 icon vẽ lại: cả 20 file semi 0, magenta r1 0, vivid 0, bright-rim 0, lề trong icon 66–67 px.)
+
+## Phương pháp
+
+- 6 lần `media.generate_image` (ảnh `hiep_si_sang_portrait.webp` làm style ref): 5 tấm lưới 2×2 1600×1600 nền magenta #FF00FF (19 biểu tượng) + 1 tấm đế vỏ sò (đã loại).
+- Cắt bằng code (`process.py`): key (249,0,245) ngưỡng 52.5 → erode alpha 1 px → defringe donor-median (mở rộng bán kính + fallback trắng, không trả đen); gom component theo centroid từng ô lưới, vùng an toàn inset 20 px quanh đường giữa (gần nhất 179 px); không `binary_fill_holes`. Fit cạnh dài 384 px, căn giữa 512×512, alpha cứng. Viền trắng sticker có sẵn trong ảnh gen, không dilate thêm.
+- Đế dựng bằng code (`build_base.py`): vẽ 4× rồi downscale LANCZOS + alpha cứng.
+- Dọn mép gộp 1 mask chung (fringe hồng nhạt + bóng tím sẫm), lặp median donor + fallback chép đúng màu pixel tốt gần nhất.
+- Xem trước (`preview.webp`, 1144×4484, 1.557.631 B): icon 200 px nền sáng + nền tối (60,60,80); trong huy hiệu ở 62% khung nền sáng + nền tối; huy hiệu 96 px 2 hàng + đế riêng 200 px.
+
+## Đã soi
+
+- Từng tấm thô 1600 trước khi cắt; preview 200 px nền sáng/tối; soi 100% + 4× vùng chân gà (legs) và viền đế.
+- 19/19 icon đọc đúng nhãn ở 200 px và trong huy hiệu 62%; ở 96 px vẫn nhận được chủ thể chính (2 icon vẽ lại: classsize đọc được nhóm 7 bạn, weekday đọc được 7 ô).
+- `classsize` và `weekday` (bản cũ, mỏng ở 62%/96 px) ĐÃ VẼ LẠI to rõ hơn (2 hàng 4+3, phủ ~80% đế) và ĐÃ ĐẨY đè tên. `queue` là 3 bạn đứng cạnh nhau thành hàng ngang (không phải trước–sau) — vẫn đọc là "xếp hàng".
+- `legs`: 5 px vết magenta trong thân (2 giữa 2 chân gà + 3 gần dấu chân) đã repaint bằng donor median; chỉ file này đổi SHA so với bản trước khi sửa vết.
+
+> Lưu ý: ảnh `preview.webp` trong thư mục làm việc gồm cả 2 icon cũ (classsize/weekday). Bản vẽ lại có ảnh xem trước riêng `preview_redraw.webp` + `zoom_inspect.webp` trong `lot17/work/forms_B2_logic/redraw/`, đã soi 3× trên nền tối. Vẽ lại bằng `cut_redraw.py`: 1 tấm 1600×1600 nền magenta, cắt như `process.py`, fit cạnh dài 384 px.
+
+**Trạng thái: đã đẩy 20 file `.b64` + mục doc này (18 file + 2 icon vẽ lại đè tên) — chờ Claude decode thành `app/assets/images/stickers/sticker_base_logic.webp` và 19 `form_logic_*.webp`.**
