@@ -4778,7 +4778,7 @@ Chưa decode (chờ Claude decode).
 
 | File | Kích thước | Byte | SHA-256 |
 |---|---|---|---|
-| `fg.png` (lớp trước trong suốt) | 1024×1024 | 274.403 | `71fbc3d6bf756a23e13d09e6930ba39fb707c0bc975acd7b69e0fa51448fb563` |
+| `fg.png` (lớp trước trong suốt) | 1024×1024 | 271.565 | `94b378e6ed34c34400be2aeea061d8f9ed913590404b6a804ab68fed14379035` |
 | `bg.png` (lớp nền) | 1024×1024 | 6.657 | `8831c084c3383df83b9beefd36941e59dbc8d3e711684ec3beff7d56cf46f6fd` |
 | `preview.png` (ảnh ghép xem trước) | 1400×1510 | 175.437 | `e7f2907bbb8bf5feb46600a5cfb6fffb1a07d4765e135cb181ef1f6406e4dfd5` |
 
@@ -4840,4 +4840,33 @@ Sửa kỹ thuật trong lúc ghép: resize LANCZOS trực tiếp gây loang mag
 - 48 px: nhận ra dạng cụm + 3 pet + dải hồng; chữ cái không đọc được riêng lẻ (giới hạn vật lý).
 - Nốt nhỏ chỉ thấy ở 3×: bậc nhỏ ở đáy-trái thân chữ T; 1 tick tím 1–2 px ở góc dưới-phải thân T; chấm tối nhỏ dưới thanh ngang chữ T (vân rim gốc).
 
-**Trạng thái: Đã đẩy 2 file .b64 lên nhánh `task/E-nhan-vat-v3b` qua `app/assets/_incoming/ui/` (`app_icon_fg.png.b64`, `app_icon_bg.png.b64`) — chờ Claude decode thành `app/assets/images/ui/app_icon_fg.png` và `app/assets/images/ui/app_icon_bg.png`.**
+**Trạng thái: đã đẩy lại `app_icon_fg.png.b64` đè file cũ (sau sửa 3 lỗi bẩn trên chữ, 28/11) — chờ Claude decode lại thành `app/assets/images/ui/app_icon_fg.png`. bg không đổi.**
+
+---
+
+## SỬA 3 LỖI BẨN TRÊN CHỮ (28/11, sau khi Claude decode + soi nền tối)
+
+Claude decode xong, soi fg ở độ phân giải gốc trên nền tối: bố cục đẹp, nhưng chữ còn 3 lỗi bẩn (chủ dự án cũng thấy). Sửa local xong, parent kiểm xong (soi 3× nền tối + đo lại bằng code), **đã đẩy lại** đè `app_icon_fg.png.b64` cũ.
+
+| File | Byte | SHA-256 |
+|---|---|---|
+| `fg.png` (gốc, đã đẩy `a16a9918`) | 274.403 | `71fbc3d6bf756a23e13d09e6930ba39fb707c0bc975acd7b69e0fa51448fb563` |
+| `fg_fixed.png` (mới) | 271.565 | `94b378e6ed34c34400be2aeea061d8f9ed913590404b6a804ab68fed14379035` |
+
+**Cách sửa:** chỉ giữ pixel thuộc nét chữ (fill hồng/tím + viền tím đậm), xóa mọi thứ khác trong 3 vùng, dựng lại viền trắng đều quanh chữ (dày như viền K — đo bằng code: K 10–12 px). Vẽ lại theo khoảng cách từ fill (distance transform): dist 0 = fill (giữ, hoặc inpaint fill hỏng bằng màu fill trung vị của hàng); dist 1–2 = viền tím đậm (giữ cả vân đốm, vẽ lại pixel hồng/trắng lạ bằng màu viền trung vị (123,51,151)); dist 3–12 = viền trắng (vẽ lại trắng (255,255,255), trong suốt giữ nguyên để không lấp khe giữa các chân chữ); dist >12 = trong suốt. **Không động pet** (chân chó kết thúc y600, vùng sửa bắt đầu y611; không pixel pet nào trong hộp sửa).
+
+| Vùng | Sửa | Số px thay đổi (so gốc) |
+|---|---|---|
+| **(1) Chân trái T** (222,600,306,672) | Mảng hồng lông xù xóa hết; thân T dựng lại thành hình chữ nhật x264–301, y600–643 + bo tròn đáy r=12 (tâm (282,5,643)), đáy y=655 phẳng ở giữa x276–289 — theo đúng dáng chân chữ i (đáy fill i1 y655–658 ở giữa, bo tròn r~12). Mép trái fill hỏng y608–616 inpaint bằng màu fill trung vị của hàng. | 1.228 |
+| **(2) Bên phải d** (745,595,802,672) | Vệt tím lem chéo xóa; mép phải bầu d dựng lại bằng nội suy tuyến tính qua các điểm sạch (604,776)→(619,785)→(649,786)→(658,776); viền trắng vẽ lại liền. | 419 |
+| **(3) Dưới chân m/o** (380,655,560,672) | Fill không đổi (đã đúng). Chỉ làm sạch dải trắng y658–672: cụm mauve chuyển tiếp + đốm lavender nhạt vẽ lại trắng; vân đốm của viền tím đậm GIỮ (giống hệt vân viền K — đã đối chiếu crop đáy K). | 301 |
+| **(thêm) Vệt đuôi tím** (302,611,322,672) | Phát hiện thêm khi sửa R1: vệt tím chéo mỏng từ ~(318,611) xuống ~(300,668) (cùng loại bẩn, liền kề chân T). Xóa 2 lượt: lượt 1 bắt pixel fill/viền-tím (44 trắng + 8 xóa); lượt 2 thêm thước "purpleish" (max−min≥35, G<R−25, G<B−15, R>140, B>140) cho pixel mauve nhạt (64 trắng + 6 xóa). **0 px vệt còn lại** (đo bằng cả 4 thước). | 172 |
+| **Tổng** | | **2.059 px** (0 px ngoài 4 hộp sửa) |
+
+**Cổng kiểm đo lại trên `fg_fixed.png`:** semi alpha **0**; magenta r1 **0**; ngoài vòng an toàn r338 **0 px** (xa nhất 314,0 px); cluster bbox **575×316** (x222–796, y354–669) — mép phải 801→796 vì vệt lem R2 (viền trắng đẩy tới x801) đã xóa, mép thật của cụm là viền d ở x796; chiều cao/trái/trên/dưới không đổi. **0 px bẩn còn lại:** hồng ngoài viền T = 0; fill tím ngoài nét d = 0; chấm tối trong viền trắng dưới m/o (y661–672) = 0. Viền trắng đều: T trái 10 px, T phải 9 px, K 10–12 px, d phải 7 px (bằng viền gốc), đáy m/o 11–13 px.
+
+**Còn lại (chấp nhận, không phải bẩn):** 16 px lavender rất nhạt (R>195, ví dụ (197,174,207)) rải rác ở x>312 — là anti-aliasing của viền, ~95% trắng, không thấy ở cỡ app; 8 px viền tím đậm ở x787–788 (viền d thật, dist 1–2); vân đốm viền tím đậm ở y658–660 dưới m/o (giống vân K).
+
+**Xem trước mới:** `fix_wordmark/preview_fixed.png` (168.527 B, SHA-12 `0834757e551a`) — bo góc + tròn + 96 px + 48 px (kèm 4×). Ảnh cắt trước/sau 3× (nền tối + xám 128): `fix_wordmark/r1_fix_*`, `r2_fix_*`, `r3_fix_*`, `r1streak_fix_*`. Báo cáo chi tiết: `fix_wordmark/report_fix.json`; script: `fix_wordmark/fix.py`, `fix_wordmark/fix_streak.py`.
+
+**Trạng thái: đã đẩy lại `app_icon_fg.png.b64` đè file cũ (cùng tên, cùng nhánh) — chờ Claude decode lại. bg không đổi, không cần đẩy lại.**
