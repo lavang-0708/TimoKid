@@ -5000,3 +5000,57 @@ Phong cách: pastel, nét mềm, **viền trắng sticker 10 px** quanh hình, k
 Tư thế "đang nói" (`*_talk`), nhóm B (sổ sticker), nhóm C (mở khóa), nhóm B2 (90 biểu tượng dạng) — vẽ tiếp, đẩy từng nhóm riêng + doc.
 
 **Trạng thái: chủ dự án ĐÃ DUYỆT (28/11 ~18:47). Đã đẩy 5 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/residents/*_portrait.webp`.**
+
+---
+
+# Lô 17 — B2 Hình học: đế + 19 biểu tượng dạng bài — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+Mảng Hình học (`geo`, màu `#BFE8CF`): `sticker_base_geo.png` + 19 file `form_geo_<mã>.png`, 512×512, nền trong suốt, lề trong 64 px (art ≤384 px). App đặt biểu tượng giữa huy hiệu, chiếm 62% khung. Phong cách pastel, viền trắng sticker 5 px, không chữ/số trong ảnh.
+
+### Đế
+
+| File | Byte | SHA-256 | Ghi chú |
+| --- | --- | --- | --- |
+| `sticker_base_geo.png` | 6827 | `e76c64531402a32b5bb94022c8ded15b760bb18a86521056e71e1e29d4dbd45d` | Vẽ bằng code: đĩa trắng r250, vành xanh lá r236, vòng trắng r166, giữa trong suốt r158 (Ø316 ≈ 62%); margin 5 px là đúng thiết kế full-frame |
+
+### 19 biểu tượng
+
+| File | Nhãn | Byte | SHA-256 |
+| --- | --- | --- | --- |
+| `form_geo_countsq.png` | Đếm hình vuông | 75860 | `3c926741caa834a21ab0da23d675189a8bacc6ce1affab2fab22e958a0285574` |
+| `form_geo_countrect.png` | Đếm chữ nhật | 57177 | `855ddeea4462200a0e30642bbe27bcf2481bdd4097856e370661859a78c0da0f` |
+| `form_geo_counttri.png` | Đếm tam giác | 69640 | `eebf85cb97a2a1bc4cf5681dbc3abb7e4d036d485713c096e68cd7751caa348f` |
+| `form_geo_perim.png` | Chu vi | 53620 | `d2990657adcd00f1fd5032101318893da68c43d49fd35db23ba6b102ce89a2e9` |
+| `form_geo_matches.png` | Xếp que diêm | 89127 | `b34182f826ee0464e4f5fa04e2bda26e625ed7e91cfda712e417cd7cee736f47` |
+| `form_geo_sides.png` | Đếm cạnh | 56900 | `3254ba9f1c468c52a59663eeefe35c5a0367a2f1cc44a55832b6c10a98c78d6f` |
+| `form_geo_cubes.png` | Tháp khối vuông | 79318 | `49b0b7f7f25ff05cc55c98f795d8dcd929b78c4867430c7eb89cff371ec94f2e` |
+| `form_geo_shapeperim.png` | Chu vi hình ghép | 38909 | `fa02ce78e7be01380526d9f5da9f9ce3a79c4234220ec7af0d551c9a93d53f81` |
+| `form_geo_cutpaper.png` | Cắt giấy | 87586 | `c658b451f6901fc1743e294b6d42c820166d633babe961f413a39f2d1cb46ad0` |
+| `form_geo_pointsegs.png` | Điểm và đoạn | 40109 | `288408475c568285b5005fe1f4dd00ae02bc279ae58330591a5c41b4b630d10f` |
+| `form_geo_shapeparts.png` | Cạnh và đỉnh | 42712 | `1fd6f728500086270c6fa0600c42c0bce7aeebd87ebd791eeb651017f23bb0ac` |
+| `form_geo_fence.png` | Cắm cọc rào | 58052 | `0520d53dd7f2abf0f4df26d5c268dc7229c5c362498b268f7d079879b67cc9b6` |
+| `form_geo_segline.png` | Đoạn thẳng | 21913 | `b5090013c0ab77b993241f43f52877b322d84d218b9f5da0be366da7415314cc` |
+| `form_geo_units.png` | Đổi dm, cm | 25761 | `b42db1d64cd574864e5938fdf1a5f39b68a8772e0b2dbb6435bb75e2a7f88b73` |
+| `form_geo_cutsquares.png` | Cắt ô vuông | 64500 | `d050b774e26924741077faa5f3b27f8fef07d69f568cfaab84381e19960812ca` |
+| `form_geo_cubefaces.png` | Mặt khối vuông | 57116 | `201d38ae4385150e55fdeefa0b8ce60703a82d0813c96c1e474b50a62127509a` |
+| `form_geo_perimchange.png` | Chu vi đổi | 21602 | `8f246a17e6c4806b464fc104b9136b28f2121d3e2eaf35ab2b0be16d9a1722c3` |
+| `form_geo_pyramid.png` | Hình chóp | 54702 | `27d663fc23dc2a861dfe3e01f5655c1f1faec325eb8a9f7d2469d49782c4caf7` |
+| `form_geo_prism.png` | Hình lăng trụ | 42596 | `aa6701117c7b301e66d8a3a43f4f463351a5a630a99106cc897e24f3925f3854` |
+
+### Cổng kiểm (đo bằng code, từng file)
+
+- `semi_alpha = 0`, `magenta_r1 = 0`, `bright_rim_vivid = 0`, `vivid_broad = 0` — cả 20 file.
+- Lề trong 64 px — cả 19 biểu tượng (art fit 374 px + viền trắng 5 px = ≤384 px). Đế là khung full-frame nên margin 5 px.
+- Soi 100% + 3× trên nền tối (60,60,80) và nền sáng: 19/19 đọc đúng nhãn, viền sạch, không vệt magenta; huy hiệu 96 px đọc rõ, 72 px vẫn nhận ra hình.
+
+### Phương pháp
+
+4 tấm lưới 3×2 nền magenta `#FF00FF` (mỗi tấm 4–5 biểu tượng) → key magenta ngưỡng 60 → tách component liên thông, gán slot theo centroid, gộp component cùng slot (perimchange 3 mảnh, cutsquares 2 mảnh) → erode alpha 1 px + defringe donor-median → fit 374 px + viền trắng 5 px → alpha cứng → repaint mọi pixel vivid-magenta còn sót. Đế vẽ bằng code. Không cắt-dán pixel từ chân dung cư dân.
+
+### Nốt
+
+- `counttri`: 3 lỗ tam giác ngược để trong suốt (nền huy hiệu hiện qua), đọc như lưới tam giác.
+- `shapeparts`: khung vuông rỗng, giữa trong suốt — đọc là hình vuông có cạnh + đỉnh đánh dấu.
+- `perimchange` / `segline` / `units` / `pointsegs` là icon rộng: giữ đúng tỉ lệ, cạnh dài fill 384 px nên trong huy hiệu 62% hiện nhỏ hơn icon vuông — đúng spec.
+- Lượt cắt đầu còn r1 1–34 px/icon (magenta lẩn trong khe hẹp sau resize); đã repaint hết bằng donor-median, lượt 2 về 0 mọi chỉ số.
+**Trạng thái: đã đẩy 20 file `.b64` (3 đợt: 8 + 8 + 4) + mục doc này — chờ Claude decode thành `app/assets/images/stickers/sticker_base_geo.webp` và `form_geo_*.webp`.**
