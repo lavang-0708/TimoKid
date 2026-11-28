@@ -15,12 +15,13 @@ const bool stickerArtReady = true;
 /// Đã có biểu tượng riêng cho TỪNG dạng bài (90 ảnh, tùy chọn) chưa. Chỉ
 /// có nghĩa khi [stickerArtReady] cũng bật. Tách riêng vì 90 ảnh vẽ sau 5
 /// huy hiệu mảng: khi bật, huy hiệu = `sticker_base_<mảng>` + biểu tượng.
-const bool stickerFormIconArtReady = false;
+const bool stickerFormIconArtReady = true;
 
 /// Biểu tượng riêng theo TỪNG MẢNG: bật một mảng khi Muse đã giao đủ biểu
 /// tượng của mọi dạng trong mảng đó (kèm `sticker_base_<mảng>`). Mảng nào
 /// chưa bật dùng khung trống [StickerConfig.frameAsset]. Chỉ có nghĩa khi
-/// [stickerArtReady] bật. Lô 17 mới giao đủ mảng Hình học (19 dạng).
+/// [stickerArtReady] bật. Lô 17 đã giao đủ cả 5 mảng (90 dạng) nên
+/// [stickerFormIconArtReady] đã bật; bản đồ này giữ cho trường hợp tắt riêng.
 const Map<String, bool> stickerFormIconStrandReady = <String, bool>{
   'geo': true,
 };
