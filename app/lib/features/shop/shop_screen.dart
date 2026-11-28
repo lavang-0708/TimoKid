@@ -25,6 +25,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../sound/sound_service.dart';
 import '../../core/animation/animation_gate.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/database/tables.dart';
@@ -217,8 +218,10 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       await _refresh();
       if (!mounted) return;
       if (result == BuyResult.bought) {
+        ref.read(soundServiceProvider).playPurchase();
         _showBought(item.name);
       } else {
+        ref.read(soundServiceProvider).playErrorSoft();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(switch (result) {

@@ -34,6 +34,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../sound/sound_service.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/widgets/press_bounce.dart';
 import '../room/pet_art.dart';
@@ -72,6 +73,7 @@ class _HatchScreenState extends ConsumerState<HatchScreen>
   String? _species;
   bool _loading = true;
   bool _showContinue = false;
+  bool _hatchSoundPlayed = false;
 
   @override
   void initState() {
@@ -80,6 +82,14 @@ class _HatchScreenState extends ConsumerState<HatchScreen>
       vsync: this,
       duration: const Duration(milliseconds: hatchTotalMs),
     );
+    // Tiếng nở trứng (nứt vỏ + lấp lánh, ~0,45 s trước khi vỡ hẳn).
+    _controller.addListener(() {
+      if (!_hatchSoundPlayed &&
+          _controller.value * hatchTotalMs >= _burstMs - 420) {
+        _hatchSoundPlayed = true;
+        ref.read(soundServiceProvider).playHatch();
+      }
+    });
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed && mounted) {
         setState(() => _showContinue = true);

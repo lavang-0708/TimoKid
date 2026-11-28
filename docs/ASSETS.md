@@ -798,3 +798,30 @@ room_walk_test.dart`; `room_screen.dart` chỉ gọi `roomWalkTarget` /
   8 món, không dùng nữa) GIỮ NGUYÊN như tiền lệ `town_v2.webp`
   (xóa mục khi file còn sẽ làm check fail); Claude có thể `git rm`
   file + mục v2 sau (xem "Việc còn lại" trong PR (D)).
+
+## Âm thanh và nhạc nền (T2-08)
+
+Toàn bộ âm thanh trong `app/assets/sounds/` do Claude **tự tổng hợp** bằng
+`tools/audio/generate_audio.py` (sóng sin/tam giác có đường bao, vang nhẹ),
+không lấy từ nguồn ngoài nên **không có giấy phép bên thứ ba** (bản gốc quy
+định nguồn CC0 trong PLAN T2-08; chủ dự án đồng ý tự tạo vì sandbox không
+tải được). 4 file WAV cũ (`correct`, `wrong`, `coin`, `stage_complete`) cũng
+là tổng hợp (xem `app/assets/sounds/README.md`).
+
+- Chạy lại: `python3 tools/audio/generate_audio.py [--preview /tmp/x.mp3]`
+  (cần numpy + ffmpeg có libvorbis). Hạt giống cố định, hai lần chạy ra file
+  giống hệt từng byte.
+- Hiệu ứng mới (mono 44,1 kHz WAV, đỉnh −2 dBFS): `tap` 0,13 s, `swoosh`
+  0,5 s, `hatch` 1,0 s, `level_up` 1,6 s, `purchase` 0,95 s, `gift_open`
+  1,0 s, `streak` 1,0 s, `error_soft` 0,28 s.
+- Nhạc nền (stereo OGG Vorbis ~80 kbps, ~−16 LUFS, đỉnh < −1 dBFS, độ dài
+  đúng số ô nhịp + vang vòng tròn nên lặp liền mạch): `music_town.ogg`
+  (Đô trưởng, 110 BPM, 32 ô ≈ 69,8 s, I–V–vi–IV) và `music_room.ogg`
+  (Fa trưởng, 85 BPM, 24 ô ≈ 67,8 s, I–V–vi–IV, hộp nhạc). App phát nhạc
+  ở âm lượng 0,35 nên nhỏ hơn hiệu ứng.
+- Cài đặt: `sound_enabled` (hiệu ứng) và `music_enabled` (nhạc nền) trong
+  `settings`, cấp máy, không đồng bộ (`isLocalOnlySettingKey`); nút loa
+  `sound-settings-button` ở HUD Phòng/Thị trấn mở bảng `toggle-sfx` /
+  `toggle-music`, không cần cổng phụ huynh.
+- Integration test đặt `AudioGate.enabled = false` (`lib/features/sound/
+  audio_gate.dart`) nên hiệu ứng và nhạc không phát trên máy ảo CI.
