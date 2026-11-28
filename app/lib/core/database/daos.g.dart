@@ -122,3 +122,15 @@ class PetsDaoManager {
   $$PetsTableTableManager get pets =>
       $$PetsTableTableManager(_db.attachedDatabase, _db.pets);
 }
+
+mixin _$PhotosDaoMixin on DatabaseAccessor<AppDatabase> {
+  $PhotosTable get photos => attachedDatabase.photos;
+  PhotosDaoManager get managers => PhotosDaoManager(this);
+}
+
+class PhotosDaoManager {
+  final _$PhotosDaoMixin _db;
+  PhotosDaoManager(this._db);
+  $$PhotosTableTableManager get photos =>
+      $$PhotosTableTableManager(_db.attachedDatabase, _db.photos);
+}

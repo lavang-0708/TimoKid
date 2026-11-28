@@ -483,3 +483,25 @@ class ReviewTombstones extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// Ảnh chụp trong Phòng (T5-05, schema v6). CHỈ TRÊN MÁY: không có cột
+/// `synced`, không có bảng tương ứng trên server, bộ đồng bộ không đụng
+/// tới (ảnh là file PNG trong thư mục tài liệu của app). `fileName` là
+/// tên file trong thư mục `photos/` (không lưu đường dẫn tuyệt đối vì
+/// thư mục app có thể đổi khi cài đè).
+class Photos extends Table {
+  TextColumn get id => text()();
+
+  TextColumn get childId => text()();
+
+  TextColumn get fileName => text()();
+
+  IntColumn get width => integer()();
+
+  IntColumn get height => integer()();
+
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

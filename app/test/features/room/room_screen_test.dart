@@ -527,7 +527,7 @@ void main() {
     // Chạm xa về phía trước bên phải: đi xuống-phải (khung `dr`).
     await tester.tapAt(
       Offset(
-        box.left + 1300 / 1600 * box.width,
+        box.left + 1100 / 1600 * box.width,
         box.top + 860 / 900 * box.height,
       ),
     );

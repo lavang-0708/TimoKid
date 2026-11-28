@@ -846,3 +846,55 @@ class PetsDao extends DatabaseAccessor<AppDatabase> with _$PetsDaoMixin {
             ..where((t) => t.childId.equals(childId) & t.active.equals(true)))
           .write(PetsCompanion(active: const Value(false)));
 }
+
+/// Ảnh album của bé (T5-05). Chỉ trên máy, xem [Photos].
+@DriftAccessor(tables: [Photos])
+class PhotosDao extends DatabaseAccessor<AppDatabase> with _$PhotosDaoMixin {
+  PhotosDao(super.db);
+
+  /// Thêm một ảnh. Trả dòng vừa tạo.
+  Future<Photo> insertPhoto({
+    required String childId,
+    required String fileName,
+    required int width,
+    required int height,
+    String? id,
+  }) async {
+    final row = PhotosCompanion.insert(
+      id: id ?? newId(),
+      childId: childId,
+      fileName: fileName,
+      width: width,
+      height: height,
+      createdAt: db.clock.now(),
+    );
+    await into(db.photos).insert(row);
+    return (select(
+      db.photos,
+    )..where((t) => t.id.equals(row.id.value))).getSingle();
+  }
+
+  /// Ảnh của bé, mới nhất trước.
+  Future<List<Photo>> listForChild(String childId) =>
+      (select(db.photos)
+            ..where((t) => t.childId.equals(childId))
+            ..orderBy([
+              (t) => OrderingTerm.desc(t.createdAt),
+              (t) => OrderingTerm.desc(t.id),
+            ]))
+          .get();
+
+  Future<int> countForChild(String childId) async {
+    final n = db.photos.id.count();
+    final q = selectOnly(db.photos)
+      ..addColumns([n])
+      ..where(db.photos.childId.equals(childId));
+    return (await q.getSingle()).read(n) ?? 0;
+  }
+
+  Future<Photo?> getById(String id) =>
+      (select(db.photos)..where((t) => t.id.equals(id))).getSingleOrNull();
+
+  Future<void> deleteById(String id) =>
+      (delete(db.photos)..where((t) => t.id.equals(id))).go();
+}

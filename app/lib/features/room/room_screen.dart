@@ -43,6 +43,9 @@
 library;
 
 import 'dart:async';
+
+import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
+
 import 'dart:math' as math;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,6 +81,8 @@ import '../unlocks/unlock_config.dart';
 import '../unlocks/unlock_service.dart';
 import '../rewards/reward_config.dart';
 import '../rewards/reward_service.dart';
+import '../album/album_config.dart';
+import '../album/photo_service.dart';
 import '../seasons/season_service.dart';
 import '../shop/shop_catalog.dart';
 import '../shop/shop_screen.dart';
@@ -139,6 +144,12 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   int _done = 0;
   bool _unlocked = false;
   String? _bubbleText;
+
+  /// Khung cảnh phòng (nền, đồ, bé, pet; KHÔNG gồm nút HUD) để chụp ảnh
+  /// (T5-05). Nằm ngoài cây HUD nên ảnh chụp không có nút nào.
+  final GlobalKey _stageKey = GlobalKey(debugLabel: 'room-stage');
+  bool _capturing = false;
+  bool _flash = false;
   int _petBounce = 0;
   Timer? _bubbleTimer;
   String? _childId;
@@ -386,6 +397,48 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
   }
 
   /// Hiện bong bóng phản ứng 1,5 giây rồi tự ẩn.
+  /// Chụp cảnh phòng vào album (T5-05). Báo bằng chữ ngắn; album đầy thì
+  /// báo ảnh cũ nhất đã bị xóa.
+  Future<void> _takePhoto() async {
+    final childId = _childId;
+    if (childId == null || _capturing) return;
+    setState(() => _capturing = true);
+    try {
+      final boundary =
+          _stageKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
+      if (boundary == null) throw StateError('Chưa có khung cảnh');
+      final shot = await captureBoundary(boundary);
+      if (shot == null) throw StateError('Không chụp được');
+      final db = ref.read(databaseProvider);
+      final result =
+          await PhotoAlbumService(
+            db: db,
+            directory: ref.read(photoDirectoryProvider),
+          ).save(
+            childId: childId,
+            png: shot.png,
+            width: shot.width,
+            height: shot.height,
+          );
+      if (!mounted) return;
+      setState(() => _flash = true);
+      Timer(const Duration(milliseconds: 160), () {
+        if (mounted) setState(() => _flash = false);
+      });
+      _showBubble(
+        result.removedOldest > 0
+            ? 'Album đầy $albumPhotoLimit ảnh: ảnh cũ nhất đã được xóa. Đã chụp xong!'
+            : 'Đã chụp! Xem ở Album ảnh nhé.',
+        seconds: result.removedOldest > 0 ? 3 : 2,
+      );
+    } catch (_) {
+      if (mounted) _showBubble('Chưa chụp được, bé thử lại nhé', seconds: 2);
+    } finally {
+      if (mounted) setState(() => _capturing = false);
+    }
+  }
+
   void _showBubble(String text, {int seconds = 0}) {
     _bubbleTimer?.cancel();
     setState(() => _bubbleText = text);
@@ -1518,7 +1571,13 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
       backgroundColor: const Color(0xFFF3E6D8),
       body: Stack(
         children: [
-          Positioned.fill(child: _buildScene(profile)),
+          Positioned.fill(
+            child: RepaintBoundary(key: _stageKey, child: _buildScene(profile)),
+          ),
+          if (_flash)
+            const Positioned.fill(
+              child: IgnorePointer(child: ColoredBox(color: Color(0xCCFFFFFF))),
+            ),
           Positioned(
             left: 0,
             right: 0,
@@ -1707,12 +1766,37 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
               bottom: 6,
               child: SafeArea(
                 top: false,
-                child: StickerHudButton(
-                  key: const Key('sticker-book-button'),
-                  onPressed: () async {
-                    await context.push('/stickers');
-                    if (mounted) _refresh();
-                  },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GameRoundButton(
+                      key: const Key('room-photo-button'),
+                      icon: Icons.photo_camera_rounded,
+                      color: const Color(0xFF5DB7F0),
+                      size: 44,
+                      label: 'Chụp',
+                      tooltip: 'Chụp ảnh phòng',
+                      onPressed: _takePhoto,
+                    ),
+                    const SizedBox(width: 6),
+                    GameRoundButton(
+                      key: const Key('room-album-button'),
+                      icon: Icons.photo_library_rounded,
+                      color: const Color(0xFFE58FB0),
+                      size: 44,
+                      label: 'Album',
+                      tooltip: 'Album ảnh',
+                      onPressed: () => context.push('/album'),
+                    ),
+                    const SizedBox(width: 6),
+                    StickerHudButton(
+                      key: const Key('sticker-book-button'),
+                      onPressed: () async {
+                        await context.push('/stickers');
+                        if (mounted) _refresh();
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
