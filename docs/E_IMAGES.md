@@ -5230,3 +5230,68 @@ sự trống, khung khóa xám đều + mờ đều, bìa sổ ghép đôi khôn
 - Chưa đẩy GitHub, chưa chạm doc repo. Nhóm C/B2 chưa vẽ.
 
 **Trạng thái: đã đẩy 7 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/stickers/*.webp`.**
+
+---
+
+# Lô 17 — Nhóm C: Đồ mở khóa — ĐÃ ĐẨY, CHỜ CLAUDE DECODE
+
+Cờ `unlockArtReady` (`app/lib/features/unlocks/unlock_config.dart`),
+thư mục `app/assets/images/unlocks/`. Đã đẩy.
+
+## sticker_book_gold_frame.png — 192×192, 35.546 byte
+
+- SHA-256: `1813933202ca433bb391c061d0e7bfc2347dad62a24d41f5e94955c2549feba6`
+- Khung viền vàng cho trang sổ sticker, chia 9 mảnh: viền **48 px mỗi cạnh**
+  (đo dọc cột x=96 và hàng y=96: đoạn đục [0,47] và [144,191]),
+  ruột trong suốt **96×96 px, alpha = 0** toàn bộ.
+- 4 góc trang trí sao vàng giống nhau, đối xứng (so flip: mean abs diff
+  6,6–12,4/255 — chênh do shading gradient vàng khác hướng mỗi góc).
+- Cổng kiểm: semi 0, magenta r1 0, vivid 0, bright-rim 0, pink_fringe 0.
+- Cách làm: dựng lại 9 mảnh từ bản thô theo bbox lỗ trong đo bằng code
+  (941×923, không vuông — scale đều thường sẽ cho viền ~40 px, sai brief);
+  góc 48×48, cạnh giữa 96×48 / 48×96, ruột trong suốt.
+- Đã sửa bằng code: 163 px viền trắng bị nhuốm hồng nhạt ở mép ngoài
+  vẽ lại bằng trắng thuần.
+
+## town_fountain.png — 512×512, 249.488 byte
+
+- SHA-256: `d7b018be0dcbcd7435020b907131827e6dfd99d0edb047c110b4c5a42b40768f`
+- Đài phun nước pastel trên bản đồ Thị trấn; **chân đài ở đáy giữa ảnh**:
+  hàng đáy y=511, đoạn đục x=223–286, **tâm x=254,5** (mục tiêu 256;
+  lệch 1,5 px do hình đối xứng không tuyệt đối). Bbox x 25–485, y 48–511.
+- Nước phun + bọt nước mềm, màu pastel, viền trắng sticker; không chữ.
+- Cổng kiểm: semi 0, magenta r1 0, vivid 0, bright-rim 0.
+  pink_fringe 105 px còn lại là hoa hồng thiết kế sát viền trắng
+  (tối đa 2 px/màu) — giữ; vệt magenta sát mép silhouette còn 0.
+- Đã sửa bằng code: 4 px khe magenta hẹp sau downscale, 2.182 px viền
+  trắng nhuốm hồng nhạt, 111 px magenta sát mép silhouette (dt≤2,5).
+
+## title_badge.png — 256×256, 59.558 byte
+
+- SHA-256: `0385a122297a7bcd136e6451b5d9f16015d8bf2dc803e2e110db555ec57f0481`
+- Huy hiệu "Nhà toán học nhí": sao vàng + mũ cử nhân xanh pastel,
+  sao nhỏ hồng/xanh lá quanh, viền trắng sticker; **không chữ**.
+  Bbox x 16–239, y 18–237, lề trong 16 px; đọc rõ ở 64 px.
+- Cổng kiểm: semi 0, magenta r1 0, vivid 0, bright-rim 0.
+  pink_fringe 280 px còn lại là sao/hoa hồng thiết kế sát viền trắng
+  (màu (219,141,170), tối đa 3 px/màu) — giữ theo tiền lệ lô A;
+  vệt magenta sát mép silhouette còn 0.
+- Đã sửa bằng code: 416 px khe magenta hẹp sau downscale, 197 px viền
+  trắng nhuốm hồng nhạt, 171 px magenta sát mép silhouette (dt≤2,5).
+
+## Phương pháp chung
+
+- 3× `media.generate_image` (chân dung Hiệp sĩ Sáng làm style ref,
+  nền magenta #FF00FF) → key (249,0,245) ngưỡng 52,5 → erode alpha 1 px
+  → defringe donor-median → alpha cứng. Không thêm viền trắng bằng code
+  (ảnh gốc đã có viền trắng sticker sẵn).
+- Soi 100% + 3× trên nền tối (60,60,80): khung vàng, tia nước, chân đài,
+  huy hiệu — xem `preview.png` (1.259.223 byte,
+  SHA `6796ec078dde71a8ba63e5398ebc6e08c613fc363dd78183fd7412b34ec1513b`)
+  và 4 ảnh `check3x_*_dark.png`.
+- Nốt: huy hiệu còn 28 px hồng nhạt (237,188,237) sát mép ngoài, mỗi px
+  rời rạc — blend viền trắng với sao hồng, chỉ thấy ở 3×, không thấy
+  ở cỡ app 64 px; giữ. Viền trong khung vàng có đường viền nâu-đỏ
+  (215,104,95) đo bằng code là viền trong thiết kế, không phải magenta.
+
+**Trạng thái: đã đẩy 3 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/unlocks/*.webp`.**
