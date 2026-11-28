@@ -5540,9 +5540,9 @@ chỉ xử lý dải mép, không đụng chi tiết bên trong.
 
 ---
 
-# Lô 17 — B2 Lôgic: 17 biểu tượng dạng bài + 1 đế huy hiệu — ĐÃ ĐẨY (18 file), CHỜ CLAUDE DECODE
+# Lô 17 — B2 Lôgic: 19 biểu tượng dạng bài + 1 đế huy hiệu — ĐÃ ĐẨY (20 file), CHỜ CLAUDE DECODE
 
-> Đã đẩy 18 file (đế + 17 biểu tượng). 2 biểu tượng `classsize` và `weekday` sẽ vẽ lại to rõ hơn và đẩy sau đè tên (Claude quyết 28/11 ~21:09).
+> Đã đẩy 20 file (đế + 19 biểu tượng). 2 biểu tượng `classsize` và `weekday` đã vẽ lại to rõ hơn (~80% đế, 2 hàng 4+3) và đẩy sau đè tên bản cũ (Claude quyết 28/11 ~21:09).
 
 ## Đế huy hiệu — `sticker_base_logic.png` (28.190 B, SHA-256 `7a63f21da11577d9b9b0f3e1971c093509a5f0f4fd52417fe924437deea15f3c`)
 
@@ -5559,7 +5559,7 @@ chỉ xử lý dải mép, không đụng chi tiết bên trong.
 - Đoạn cắt ngang y=256 khớp đế mẫu number gần như từng px (trắng 25–36, mảng 37–89, trắng 90–97, tâm 98–413).
 - Đế vẽ bằng ảnh (vỏ sò) đã **loại**: tuy cũng là đĩa đầy nhưng mép vỏ sò khác chuẩn, tâm phẳng không nhạt, kèm 1090 px đen + bóng đỏ tím sẫm 2450 px bám ngoài viền trắng.
 
-## 17 biểu tượng `form_logic_<tên>.png` (512×512, lề trong 64 px, không chữ/số)
+## 19 biểu tượng `form_logic_<tên>.png` (512×512, lề trong 64 px, không chữ/số)
 
 | Mã dạng | File | Nhãn | Byte | SHA-256 (12 ký tự đầu) |
 | --- | --- | --- | --- | --- |
@@ -5567,12 +5567,14 @@ chỉ xử lý dải mép, không đụng chi tiết bên trong.
 | logic.queue | form_logic_queue.png | Xếp hàng | 131.739 | `c7650297d948` |
 | logic.balance | form_logic_balance.png | Cân thăng bằng | 81.276 | `03f4a02c407a` |
 | logic.backward | form_logic_backward.png | Tính ngược | 94.417 | `3b4dbe13ed37` |
+| logic.weekday | form_logic_weekday.png | Thứ trong tuần | 125.730 | `27af1aea5ab3` |
 | logic.cut | form_logic_cut.png | Cưa khúc gỗ | 95.244 | `7329543fc0b7` |
 | logic.stairs | form_logic_stairs.png | Bậc thang | 74.255 | `860fcab7e14f` |
 | logic.trees | form_logic_trees.png | Trồng cây | 89.234 | `45c2357b92d0` |
 | logic.legs | form_logic_legs.png | Đếm chân | 96.509 | `69d9e6e4d1c9` |
 | logic.compare | form_logic_compare.png | So sánh người | 147.695 | `6bdf5f65b274` |
 | logic.equalize | form_logic_equalize.png | Chia cho bằng | 78.949 | `fcbd0b382b26` |
+| logic.classsize | form_logic_classsize.png | Sĩ số lớp | 200.028 | `abf8d97aaa6e` |
 | logic.seqgrow | form_logic_seqgrow.png | Dãy tăng dần | 93.528 | `22674131f414` |
 | logic.interleave | form_logic_interleave.png | Dãy xen kẽ | 45.373 | `0faf234f5e57` |
 | logic.cyclepattern | form_logic_cyclepattern.png | Hình lặp lại | 49.261 | `b9282b3b8d6e` |
@@ -5581,11 +5583,11 @@ chỉ xử lý dải mép, không đụng chi tiết bên trong.
 | logic.calendar | form_logic_calendar.png | Xem lịch | 102.045 | `f0a82df78980` |
 | logic.table | form_logic_table.png | Bảng quy luật | 135.061 | `95bdf1217701` |
 
-SHA-256 đầy đủ từng file trong `report.json` (thư mục `lot17/work/forms_B2_logic/`).
+SHA-256 đầy đủ từng file trong `report.json` (thư mục `lot17/work/forms_B2_logic/`); 2 icon vẽ lại trong `report_redraw.json` (thư mục `lot17/work/forms_B2_logic/redraw/`).
 
 ## Cổng kiểm (đo bằng code, cả 20 file đều đạt)
 
-semi 0 · magenta r1 0 · vivid 0 · bright-rim 0 · fringe hồng nhạt mép 0 · bóng tím sẫm 0 · vết trong thân 0 · px đen 0 · lề trong icon 66–67 px (≥64) · lề đế 25 px (≥24). (Đo trên 18 file đã đẩy; 2 icon vẽ lại kiểm riêng khi đẩy sau.)
+semi 0 · magenta r1 0 · vivid 0 · bright-rim 0 · fringe hồng nhạt mép 0 · bóng tím sẫm 0 · vết trong thân 0 · px đen 0 · lề trong icon 66–67 px (≥64) · lề đế 25 px (≥24). (Đo trên 18 file đã đẩy + 2 icon vẽ lại: cả 20 file semi 0, magenta r1 0, vivid 0, bright-rim 0, lề trong icon 66–67 px.)
 
 ## Phương pháp
 
@@ -5598,10 +5600,10 @@ semi 0 · magenta r1 0 · vivid 0 · bright-rim 0 · fringe hồng nhạt mép 0
 ## Đã soi
 
 - Từng tấm thô 1600 trước khi cắt; preview 200 px nền sáng/tối; soi 100% + 4× vùng chân gà (legs) và viền đế.
-- 17/17 icon đã đẩy đọc đúng nhãn ở 200 px và trong huy hiệu 62%; ở 96 px vẫn nhận được chủ thể chính.
-- `classsize` và `weekday` (bản cũ, mỏng ở 62%/96 px) ĐANG VẼ LẠI to rõ hơn (~80% đế), đẩy sau đè tên. `queue` là 3 bạn đứng cạnh nhau thành hàng ngang (không phải trước–sau) — vẫn đọc là "xếp hàng".
+- 19/19 icon đọc đúng nhãn ở 200 px và trong huy hiệu 62%; ở 96 px vẫn nhận được chủ thể chính (2 icon vẽ lại: classsize đọc được nhóm 7 bạn, weekday đọc được 7 ô).
+- `classsize` và `weekday` (bản cũ, mỏng ở 62%/96 px) ĐÃ VẼ LẠI to rõ hơn (2 hàng 4+3, phủ ~80% đế) và ĐÃ ĐẨY đè tên. `queue` là 3 bạn đứng cạnh nhau thành hàng ngang (không phải trước–sau) — vẫn đọc là "xếp hàng".
 - `legs`: 5 px vết magenta trong thân (2 giữa 2 chân gà + 3 gần dấu chân) đã repaint bằng donor median; chỉ file này đổi SHA so với bản trước khi sửa vết.
 
-> Lưu ý: ảnh `preview.png` trong thư mục làm việc gồm cả 2 icon cũ (classsize/weekday) — bản vẽ lại có ảnh xem trước riêng khi đẩy sau.
+> Lưu ý: ảnh `preview.png` trong thư mục làm việc gồm cả 2 icon cũ (classsize/weekday). Bản vẽ lại có ảnh xem trước riêng `preview_redraw.png` + `zoom_inspect.png` trong `lot17/work/forms_B2_logic/redraw/`, đã soi 3× trên nền tối. Vẽ lại bằng `cut_redraw.py`: 1 tấm 1600×1600 nền magenta, cắt như `process.py`, fit cạnh dài 384 px.
 
-**Trạng thái: đã đẩy 18 file `.b64` + mục doc này — chờ Claude decode thành `app/assets/images/stickers/sticker_base_logic.webp` và 17 `form_logic_*.webp` (trừ classsize/weekday).**
+**Trạng thái: đã đẩy 20 file `.b64` + mục doc này (18 file + 2 icon vẽ lại đè tên) — chờ Claude decode thành `app/assets/images/stickers/sticker_base_logic.webp` và 19 `form_logic_*.webp`.**
