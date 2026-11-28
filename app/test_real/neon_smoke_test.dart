@@ -154,6 +154,25 @@ void main() {
     );
     // ignore: avoid_print
     print('server msg $srv ${srv.body}');
+    // Đề tự soạn (0003): bố soạn 1 câu trên server, app tải về.
+    await client.api(
+      'POST',
+      'custom_questions',
+      body: {
+        'child_id': childId,
+        'strand': 'arith',
+        'rung': 1,
+        'text_vi': 'Bố hỏi: 3 + 4 = ?',
+        'answer': '7',
+      },
+      prefer: 'return=minimal',
+    );
+    final r4 = await engine.syncOnce();
+    expect(r4.ok, isTrue);
+    final cq = await db.customQuestionsDao.getAll();
+    // ignore: avoid_print
+    print('custom ${cq.length} ${cq.isEmpty ? '' : cq.first.textVi}');
+    expect(cq, hasLength(1));
     await client.signOut();
     await db.close();
   }, timeout: const Timeout(Duration(minutes: 3)));

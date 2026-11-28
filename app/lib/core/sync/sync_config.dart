@@ -45,4 +45,4 @@ const bool syncExtraTablesEnabled = true;
 /// `db/migrations/0003_custom_questions.sql` trên Neon (bảng chưa có thì
 /// server trả 404 và làm hỏng mọi lần đồng bộ). Khi tắt: không gọi mạng cho
 /// bảng này và đề ngày không có câu tự soạn. Bật bằng cách đổi thành `true`.
-const bool customQuestionsEnabled = false;
+const bool customQuestionsEnabled = true;
