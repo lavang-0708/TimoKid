@@ -94,8 +94,8 @@ void main() {
   }
 
   group('cờ và cấu hình', () {
-    test('cờ customQuestionsEnabled mặc định TẮT (chờ chạy SQL 0003)', () {
-      expect(customQuestionsEnabled, isFalse);
+    test('cờ customQuestionsEnabled BẬT (0003 đã chạy trên Neon 28/11)', () {
+      expect(customQuestionsEnabled, isTrue);
     });
   });
 
